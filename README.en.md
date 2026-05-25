@@ -1,0 +1,101 @@
+# Jarvis Reader
+
+Current public starting version: v0.1.5
+
+Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, excerpts, and book notes inside the vault.
+
+## Credits And Attribution
+
+Jarvis Reader is a personalized modification based on [Awesome Reader](https://github.com/awesomedog/obsidian-awesome-reader). The core reading capability, EPUB reader foundation, and part of the plugin structure come from Awesome Reader.
+
+This repository mainly documents my own changes for a personal reading workflow, including bookshelf and TOC layout, excerpt sidebar, highlight reflections, Obsidian-style wiki link input, reading progress display, and interface refinements.
+
+The upstream Awesome Reader project was created by awesomedog and is licensed under the MIT License. If this plugin is publicly distributed, attribution and license information for the original project should be preserved.
+
+## Features
+
+- Open `.epub` files directly in Obsidian.
+- Browse EPUB books from a dedicated Jarvis Reader bookshelf.
+- Switch between bookshelf, table of contents, and excerpt panels.
+- Read in paginated or scrolling mode.
+- Switch between single-page and dual-page reading.
+- Track reading progress per book.
+- Show chapter page progress and whole-book percentage.
+- Create highlights and reflections from selected text.
+- Save excerpts into the matching Markdown book note.
+- Use Obsidian-style wiki links in reflection text.
+- Open linked notes from excerpt previews.
+- Search, filter, and sort excerpts in the sidebar.
+
+## Reading Progress
+
+Jarvis Reader uses a layered progress model:
+
+1. If the EPUB provides a page list, the reader can show real book page numbers.
+2. If no page list exists, it shows current chapter page numbers plus whole-book percentage.
+3. Whole-book percentage prefers EPUB locations when available.
+4. If locations are unavailable, it falls back to spine position plus in-chapter page position.
+
+This avoids treating chapter page numbers as whole-book page numbers.
+
+## Installation
+
+Manual installation:
+
+1. Download or clone this repository.
+2. Copy the folder into your Obsidian vault:
+
+```text
+.obsidian/plugins/jarvis-reader
+```
+
+3. Make sure the folder contains:
+
+```text
+main.js
+manifest.json
+styles.css
+```
+
+4. In Obsidian, open `Settings -> Community plugins`.
+5. Reload plugins if needed.
+6. Enable `Jarvis Reader`.
+
+## Usage
+
+- Click the Jarvis Reader ribbon icon to open the bookshelf.
+- Open an EPUB from the bookshelf.
+- Select text while reading to create a highlight and reflection.
+- Use `[[note name]]` inside reflections to connect your reading notes with the rest of your vault.
+- Configure the book note folder and template from the plugin settings.
+
+## Data And Privacy
+
+The repository should only contain plugin code:
+
+```text
+main.js
+manifest.json
+styles.css
+README.md
+README.en.md
+```
+
+Local plugin data such as reading progress, highlights, cached covers, and settings may be stored by Obsidian in `data.json`. That file is intentionally ignored by Git and should not be committed.
+
+## Development Notes
+
+This repository currently contains the built plugin files, not the original source project. `main.js` is a bundled file.
+
+Before committing changes, run:
+
+```powershell
+node --check main.js
+```
+
+Recommended Obsidian checks:
+
+```powershell
+obsidian plugin:reload id=jarvis-reader
+obsidian dev:errors
+```
