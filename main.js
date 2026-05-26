@@ -47583,16 +47583,26 @@ function normalizeHighlightQuote(quote) {
 function formatBlockquote(text) {
   return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
 }
+function formatLocalDateTime(value) {
+  if (!value)
+    return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return value;
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
 function formatHighlightNoteBlock(highlight) {
-  const title = highlight.chapterTitle || "闁哄牜浜為悡锛勭博閻樺搫螡";
+  const title = highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282";
   const quote = formatBlockquote(highlight.quote);
-  const comment = formatBlockquote(`闁规壆鍠愰崗鍌炴晬?{highlight.comment || ""}`);
-  const timestamp = formatBlockquote(`闁哄啫鐖煎Λ鍧楁晬?{highlight.updated || highlight.created || ""}`);
+  const comment = (highlight.comment || "").trim();
+  const commentBlock = comment ? `>
+${formatBlockquote(`\u611f\u60f3\uff1a${comment}`)}
+` : ">";
+  const timestamp = formatBlockquote(`\u65f6\u95f4\uff1a${formatLocalDateTime(highlight.updated || highlight.created)}`);
   return `> [!quote] ${title}
 ${quote}
->
-${comment}
->
+${commentBlock}
 ${timestamp}
 ^${highlight.blockId}`;
 }
@@ -47600,10 +47610,10 @@ function normalizeHeadingText(text) {
   return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
 }
 function getHighlightChapterHeadingText(highlight) {
-  return normalizeHeadingText(highlight.chapterTitle || "闁哄牜浜為悡锛勭博閻樺搫螡") || "闁哄牜浜為悡锛勭博閻樺搫螡";
+  return normalizeHeadingText(highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282") || "\u672a\u547d\u540d\u7ae0\u8282";
 }
 function getFallbackHighlightChapterHeading(highlight) {
-  const title = (highlight.chapterTitle || "闁哄牜浜為悡锛勭博閻樺搫螡").replace(/\s+/g, " ").trim() || "闁哄牜浜為悡锛勭博閻樺搫螡";
+  const title = (highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282").replace(/\s+/g, " ").trim() || "\u672a\u547d\u540d\u7ae0\u8282";
   return `## ${title}`;
 }
 function insertHighlightInChapter(content, highlight) {
@@ -47995,6 +48005,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const [highlightList, setHighlightList] = (0, import_react.useState)(highlights || []);
   const [pendingSelection, setPendingSelection] = (0, import_react.useState)(null);
   const [highlightComment, setHighlightComment] = (0, import_react.useState)("");
+  const [pendingHighlightMenu, setPendingHighlightMenu] = (0, import_react.useState)(null);
   const [wikiSuggest, setWikiSuggest] = (0, import_react.useState)(null);
   const [wikiEditRange, setWikiEditRange] = (0, import_react.useState)(null);
   const [highlightPopoverRect, setHighlightPopoverRect] = (0, import_react.useState)(null);
@@ -48003,6 +48014,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const highlightPopoverRectRef = (0, import_react.useRef)(null);
   const renditionRef = (0, import_react.useRef)(null);
   const highlightListRef = (0, import_react.useRef)(highlights || []);
+  const pendingHighlightMenuRef = (0, import_react.useRef)(null);
   const readerTitleRef = (0, import_react.useRef)(title);
   const tocRef = (0, import_react.useRef)([]);
   const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
@@ -48043,6 +48055,75 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       width,
       height
     });
+  };
+  const clampHighlightMenuRect = (rect) => {
+    const bounds = getHighlightPopoverBounds();
+    const margin = 14;
+    const width = Math.min(280, Math.max(220, rect.width || 236));
+    const height = rect.height || 48;
+    const maxX = Math.max(margin, bounds.width - width - margin);
+    const maxY = Math.max(margin, bounds.height - height - margin);
+    return {
+      x: Math.min(maxX, Math.max(margin, rect.x || margin)),
+      y: Math.min(maxY, Math.max(margin, rect.y || margin)),
+      width
+    };
+  };
+  const getDefaultHighlightMenuRect = () => {
+    const bounds = getHighlightPopoverBounds();
+    return clampHighlightMenuRect({
+      x: (bounds.width - 236) / 2,
+      y: Math.max(18, bounds.height * 0.28),
+      width: 236
+    });
+  };
+  const getSelectionHighlightMenuRect = (contents2) => {
+    var _a, _b;
+    try {
+      const selection = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection();
+      if (!selection || !selection.rangeCount)
+        return getDefaultHighlightMenuRect();
+      const rangeRect = selection.getRangeAt(0).getBoundingClientRect();
+      const frame = (_b = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _b.frameElement;
+      const frameRect = frame && typeof frame.getBoundingClientRect === "function" ? frame.getBoundingClientRect() : null;
+      const containerRect = containerRef.current && typeof containerRef.current.getBoundingClientRect === "function" ? containerRef.current.getBoundingClientRect() : null;
+      if (!rangeRect || !containerRect)
+        return getDefaultHighlightMenuRect();
+      const left = rangeRect.left + ((frameRect == null ? void 0 : frameRect.left) || 0) - containerRect.left;
+      const top = rangeRect.top + ((frameRect == null ? void 0 : frameRect.top) || 0) - containerRect.top;
+      return clampHighlightMenuRect({
+        x: left + rangeRect.width / 2 - 118,
+        y: top - 58,
+        width: 236
+      });
+    } catch (error) {
+      return getDefaultHighlightMenuRect();
+    }
+  };
+  const getEventHighlightMenuRect = (event) => {
+    try {
+      const containerRect = containerRef.current && typeof containerRef.current.getBoundingClientRect === "function" ? containerRef.current.getBoundingClientRect() : null;
+      if (!event || !containerRect)
+        return getDefaultHighlightMenuRect();
+      const target = event.currentTarget || event.target;
+      const targetRect = target && typeof target.getBoundingClientRect === "function" ? target.getBoundingClientRect() : null;
+      if (targetRect) {
+        return clampHighlightMenuRect({
+          x: targetRect.left + targetRect.width / 2 - containerRect.left - 118,
+          y: targetRect.top - containerRect.top - 58,
+          width: 236
+        });
+      }
+      if (typeof event.clientX !== "number" || typeof event.clientY !== "number")
+        return getDefaultHighlightMenuRect();
+      return clampHighlightMenuRect({
+        x: event.clientX - containerRect.left - 118,
+        y: event.clientY - containerRect.top - 58,
+        width: 236
+      });
+    } catch (error) {
+      return getDefaultHighlightMenuRect();
+    }
   };
   const resetHighlightPopoverRect = () => {
     const next = getDefaultHighlightPopoverRect();
@@ -48142,17 +48223,32 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       return;
     rendition.__awesomeReaderHighlightIds.add(key);
     try {
-      rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, () => {
+      rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, (event) => {
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
-        setPendingSelection({
+        if ((liveHighlight.comment || "").trim()) {
+          openHighlightCommentEditor(liveHighlight);
+          return;
+        }
+        setPendingSelection(null);
+        setHighlightComment("");
+        setWikiSuggest(null);
+        setWikiEditRange(null);
+        setPendingHighlightMenu({
           ...liveHighlight,
-          chapterTitle: liveHighlight.chapterTitle || readerTitleRef.current
+          chapterTitle: liveHighlight.chapterTitle || readerTitleRef.current,
+          rect: getEventHighlightMenuRect(event)
         });
-        setHighlightComment(liveHighlight.comment || "");
-      }, "jarvis-reader-highlight", {
+      }, highlight.comment ? "jarvis-reader-highlight-with-comment" : "jarvis-reader-highlight", highlight.comment ? {
+        fill: "#ffe8cc",
+        "fill-opacity": "0.56",
+        "mix-blend-mode": "multiply",
+        stroke: "#d9480f",
+        "stroke-width": "1.2",
+        "stroke-opacity": "0.88"
+      } : {
         fill: getObsidianCssVar("--text-highlight-bg", "#ffd54f"),
-        "fill-opacity": "0.35",
+        "fill-opacity": "0.32",
         "mix-blend-mode": "multiply"
       });
       refreshHighlightPanes(rendition);
@@ -48183,6 +48279,9 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     highlightPopoverRectRef.current = highlightPopoverRect;
   }, [highlightPopoverRect]);
   (0, import_react.useEffect)(() => {
+    pendingHighlightMenuRef.current = pendingHighlightMenu;
+  }, [pendingHighlightMenu]);
+  (0, import_react.useEffect)(() => {
     setHighlightList(highlights || []);
     highlightListRef.current = highlights || [];
   }, [highlights]);
@@ -48202,6 +48301,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
         chapterTitle: highlight.chapterTitle || readerTitleRef.current
       });
       setHighlightComment(highlight.comment || "");
+      setPendingHighlightMenu(null);
       setWikiSuggest(null);
       setWikiEditRange(null);
     });
@@ -48214,6 +48314,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       return;
     registerHighlightDeleted((highlight) => {
       removeHighlightMark(renditionRef.current, highlight);
+      setPendingHighlightMenu(null);
       setHighlightList((current) => {
         const next = current.filter((item) => item.id !== highlight.id);
         highlightListRef.current = next;
@@ -48239,6 +48340,45 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       container.removeEventListener("wheel", onWheel);
     };
   }, [setReaderZoom]);
+  (0, import_react.useEffect)(() => {
+    if (!pendingHighlightMenu || pendingHighlightMenu.id)
+      return;
+    const rendition = renditionRef.current;
+    const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : [];
+    const docs = views.map((view) => {
+      var _a;
+      return ((_a = view == null ? void 0 : view.contents) == null ? void 0 : _a.document) || null;
+    }).filter(Boolean);
+    if (!docs.length)
+      return;
+    const hasLiveSelection = () => docs.some((doc) => {
+      var _a, _b;
+      const selectionText = normalizeHighlightQuote((_b = (_a = doc.defaultView) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
+      return !!selectionText;
+    });
+    const closeIfSelectionGone = () => {
+      window.setTimeout(() => {
+        const current = pendingHighlightMenuRef.current;
+        if (!current || current.id)
+          return;
+        if (!hasLiveSelection()) {
+          clearHighlightUi();
+        }
+      }, 0);
+    };
+    for (const doc of docs) {
+      doc.addEventListener("selectionchange", closeIfSelectionGone);
+      doc.addEventListener("mouseup", closeIfSelectionGone);
+      doc.addEventListener("keyup", closeIfSelectionGone);
+    }
+    return () => {
+      for (const doc of docs) {
+        doc.removeEventListener("selectionchange", closeIfSelectionGone);
+        doc.removeEventListener("mouseup", closeIfSelectionGone);
+        doc.removeEventListener("keyup", closeIfSelectionGone);
+      }
+    };
+  }, [pendingHighlightMenu]);
   const updateReaderTitle = (relocated) => {
     const href = relocated && relocated.start ? relocated.start.href : "";
     const chapterTitle = findChapterTitle(tocRef.current, href);
@@ -48253,10 +48393,12 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     const selectedText = normalizeHighlightQuote((_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
     if (!selectedText)
       return;
-    setPendingSelection({
+    setPendingSelection(null);
+    setPendingHighlightMenu({
       cfiRange,
       quote: selectedText,
-      chapterTitle: readerTitleRef.current
+      chapterTitle: readerTitleRef.current,
+      rect: getSelectionHighlightMenuRect(contents2)
     });
     setHighlightComment("");
     setWikiSuggest(null);
@@ -48412,28 +48554,72 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     }
     return nodes.length ? nodes : React.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7");
   };
+  const clearHighlightUi = () => {
+    setPendingSelection(null);
+    setPendingHighlightMenu(null);
+    setHighlightComment("");
+    setWikiSuggest(null);
+    setWikiEditRange(null);
+  };
+  const copyHighlightQuote = async (item) => {
+    if (!item || !item.quote)
+      return;
+    try {
+      await navigator.clipboard.writeText(item.quote);
+      new import_obsidian2.Notice("\u5df2\u590d\u5236");
+    } catch (error) {
+      console.warn("Jarvis Reader copy highlight failed.", error);
+      new import_obsidian2.Notice("\u590d\u5236\u5931\u8d25");
+    }
+  };
+  const openHighlightCommentEditor = (item) => {
+    if (!item)
+      return;
+    setPendingHighlightMenu(null);
+    selectHighlight(item);
+    setPendingSelection({
+      ...item,
+      chapterTitle: item.chapterTitle || readerTitleRef.current
+    });
+    setHighlightComment(item.comment || "");
+    setWikiSuggest(null);
+    setWikiEditRange(null);
+  };
+  const savePlainHighlight = async (item) => {
+    if (!item || item.id)
+      return;
+    const created = await createHighlight({
+      ...item,
+      comment: ""
+    });
+    if (created) {
+      setHighlightList((current) => [...current, created]);
+      applyHighlight(renditionRef.current, created);
+    }
+    clearHighlightUi();
+  };
+  const deleteExistingHighlight = async (item) => {
+    if (!item || !item.id)
+      return;
+    const deleted = await deleteHighlight(item);
+    if (deleted) {
+      removeHighlightMark(renditionRef.current, item);
+      setHighlightList((current) => current.filter((highlight) => highlight.id !== item.id));
+    }
+    clearHighlightUi();
+  };
   const confirmHighlight = async () => {
     if (!pendingSelection)
       return;
     setWikiSuggest(null);
     if (pendingSelection.id) {
-      if (!highlightComment.trim()) {
-        const deleted = await deleteHighlight(pendingSelection);
-        if (deleted) {
-          removeHighlightMark(renditionRef.current, pendingSelection);
-          setHighlightList((current) => current.filter((item) => item.id !== pendingSelection.id));
-        }
-        setPendingSelection(null);
-        setHighlightComment("");
-        setWikiSuggest(null);
-        setWikiEditRange(null);
-        return;
-      }
       const updated = await updateHighlight({
         ...pendingSelection,
         comment: highlightComment.trim()
       });
       if (updated) {
+        removeHighlightMark(renditionRef.current, pendingSelection);
+        applyHighlight(renditionRef.current, updated);
         setHighlightList((current) => current.map((item) => item.id === updated.id ? updated : item));
       }
     } else {
@@ -48446,16 +48632,24 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
         applyHighlight(renditionRef.current, created);
       }
     }
-    setPendingSelection(null);
-    setHighlightComment("");
-    setWikiSuggest(null);
-    setWikiEditRange(null);
+    clearHighlightUi();
   };
   const activeHighlightPopoverRect = pendingSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
   return /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-epub",
     ref: containerRef,
-    style: { border: "none", height: "100%", width: "100%", overflow: "hidden" }
+    style: { border: "none", height: "100%", width: "100%", overflow: "hidden" },
+    onClick: (event) => {
+      if (!pendingSelection && !pendingHighlightMenu)
+        return;
+      const popover = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-popover");
+      if (popover && popover.contains(event.target))
+        return;
+      const menu = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-menu");
+      if (menu && menu.contains(event.target))
+        return;
+      clearHighlightUi();
+    }
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-side-hover-zone"
   }, /* @__PURE__ */ React.createElement("div", {
@@ -48661,7 +48855,31 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
         margin: "-1px -27%"
       }
     }
-  }), pendingSelection ? /* @__PURE__ */ React.createElement("div", {
+  }), pendingHighlightMenu ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-menu",
+    style: pendingHighlightMenu.rect ? {
+      left: pendingHighlightMenu.rect.x,
+      top: pendingHighlightMenu.rect.y,
+      width: pendingHighlightMenu.rect.width
+    } : void 0,
+    onClick: (event) => event.stopPropagation()
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-menu-button",
+    type: "button",
+    onClick: () => copyHighlightQuote(pendingHighlightMenu)
+  }, "\u590d\u5236"), pendingHighlightMenu.id ? null : /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-menu-button",
+    type: "button",
+    onClick: () => savePlainHighlight(pendingHighlightMenu)
+  }, "\u9ad8\u4eae"), /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-primary",
+    type: "button",
+    onClick: () => openHighlightCommentEditor(pendingHighlightMenu)
+  }, "\u5199\u60f3\u6cd5"), pendingHighlightMenu.id ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-danger",
+    type: "button",
+    onClick: () => deleteExistingHighlight(pendingHighlightMenu)
+  }, "\u5220\u9664\u9ad8\u4eae") : null) : null, pendingSelection ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating",
     style: activeHighlightPopoverRect ? {
       left: activeHighlightPopoverRect.x,
@@ -48673,7 +48891,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-highlight-title",
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
-  }, "\u5212\u7ebf\u6458\u6284"), /* @__PURE__ */ React.createElement("div", {
+  }, "\u5199\u60f3\u6cd5"), /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-highlight-quote"
   }, pendingSelection.quote), /* @__PURE__ */ React.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
@@ -48690,6 +48908,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     ref: highlightInputRef,
     value: highlightComment,
     placeholder: "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7",
+    autoFocus: true,
     onChange: (event) => {
       const value = event.currentTarget.value;
       setHighlightComment(value);
@@ -48859,7 +49078,7 @@ var EpubView = class extends import_obsidian2.FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id);
-    new import_obsidian2.Notice("\u6458\u6284\u5df2\u4fdd\u5b58");
+    new import_obsidian2.Notice(highlight.comment ? "\u60f3\u6cd5\u5df2\u4fdd\u5b58" : "\u9ad8\u4eae\u5df2\u4fdd\u5b58");
     return highlight;
   }
   async updateHighlight(highlight) {
@@ -48883,7 +49102,7 @@ var EpubView = class extends import_obsidian2.FileView {
     this.selectedHighlightId = updated.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id);
-    new import_obsidian2.Notice("\u6458\u6284\u5df2\u66f4\u65b0");
+    new import_obsidian2.Notice(updated.comment ? "\u60f3\u6cd5\u5df2\u66f4\u65b0" : "\u9ad8\u4eae\u5df2\u66f4\u65b0");
     return updated;
   }
   async deleteHighlight(highlight) {
@@ -49620,7 +49839,9 @@ var JarvisReaderBookshelfView = class extends import_obsidian3.ItemView {
         plugin: this.plugin,
         reader: null,
         searchQuery: "",
-        filterMode: "all",
+        typeFilter: "all",
+        linksOnly: false,
+        currentChapterOnly: false,
         sortMode: "chapter",
         focusSearchOnRender: false,
         listScrollTop: 0,
@@ -49741,7 +49962,9 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
     this.plugin = plugin;
     this.reader = null;
     this.searchQuery = "";
-    this.filterMode = "all";
+    this.typeFilter = "all";
+    this.linksOnly = false;
+    this.currentChapterOnly = false;
     this.sortMode = "chapter";
     this.focusSearchOnRender = false;
     this.listScrollTop = 0;
@@ -49751,7 +49974,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
     return HIGHLIGHTS_VIEW_TYPE;
   }
   getDisplayText() {
-    return "Jarvis Reader \u6458\u6284";
+    return "Jarvis Reader \u6807\u6ce8";
   }
   getIcon() {
     return "highlighter";
@@ -49853,13 +50076,16 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
     const query = (this.searchQuery || "").trim().toLowerCase();
     const currentChapter = this.getCurrentChapterTitle();
     let result = list.filter((highlight) => {
+      const hasComment = !!(highlight.comment || "").trim();
       if (query && !this.getSearchText(highlight).includes(query))
         return false;
-      if (this.filterMode === "links" && !this.getWikiLinks(highlight.comment).length)
+      if (this.typeFilter === "highlight" && hasComment)
         return false;
-      if (this.filterMode === "nolinks" && this.getWikiLinks(highlight.comment).length)
+      if (this.typeFilter === "thought" && !hasComment)
         return false;
-      if (this.filterMode === "chapter" && (!currentChapter || (highlight.chapterTitle || "").trim() !== currentChapter))
+      if (this.linksOnly && !this.getWikiLinks(highlight.comment).length)
+        return false;
+      if (this.currentChapterOnly && (!currentChapter || (highlight.chapterTitle || "").trim() !== currentChapter))
         return false;
       return true;
     });
@@ -49870,13 +50096,54 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
   }
   renderFilterButton(container, mode, label) {
     const button = container.createEl("button", {
-      cls: this.filterMode === mode ? "jarvis-reader-highlights-filter is-active" : "jarvis-reader-highlights-filter",
+      cls: this.typeFilter === mode ? "jarvis-reader-highlights-filter is-active" : "jarvis-reader-highlights-filter",
       text: label
     });
     button.onclick = () => {
-      this.filterMode = mode;
+      this.typeFilter = mode;
       this.render();
     };
+  }
+  renderMoreMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = new import_obsidian3.Menu();
+    menu.addItem((item) => {
+      item.setTitle("\u5f53\u524d\u7ae0\u8282").setIcon(this.currentChapterOnly ? "check" : "list").onClick(() => {
+        this.currentChapterOnly = !this.currentChapterOnly;
+        this.render();
+      });
+    });
+    menu.addItem((item) => {
+      item.setTitle("\u6709\u94fe\u63a5").setIcon(this.linksOnly ? "check" : "link").onClick(() => {
+        this.linksOnly = !this.linksOnly;
+        this.render();
+      });
+    });
+    menu.addSeparator();
+    menu.addItem((item) => {
+      item.setTitle("\u7ae0\u8282\u987a\u5e8f").setIcon(this.sortMode === "chapter" ? "check" : "list-ordered").onClick(() => {
+        this.sortMode = "chapter";
+        this.render();
+      });
+    });
+    menu.addItem((item) => {
+      item.setTitle("\u65f6\u95f4\u987a\u5e8f").setIcon(this.sortMode === "time" ? "check" : "clock").onClick(() => {
+        this.sortMode = "time";
+        this.render();
+      });
+    });
+    if (this.linksOnly || this.currentChapterOnly) {
+      menu.addSeparator();
+      menu.addItem((item) => {
+        item.setTitle("\u6e05\u9664\u8f85\u52a9\u7b5b\u9009").setIcon("x").onClick(() => {
+          this.linksOnly = false;
+          this.currentChapterOnly = false;
+          this.render();
+        });
+      });
+    }
+    menu.showAtMouseEvent(event);
   }
   renderControls(container) {
     const controls = container.createDiv({ cls: "jarvis-reader-highlights-controls" });
@@ -49884,7 +50151,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
       cls: "jarvis-reader-highlights-search",
       attr: {
         type: "search",
-        placeholder: "\u641c\u7d22\u6458\u6284\u3001\u611f\u60f3\u3001\u94fe\u63a5"
+        placeholder: "\u641c\u7d22\u9ad8\u4eae\u3001\u60f3\u6cd5\u3001\u94fe\u63a5"
       }
     });
     search.value = this.searchQuery || "";
@@ -49896,27 +50163,33 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
         search.setSelectionRange(length, length);
       });
     }
+    let composing = false;
+    search.addEventListener("compositionstart", () => {
+      composing = true;
+    });
+    search.addEventListener("compositionend", (event) => {
+      composing = false;
+      this.searchQuery = event.currentTarget.value || "";
+      this.focusSearchOnRender = true;
+      this.render();
+    });
     search.oninput = (event) => {
+      if (composing) return;
       this.searchQuery = event.currentTarget.value || "";
       this.focusSearchOnRender = true;
       this.render();
     };
     search.onclick = (event) => event.stopPropagation();
-    search.onkeydown = (event) => event.stopPropagation();
-    search.onkeyup = (event) => event.stopPropagation();
     const filters = controls.createDiv({ cls: "jarvis-reader-highlights-filters" });
     this.renderFilterButton(filters, "all", "\u5168\u90e8");
-    this.renderFilterButton(filters, "links", "\u6709\u94fe\u63a5");
-    this.renderFilterButton(filters, "nolinks", "\u65e0\u94fe\u63a5");
-    this.renderFilterButton(filters, "chapter", "\u7ae0\u8282\u987a\u5e8f");
-    const sort = controls.createEl("button", {
-      cls: "jarvis-reader-highlights-sort",
-      text: this.sortMode === "time" ? "\u7ae0\u8282\u987a\u5e8f" : "\u65f6\u95f4\u987a\u5e8f"
+    this.renderFilterButton(filters, "highlight", "\u9ad8\u4eae");
+    this.renderFilterButton(filters, "thought", "\u60f3\u6cd5");
+    const more = filters.createEl("button", {
+      cls: this.linksOnly || this.currentChapterOnly || this.sortMode === "time" ? "jarvis-reader-highlights-filter jarvis-reader-highlights-more is-active" : "jarvis-reader-highlights-filter jarvis-reader-highlights-more",
+      text: "..."
     });
-    sort.onclick = () => {
-      this.sortMode = this.sortMode === "time" ? "chapter" : "time";
-      this.render();
-    };
+    more.setAttr("aria-label", "\u66f4\u591a\u7b5b\u9009\u4e0e\u6392\u5e8f");
+    more.onclick = (event) => this.renderMoreMenu(event);
   }
   renderWikiLinks(container, links) {
     if (!links.length)
@@ -49955,21 +50228,21 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
     container.empty();
     container.addClass("jarvis-reader-highlights-view");
     if (!this.reader) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5f00\u4e00\u672c EPUB \u540e\u663e\u793a\u6458\u6284" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5f00\u4e00\u672c EPUB \u540e\u663e\u793a\u6807\u6ce8" });
       return;
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u6458\u6284" });
+    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u6807\u6ce8" });
     header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
     const list = this.reader.getBookHighlights();
     if (!list.length) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6682\u65e0\u6458\u6284\u3002\u9009\u4e2d\u6b63\u6587\u540e\u5199\u611f\u60f3\u5373\u53ef\u751f\u6210\u3002" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6682\u65e0\u6807\u6ce8\u3002\u9009\u4e2d\u6b63\u6587\u540e\u9ad8\u4eae\u6216\u5199\u60f3\u6cd5\u5373\u53ef\u751f\u6210\u3002" });
       return;
     }
     this.renderControls(container);
     const visibleList = this.getFilteredHighlights(list);
     if (!visibleList.length) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6ca1\u6709\u5339\u914d\u7684\u6458\u6284" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6ca1\u6709\u5339\u914d\u7684\u6807\u6ce8" });
       return;
     }
     const body = container.createDiv({ cls: "jarvis-reader-highlights-list" });
@@ -49977,6 +50250,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
       this.listScrollTop = body.scrollTop;
     });
     let revealCard = null;
+    let clickTimer = null;
     restoreScroll(body);
     for (const highlight of visibleList) {
       const isActive = highlight.id && highlight.id === this.reader.selectedHighlightId;
@@ -49989,10 +50263,20 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
       card.setAttr("role", "button");
       card.setAttr("tabindex", "0");
       card.onclick = () => {
-        this.reader.jumpToHighlight(highlight);
+        if (clickTimer) {
+          window.clearTimeout(clickTimer);
+        }
+        clickTimer = window.setTimeout(() => {
+          clickTimer = null;
+          this.reader.jumpToHighlight(highlight);
+        }, 180);
       };
       card.ondblclick = (event) => {
         event.preventDefault();
+        if (clickTimer) {
+          window.clearTimeout(clickTimer);
+          clickTimer = null;
+        }
         this.reader.editHighlight(highlight);
       };
       card.oncontextmenu = (event) => {
@@ -50092,7 +50376,7 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.registerEvent(this.app.workspace.on("active-leaf-change", (leaf) => {
       const view = leaf == null ? void 0 : leaf.view;
       if (view instanceof EpubView) {
-        this.setActiveReader(view, "toc");
+        this.activeReaderView = view;
       } else if (view instanceof JarvisReaderBookshelfView) {
         this.bookshelfView = view;
         view.render();

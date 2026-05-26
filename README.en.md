@@ -1,14 +1,14 @@
 # Jarvis Reader
 
-Current public starting version: v0.1.5
+Current version: v0.1.6
 
-Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, excerpts, and book notes inside the vault.
+Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 ## Credits And Attribution
 
 Jarvis Reader is a personalized modification based on [Awesome Reader](https://github.com/awesomedog/obsidian-awesome-reader). The core reading capability, EPUB reader foundation, and part of the plugin structure come from Awesome Reader.
 
-This repository mainly documents my own changes for a personal reading workflow, including bookshelf and TOC layout, excerpt sidebar, highlight reflections, Obsidian-style wiki link input, reading progress display, and interface refinements.
+This repository mainly documents my own changes for a personal reading workflow, including bookshelf and TOC layout, annotation sidebar, highlights and reflections, Obsidian-style wiki link input, reading progress display, and interface refinements.
 
 The upstream Awesome Reader project was created by awesomedog and is licensed under the MIT License. If this plugin is publicly distributed, attribution and license information for the original project should be preserved.
 
@@ -16,16 +16,19 @@ The upstream Awesome Reader project was created by awesomedog and is licensed un
 
 - Open `.epub` files directly in Obsidian.
 - Browse EPUB books from a dedicated Jarvis Reader bookshelf.
-- Switch between bookshelf, table of contents, and excerpt panels.
+- Switch between bookshelf, table of contents, and annotation panels.
 - Read in paginated or scrolling mode.
 - Switch between single-page and dual-page reading.
 - Track reading progress per book.
 - Show chapter page progress and whole-book percentage.
-- Create highlights and reflections from selected text.
-- Save excerpts into the matching Markdown book note.
+- Create plain highlights or reflection highlights from selected text.
+- Save highlighted text, reflections, and block IDs into the matching Markdown book note.
+- Show reflection highlights with a stronger visual marker in the reader.
 - Use Obsidian-style wiki links in reflection text.
-- Open linked notes from excerpt previews.
-- Search, filter, and sort excerpts in the sidebar.
+- Open linked notes from annotation previews.
+- Filter annotations by all, highlight, or reflection, and use the more menu for current chapter, linked items, and sorting.
+- Click an annotation card to jump to the source text, or double-click it to edit the reflection.
+- Write book-note timestamps in local time.
 
 ## Reading Progress
 
@@ -65,7 +68,8 @@ styles.css
 
 - Click the Jarvis Reader ribbon icon to open the bookshelf.
 - Open an EPUB from the bookshelf.
-- Select text while reading to create a highlight and reflection.
+- Select text while reading, then choose `Highlight` or `Write reflection`.
+- Plain highlights save only the selected text; reflections save both the selected text and your note.
 - Use `[[note name]]` inside reflections to connect your reading notes with the rest of your vault.
 - Configure the book note folder and template from the plugin settings.
 
