@@ -1,7 +1,7 @@
 {
 	"id": "jarvis-reader",
 	"name": "Jarvis Reader",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"minAppVersion": "0.15.0",
 	"description": "A personalized Obsidian EPUB reader with bookshelf, reading progress, highlights, annotations, reflections, and book notes.",
 	"author": "Bylrb",

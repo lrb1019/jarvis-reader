@@ -47197,39 +47197,91 @@ module.exports = __toCommonJS(main_exports);
 var import_obsidian3 = require("obsidian");
 
 function getMarkdownLinkCandidates(app) {
-  var _a;
-  const files = (((_a = app == null ? void 0 : app.vault) == null ? void 0 : _a.getMarkdownFiles) ? app.vault.getMarkdownFiles() : []).filter((file) => {
+  var _a, _b;
+  const files = (((_a = app == null ? void 0 : app.vault) == null ? void 0 : _a.getFiles) ? app.vault.getFiles() : []).filter((file) => {
     const path = (file.path || "").replace(/\\/g, "/");
-    return path && !path.startsWith(".obsidian/") && !path.startsWith(".agents/") && !path.startsWith(".claude/") && !path.startsWith(".trash/");
+    return path && !path.split("/").some((part) => part.startsWith("."));
   });
-  const recentPaths = (app == null ? void 0 : app.workspace) && typeof app.workspace.getLastOpenFiles === "function" ? app.workspace.getLastOpenFiles() : [];
+  const workspace = app == null ? void 0 : app.workspace;
+  const recentPaths = [];
+  if (workspace && Array.isArray(workspace.lastOpenFiles)) {
+    recentPaths.push(...workspace.lastOpenFiles);
+  }
+  if (workspace && typeof workspace.getLastOpenFiles === "function") {
+    const lastOpenFiles = workspace.getLastOpenFiles();
+    if (Array.isArray(lastOpenFiles))
+      recentPaths.push(...lastOpenFiles);
+  }
   const recentRank = /* @__PURE__ */ new Map();
   if (Array.isArray(recentPaths)) {
     recentPaths.forEach((path, index) => {
-      if (typeof path === "string") {
-        recentRank.set(path.replace(/\\/g, "/").toLowerCase(), index);
+      const recentPath = typeof path === "string" ? path : path && typeof path.path === "string" ? path.path : "";
+      if (recentPath) {
+        const normalizedPath = recentPath.replace(/\\/g, "/").toLowerCase();
+        if (!recentRank.has(normalizedPath))
+          recentRank.set(normalizedPath, index);
+        const pathWithoutExtension = normalizedPath.replace(/\.[^/.]+$/i, "");
+        if (!recentRank.has(pathWithoutExtension))
+          recentRank.set(pathWithoutExtension, index);
       }
     });
   }
   const basenameCounts = /* @__PURE__ */ new Map();
   for (const file of files) {
-    const title = file.basename || (file.name || "").replace(/\.md$/i, "");
+    const title = file.basename || (file.name || "").replace(/\.[^/.]+$/i, "");
     const key = title.toLowerCase();
     basenameCounts.set(key, (basenameCounts.get(key) || 0) + 1);
   }
-  return files.map((file) => {
-    const title = file.basename || (file.name || "").replace(/\.md$/i, "");
+  const candidates = [];
+  for (const file of files) {
+    const title = file.basename || (file.name || "").replace(/\.[^/.]+$/i, "");
     const path = file.path || title;
-    const pathWithoutExtension = path.replace(/\.md$/i, "");
+    const pathWithoutExtension = path.replace(/\.[^/.]+$/i, "");
     const duplicate = (basenameCounts.get(title.toLowerCase()) || 0) > 1;
-    return {
+    const insertText = duplicate ? pathWithoutExtension : title;
+    const pathKey = path.toLowerCase();
+    const pathWithoutExtensionKey = pathWithoutExtension.toLowerCase();
+    const recentIndex = recentRank.has(pathKey) ? recentRank.get(pathKey) : recentRank.has(pathWithoutExtensionKey) ? recentRank.get(pathWithoutExtensionKey) : Number.POSITIVE_INFINITY;
+    const modifiedTime = file.stat && typeof file.stat.mtime === "number" ? file.stat.mtime : 0;
+    candidates.push({
+      kind: "file",
       title,
       path,
-      insertText: duplicate ? pathWithoutExtension : title,
-      recentIndex: recentRank.has(path.toLowerCase()) ? recentRank.get(path.toLowerCase()) : Number.POSITIVE_INFINITY,
-      modifiedTime: file.stat && typeof file.stat.mtime === "number" ? file.stat.mtime : 0
-    };
-  }).sort((a, b) => {
+      insertText,
+      recentIndex,
+      modifiedTime
+    });
+    if ((file.extension || "").toLowerCase() !== "md")
+      continue;
+    const cache = ((_b = app == null ? void 0 : app.metadataCache) == null ? void 0 : _b.getFileCache) ? app.metadataCache.getFileCache(file) : null;
+    for (const heading of (cache == null ? void 0 : cache.headings) || []) {
+      const headingText = (heading == null ? void 0 : heading.heading) || "";
+      if (!headingText.trim())
+        continue;
+      candidates.push({
+        kind: "heading",
+        title: `${title}#${headingText}`,
+        path: `${path}#${headingText}`,
+        insertText: `${insertText}#${headingText}`,
+        recentIndex,
+        modifiedTime
+      });
+    }
+    const blocks = cache == null ? void 0 : cache.blocks;
+    if (blocks && typeof blocks === "object") {
+      for (const blockId of Object.keys(blocks)) {
+        candidates.push({
+          kind: "block",
+          title: `${title}#^${blockId}`,
+          path: `${path}#^${blockId}`,
+          insertText: `${insertText}#^${blockId}`,
+          recentIndex,
+          modifiedTime
+        });
+      }
+    }
+  }
+  return candidates.sort((a, b) => {
     const recentDelta = (a.recentIndex ?? Number.POSITIVE_INFINITY) - (b.recentIndex ?? Number.POSITIVE_INFINITY);
     if (Number.isFinite(recentDelta) && recentDelta !== 0)
       return recentDelta;
@@ -47428,7 +47480,7 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
           return modifiedDelta;
       }
       return a.label.localeCompare(b.label, "zh-Hans-CN");
-    }).slice(0, 6);
+    }).slice(0, 12);
         if (!options.length)
           return null;
         return { from: start + 2, options };
@@ -47532,7 +47584,8 @@ function joinVaultPath(folder, filename) {
 }
 function getDefaultBookNoteContent(file, toc) {
   return `---
-bookname: "${file.basename}.${file.extension}"
+bookname: "[[${file.basename}.${file.extension}]]"
+created: ${formatLocalDateTime(new Date())}
 ---
 
 ` + toc;
@@ -47541,7 +47594,7 @@ function renderBookNoteTemplate(template, file, toc) {
   if (!template || !template.trim()) {
     return getDefaultBookNoteContent(file, toc);
   }
-  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{toc\}\}/g, toc || "");
+  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, formatLocalDateTime(new Date())).replace(/\{\{toc\}\}/g, toc || "");
 }
 function getBookNotePath(file, settings = {}) {
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
@@ -47597,14 +47650,18 @@ function formatHighlightNoteBlock(highlight) {
   const quote = formatBlockquote(highlight.quote);
   const comment = (highlight.comment || "").trim();
   const commentBlock = comment ? `>
-${formatBlockquote(`\u611f\u60f3\uff1a${comment}`)}
+> **\u60f3\u6cd5**
+${formatBlockquote(comment)}
 ` : ">";
-  const timestamp = formatBlockquote(`\u65f6\u95f4\uff1a${formatLocalDateTime(highlight.updated || highlight.created)}`);
-  return `> [!quote] ${title}
+  const timestamp = formatBlockquote(`**\u65f6\u95f4**\n${formatLocalDateTime(highlight.updated || highlight.created)}`);
+  return `> [!note] ${title}
 ${quote}
 ${commentBlock}
 ${timestamp}
 ^${highlight.blockId}`;
+}
+function isHighlightNoteBlockStart(line) {
+  return /^> \[!(?:quote|note)\]/i.test(line || "");
 }
 function normalizeHeadingText(text) {
   return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
@@ -47672,10 +47729,10 @@ async function replaceHighlightInBookNote(app, noteFile, highlight) {
     return;
   }
   let startIndex = blockIndex;
-  while (startIndex > 0 && !lines[startIndex].startsWith("> [!quote]")) {
+  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
     startIndex--;
   }
-  if (!lines[startIndex].startsWith("> [!quote]")) {
+  if (!isHighlightNoteBlockStart(lines[startIndex])) {
     await appendHighlightToBookNote(app, noteFile, highlight);
     return;
   }
@@ -47690,10 +47747,10 @@ async function deleteHighlightFromBookNote(app, noteFile, highlight) {
   if (blockIndex < 0)
     return;
   let startIndex = blockIndex;
-  while (startIndex > 0 && !lines[startIndex].startsWith("> [!quote]")) {
+  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
     startIndex--;
   }
-  if (!lines[startIndex].startsWith("> [!quote]"))
+  if (!isHighlightNoteBlockStart(lines[startIndex]))
     return;
   let deleteEnd = blockIndex + 1;
   while (deleteEnd < lines.length && lines[deleteEnd].trim() === "") {
@@ -47998,13 +48055,14 @@ function getBookshelfProgressLabel(progress) {
 
 // src/EpubView.tsx
 var import_react_reader = __toESM(require_lib4());
-var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react.useState)("");
   const [highlightList, setHighlightList] = (0, import_react.useState)(highlights || []);
   const [pendingSelection, setPendingSelection] = (0, import_react.useState)(null);
   const [highlightComment, setHighlightComment] = (0, import_react.useState)("");
+  const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = (0, import_react.useState)(wikiLinkCandidates || []);
   const [pendingHighlightMenu, setPendingHighlightMenu] = (0, import_react.useState)(null);
   const [wikiSuggest, setWikiSuggest] = (0, import_react.useState)(null);
   const [wikiEditRange, setWikiEditRange] = (0, import_react.useState)(null);
@@ -48031,11 +48089,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     const bounds = getHighlightPopoverBounds();
     const margin = 16;
     const minWidth = Math.min(360, Math.max(280, bounds.width - margin * 2));
-    const minHeight = Math.min(220, Math.max(180, bounds.height - margin * 2));
+    const minHeight = Math.min(260, Math.max(220, bounds.height - margin * 2));
     const maxWidth = Math.max(minWidth, bounds.width - margin * 2);
     const maxHeight = Math.max(minHeight, bounds.height - margin * 2);
     const width = Math.min(maxWidth, Math.max(minWidth, rect.width || 560));
-    const height = Math.min(maxHeight, Math.max(minHeight, rect.height || 260));
+    const height = Math.min(maxHeight, Math.max(minHeight, rect.height || 300));
     const maxX = Math.max(margin, bounds.width - width - margin);
     const maxY = Math.max(margin, bounds.height - height - margin);
     return {
@@ -48048,10 +48106,10 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const getDefaultHighlightPopoverRect = () => {
     const bounds = getHighlightPopoverBounds();
     const width = Math.min(560, Math.max(360, bounds.width - 120));
-    const height = Math.min(280, Math.max(220, bounds.height - 180));
+    const height = Math.min(320, Math.max(280, bounds.height - 180));
     return clampHighlightPopoverRect({
-      x: (bounds.width - width) / 2,
-      y: Math.max(16, bounds.height - height - 78),
+      x: bounds.width - width - 32,
+      y: Math.max(16, (bounds.height - height) / 2),
       width,
       height
     });
@@ -48439,25 +48497,41 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     }
     return null;
   };
-  const getWikiSuggestItems = (query) => {
+  const getWikiSuggestItems = (query, sourceCandidates = currentWikiLinkCandidates) => {
     const needle = (query || "").trim().toLowerCase();
-    const candidates = Array.isArray(wikiLinkCandidates) ? wikiLinkCandidates : [];
-    return candidates.map((item) => {
+    const wantsAnchor = needle.includes("#") || needle.includes("^");
+    const candidates = Array.isArray(sourceCandidates) ? sourceCandidates : [];
+    return candidates.filter((item) => wantsAnchor || item.kind !== "heading" && item.kind !== "block").map((item) => {
       const title = (item.title || "").toLowerCase();
       const path = (item.path || "").toLowerCase();
+      const insertText = (item.insertText || "").toLowerCase();
       let score = 0;
       if (needle) {
-        if (title === needle)
+        if (insertText === needle || title === needle)
           score = 100;
-        else if (title.startsWith(needle))
+        else if (insertText.startsWith(needle) || title.startsWith(needle))
           score = 80;
-        else if (title.includes(needle))
+        else if (insertText.includes(needle) || title.includes(needle))
           score = 60;
         else if (path.includes(needle))
           score = 40;
+      } else {
+        score = 1;
       }
       return { ...item, score };
-    }).filter((item) => !needle || item.score > 0).sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, "zh-Hans-CN")).slice(0, 8);
+    }).filter((item) => !needle || item.score > 0).sort((a, b) => {
+      if ((b.score || 0) !== (a.score || 0))
+        return (b.score || 0) - (a.score || 0);
+      const recentDelta = (a.recentIndex ?? Number.POSITIVE_INFINITY) - (b.recentIndex ?? Number.POSITIVE_INFINITY);
+      if (recentDelta !== 0)
+        return recentDelta;
+      if (!needle) {
+        const modifiedDelta = (b.modifiedTime || 0) - (a.modifiedTime || 0);
+        if (modifiedDelta !== 0)
+          return modifiedDelta;
+      }
+      return (a.title || "").localeCompare(b.title || "", "zh-Hans-CN");
+    }).slice(0, 12);
   };
   const updateWikiSuggest = (value, cursor) => {
     const trigger = getWikiTrigger(value, cursor);
@@ -48465,7 +48539,9 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       setWikiSuggest(null);
       return;
     }
-    const items = getWikiSuggestItems(trigger.query);
+    const nextCandidates = typeof getWikiLinkCandidates === "function" ? getWikiLinkCandidates() || [] : currentWikiLinkCandidates;
+    setCurrentWikiLinkCandidates(nextCandidates);
+    const items = getWikiSuggestItems(trigger.query, nextCandidates);
     setWikiSuggest(items.length ? { ...trigger, items, activeIndex: 0 } : null);
   };
   const updateWikiEditRange = (value, cursor) => {
@@ -48575,6 +48651,9 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const openHighlightCommentEditor = (item) => {
     if (!item)
       return;
+    if (typeof getWikiLinkCandidates === "function") {
+      setCurrentWikiLinkCandidates(getWikiLinkCandidates() || []);
+    }
     setPendingHighlightMenu(null);
     selectHighlight(item);
     setPendingSelection({
@@ -48634,7 +48713,12 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     }
     clearHighlightUi();
   };
+  const isWikiSuggestOpen = !!(wikiSuggest && wikiSuggest.items && wikiSuggest.items.length);
   const activeHighlightPopoverRect = pendingSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
+  const visibleHighlightPopoverRect = activeHighlightPopoverRect && isWikiSuggestOpen ? clampHighlightPopoverRect({
+    ...activeHighlightPopoverRect,
+    height: Math.max(activeHighlightPopoverRect.height || 0, 480)
+  }) : activeHighlightPopoverRect;
   return /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-epub",
     ref: containerRef,
@@ -48880,12 +48964,12 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     type: "button",
     onClick: () => deleteExistingHighlight(pendingHighlightMenu)
   }, "\u5220\u9664\u9ad8\u4eae") : null) : null, pendingSelection ? /* @__PURE__ */ React.createElement("div", {
-    className: "jarvis-reader-highlight-popover is-floating",
-    style: activeHighlightPopoverRect ? {
-      left: activeHighlightPopoverRect.x,
-      top: activeHighlightPopoverRect.y,
-      width: activeHighlightPopoverRect.width,
-      height: activeHighlightPopoverRect.height
+    className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
+    style: visibleHighlightPopoverRect ? {
+      left: visibleHighlightPopoverRect.x,
+      top: visibleHighlightPopoverRect.y,
+      width: visibleHighlightPopoverRect.width,
+      height: visibleHighlightPopoverRect.height
     } : void 0
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-highlight-title",
@@ -48896,7 +48980,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   }, pendingSelection.quote), /* @__PURE__ */ React.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
     onChange: (value) => setHighlightComment(value),
-    candidates: wikiLinkCandidates,
+    candidates: currentWikiLinkCandidates,
     onOpenLink: openWikiLink,
     placeholder: "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7"
   }), /* @__PURE__ */ React.createElement("div", {
@@ -48979,7 +49063,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   })), wikiSuggest && wikiSuggest.items && wikiSuggest.items.length ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-wikilink-suggest"
   }, wikiSuggest.items.map((item, index) => /* @__PURE__ */ React.createElement("button", {
-    key: item.path,
+    key: `${item.path}-${index}`,
     type: "button",
     className: index === wikiSuggest.activeIndex ? "jarvis-reader-wikilink-suggest-item is-active" : "jarvis-reader-wikilink-suggest-item",
     onMouseDown: (event) => {
@@ -49133,7 +49217,7 @@ var EpubView = class extends import_obsidian2.FileView {
     }
     this.renderHighlightsPane();
     this.refreshCurrentHighlightPanes();
-    new import_obsidian2.Notice("\u6458\u6284\u5df2\u5220\u9664");
+    new import_obsidian2.Notice("\u6807\u6ce8\u5df2\u5220\u9664");
     return true;
   }
   selectHighlight(highlight) {
@@ -49344,6 +49428,7 @@ var EpubView = class extends import_obsidian2.FileView {
         this.startThemeSync(rendition);
       },
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
+      getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText) => {
         this.openWikiLink(linkText);
       }
@@ -49595,8 +49680,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian3.ItemView {
     const button = container.createEl("button", {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
-        "aria-label": label,
-        title: label
+        "aria-label": label
       }
     });
     button.innerHTML = icon;
@@ -49626,8 +49710,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian3.ItemView {
     const layoutButton = toolbar.createEl("button", {
       cls: "jarvis-reader-sidebar-tab jarvis-reader-sidebar-layout-toggle",
       attr: {
-        "aria-label": mode === "single" ? "\u5207\u6362\u5230\u53cc\u680f" : "\u5207\u6362\u5230\u5355\u680f",
-        title: mode === "single" ? "\u5207\u6362\u5230\u53cc\u680f" : "\u5207\u6362\u5230\u5355\u680f"
+        "aria-label": mode === "single" ? "\u5207\u6362\u5230\u53cc\u680f" : "\u5207\u6362\u5230\u5355\u680f"
       }
     });
     layoutButton.innerHTML = mode === "single" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M12 4v16"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M9 4v16"></path><path d="m14 9-3 3 3 3"></path></svg>';
@@ -49644,11 +49727,11 @@ var JarvisReaderBookshelfView = class extends import_obsidian3.ItemView {
         this.render();
       });
     }
-    this.makePanelButton(panelActions, "\u6458\u6284", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4"></path><path d="m14.5 4.5 5 5"></path><path d="M13 6 5 14l-1 5 5-1 8-8"></path></svg>', mode === "single" && this.activePanel === "highlights" || mode === "dual" && this.dualHighlightsMode, !hasReader, () => {
+    this.makePanelButton(panelActions, "\u6807\u6ce8", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4"></path><path d="m14.5 4.5 5 5"></path><path d="M13 6 5 14l-1 5 5-1 8-8"></path></svg>', mode === "single" && this.activePanel === "highlights" || mode === "dual" && this.dualHighlightsMode, !hasReader, () => {
       if (mode === "single") {
-        this.activePanel = this.activePanel === "highlights" ? "toc" : "highlights";
+        this.activePanel = "highlights";
       } else {
-        this.dualHighlightsMode = !this.dualHighlightsMode;
+        this.dualHighlightsMode = true;
       }
       this.render();
     });
@@ -50283,7 +50366,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian3.ItemView {
         event.preventDefault();
         const menu = new import_obsidian3.Menu();
         menu.addItem((item) => {
-          item.setTitle("\u5220\u9664\u6458\u6284").setIcon("trash").onClick(async () => {
+          item.setTitle("\u5220\u9664\u6807\u6ce8").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
           });
         });
@@ -50541,9 +50624,10 @@ var JarvisReaderSettingTab = class extends import_obsidian3.PluginSettingTab {
         folderText.setValue("");
       }
     }));
-    new import_obsidian3.Setting(containerEl).setName("\u8bfb\u4e66\u7b14\u8bb0\u6a21\u677f").setDesc("\u652f\u6301 {{bookname}} {{title}} {{extension}} {{toc}}").addTextArea((text) => {
+    new import_obsidian3.Setting(containerEl).setName("\u8bfb\u4e66\u7b14\u8bb0\u6a21\u677f").setDesc("\u652f\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
       text.setPlaceholder(`---
-bookname: "{{bookname}}"
+bookname: "[[{{bookname}}]]"
+created: {{created}}
 ---
 
 {{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value) => {

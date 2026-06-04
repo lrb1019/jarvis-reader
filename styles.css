@@ -346,7 +346,7 @@
   border-radius: 8px;
   box-shadow: 0 14px 36px rgb(0 0 0 / 16%);
   font-family: var(--font-interface);
-  max-height: 240px;
+  max-height: min(420px, calc(100vh - 180px));
   min-width: min(420px, calc(100vw - 80px));
   overflow: hidden;
   z-index: 1000;
@@ -357,7 +357,7 @@
 }
 
 .jarvis-reader-highlight-popover .cm-tooltip-autocomplete > ul {
-  max-height: 196px;
+  max-height: min(360px, calc(100vh - 240px));
   padding: 6px;
 }
 
@@ -435,7 +435,7 @@
 .jarvis-reader-highlight-popover .cm-tooltip-autocomplete::after {
   border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
   color: var(--text-muted);
-  content: "# heading    ^ block    | alias";
+  content: "输入 # 可以链接到标题    输入 ^ 链接文本块    输入 | 指定显示的文本。";
   display: block;
   font-size: var(--font-ui-smaller);
   line-height: 1.35;
@@ -450,10 +450,18 @@
   border-radius: 8px;
   box-shadow: 0 14px 36px rgb(0 0 0 / 16%);
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  max-height: 240px;
+  max-height: min(300px, calc(100vh - 240px));
+  min-height: 96px;
   overflow-y: auto;
   padding: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.jarvis-reader-highlight-popover.is-suggesting .jarvis-reader-highlight-input-shell {
+  flex: 0 0 126px;
 }
 
 .jarvis-reader-wikilink-suggest-item {
@@ -509,7 +517,7 @@
 .jarvis-reader-wikilink-suggest::after {
   border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
   color: var(--text-muted);
-  content: "# heading    ^ block    | alias";
+  content: "输入 # 可以链接到标题    输入 ^ 链接文本块    输入 | 指定显示的文本。";
   display: block;
   font-size: var(--font-ui-smaller);
   line-height: 1.35;
@@ -523,6 +531,8 @@
   flex: 0 0 auto;
   gap: 8px;
   justify-content: flex-end;
+  position: relative;
+  z-index: 2;
 }
 
 .jarvis-reader-highlight-resize-handle {
@@ -617,10 +627,12 @@
 }
 
 .jarvis-reader-highlights-controls {
+  border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 68%, transparent);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 6px 4px;
+  margin: 0 6px;
+  padding: 10px 0 12px;
 }
 
 .jarvis-reader-highlights-search {
@@ -643,8 +655,9 @@
 
 .jarvis-reader-highlights-filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: 5px;
+  width: 100%;
 }
 
 .jarvis-reader-highlights-filter {
@@ -656,7 +669,9 @@
   cursor: pointer;
   font-size: var(--font-ui-smaller);
   line-height: 1.2;
-  padding: 5px 9px;
+  min-width: 0;
+  padding: 5px 8px;
+  white-space: nowrap;
 }
 
 .jarvis-reader-highlights-filter:hover {
@@ -671,10 +686,11 @@
 }
 
 .jarvis-reader-highlights-more {
+  flex: 0 0 auto;
   margin-left: auto;
-  min-width: 34px;
-  padding-left: 10px;
-  padding-right: 10px;
+  min-width: 32px;
+  padding-left: 8px;
+  padding-right: 8px;
   text-align: center;
 }
 
