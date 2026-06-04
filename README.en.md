@@ -1,8 +1,18 @@
 # Jarvis Reader
 
-Current version: v0.1.6
+Current version: v0.1.7
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
+
+## Release Notes
+
+### v0.1.7
+
+- Makes `[[wiki link]]` suggestions in the reflection editor behave closer to Obsidian, prioritizing recently opened and recently modified files.
+- Supports non-Markdown vault files in wiki link suggestions, including EPUB, PDF, DOC, and DOCX, while ignoring hidden folders such as `.obsidian`.
+- Aligns the `#`, `^`, and `|` helper text with Obsidian's link input hints.
+- Moves the default reflection editor to the middle-right area and keeps wiki link suggestions inside the editor layout to avoid covering action buttons.
+- Adds `created` to the default book note template and stores `bookname` as a wiki link by default.
 
 ## Credits And Attribution
 
