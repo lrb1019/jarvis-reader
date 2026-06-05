@@ -435,7 +435,7 @@
 .jarvis-reader-highlight-popover .cm-tooltip-autocomplete::after {
   border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
   color: var(--text-muted);
-  content: "输入 # 可以链接到标题    输入 ^ 链接文本块    输入 | 指定显示的文本。";
+  content: "输入 # 链接标题　输入 ^ 链接块　输入 | 指定显示文本";
   display: block;
   font-size: var(--font-ui-smaller);
   line-height: 1.35;
@@ -517,7 +517,7 @@
 .jarvis-reader-wikilink-suggest::after {
   border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
   color: var(--text-muted);
-  content: "输入 # 可以链接到标题    输入 ^ 链接文本块    输入 | 指定显示的文本。";
+  content: "输入 # 链接标题　输入 ^ 链接块　输入 | 指定显示文本";
   display: block;
   font-size: var(--font-ui-smaller);
   line-height: 1.35;
@@ -572,6 +572,11 @@
   padding: 6px 14px;
 }
 
+.jarvis-reader-highlight-button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
 .jarvis-reader-highlight-button:hover {
   background: var(--interactive-hover);
 }
@@ -580,6 +585,393 @@
   background: var(--interactive-accent);
   border-color: var(--interactive-accent);
   color: var(--text-on-accent);
+}
+
+.jarvis-reader-translation-prompt-help {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.45;
+  margin: 18px 0 6px;
+  max-width: 720px;
+}
+
+.jarvis-reader-word-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.jarvis-reader-word-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jarvis-reader-word-lemma {
+  color: #c62828;
+  font: 800 1.08rem / 1.2 var(--font-interface);
+}
+
+.jarvis-reader-word-lemma-button {
+  appearance: none !important;
+  align-self: flex-start;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex;
+  height: auto;
+  justify-content: flex-start;
+  margin: 0;
+  min-height: 0;
+  outline: none;
+  padding: 0;
+  text-align: left;
+  width: auto;
+}
+
+.jarvis-reader-word-lemma-button:hover {
+  text-decoration: underline;
+}
+
+.jarvis-reader-word-lemma-button:focus,
+.jarvis-reader-word-lemma-button:focus-visible,
+.jarvis-reader-word-lemma-button:active {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.jarvis-reader-word-phonetic {
+  color: var(--text-muted);
+  font: 500 var(--font-ui-small) / 1.35 var(--font-interface);
+}
+
+.jarvis-reader-word-pos {
+  color: var(--text-faint);
+  font: 600 var(--font-ui-smaller) / 1.2 var(--font-interface);
+  text-transform: uppercase;
+}
+
+.jarvis-reader-word-translation {
+  color: var(--text-normal);
+  font: 500 var(--font-ui-small) / 1.55 var(--font-text);
+  white-space: pre-wrap;
+}
+
+.jarvis-reader-word-example {
+  background: color-mix(in srgb, var(--background-secondary) 78%, transparent);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font: 500 var(--font-ui-small) / 1.5 var(--font-text);
+  padding: 9px 10px;
+}
+
+.jarvis-reader-word-muted,
+.jarvis-reader-word-saved {
+  color: var(--text-muted);
+  font: 500 var(--font-ui-small) / 1.4 var(--font-interface);
+}
+
+.jarvis-reader-word-error {
+  color: var(--text-error);
+  font: 600 var(--font-ui-small) / 1.45 var(--font-interface);
+}
+
+.jarvis-reader-word-card {
+  backdrop-filter: blur(18px) saturate(1.18);
+  background: color-mix(in srgb, var(--background-primary) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 18%);
+  color: var(--text-normal);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(620px, calc(100vh - 72px));
+  max-width: min(480px, calc(100% - 32px));
+  min-height: 0;
+  min-width: 360px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  padding: 14px 16px 12px;
+  position: absolute;
+  z-index: 820;
+}
+
+.jarvis-reader-word-card-head {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jarvis-reader-word-card-head-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.jarvis-reader-word-card-lemma {
+  appearance: none !important;
+  align-self: flex-start;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #c62828;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1 1 auto;
+  font: 800 1.12em / 1.25 var(--font-interface);
+  height: auto;
+  justify-content: flex-start;
+  margin: 0;
+  min-height: 0;
+  min-width: 0;
+  outline: none;
+  padding: 0;
+  text-align: left;
+  width: auto;
+}
+
+.jarvis-reader-word-card-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.jarvis-reader-word-card-action {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 14px;
+  height: 22px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+  width: 22px;
+}
+
+.jarvis-reader-word-card-action:hover {
+  background: var(--background-modifier-hover);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+}
+
+.jarvis-reader-word-card-mastered:hover {
+  color: var(--interactive-accent);
+}
+
+.jarvis-reader-word-card-delete:hover {
+  color: var(--text-error);
+}
+
+.jarvis-reader-word-card-action-icon,
+.jarvis-reader-word-card-action-icon svg {
+  display: block;
+  height: 15px;
+  width: 15px;
+}
+
+.jarvis-reader-word-card-action:focus,
+.jarvis-reader-word-card-action:focus-visible,
+.jarvis-reader-word-card-action:active {
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 28%, transparent);
+  outline: none;
+}
+
+.jarvis-reader-word-card button.jarvis-reader-word-card-lemma {
+  appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #c62828 !important;
+  display: inline-flex;
+  height: auto;
+  justify-content: flex-start;
+  min-height: 0;
+  width: auto;
+}
+
+.jarvis-reader-word-card-lemma:hover {
+  text-decoration: underline;
+}
+
+.jarvis-reader-word-card-lemma:focus,
+.jarvis-reader-word-card-lemma:focus-visible,
+.jarvis-reader-word-card-lemma:active {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.jarvis-reader-word-card .jarvis-reader-word-translation,
+.jarvis-reader-word-card .jarvis-reader-word-example {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.jarvis-reader-word-card-body {
+  flex: 1 1 auto;
+  max-height: min(440px, calc(100vh - 190px));
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  position: relative;
+}
+
+.jarvis-reader-word-card-body.is-blurred > * {
+  filter: blur(3px) saturate(0.9) !important;
+  opacity: 0.72;
+  transition: filter 160ms ease, opacity 160ms ease;
+  user-select: none;
+}
+
+.jarvis-reader-word-card-body.is-blurred::after {
+  align-items: center;
+  backdrop-filter: blur(9px) saturate(1.18);
+  background: color-mix(in srgb, var(--background-primary) 38%, transparent);
+  border-radius: 8px;
+  color: var(--text-muted);
+  content: "";
+  display: flex;
+  font-size: var(--font-ui-smaller);
+  inset: 0;
+  justify-content: center;
+  opacity: 0.86;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 160ms ease, backdrop-filter 160ms ease;
+}
+
+.jarvis-reader-word-card-body.is-blurred:hover > *,
+.jarvis-reader-word-card-body.is-blurred:focus-within > * {
+  filter: none !important;
+  opacity: 1;
+  user-select: text;
+}
+
+.jarvis-reader-word-card-body.is-blurred:hover::after,
+.jarvis-reader-word-card-body.is-blurred:focus-within::after {
+  opacity: 0;
+}
+
+.jarvis-reader-word-card-display {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 0;
+  overflow: visible;
+}
+
+.jarvis-reader-word-card-display-heading {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: 750;
+  margin-top: 4px;
+}
+
+.jarvis-reader-word-card-display-list {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  padding-left: 14px;
+  position: relative;
+  white-space: pre-wrap;
+}
+
+.jarvis-reader-word-card-display-list::before {
+  color: var(--text-faint);
+  content: "•";
+  left: 2px;
+  position: absolute;
+}
+
+.jarvis-reader-word-card-display-quote {
+  border-left: 2px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  padding-left: 8px;
+  white-space: pre-wrap;
+}
+
+.jarvis-reader-word-card-display-line {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.jarvis-reader-word-card .jarvis-reader-word-example {
+  border-left: 2px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.45;
+  padding-left: 8px;
+}
+
+.jarvis-reader-word-card-sources {
+  border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 65%, transparent);
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 4px;
+  padding-right: 34px;
+}
+
+.jarvis-reader-word-card-section-title {
+  color: var(--text-faint);
+  flex: 0 0 auto;
+  font-size: var(--font-ui-smaller);
+  font-weight: 650;
+}
+
+.jarvis-reader-word-card-updated {
+  display: none;
+}
+
+.jarvis-reader-word-card-source {
+  color: var(--text-muted);
+  flex: 1 1 auto;
+  font-size: var(--font-ui-smaller);
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jarvis-reader-word-card-source-quote {
+  display: none;
 }
 
 .jarvis-reader-highlights-view {

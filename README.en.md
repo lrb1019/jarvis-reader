@@ -1,10 +1,22 @@
 # Jarvis Reader
 
-Current version: v0.1.7
+Current version: v0.2.0
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 ## Release Notes
+
+### v0.2.0
+
+- Adds a word translation and global vocabulary-card workflow for selected EPUB words or short phrases.
+- Uses `display` as the primary card body so the translation popup, hover card, and Markdown `## Card` share the same source.
+- Simplifies word-note output to `## Card` and `## Sources`, reducing duplicated fields and legacy metadata noise.
+- Localizes translation settings, adds default-prompt restore, and validates the JSON template before test requests.
+- Loads full card bodies back from Markdown `## Card` and protects hover rendering with display cache limits and truncation.
+- Adds Obsidian-style hover-card action icons for mastered, delete, and open note.
+- Deletes both the Markdown word block and plugin index entry when deleting a word.
+- Lets the red word title trigger pronunciation and uses Obsidian Notice for save feedback.
+- Closes the translation popup when clicking back into EPUB content.
 
 ### v0.1.7
 
@@ -36,6 +48,9 @@ The upstream Awesome Reader project was created by awesomedog and is licensed un
 - Show reflection highlights with a stronger visual marker in the reader.
 - Use Obsidian-style wiki links in reflection text.
 - Open linked notes from annotation previews.
+- Translate selected English words or short phrases and save them as global vocabulary cards.
+- Preview vocabulary cards on hover, play pronunciation, open the word note, mark mastered, or delete the entry.
+- Store vocabulary-card content in Markdown `## Card` sections for later review and personal notes.
 - Filter annotations by all, highlight, or reflection, and use the more menu for current chapter, linked items, and sorting.
 - Click an annotation card to jump to the source text, or double-click it to edit the reflection.
 - Write book-note timestamps in local time.

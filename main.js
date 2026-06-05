@@ -47606,7 +47606,7 @@ async function getOrCreateBookNote(app, file, toc, settings = {}) {
   if (configuredFolder) {
     const folder = app.vault.getAbstractFileByPath(configuredFolder);
     if (folder == null || !(folder instanceof import_obsidian.TFolder)) {
-      new import_obsidian.Notice(`Jarvis Reader 缂佹妫侀鍥棘閸ワ附顐藉鍫曗偓娑氱憹閻庢稒锚濠€顏堟晬?{configuredFolder}`);
+      new import_obsidian.Notice(`Jarvis Reader note folder does not exist: ${configuredFolder}`);
       return null;
     }
   }
@@ -47626,6 +47626,798 @@ async function openOrCreateNote(app, file, toc, settings = {}) {
     const fileLeaf = app.workspace.createLeafBySplit(leaf);
     await fileLeaf.openFile(noteFile, { active: true });
   }
+}
+var JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
+var JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
+var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
+var DEFAULT_TRANSLATION_PROMPT = `Return ONLY valid JSON. Do not wrap it in markdown.
+All string values must be valid JSON strings. If display needs line breaks, use escaped \\n, not raw line breaks.
+The display field is the full learner-facing card body. Put pronunciation, part of speech, definition, examples, collocations, derivatives, etymology, and synonyms in display when useful.
+
+{
+  "lemma": "normalized lowercase base form",
+  "translation": "concise Simplified Chinese meaning",
+  "display": "full Markdown card body with all learner-facing content",
+  "isWord": true
+}`;
+var TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。display 是唯一正文显示源；换行请写成 \\n。测试会先校验 JSON 示例。";
+function formatLocalDate(value) {
+  if (!value)
+    return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return "";
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+function sanitizeWordAssetFilename(value) {
+  const cleaned = (value || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim();
+  return cleaned || "word";
+}
+function escapeRegExp(value) {
+  return (value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function normalizeWordSelection(value) {
+  const cleaned = (value || "").replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
+  if (!cleaned)
+    return null;
+  const stripped = cleaned.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, "").replace(/\s+/g, " ").trim();
+  if (!stripped || !/[A-Za-z]/.test(stripped))
+    return null;
+  if (!/^[A-Za-z][A-Za-z\s'-]*[A-Za-z]$|^[A-Za-z]$/.test(stripped))
+    return null;
+  const tokens = stripped.split(/\s+/).filter(Boolean);
+  if (!tokens.length || tokens.length > 4)
+    return null;
+  return {
+    lemma: stripped.toLowerCase(),
+    surface: stripped,
+    tokens,
+    isSingleWord: tokens.length === 1,
+    isPhrase: tokens.length > 1
+  };
+}
+var DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
+function getWordAudioType(accent) {
+  return String(accent || "us").toLowerCase() === "uk" ? "1" : "2";
+}
+function buildWordAudioUrl(template, word, accent) {
+  const normalized = normalizeWordSelection(word);
+  const cleanWord = normalized ? normalized.surface || normalized.lemma : String(word || "").trim();
+  const cleanTemplate = String(template || "").trim();
+  if (!cleanTemplate || !cleanWord)
+    return "";
+  const type = getWordAudioType(accent);
+  return cleanTemplate.replace(/\{\{\s*word\s*\}\}/g, encodeURIComponent(cleanWord)).replace(/\{\{\s*type\s*\}\}/g, type).replace(/\{\{\s*accent\s*\}\}/g, accent || "us");
+}
+function isEnglishWordCandidate(value) {
+  const normalized = normalizeWordSelection(value);
+  return !!(normalized && (normalized.isSingleWord || normalized.isPhrase));
+}
+function getWordNoteFolder(settings = {}) {
+  return normalizeVaultPath(settings.wordNoteFolder || "09 Books/Words");
+}
+function getWordNotePath(lemma, settings = {}) {
+  return joinVaultPath(getWordNoteFolder(settings), `${sanitizeWordAssetFilename(lemma)}.md`);
+}
+function getWordBookNotePath(file, settings = {}) {
+  const baseName = file && file.basename ? file.basename : "Words";
+  return joinVaultPath(getWordNoteFolder(settings), `${sanitizeWordAssetFilename(baseName)}.md`);
+}
+function getWordBlockId(lemma) {
+  const normalized = normalizeWordSelection(lemma);
+  const source = normalized ? normalized.lemma : String(lemma || "word").toLowerCase();
+  const slug = source.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return `jr-word-${slug || "word"}`;
+}
+async function ensureVaultFolder(app, folderPath) {
+  const cleanPath = normalizeVaultPath(folderPath);
+  if (!cleanPath)
+    return;
+  const segments = cleanPath.split("/").filter(Boolean);
+  let currentPath = "";
+  for (const segment of segments) {
+    currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+    const existing = app.vault.getAbstractFileByPath(currentPath);
+    if (!existing) {
+      await app.vault.createFolder(currentPath);
+    }
+  }
+}
+function escapeYamlString(value) {
+  return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+function formatWordSourceLink(source) {
+  const target = source && source.bookPath ? source.bookPath : "";
+  return target ? `"[[${escapeYamlString(target)}]]"` : '""';
+}
+function formatWordSourceLine(source) {
+  const bookPath = source && source.bookPath ? source.bookPath : "";
+  const chapterTitle = source && source.chapterTitle ? source.chapterTitle : "";
+  const quote = source && source.quote ? source.quote : "";
+  const preview = quote.length > 88 ? `${quote.slice(0, 88)}...` : quote;
+  return `- ${bookPath || "Unknown"}${chapterTitle ? ` - ${chapterTitle}` : ""}${preview ? ` - ${preview}` : ""}`;
+}
+function buildWordGeneratedBlock(asset) {
+  const cardText = normalizeWordDisplayText((asset == null ? void 0 : asset.display) || (asset == null ? void 0 : asset.translation) || (asset == null ? void 0 : asset.example) || "");
+  const lines = [
+    JARVIS_WORD_NOTE_START,
+    `## Card`,
+    cardText,
+    ""
+  ];
+  lines.push("## Sources");
+  if ((asset.sources || []).length) {
+    for (const source of asset.sources) {
+      lines.push(formatWordSourceLine(source));
+    }
+  } else {
+    lines.push("- None");
+  }
+  lines.push("", JARVIS_WORD_NOTE_END);
+  return lines.join("\n");
+}
+function buildWordNoteFrontmatter(asset) {
+  const primarySource = asset.sources && asset.sources.length ? asset.sources[0] : null;
+  return `---
+created: ${formatLocalDate(asset.created || new Date())}
+author: "[[Jarvis]]"
+type: word
+word: "${escapeYamlString(asset.lemma || "")}"
+phonetic: "${escapeYamlString(asset.phonetic || "")}"
+translation: "${escapeYamlString(asset.translation || "")}"
+source:
+  - ${formatWordSourceLink(primarySource)}
+---`;
+}
+function syncWordNoteFrontmatter(content, asset) {
+  const frontmatter = buildWordNoteFrontmatter(asset);
+  if (/^---\r?\n[\s\S]*?\r?\n---/.test(content || "")) {
+    const body = (content || "").replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+    return `${frontmatter}\n\n${body.trimStart()}`;
+  }
+  return `${frontmatter}\n\n${(content || "").trimStart()}`;
+}
+function buildWordNoteFileContent(asset) {
+  const generatedBlock = buildWordGeneratedBlock(asset);
+  return `${buildWordNoteFrontmatter(asset)}
+
+# ${asset.lemma || "word"}
+
+${generatedBlock}
+
+## Thoughts
+`;
+}
+function buildWordBookFrontmatter(file) {
+  return `---
+created: ${formatLocalDate(new Date())}
+author: "[[Jarvis]]"
+type: wordbook
+book: "${escapeYamlString(file && file.basename ? file.basename : "Words")}"
+source:
+  - "${file && file.path ? `[[${escapeYamlString(file.path)}]]` : ""}"
+---`;
+}
+function buildWordBookFileContent(file) {
+  const title = file && file.basename ? file.basename : "Words";
+  return `${buildWordBookFrontmatter(file)}
+
+# ${title}
+
+`;
+}
+function getWordEntryStart(lemma) {
+  return `<!-- jarvis-reader-word-entry:${getWordBlockId(lemma)}:start -->`;
+}
+function getWordEntryEnd(lemma) {
+  return `<!-- jarvis-reader-word-entry:${getWordBlockId(lemma)}:end -->`;
+}
+function buildWordEntryBlock(asset) {
+  const blockId = asset.blockId || getWordBlockId(asset.lemma);
+  return `${getWordEntryStart(asset.lemma)}
+## ${asset.lemma || "word"}
+
+${buildWordGeneratedBlock(asset)}
+
+## Thoughts
+
+^${blockId}
+${getWordEntryEnd(asset.lemma)}`;
+}
+function upsertWordEntryInContent(content, asset) {
+  const current = content || "";
+  const startMarker = getWordEntryStart(asset.lemma);
+  const endMarker = getWordEntryEnd(asset.lemma);
+  const startIndex = current.indexOf(startMarker);
+  const endIndex = current.indexOf(endMarker);
+  if (startIndex >= 0 && endIndex > startIndex) {
+    const entryEnd = endIndex + endMarker.length;
+    const entry = current.slice(startIndex, entryEnd);
+    const generatedBlock = buildWordGeneratedBlock(asset);
+    const generatedStart = entry.indexOf(JARVIS_WORD_NOTE_START);
+    const generatedEnd = entry.indexOf(JARVIS_WORD_NOTE_END);
+    if (generatedStart >= 0 && generatedEnd > generatedStart) {
+      const nextEntry = entry.slice(0, generatedStart) + generatedBlock + entry.slice(generatedEnd + JARVIS_WORD_NOTE_END.length);
+      return current.slice(0, startIndex) + nextEntry + current.slice(entryEnd);
+    }
+    return current.slice(0, startIndex) + buildWordEntryBlock(asset) + current.slice(entryEnd);
+  }
+  return `${current.trimEnd()}\n\n${buildWordEntryBlock(asset)}\n`;
+}
+function removeWordEntryMetadataInContent(content, asset) {
+  const current = content || "";
+  const startMarker = getWordEntryStart(asset.lemma);
+  const endMarker = getWordEntryEnd(asset.lemma);
+  const startIndex = current.indexOf(startMarker);
+  const endIndex = current.indexOf(endMarker);
+  if (startIndex < 0 || endIndex <= startIndex) {
+    return upsertWordEntryInContent(current, asset);
+  }
+  const entryEnd = endIndex + endMarker.length;
+  const entry = current.slice(startIndex, entryEnd);
+  const nextEntry = entry.replace(/\r?\n## Metadata\r?\n[\s\S]*?(?=\r?\n## |\r?\n<!-- jarvis-reader-word:end -->|$)/i, "");
+  if (nextEntry === entry) {
+    return current;
+  }
+  return current.slice(0, startIndex) + nextEntry + current.slice(entryEnd);
+}
+function deleteWordEntryInContent(content, asset) {
+  const current = content || "";
+  if (!asset || !asset.lemma)
+    return current;
+  const startMarker = getWordEntryStart(asset.lemma);
+  const endMarker = getWordEntryEnd(asset.lemma);
+  const startIndex = current.indexOf(startMarker);
+  const endIndex = current.indexOf(endMarker);
+  if (startIndex < 0 || endIndex <= startIndex)
+    return current;
+  const entryEnd = endIndex + endMarker.length;
+  const before = current.slice(0, startIndex).replace(/[ \t]*(?:\r?\n[ \t]*){0,2}$/, "");
+  const after = current.slice(entryEnd).replace(/^(?:[ \t]*\r?\n){0,2}/, "");
+  if (before && after)
+    return `${before}\n\n${after}`;
+  return before || after;
+}
+async function upsertWordAssetNote(app, settings = {}, asset, file = null) {
+  const folder = getWordNoteFolder(settings);
+  await ensureVaultFolder(app, folder);
+  const notePath = normalizeVaultPath(asset.notePath || getWordBookNotePath(file, settings));
+  const existing = app.vault.getAbstractFileByPath(notePath);
+  if (existing instanceof import_obsidian.TFile) {
+    const current = await app.vault.read(existing);
+    const nextContent = upsertWordEntryInContent(current, asset);
+    await app.vault.modify(existing, nextContent);
+    return existing;
+  }
+  const initialContent = upsertWordEntryInContent(buildWordBookFileContent(file), asset);
+  return await app.vault.create(notePath, initialContent);
+}
+function mergeWordSources(existingSources, nextSource) {
+  const list = Array.isArray(existingSources) ? [...existingSources] : [];
+  if (list.length) {
+    return list.slice(0, 1);
+  }
+  const source = nextSource || null;
+  if (!source)
+    return list;
+  return [source];
+}
+function mergeStringList(existingList, nextValue) {
+  const values = Array.isArray(existingList) ? [...existingList] : [];
+  const candidate = (nextValue || "").trim();
+  if (candidate && !values.includes(candidate)) {
+    values.push(candidate);
+  }
+  return values.slice(0, 12);
+}
+function buildWordAssetFromSelection(file, selection, translation, existingAsset = null, settings = {}) {
+  const normalized = normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
+  if (!normalized)
+    return null;
+  const now = new Date().toISOString();
+  const source = {
+    bookPath: file.path,
+    bookTitle: file.basename,
+    chapterTitle: (selection == null ? void 0 : selection.chapterTitle) || file.basename,
+    cfiRange: (selection == null ? void 0 : selection.cfiRange) || "",
+    quote: normalizeHighlightQuote((selection == null ? void 0 : selection.quote) || ""),
+    created: now
+  };
+  const asset = {
+    lemma: normalized.lemma,
+    surfaceForms: mergeStringList(existingAsset == null ? void 0 : existingAsset.surfaceForms, normalized.surface),
+    translation: ((translation == null ? void 0 : translation.translation) || (existingAsset == null ? void 0 : existingAsset.translation) || "").trim(),
+    phonetic: ((translation == null ? void 0 : translation.phonetic) || (existingAsset == null ? void 0 : existingAsset.phonetic) || "").trim(),
+    partOfSpeech: ((translation == null ? void 0 : translation.partOfSpeech) || (existingAsset == null ? void 0 : existingAsset.partOfSpeech) || "").trim(),
+    example: ((translation == null ? void 0 : translation.example) || (existingAsset == null ? void 0 : existingAsset.example) || "").trim(),
+    display: ((translation == null ? void 0 : translation.display) || (existingAsset == null ? void 0 : existingAsset.display) || "").trim(),
+    notePath: normalizeVaultPath((existingAsset == null ? void 0 : existingAsset.blockId) && (existingAsset == null ? void 0 : existingAsset.notePath) ? existingAsset.notePath : getWordBookNotePath(file, settings)),
+    blockId: (existingAsset == null ? void 0 : existingAsset.blockId) || getWordBlockId(normalized.lemma),
+    mastered: !!(existingAsset == null ? void 0 : existingAsset.mastered),
+    sources: mergeWordSources(existingAsset == null ? void 0 : existingAsset.sources, source),
+    created: (existingAsset == null ? void 0 : existingAsset.created) || now,
+    updated: now
+  };
+  return asset;
+}
+function extractOpenAIMessageText(payload) {
+  var _a, _b, _c;
+  const message = (_c = (_b = (_a = payload == null ? void 0 : payload.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.content;
+  if (typeof message === "string") {
+    return message;
+  }
+  if (Array.isArray(message)) {
+    return message.map((part) => {
+      if (typeof part === "string")
+        return part;
+      if (part && typeof part.text === "string")
+        return part.text;
+      return "";
+    }).join("\n");
+  }
+  return "";
+}
+function parseTranslationResponseText(text) {
+  const raw = (text || "").trim();
+  if (!raw)
+    return null;
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+  }
+  const fenced = raw.match(/```json\s*([\s\S]+?)```/i) || raw.match(/```\s*([\s\S]+?)```/i);
+  if (fenced && fenced[1]) {
+    try {
+      return JSON.parse(fenced[1].trim());
+    } catch (error) {
+    }
+  }
+  const objectMatch = raw.match(/\{[\s\S]*\}/);
+  if (objectMatch && objectMatch[0]) {
+    try {
+      return JSON.parse(objectMatch[0]);
+    } catch (error) {
+    }
+  }
+  return null;
+}
+function looksLikeJsonObjectText(text) {
+  const raw = String(text || "").trim();
+  return raw.startsWith("{") || /^```(?:json)?\s*\{/i.test(raw);
+}
+function getFirstJsonObjectText(text) {
+  const source = String(text || "");
+  for (let firstBrace = source.indexOf("{"); firstBrace >= 0; firstBrace = source.indexOf("{", firstBrace + 1)) {
+    if (source[firstBrace + 1] === "{" || source[firstBrace - 1] === "{")
+      continue;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let index = firstBrace; index < source.length; index++) {
+      const char = source[index];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (char === "\\") {
+        escaped = true;
+        continue;
+      }
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+      if (inString)
+        continue;
+      if (char === "{") {
+        depth++;
+      } else if (char === "}") {
+        depth--;
+        if (depth === 0) {
+          return source.slice(firstBrace, index + 1);
+        }
+      }
+    }
+    return source.slice(firstBrace);
+  }
+  return "";
+}
+function validateTranslationPromptJsonTemplate(prompt) {
+  const objectText = getFirstJsonObjectText(prompt);
+  if (!objectText)
+    return { ok: false, error: "未找到 JSON 示例。" };
+  try {
+    const parsed = JSON.parse(objectText);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { ok: false, error: "提示词 JSON 示例必须是对象。" };
+    }
+    const requiredFields = ["lemma", "translation", "display", "isWord"];
+    const missingFields = requiredFields.filter((field) => !(field in parsed));
+    if (missingFields.length) {
+      return { ok: false, error: `缺少必需字段：${missingFields.join("、")}` };
+    }
+    return { ok: true, error: "" };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error && error.message ? error.message : "JSON 示例无效。"
+    };
+  }
+}
+function pickLabeledValue(text, labels) {
+  const source = text || "";
+  for (const label of labels) {
+    const pattern = new RegExp(`^${escapeRegExp(label)}\\s*:?\\s*(.+)$`, "im");
+    const match = source.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return "";
+}
+function pickLabeledBlock(text, label, nextLabels = []) {
+  const source = text || "";
+  const next = nextLabels.length ? `|${nextLabels.map((item) => escapeRegExp(item)).join("|")}` : "";
+  const pattern = new RegExp(`${escapeRegExp(label)}\\s*:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:${nextLabels.map((item) => escapeRegExp(item)).join("|")})\\s*:?|$)`, "i");
+  const match = source.match(pattern);
+  return match && match[1] ? match[1].trim() : "";
+}
+function parsePlainTranslationResponse(selectedText, text) {
+  const raw = (text || "").trim();
+  if (!raw)
+    return null;
+  const normalized = normalizeWordSelection(pickLabeledValue(raw, ["Word"]) || selectedText || "");
+  const ipaBlock = pickLabeledBlock(raw, "IPA", ["Part of speech", "Core meaning", "Chinese"]);
+  const usIpa = pickLabeledValue(ipaBlock, ["US"]);
+  const ukIpa = pickLabeledValue(ipaBlock, ["UK"]);
+  const chinese = pickLabeledBlock(raw, "Chinese", ["Memory tip", "Common collocations", "Synonyms", "Example", "Pronunciation"]);
+  const partOfSpeech = pickLabeledBlock(raw, "Part of speech", ["Core meaning", "Chinese", "Memory tip"]);
+  const example = pickLabeledBlock(raw, "Example", ["Pronunciation"]);
+  const firstChineseLine = raw.split(/\r?\n/).find((line) => /[\u4e00-\u9fff]/.test(line)) || "";
+  return {
+    lemma: normalized ? normalized.lemma : "",
+    translation: chinese || firstChineseLine || raw.slice(0, 120),
+    phonetic: usIpa || ukIpa || "",
+    partOfSpeech,
+    example,
+    display: raw,
+    isWord: !!normalized
+  };
+}
+function normalizeJsonString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+function normalizeJsonArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+function getPrimaryPosMeaning(payload) {
+  const meanings = normalizeJsonArray(payload == null ? void 0 : payload.pos_meanings);
+  const first = meanings.find((item) => item && (normalizeJsonString(item.pos) || normalizeJsonString(item.meaning)));
+  return first || null;
+}
+function normalizeJsonExample(value) {
+  if (typeof value === "string") {
+    return {
+      en: value.trim(),
+      zh: ""
+    };
+  }
+  if (value && typeof value === "object") {
+    return {
+      en: normalizeJsonString(value.en),
+      zh: normalizeJsonString(value.zh)
+    };
+  }
+  return {
+    en: "",
+    zh: ""
+  };
+}
+function buildStructuredWordDisplay(payload, lemma) {
+  if (!payload || typeof payload !== "object")
+    return "";
+  const lines = [];
+  const word = normalizeJsonString(payload.lemma) || lemma || "";
+  const phonetic = normalizeJsonString(payload.phonetic);
+  const posMeanings = normalizeJsonArray(payload.pos_meanings);
+  const example = normalizeJsonExample(payload.example);
+  const collocations = normalizeJsonArray(payload.collocations);
+  const derivatives = normalizeJsonArray(payload.derivatives);
+  const etymology = normalizeJsonString(payload.etymology);
+  const synonyms = normalizeJsonArray(payload.synonyms).map((item) => normalizeJsonString(item)).filter(Boolean);
+  if (word || phonetic) {
+    lines.push(`**${word}**${phonetic ? ` ${phonetic}` : ""}`.trim());
+  }
+  if (posMeanings.length) {
+    lines.push("", "Part of speech / meaning");
+    for (const item of posMeanings) {
+      if (!item)
+        continue;
+      const pos = normalizeJsonString(item.pos);
+      const meaning = normalizeJsonString(item.meaning);
+      if (pos || meaning) {
+        lines.push(`- ${pos ? `${pos}: ` : ""}${meaning}`.trim());
+      }
+    }
+  }
+  if (example.en || example.zh) {
+    lines.push("", "Example");
+    if (example.en)
+      lines.push(`- ${example.en}`);
+    if (example.zh)
+      lines.push(`- ${example.zh}`);
+  }
+  if (collocations.length) {
+    lines.push("", "Collocations");
+    for (const item of collocations) {
+      if (!item)
+        continue;
+      const phrase = normalizeJsonString(item.phrase);
+      const zh = normalizeJsonString(item.zh);
+      if (phrase || zh) {
+        lines.push(`- ${phrase}${zh ? `: ${zh}` : ""}`);
+      }
+    }
+  }
+  if (derivatives.length) {
+    lines.push("", "Derivatives");
+    for (const item of derivatives) {
+      if (!item)
+        continue;
+      const derivedWord = normalizeJsonString(item.word);
+      const pos = normalizeJsonString(item.pos);
+      const meaning = normalizeJsonString(item.meaning);
+      if (derivedWord || pos || meaning) {
+        lines.push(`- ${derivedWord}${pos ? ` (${pos})` : ""}${meaning ? `: ${meaning}` : ""}`);
+      }
+    }
+  }
+  if (etymology) {
+    lines.push("", "Etymology", etymology);
+  }
+  if (synonyms.length) {
+    lines.push("", "Synonyms", synonyms.join(", "));
+  }
+  return lines.join("\n").trim();
+}
+function normalizeTranslationResult(selectedText, payload) {
+  const normalized = normalizeWordSelection((payload == null ? void 0 : payload.lemma) || selectedText || "");
+  const primaryMeaning = getPrimaryPosMeaning(payload);
+  const example = normalizeJsonExample(payload == null ? void 0 : payload.example);
+  const translation = payload && typeof payload.translation === "string" ? payload.translation.trim() : normalizeJsonString(primaryMeaning == null ? void 0 : primaryMeaning.meaning);
+  const display = normalizeWordDisplayText(payload && typeof payload.display === "string" ? payload.display : buildStructuredWordDisplay(payload, normalized ? normalized.lemma : ""));
+  return {
+    lemma: normalized ? normalized.lemma : "",
+    surface: normalized ? normalized.surface : ((selectedText || "").trim()),
+    translation,
+    phonetic: payload && typeof payload.phonetic === "string" ? payload.phonetic.trim() : "",
+    partOfSpeech: payload && typeof payload.partOfSpeech === "string" ? payload.partOfSpeech.trim() : normalizeJsonString(primaryMeaning == null ? void 0 : primaryMeaning.pos),
+    example: example.en,
+    display,
+    isWord: payload && typeof payload.isWord === "boolean" ? payload.isWord : !!normalized
+  };
+}
+function normalizeTranslationProvider(value, baseUrl = "") {
+  const lowered = String(baseUrl || "").toLowerCase();
+  if (lowered.includes("anthropic"))
+    return "anthropic";
+  if (lowered.includes("googleapis") || lowered.includes("generativelanguage"))
+    return "gemini";
+  const provider = String(value || "").trim().toLowerCase();
+  if (TRANSLATION_PROVIDER_OPTIONS.includes(provider)) {
+    return provider;
+  }
+  return "openai-compatible";
+}
+function detectTranslationApiType(settings = {}) {
+  const api = settings.translationApi || {};
+  const lowered = String(api.baseUrl || "").toLowerCase();
+  if (lowered.includes("anthropic"))
+    return "anthropic";
+  if (lowered.includes("googleapis") || lowered.includes("generativelanguage"))
+    return "gemini";
+  const provider = normalizeTranslationProvider(api.provider, api.baseUrl);
+  if (provider !== "custom") {
+    return provider;
+  }
+  return "openai-compatible";
+}
+function getTranslationProviderDefaults(provider) {
+  const normalized = normalizeTranslationProvider(provider);
+  switch (normalized) {
+    case "anthropic":
+      return {
+        baseUrl: "https://api.deepseek.com/anthropic",
+        model: "deepseek-v4-flash"
+      };
+    case "gemini":
+      return {
+        baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+        model: "gemini-1.5-flash"
+      };
+    case "custom":
+      return {
+        baseUrl: "",
+        model: ""
+      };
+    case "openai-compatible":
+    default:
+      return {
+        baseUrl: "https://api.deepseek.com/v1",
+        model: "deepseek-chat"
+      };
+  }
+}
+function buildTranslationApiEndpoint(settings = {}) {
+  const api = settings.translationApi || {};
+  const baseUrl = String(api.baseUrl || "").trim().replace(/\/+$/g, "");
+  const model = String(api.model || "").trim();
+  const apiKey = String(api.apiKey || "").trim();
+  const apiType = detectTranslationApiType(settings);
+  if (!baseUrl)
+    return "";
+  switch (apiType) {
+    case "anthropic":
+      return /\/messages$/i.test(baseUrl) ? baseUrl : `${baseUrl}/v1/messages`;
+    case "gemini":
+      if (baseUrl.includes(":generateContent")) {
+        return baseUrl.includes("?key=") ? baseUrl : `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}key=${encodeURIComponent(apiKey)}`;
+      }
+      return `${baseUrl}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    case "openai-compatible":
+    default:
+      return /\/chat\/completions$/i.test(baseUrl) ? baseUrl : `${baseUrl}/chat/completions`;
+  }
+}
+function buildTranslationPromptText(prompt, selectedText, sentence = "") {
+  const word = (selectedText || "").trim();
+  const contextSentence = (sentence || selectedText || "").trim();
+  const sourcePrompt = String(prompt || "");
+  const templated = sourcePrompt.replace(/\{\{\s*word\s*\}\}/g, word).replace(/\{\{\s*sentence\s*\}\}/g, contextSentence).replace(/\{\{\s*text\s*\}\}/g, word);
+  if (templated !== sourcePrompt) {
+    return templated;
+  }
+  return `${templated}
+
+Selected text: ${selectedText}`;
+}
+function extractAnthropicMessageText(payload) {
+  var _a;
+  const content = (_a = payload == null ? void 0 : payload.content) != null ? _a : [];
+  if (!Array.isArray(content))
+    return "";
+  return content.map((part) => part && typeof part.text === "string" ? part.text : "").join("\n").trim();
+}
+function extractGeminiMessageText(payload) {
+  var _a, _b, _c, _d, _e;
+  const parts = (_e = (_d = (_c = (_b = (_a = payload == null ? void 0 : payload.candidates) == null ? void 0 : _a[0]) == null ? void 0 : _b.content) == null ? void 0 : _c.parts) != null ? _d : []) != null ? _e : [];
+  if (!Array.isArray(parts))
+    return "";
+  return parts.map((part) => part && typeof part.text === "string" ? part.text : "").join("\n").trim();
+}
+async function translateSelectionWithApi(settings = {}, selectedText) {
+  const api = settings.translationApi || {};
+  const apiType = detectTranslationApiType(settings);
+  const endpoint = buildTranslationApiEndpoint(settings);
+  const apiKey = String(api.apiKey || "").trim();
+  const model = String(api.model || "").trim();
+  if (!endpoint || !apiKey || !model) {
+    throw new Error("Translation API is not configured.");
+  }
+  const prompt = String(settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).trim() || DEFAULT_TRANSLATION_PROMPT;
+  const requestText = buildTranslationPromptText(prompt, selectedText);
+  let headers = {
+    "Content-Type": "application/json"
+  };
+  let body = null;
+  switch (apiType) {
+    case "anthropic":
+      headers = {
+        ...headers,
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      };
+      body = {
+        model,
+        max_tokens: 800,
+        messages: [
+          {
+            role: "user",
+            content: requestText
+          }
+        ]
+      };
+      break;
+    case "gemini":
+      body = {
+        contents: [
+          {
+            parts: [
+              {
+                text: requestText
+              }
+            ]
+          }
+        ]
+      };
+      break;
+    case "openai-compatible":
+    default:
+      headers = {
+        ...headers,
+        Authorization: `Bearer ${apiKey}`
+      };
+      body = {
+        model,
+        temperature: 0.2,
+        messages: [
+          {
+            role: "system",
+            content: prompt
+          },
+          {
+            role: "user",
+            content: `Selected text: ${selectedText}`
+          }
+        ]
+      };
+      break;
+  }
+  let payload = null;
+  if (typeof import_obsidian.requestUrl === "function") {
+    const response = await import_obsidian.requestUrl({
+      url: endpoint,
+      method: "POST",
+      headers,
+      body: JSON.stringify(body)
+    });
+    if (response.status >= 400) {
+      throw new Error(((response.text || `HTTP ${response.status}`) + "").slice(0, 280));
+    }
+    payload = response.json;
+  } else {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error((errorText || `HTTP ${response.status}`).slice(0, 280));
+    }
+    payload = await response.json();
+  }
+  const content = apiType === "anthropic" ? extractAnthropicMessageText(payload) : apiType === "gemini" ? extractGeminiMessageText(payload) : extractOpenAIMessageText(payload);
+  const parsed = parseTranslationResponseText(content);
+  if (!parsed && looksLikeJsonObjectText(content)) {
+    throw new Error("翻译响应看起来是 JSON，但无法解析。请检查引号、逗号，以及 display 字段中的换行是否写成转义的 \\n。");
+  }
+  const fallbackParsed = parsed || parsePlainTranslationResponse(selectedText, content);
+  if (!fallbackParsed) {
+    throw new Error("翻译响应为空。");
+  }
+  const result = normalizeTranslationResult(selectedText, fallbackParsed);
+  if (!result.translation) {
+    throw new Error("翻译响应缺少 translation 字段。");
+  }
+  if (!result.display) {
+    throw new Error("翻译响应缺少 display 字段。");
+  }
+  return result;
+}
+function shouldAutoHighlightFile(filePath, settings = {}) {
+  const normalizedPath = normalizeVaultPath(filePath).toLowerCase();
+  const folders = Array.isArray(settings.autoHighlightFolders) ? settings.autoHighlightFolders : [];
+  if (!normalizedPath || !folders.length)
+    return false;
+  return folders.some((folder) => {
+    const target = normalizeVaultPath(folder).toLowerCase();
+    return target && (normalizedPath === target || normalizedPath.startsWith(`${target}/`));
+  });
+}
+function getWordAssetsMap(settings = {}) {
+  return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
 }
 function createHighlightId() {
   return `ar-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -48052,16 +48844,144 @@ function getBookshelfProgressLabel(progress) {
   const chapterTitle = (progress.chapterTitle || "").trim();
   return chapterTitle ? `${chapterTitle} ${percentage}%` : `${percentage}%`;
 }
+function getWordLookupResultFromAsset(asset, selectedText = "") {
+  if (!asset)
+    return null;
+  return {
+    lemma: asset.lemma || "",
+    surface: selectedText || asset.lemma || "",
+    translation: asset.translation || "",
+    phonetic: asset.phonetic || "",
+    partOfSpeech: asset.partOfSpeech || "",
+    example: asset.example || "",
+    display: asset.display || "",
+    isWord: true
+  };
+}
+function getLightWordAsset(asset) {
+  if (!asset)
+    return asset;
+  const next = {
+    ...asset
+  };
+  if (next.display && next.notePath && next.blockId) {
+    delete next.display;
+  }
+  return next;
+}
+function extractWordCardDisplayFromContent(content, asset) {
+  if (!content || !asset || !asset.lemma)
+    return "";
+  const startMarker = getWordEntryStart(asset.lemma);
+  const endMarker = getWordEntryEnd(asset.lemma);
+  const startIndex = content.indexOf(startMarker);
+  const endIndex = content.indexOf(endMarker);
+  const source = startIndex >= 0 && endIndex > startIndex ? content.slice(startIndex, endIndex) : content;
+  const lines = source.split(/\r?\n/);
+  const cardStart = lines.findIndex((line) => /^##\s+Card\s*$/i.test((line || "").trim()));
+  if (cardStart < 0)
+    return "";
+  const cardLines = [];
+  for (let index = cardStart + 1; index < lines.length; index++) {
+    const line = lines[index] || "";
+    const trimmed = line.trim();
+    if (/^##\s+/.test(trimmed))
+      break;
+    if (/^<!--\s*jarvis-reader-word/.test(trimmed))
+      continue;
+    if (/^\^jr-word-/.test(trimmed))
+      continue;
+    cardLines.push(line);
+  }
+  return normalizeWordDisplayText(cardLines.join("\n"));
+}
+var WORD_DISPLAY_CACHE_LIMIT = 50;
+var WORD_DISPLAY_MAX_CHARS = 8e3;
+function normalizeWordDisplayText(value) {
+  return String(value || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
+}
+function truncateWordDisplay(value) {
+  const text = normalizeWordDisplayText(value);
+  if (text.length <= WORD_DISPLAY_MAX_CHARS)
+    return text;
+  return `${text.slice(0, WORD_DISPLAY_MAX_CHARS).trimEnd()}\n\n...`;
+}
+function renderWordCardDisplayText(text) {
+  const value = String(text || "");
+  const parts = [];
+  const pattern = /(\*\*|__)([\s\S]+?)\1/g;
+  let lastIndex = 0;
+  let match = null;
+  while ((match = pattern.exec(value))) {
+    if (match.index > lastIndex) {
+      parts.push(value.slice(lastIndex, match.index));
+    }
+    parts.push(React.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
+    lastIndex = pattern.lastIndex;
+  }
+  if (lastIndex < value.length) {
+    parts.push(value.slice(lastIndex));
+  }
+  return parts.length ? parts : value;
+}
+function getWordCardDisplayLineMeta(line) {
+  const raw = String(line || "");
+  const trimmed = raw.trim();
+  if (/^#{1,6}\s+/.test(trimmed)) {
+    return {
+      className: "jarvis-reader-word-card-display-heading",
+      text: trimmed.replace(/^#{1,6}\s+/, "")
+    };
+  }
+  if (/^>\s*/.test(trimmed)) {
+    return {
+      className: "jarvis-reader-word-card-display-quote",
+      text: trimmed.replace(/^>\s*/, "")
+    };
+  }
+  if (/^(?:[-*]|\d+[.)])\s+/.test(trimmed)) {
+    return {
+      className: "jarvis-reader-word-card-display-list",
+      text: trimmed.replace(/^(?:[-*]|\d+[.)])\s+/, "")
+    };
+  }
+  return {
+    className: "jarvis-reader-word-card-display-line",
+    text: raw
+  };
+}
+function buildWordMatchRegex(lemma) {
+  const normalized = normalizeWordSelection(lemma);
+  if (!normalized)
+    return null;
+  const pattern = normalized.tokens.map((token) => escapeRegExp(token)).join("\\s+");
+  return new RegExp(`(^|[^A-Za-z'-])(${pattern})(?=$|[^A-Za-z'-])`, "gi");
+}
+function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
+  const containerRect = container && typeof container.getBoundingClientRect === "function" ? container.getBoundingClientRect() : null;
+  const boundsWidth = Math.max(360, (containerRect == null ? void 0 : containerRect.width) || window.innerWidth || 960);
+  const boundsHeight = Math.max(240, (containerRect == null ? void 0 : containerRect.height) || window.innerHeight || 720);
+  const left = rect ? rect.left - (containerRect == null ? void 0 : containerRect.left) : 24;
+  const top = rect ? rect.bottom - (containerRect == null ? void 0 : containerRect.top) + 8 : 24;
+  return {
+    left: Math.min(boundsWidth - width - 16, Math.max(16, left)),
+    top: Math.min(boundsHeight - height - 16, Math.max(16, top))
+  };
+}
 
 // src/EpubView.tsx
 var import_react_reader = __toESM(require_lib4());
-var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react.useState)("");
   const [highlightList, setHighlightList] = (0, import_react.useState)(highlights || []);
   const [pendingSelection, setPendingSelection] = (0, import_react.useState)(null);
   const [highlightComment, setHighlightComment] = (0, import_react.useState)("");
+  const [currentWordAssets, setCurrentWordAssets] = (0, import_react.useState)(wordAssets || {});
+  const [pendingWordSelection, setPendingWordSelection] = (0, import_react.useState)(null);
+  const [wordLookupState, setWordLookupState] = (0, import_react.useState)({ status: "idle", result: null, error: "", savedLemma: "" });
+  const [activeWordHover, setActiveWordHover] = (0, import_react.useState)(null);
   const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = (0, import_react.useState)(wikiLinkCandidates || []);
   const [pendingHighlightMenu, setPendingHighlightMenu] = (0, import_react.useState)(null);
   const [wikiSuggest, setWikiSuggest] = (0, import_react.useState)(null);
@@ -48072,7 +48992,12 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const highlightPopoverRectRef = (0, import_react.useRef)(null);
   const renditionRef = (0, import_react.useRef)(null);
   const highlightListRef = (0, import_react.useRef)(highlights || []);
+  const wordAssetsRef = (0, import_react.useRef)(wordAssets || {});
+  const wordDisplayCacheRef = (0, import_react.useRef)(/* @__PURE__ */ new Map());
+  const pendingWordLookupRef = (0, import_react.useRef)(0);
+  const wordHoverHideTimerRef = (0, import_react.useRef)(null);
   const pendingHighlightMenuRef = (0, import_react.useRef)(null);
+  const pendingWordSelectionRef = (0, import_react.useRef)(null);
   const readerTitleRef = (0, import_react.useRef)(title);
   const tocRef = (0, import_react.useRef)([]);
   const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
@@ -48333,12 +49258,588 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       console.warn("Jarvis Reader highlight remove failed.", error);
     }
   };
+  const clearWordHoverHideTimer = () => {
+    if (wordHoverHideTimerRef.current) {
+      window.clearTimeout(wordHoverHideTimerRef.current);
+      wordHoverHideTimerRef.current = null;
+    }
+  };
+  const hideWordHoverCard = () => {
+    clearWordHoverHideTimer();
+    setActiveWordHover(null);
+  };
+  const scheduleHideWordHoverCard = () => {
+    clearWordHoverHideTimer();
+    wordHoverHideTimerRef.current = window.setTimeout(() => {
+      setActiveWordHover(null);
+    }, 120);
+  };
+  const loadWordDisplayIntoHover = (asset) => {
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!normalized || !asset || asset.display || typeof loadWordDisplay !== "function")
+      return;
+    const cacheKey = `${asset.notePath || ""}#${asset.blockId || normalized.lemma}`;
+    const cache = wordDisplayCacheRef.current;
+    if (cache.has(cacheKey)) {
+      const cachedDisplay = cache.get(cacheKey);
+      cache.delete(cacheKey);
+      cache.set(cacheKey, cachedDisplay);
+      setActiveWordHover((current) => current && current.asset && normalizeWordSelection(current.asset.lemma || "") && normalizeWordSelection(current.asset.lemma || "").lemma === normalized.lemma ? {
+        ...current,
+        asset: {
+          ...current.asset,
+          display: cachedDisplay
+        }
+      } : current);
+      return;
+    }
+    Promise.resolve(loadWordDisplay(asset)).then((display) => {
+      const nextDisplay = truncateWordDisplay(display);
+      if (!nextDisplay)
+        return;
+      cache.set(cacheKey, nextDisplay);
+      while (cache.size > WORD_DISPLAY_CACHE_LIMIT) {
+        const oldestKey = cache.keys().next().value;
+        cache.delete(oldestKey);
+      }
+      setActiveWordHover((current) => current && current.asset && normalizeWordSelection(current.asset.lemma || "") && normalizeWordSelection(current.asset.lemma || "").lemma === normalized.lemma ? {
+        ...current,
+        asset: {
+          ...current.asset,
+          display: nextDisplay
+        }
+      } : current);
+    }).catch(() => {
+    });
+  };
+  const playWordAudioText = (text) => {
+    if (!enableWordAudio || !text)
+      return;
+    const audioUrl = buildWordAudioUrl(wordAudioTemplate, text, wordAudioAccent);
+    if (audioUrl) {
+      try {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {
+          if (typeof speechSynthesis === "undefined")
+            return;
+          speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = speechLang || (String(wordAudioAccent || "us").toLowerCase() === "uk" ? "en-GB" : "en-US");
+          utterance.rate = 0.92;
+          speechSynthesis.speak(utterance);
+        });
+        return;
+      } catch (error) {
+        console.warn("Jarvis Reader word audio URL failed.", error);
+      }
+    }
+    if (typeof speechSynthesis === "undefined")
+      return;
+    try {
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang || (String(wordAudioAccent || "us").toLowerCase() === "uk" ? "en-GB" : "en-US");
+      utterance.rate = 0.92;
+      speechSynthesis.speak(utterance);
+    } catch (error) {
+      console.warn("Jarvis Reader word audio failed.", error);
+    }
+  };
+  const showWordHoverCard = (asset, element) => {
+    if (!asset || !element)
+      return;
+    clearWordHoverHideTimer();
+    const rect = typeof element.getBoundingClientRect === "function" ? element.getBoundingClientRect() : null;
+    const position = clampFloatingCardPosition(containerRef.current, rect, 320, 190);
+    setActiveWordHover({
+      asset,
+      left: position.left,
+      top: position.top
+    });
+    loadWordDisplayIntoHover(asset);
+  };
+  const showWordHoverCardAtRect = (asset, rect) => {
+    if (!asset || !rect)
+      return;
+    clearWordHoverHideTimer();
+    const position = clampFloatingCardPosition(containerRef.current, rect, 360, 220);
+    setActiveWordHover({
+      asset,
+      left: position.left,
+      top: position.top
+    });
+    loadWordDisplayIntoHover(asset);
+  };
+  const getWordAssetAtPoint = (contents2, event) => {
+    var _a, _b;
+    const doc = contents2 == null ? void 0 : contents2.document;
+    const win = ((_a = contents2 == null ? void 0 : contents2.window) != null ? _a : doc == null ? void 0 : doc.defaultView);
+    if (!doc || !win || !wordAssetsRef.current)
+      return null;
+    const selectionText = normalizeHighlightQuote((_b = win.getSelection == null ? void 0 : win.getSelection().toString()) != null ? _b : "");
+    if (selectionText)
+      return null;
+    let range = null;
+    try {
+      if (typeof doc.caretRangeFromPoint === "function") {
+        range = doc.caretRangeFromPoint(event.clientX, event.clientY);
+      } else if (typeof doc.caretPositionFromPoint === "function") {
+        const position = doc.caretPositionFromPoint(event.clientX, event.clientY);
+        if (position && position.offsetNode) {
+          range = doc.createRange();
+          range.setStart(position.offsetNode, position.offset);
+          range.collapse(true);
+        }
+      }
+    } catch (error) {
+      return null;
+    }
+    const node = range == null ? void 0 : range.startContainer;
+    if (!node || node.nodeType !== Node.TEXT_NODE)
+      return null;
+    const text = node.nodeValue || "";
+    let offset = Math.max(0, Math.min(text.length, range.startOffset || 0));
+    if (offset === text.length && offset > 0)
+      offset -= 1;
+    if (!/[A-Za-z'-]/.test(text.charAt(offset)) && offset > 0 && /[A-Za-z'-]/.test(text.charAt(offset - 1)))
+      offset -= 1;
+    if (!/[A-Za-z'-]/.test(text.charAt(offset)))
+      return null;
+    let start = offset;
+    let end = offset + 1;
+    while (start > 0 && /[A-Za-z'-]/.test(text.charAt(start - 1)))
+      start -= 1;
+    while (end < text.length && /[A-Za-z'-]/.test(text.charAt(end)))
+      end += 1;
+    const normalized = normalizeWordSelection(text.slice(start, end));
+    if (!normalized)
+      return null;
+    const asset = wordAssetsRef.current[normalized.lemma] || Object.values(wordAssetsRef.current).find((item) => item && normalizeWordSelection(item.lemma || "") && normalizeWordSelection(item.lemma || "").lemma === normalized.lemma);
+    if (!asset || asset.mastered)
+      return null;
+    const wordRange = doc.createRange();
+    wordRange.setStart(node, start);
+    wordRange.setEnd(node, end);
+    const rect = wordRange.getBoundingClientRect();
+    if (!rect || !rect.width || !rect.height)
+      return null;
+    const frameElement = win.frameElement;
+    const frameRect = frameElement && typeof frameElement.getBoundingClientRect === "function" ? frameElement.getBoundingClientRect() : { left: 0, top: 0 };
+    return {
+      asset,
+      rect: {
+        left: frameRect.left + rect.left,
+        right: frameRect.left + rect.right,
+        top: frameRect.top + rect.top,
+        bottom: frameRect.top + rect.bottom,
+        width: rect.width,
+        height: rect.height
+      }
+    };
+  };
+  const clearWordLookup = () => {
+    pendingWordLookupRef.current += 1;
+    setPendingWordSelection(null);
+    setWordLookupState({ status: "idle", result: null, error: "", savedLemma: "" });
+  };
+  const openWordTranslator = async (item) => {
+    if (!item || typeof translateSelection !== "function")
+      return;
+    const normalized = normalizeWordSelection(item.quote || "");
+    setPendingSelection(null);
+    setPendingHighlightMenu(null);
+    setHighlightComment("");
+    setWikiSuggest(null);
+    setWikiEditRange(null);
+    setPendingWordSelection({
+      ...item,
+      normalized
+    });
+    setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
+    if (normalized && wordAssetsRef.current[normalized.lemma]) {
+      const existingWordAsset = wordAssetsRef.current[normalized.lemma];
+      setWordLookupState({
+        status: "ready",
+        result: getWordLookupResultFromAsset(existingWordAsset, item.quote || normalized.surface),
+        error: "",
+        savedLemma: normalized.lemma
+      });
+      if (!existingWordAsset.display && typeof loadWordDisplay === "function") {
+        Promise.resolve(loadWordDisplay(existingWordAsset)).then((display) => {
+          const nextDisplay = truncateWordDisplay(display);
+          if (!nextDisplay)
+            return;
+          setWordLookupState((current) => current.savedLemma === normalized.lemma && current.result ? {
+            ...current,
+            result: {
+              ...current.result,
+              display: nextDisplay
+            }
+          } : current);
+        }).catch(() => {
+        });
+      }
+      return;
+    }
+    const requestId = pendingWordLookupRef.current + 1;
+    pendingWordLookupRef.current = requestId;
+    try {
+      const result = await translateSelection(item.quote || "");
+      if (pendingWordLookupRef.current !== requestId)
+        return;
+      setWordLookupState({
+        status: "ready",
+        result,
+        error: "",
+        savedLemma: ""
+      });
+    } catch (error) {
+      if (pendingWordLookupRef.current !== requestId)
+        return;
+      setWordLookupState({
+        status: "error",
+        result: null,
+        error: error && error.message ? error.message : String(error || "Translation failed."),
+        savedLemma: ""
+      });
+    }
+  };
+  const persistPendingWordAsset = async () => {
+    if (!pendingWordSelection || !wordLookupState.result || typeof saveWordAsset !== "function")
+      return;
+    try {
+      const asset = await saveWordAsset(pendingWordSelection, wordLookupState.result);
+      if (!asset)
+        return;
+      setCurrentWordAssets((current) => {
+        const next = {
+          ...current,
+          [asset.lemma]: asset
+        };
+        wordAssetsRef.current = next;
+        return next;
+      });
+      setWordLookupState((current) => ({
+        ...current,
+        savedLemma: asset.lemma
+      }));
+      if (renditionRef.current) {
+        clearWordHoverHideTimer();
+        setActiveWordHover(null);
+      }
+    } catch (error) {
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to save word.");
+    }
+  };
+  const restorePendingWordAsset = async () => {
+    if (!savedWordAsset || typeof setWordMastered !== "function")
+      return;
+    const normalized = normalizeWordSelection(savedWordAsset.lemma || "");
+    if (!normalized)
+      return;
+    try {
+      const updated = await setWordMastered(savedWordAsset, false);
+      setCurrentWordAssets((current) => {
+        const next = {
+          ...current,
+          [normalized.lemma]: updated || {
+            ...savedWordAsset,
+            mastered: false
+          }
+        };
+        wordAssetsRef.current = next;
+        return next;
+      });
+      clearAutoWordHighlights(renditionRef.current);
+      syncAutoWordHighlights(renditionRef.current);
+      new import_obsidian2.Notice("Word restored.");
+    } catch (error) {
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to restore word.");
+    }
+  };
+  const markActiveWordMastered = async () => {
+    const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!asset || !normalized || typeof setWordMastered !== "function")
+      return;
+    try {
+      const updated = await setWordMastered(asset, true);
+      setCurrentWordAssets((current) => {
+        const next = {
+          ...current,
+          [normalized.lemma]: updated || {
+            ...asset,
+            mastered: true
+          }
+        };
+        wordAssetsRef.current = next;
+        return next;
+      });
+      clearAutoWordHighlights(renditionRef.current);
+      syncAutoWordHighlights(renditionRef.current);
+      setActiveWordHover(null);
+    } catch (error) {
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to mark mastered.");
+    }
+  };
+  const deleteActiveWordAsset = async () => {
+    const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!asset || !normalized || typeof deleteWordAsset !== "function")
+      return;
+    if (typeof window !== "undefined" && typeof window.confirm === "function" && !window.confirm("Delete this word from index and note?"))
+      return;
+    try {
+      const deleted = await deleteWordAsset(asset);
+      if (!deleted)
+        return;
+      setCurrentWordAssets((current) => {
+        const next = {
+          ...current
+        };
+        delete next[normalized.lemma];
+        wordAssetsRef.current = next;
+        return next;
+      });
+      wordDisplayCacheRef.current.delete(`${asset.notePath || ""}#${asset.blockId || normalized.lemma}`);
+      hideWordHoverCard();
+      clearAutoWordHighlights(renditionRef.current);
+      syncAutoWordHighlights(renditionRef.current);
+    } catch (error) {
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to delete word.");
+    }
+  };
+  const clearAutoWordHighlights = (rendition) => {
+    if (!rendition || !rendition.annotations)
+      return;
+    const ids = rendition.__jarvisReaderWordHighlightIds;
+    const cleanupMap = rendition.__jarvisReaderWordHighlightCleanup;
+    const hoverCleanupMap = rendition.__jarvisReaderWordHoverCleanup;
+    if (hoverCleanupMap && typeof hoverCleanupMap.forEach === "function") {
+      hoverCleanupMap.forEach((cleanup) => {
+        if (typeof cleanup === "function") {
+          cleanup();
+        }
+      });
+      hoverCleanupMap.clear();
+    }
+    if (cleanupMap && typeof cleanupMap.forEach === "function") {
+      cleanupMap.forEach((cleanup) => {
+        if (typeof cleanup === "function") {
+          cleanup();
+        }
+      });
+      cleanupMap.clear();
+    }
+    if (ids && typeof ids.forEach === "function") {
+      ids.forEach((cfiRange) => {
+        try {
+          rendition.annotations.remove(cfiRange, "underline");
+        } catch (error) {
+        }
+      });
+      ids.clear();
+    }
+  };
+  const applyAutoWordHighlight = (rendition, asset, cfiRange) => {
+    if (!rendition || !rendition.annotations || !asset || !cfiRange)
+      return;
+    if (!rendition.__jarvisReaderWordHighlightIds) {
+      rendition.__jarvisReaderWordHighlightIds = /* @__PURE__ */ new Set();
+    }
+    if (!rendition.__jarvisReaderWordHighlightCleanup) {
+      rendition.__jarvisReaderWordHighlightCleanup = /* @__PURE__ */ new Map();
+    }
+    if (rendition.__jarvisReaderWordHighlightIds.has(cfiRange))
+      return;
+    rendition.__jarvisReaderWordHighlightIds.add(cfiRange);
+    try {
+      const mark = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, null, "jarvis-reader-word-highlight", {
+        stroke: "#4dabf7",
+        "stroke-opacity": "0.92",
+        "stroke-width": "1.5",
+        "mix-blend-mode": "multiply"
+      });
+      const element = mark == null ? void 0 : mark.element;
+      if (element) {
+        const paneElement = element.ownerSVGElement;
+        if (paneElement) {
+          paneElement.style.pointerEvents = "auto";
+        }
+        element.style.pointerEvents = "visibleStroke";
+        element.style.cursor = "pointer";
+        Array.from(element.children || []).forEach((child) => {
+          child.style.pointerEvents = "visibleStroke";
+          child.style.cursor = "pointer";
+        });
+        const onMouseEnter = () => showWordHoverCard(asset, element);
+        const onMouseLeave = () => scheduleHideWordHoverCard();
+        const onClick = (event) => {
+          event.preventDefault();
+          showWordHoverCard(asset, element);
+        };
+        element.addEventListener("mouseenter", onMouseEnter);
+        element.addEventListener("mouseover", onMouseEnter);
+        element.addEventListener("mouseleave", onMouseLeave);
+        element.addEventListener("mouseout", onMouseLeave);
+        element.addEventListener("click", onClick);
+        rendition.__jarvisReaderWordHighlightCleanup.set(cfiRange, () => {
+          element.removeEventListener("mouseenter", onMouseEnter);
+          element.removeEventListener("mouseover", onMouseEnter);
+          element.removeEventListener("mouseleave", onMouseLeave);
+          element.removeEventListener("mouseout", onMouseLeave);
+          element.removeEventListener("click", onClick);
+        });
+      }
+    } catch (error) {
+      console.warn("Jarvis Reader word highlight render failed.", error);
+    }
+  };
+  const attachAutoWordHover = (rendition, contents2) => {
+    const doc = contents2 == null ? void 0 : contents2.document;
+    if (!rendition || !doc)
+      return;
+    if (!rendition.__jarvisReaderWordHoverCleanup) {
+      rendition.__jarvisReaderWordHoverCleanup = /* @__PURE__ */ new Map();
+    }
+    if (rendition.__jarvisReaderWordHoverCleanup.has(doc))
+      return;
+    let lastLemma = "";
+    let lastMoveAt = 0;
+    const onMouseMove = (event) => {
+      const now = Date.now();
+      if (now - lastMoveAt < 60)
+        return;
+      lastMoveAt = now;
+      const hit = getWordAssetAtPoint(contents2, event);
+      if (!hit) {
+        lastLemma = "";
+        scheduleHideWordHoverCard();
+        return;
+      }
+      if (lastLemma === hit.asset.lemma)
+        return;
+      lastLemma = hit.asset.lemma || "";
+      showWordHoverCardAtRect(hit.asset, hit.rect);
+    };
+    const onMouseLeave = () => {
+      lastLemma = "";
+      scheduleHideWordHoverCard();
+    };
+    const onMouseDown = () => {
+      if (!pendingWordSelectionRef.current)
+        return;
+      clearHighlightUi();
+      hideWordHoverCard();
+    };
+    doc.addEventListener("mousemove", onMouseMove);
+    doc.addEventListener("mouseleave", onMouseLeave);
+    doc.addEventListener("mousedown", onMouseDown);
+    rendition.__jarvisReaderWordHoverCleanup.set(doc, () => {
+      doc.removeEventListener("mousemove", onMouseMove);
+      doc.removeEventListener("mouseleave", onMouseLeave);
+      doc.removeEventListener("mousedown", onMouseDown);
+    });
+  };
+  const collectAutoWordMatches = (contents2, assetsMap) => {
+    if (!contents2 || !contents2.document || !contents2.document.body || !assetsMap)
+      return [];
+    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma && !asset.mastered).map((asset) => ({
+      asset,
+      regex: buildWordMatchRegex(asset.lemma)
+    })).filter((item) => item.regex).sort((a, b) => (b.asset.lemma || "").length - (a.asset.lemma || "").length);
+    if (!assets.length)
+      return [];
+    const doc = contents2.document;
+    const matches = [];
+    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        var _a;
+        const text = (node == null ? void 0 : node.nodeValue) || "";
+        const parentTag = ((_a = node == null ? void 0 : node.parentElement) == null ? void 0 : _a.tagName) || "";
+        if (!text.trim())
+          return NodeFilter.FILTER_REJECT;
+        if (["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA"].includes(parentTag))
+          return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    let node = walker.nextNode();
+    while (node) {
+      const text = node.nodeValue || "";
+      const candidates = [];
+      for (const entry of assets) {
+        entry.regex.lastIndex = 0;
+        let match;
+        while ((match = entry.regex.exec(text)) !== null) {
+          const prefix = match[1] || "";
+          const body = match[2] || "";
+          const start = match.index + prefix.length;
+          const end = start + body.length;
+          candidates.push({
+            start,
+            end,
+            asset: entry.asset
+          });
+        }
+      }
+      candidates.sort((a, b) => a.start !== b.start ? a.start - b.start : b.end - a.end);
+      let lastEnd = -1;
+      for (const candidate of candidates) {
+        if (candidate.start < lastEnd)
+          continue;
+        try {
+          const range = doc.createRange();
+          range.setStart(node, candidate.start);
+          range.setEnd(node, candidate.end);
+          const cfiRange = contents2.cfiFromRange(range);
+          if (cfiRange) {
+            matches.push({
+              asset: candidate.asset,
+              cfiRange
+            });
+            lastEnd = candidate.end;
+          }
+        } catch (error) {
+        }
+      }
+      node = walker.nextNode();
+    }
+    return matches;
+  };
+  const syncAutoWordHighlights = (rendition) => {
+    if (!rendition || !autoWordHighlight) {
+      clearAutoWordHighlights(rendition);
+      return;
+    }
+    clearAutoWordHighlights(rendition);
+    const contentsList = typeof rendition.getContents === "function" ? rendition.getContents() || [] : [];
+    const seen = /* @__PURE__ */ new Set();
+    for (const contents2 of contentsList) {
+      attachAutoWordHover(rendition, contents2);
+      const matches = collectAutoWordMatches(contents2, wordAssetsRef.current);
+      for (const match of matches) {
+        if (!match.cfiRange || seen.has(match.cfiRange))
+          continue;
+        seen.add(match.cfiRange);
+        applyAutoWordHighlight(rendition, match.asset, match.cfiRange);
+      }
+    }
+    refreshHighlightPanes(rendition);
+  };
   (0, import_react.useEffect)(() => {
     highlightPopoverRectRef.current = highlightPopoverRect;
   }, [highlightPopoverRect]);
   (0, import_react.useEffect)(() => {
     pendingHighlightMenuRef.current = pendingHighlightMenu;
   }, [pendingHighlightMenu]);
+  (0, import_react.useEffect)(() => {
+    pendingWordSelectionRef.current = pendingWordSelection;
+  }, [pendingWordSelection]);
+  (0, import_react.useEffect)(() => {
+    setCurrentWordAssets(wordAssets || {});
+    wordAssetsRef.current = wordAssets || {};
+  }, [wordAssets]);
   (0, import_react.useEffect)(() => {
     setHighlightList(highlights || []);
     highlightListRef.current = highlights || [];
@@ -48348,11 +49849,25 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     applyHighlights(renditionRef.current, highlightList);
   }, [highlightList]);
   (0, import_react.useEffect)(() => {
+    wordAssetsRef.current = currentWordAssets || {};
+    syncAutoWordHighlights(renditionRef.current);
+  }, [currentWordAssets, autoWordHighlight]);
+  (0, import_react.useEffect)(() => {
+    return () => {
+      clearWordHoverHideTimer();
+      if (typeof speechSynthesis !== "undefined") {
+        speechSynthesis.cancel();
+      }
+      clearAutoWordHighlights(renditionRef.current);
+    };
+  }, []);
+  (0, import_react.useEffect)(() => {
     if (typeof registerHighlightEditor !== "function")
       return;
     registerHighlightEditor((highlight) => {
       if (!highlight)
         return;
+      clearWordLookup();
       selectHighlight(highlight);
       setPendingSelection({
         ...highlight,
@@ -48451,6 +49966,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     const selectedText = normalizeHighlightQuote((_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
     if (!selectedText)
       return;
+    clearWordLookup();
     setPendingSelection(null);
     setPendingHighlightMenu({
       cfiRange,
@@ -48631,11 +50147,13 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     return nodes.length ? nodes : React.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7");
   };
   const clearHighlightUi = () => {
+    pendingWordLookupRef.current += 1;
     setPendingSelection(null);
     setPendingHighlightMenu(null);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
+    clearWordLookup();
   };
   const copyHighlightQuote = async (item) => {
     if (!item || !item.quote)
@@ -48654,6 +50172,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     if (typeof getWikiLinkCandidates === "function") {
       setCurrentWikiLinkCandidates(getWikiLinkCandidates() || []);
     }
+    clearWordLookup();
     setPendingHighlightMenu(null);
     selectHighlight(item);
     setPendingSelection({
@@ -48719,12 +50238,43 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     ...activeHighlightPopoverRect,
     height: Math.max(activeHighlightPopoverRect.height || 0, 480)
   }) : activeHighlightPopoverRect;
+  const activeWordPopoverRect = pendingWordSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
+  const visibleWordPopoverRect = activeWordPopoverRect ? clampHighlightPopoverRect({
+    ...activeWordPopoverRect,
+    height: Math.max(activeWordPopoverRect.height || 0, 360)
+  }) : null;
+  const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
+  const savedWordAsset = normalizedPendingWord ? currentWordAssets[normalizedPendingWord.lemma] || null : null;
+  const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.isWord && normalizedPendingWord);
+  const renderObsidianIcon = (name) => React.createElement("span", {
+    "aria-hidden": "true",
+    className: "jarvis-reader-word-card-action-icon",
+    ref: (element) => {
+      if (!element)
+        return;
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      if (typeof import_obsidian2.setIcon === "function") {
+        (0, import_obsidian2.setIcon)(element, name);
+      }
+    }
+  });
+  const renderWordDisplayContent = (display) => React.createElement("div", {
+    className: "jarvis-reader-word-card-display"
+  }, truncateWordDisplay(display || "").split(/\r?\n/).filter((line) => line.trim()).map((line, index) => {
+    const meta = getWordCardDisplayLineMeta(line);
+    return /* @__PURE__ */ React.createElement("div", {
+      className: meta.className,
+      key: index
+    }, renderWordCardDisplayText(meta.text));
+  }));
   return /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-epub",
     ref: containerRef,
     style: { border: "none", height: "100%", width: "100%", overflow: "hidden" },
     onClick: (event) => {
-      if (!pendingSelection && !pendingHighlightMenu)
+      if (!pendingSelection && !pendingHighlightMenu && !pendingWordSelection && !activeWordHover)
         return;
       const popover = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-popover");
       if (popover && popover.contains(event.target))
@@ -48732,7 +50282,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       const menu = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-menu");
       if (menu && menu.contains(event.target))
         return;
+      const wordCard = containerRef.current && containerRef.current.querySelector(".jarvis-reader-word-card");
+      if (wordCard && wordCard.contains(event.target))
+        return;
       clearHighlightUi();
+      hideWordHoverCard();
     }
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-side-hover-zone"
@@ -48795,18 +50349,22 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       renditionRef.current = rendition;
       syncRenditionTheme(rendition);
       applyHighlights(rendition, highlightList);
+      syncAutoWordHighlights(rendition);
       ensureReaderLocations(rendition, updateReaderTitle);
       if (rendition && typeof rendition.on === "function" && !rendition.__awesomeReaderTitleBound) {
         rendition.__awesomeReaderTitleBound = true;
         rendition.on("relocated", (relocated) => {
           updateReaderTitle(relocated);
+          syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
         rendition.on("rendered", () => {
           applyHighlights(rendition, highlightListRef.current);
+          syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
         rendition.on("resized", () => {
+          syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
       }
@@ -48951,7 +50509,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-highlight-menu-button",
     type: "button",
     onClick: () => copyHighlightQuote(pendingHighlightMenu)
-  }, "\u590d\u5236"), pendingHighlightMenu.id ? null : /* @__PURE__ */ React.createElement("button", {
+  }, "\u590d\u5236"), /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-menu-button",
+    type: "button",
+    onClick: () => openWordTranslator(pendingHighlightMenu)
+  }, "\u7ffb\u8bd1"), pendingHighlightMenu.id ? null : /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-highlight-menu-button",
     type: "button",
     onClick: () => savePlainHighlight(pendingHighlightMenu)
@@ -48963,7 +50525,57 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-danger",
     type: "button",
     onClick: () => deleteExistingHighlight(pendingHighlightMenu)
-  }, "\u5220\u9664\u9ad8\u4eae") : null) : null, pendingSelection ? /* @__PURE__ */ React.createElement("div", {
+  }, "\u5220\u9664\u9ad8\u4eae") : null) : null, pendingWordSelection ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
+    style: visibleWordPopoverRect ? {
+      left: visibleWordPopoverRect.x,
+      top: visibleWordPopoverRect.y,
+      width: visibleWordPopoverRect.width,
+      height: visibleWordPopoverRect.height
+    } : void 0,
+    onClick: (event) => event.stopPropagation()
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-title",
+    onPointerDown: beginHighlightPopoverMove,
+    onDoubleClick: resetHighlightPopoverRect
+  }, "\u7ffb\u8bd1"), /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-quote"
+  }, pendingWordSelection.quote), /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-panel"
+  }, wordLookupState.status === "loading" ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-muted"
+  }, "\u6b63\u5728\u7ffb\u8bd1...") : null, wordLookupState.status === "error" ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-error"
+  }, wordLookupState.error || "\u7ffb\u8bd1\u5931\u8d25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-head"
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
+    title: "\u70b9\u51fb\u53d1\u97f3",
+    onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
+    disabled: !enableWordAudio
+  }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-phonetic"
+  }, wordLookupState.result.phonetic) : null), wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-translation"
+  }, wordLookupState.result.translation)) : null), /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-actions"
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-button",
+    onClick: clearHighlightUi
+  }, "\u53d6\u6d88"), savedWordAsset ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-button",
+    onClick: () => openWordNote(savedWordAsset)
+  }, "\u6253\u5f00\u8bcd\u6761") : null, savedWordAsset && savedWordAsset.mastered ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+    onClick: restorePendingWordAsset
+  }, "\u91cd\u65b0\u52a0\u5165") : null, canPersistPendingWord && !savedWordAsset ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+    onClick: persistPendingWordAsset
+  }, "\u4fdd\u5b58\u5355\u8bcd") : null, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-highlight-resize-handle",
+    onPointerDown: beginHighlightPopoverResize,
+    title: "Resize"
+  }))) : null, pendingSelection ? /* @__PURE__ */ React.createElement("div", {
     className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
     style: visibleHighlightPopoverRect ? {
       left: visibleHighlightPopoverRect.x,
@@ -49091,7 +50703,58 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
-  }))) : null, progressLabel ? /* @__PURE__ */ React.createElement("div", {
+  }))) : null, activeWordHover ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card",
+    style: {
+      left: activeWordHover.left,
+      top: activeWordHover.top
+    },
+    onMouseEnter: clearWordHoverHideTimer,
+    onMouseLeave: scheduleHideWordHoverCard
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-head"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-head-row"
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-word-card-lemma",
+    title: "\u70b9\u51fb\u53d1\u97f3",
+    onClick: () => playWordAudioText(activeWordHover.asset.lemma || "")
+  }, activeWordHover.asset.lemma), /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-actions"
+  }, /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
+    title: "\u6807\u8bb0\u5df2\u638c\u63e1",
+    onClick: markActiveWordMastered
+  }, renderObsidianIcon("check")), /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
+    title: "\u5220\u9664\u8bcd\u6761",
+    onClick: deleteActiveWordAsset
+  }, renderObsidianIcon("trash")), activeWordHover.asset.notePath ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
+    title: "\u6253\u5f00\u8bcd\u6761",
+    onClick: () => openWordNote(activeWordHover.asset)
+  }, renderObsidianIcon("book-open")) : null)), activeWordHover.asset.phonetic ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-phonetic"
+  }, activeWordHover.asset.phonetic) : null), /* @__PURE__ */ React.createElement("div", {
+    className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
+  }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-translation"
+  }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-pos"
+  }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-example"
+  }, activeWordHover.asset.example) : null), activeWordHover.asset.sources && activeWordHover.asset.sources.length ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-sources"
+  }, /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-section-title"
+  }, "\u6765\u6e90"), activeWordHover.asset.sources.slice(0, 3).map((source, index) => /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-source",
+    key: `${source.bookPath || ""}-${source.cfiRange || index}`
+  }, source.bookTitle || source.bookPath || "", source.chapterTitle ? ` \u00b7 ${source.chapterTitle}` : "", source.quote ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-source-quote"
+  }, source.quote) : null))) : null, activeWordHover.asset.updated ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-updated"
+  }, `Updated ${formatLocalDate(activeWordHover.asset.updated)}`) : null) : null, progressLabel ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-progress-label"
   }, progressLabel) : null);
 };
@@ -49111,6 +50774,165 @@ var EpubView = class extends import_obsidian2.FileView {
   }
   async createBookNote() {
     await openOrCreateNote(this.app, this.file, getEpubTocMd(this.fileToc), this.plugin.settings);
+  }
+  getWordAssets() {
+    return getWordAssetsMap(this.plugin.settings);
+  }
+  async translateSelection(text) {
+    return await translateSelectionWithApi(this.plugin.settings, text);
+  }
+  async saveWordAsset(selection, translation) {
+    const assetMap = getWordAssetsMap(this.plugin.settings);
+    const normalized = normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
+    if (!normalized) {
+      new import_obsidian2.Notice("Only English words or short phrases can be saved.");
+      return null;
+    }
+    const existing = assetMap[normalized.lemma];
+    const asset = buildWordAssetFromSelection(this.file, selection, translation, existing, this.plugin.settings);
+    if (!asset) {
+      new import_obsidian2.Notice("Failed to build word asset.");
+      return null;
+    }
+    const noteFile = await upsertWordAssetNote(this.app, this.plugin.settings, asset, this.file);
+    asset.notePath = noteFile.path;
+    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
+      this.plugin.settings.wordAssets = {};
+    }
+    this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
+    await this.plugin.saveSettings();
+    new import_obsidian2.Notice("已保存到全局单词库");
+    return asset;
+  }
+  async openWordNote(asset) {
+    if (!asset || !asset.notePath)
+      return;
+    const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (!(existing instanceof import_obsidian2.TFile)) {
+      const normalized = normalizeWordSelection(asset.lemma || "");
+      if (!normalized) {
+        new import_obsidian2.Notice("Word note is missing.");
+        return;
+      }
+      const rebuilt = {
+        ...asset,
+        notePath: getWordBookNotePath(this.file, this.plugin.settings),
+        blockId: asset.blockId || getWordBlockId(normalized.lemma)
+      };
+      const noteFile = await upsertWordAssetNote(this.app, this.plugin.settings, rebuilt, this.file);
+      rebuilt.notePath = noteFile.path;
+      if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
+        this.plugin.settings.wordAssets = {};
+      }
+      this.plugin.settings.wordAssets[normalized.lemma] = getLightWordAsset(rebuilt);
+      await this.plugin.saveSettings();
+      asset = rebuilt;
+    }
+    if (asset.blockId && this.app.workspace && typeof this.app.workspace.openLinkText === "function") {
+      const markdownLeaves = typeof this.app.workspace.getLeavesOfType === "function" ? this.app.workspace.getLeavesOfType("markdown") || [] : [];
+      const openedLeaf = markdownLeaves.find((leaf) => {
+        var _a, _b;
+        return ((_b = (_a = leaf == null ? void 0 : leaf.view) == null ? void 0 : _a.file) == null ? void 0 : _b.path) === asset.notePath;
+      });
+      if (openedLeaf instanceof import_obsidian2.WorkspaceLeaf) {
+        await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
+        await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
+      } else {
+        const activeLeaf = this.app.workspace.getMostRecentLeaf();
+        const targetLeaf = activeLeaf instanceof import_obsidian2.WorkspaceLeaf ? this.app.workspace.createLeafBySplit(activeLeaf, "vertical") : null;
+        if (targetLeaf instanceof import_obsidian2.WorkspaceLeaf) {
+          await this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+          await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
+        } else {
+          await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", true);
+        }
+      }
+      return;
+    }
+    const target = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (!(target instanceof import_obsidian2.TFile)) {
+      new import_obsidian2.Notice("Word note is missing.");
+      return;
+    }
+    const markdownLeaves = typeof this.app.workspace.getLeavesOfType === "function" ? this.app.workspace.getLeavesOfType("markdown") || [] : [];
+    const openedLeaf = markdownLeaves.find((leaf2) => {
+      var _a, _b;
+      return ((_b = (_a = leaf2 == null ? void 0 : leaf2.view) == null ? void 0 : _a.file) == null ? void 0 : _b.path) === asset.notePath;
+    });
+    if (openedLeaf instanceof import_obsidian2.WorkspaceLeaf) {
+      await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
+      await openedLeaf.openFile(target, { active: true });
+    } else {
+      const leaf = this.app.workspace.getMostRecentLeaf();
+      const targetLeaf = leaf instanceof import_obsidian2.WorkspaceLeaf ? this.app.workspace.createLeafBySplit(leaf, "vertical") : null;
+      if (targetLeaf instanceof import_obsidian2.WorkspaceLeaf) {
+        await targetLeaf.openFile(target, { active: true });
+      } else if (leaf instanceof import_obsidian2.WorkspaceLeaf) {
+        await leaf.openFile(target, { active: true });
+      }
+    }
+  }
+  async setWordMastered(asset, mastered) {
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!normalized)
+      return null;
+    const current = getWordAssetsMap(this.plugin.settings)[normalized.lemma] || asset;
+    const updated = {
+      ...current,
+      mastered: !!mastered,
+      updated: new Date().toISOString()
+    };
+    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
+      this.plugin.settings.wordAssets = {};
+    }
+    this.plugin.settings.wordAssets[normalized.lemma] = getLightWordAsset(updated);
+    if (updated.notePath) {
+      const existing = this.app.vault.getAbstractFileByPath(updated.notePath);
+      if (existing instanceof import_obsidian2.TFile) {
+        const content = await this.app.vault.read(existing);
+        await this.app.vault.modify(existing, removeWordEntryMetadataInContent(content, updated));
+      }
+    }
+    await this.plugin.saveSettings();
+    return updated;
+  }
+  async deleteWordAsset(asset) {
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!normalized)
+      return false;
+    const current = getWordAssetsMap(this.plugin.settings)[normalized.lemma] || asset;
+    const notePath = current.notePath || asset.notePath;
+    if (notePath) {
+      const existing = this.app.vault.getAbstractFileByPath(notePath);
+      if (existing instanceof import_obsidian2.TFile) {
+        const content = await this.app.vault.read(existing);
+        const nextContent = deleteWordEntryInContent(content, current);
+        if (nextContent !== content) {
+          await this.app.vault.modify(existing, nextContent);
+        }
+      }
+    }
+    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
+      this.plugin.settings.wordAssets = {};
+    }
+    delete this.plugin.settings.wordAssets[normalized.lemma];
+    await this.plugin.saveSettings();
+    new import_obsidian2.Notice("Word deleted.");
+    return true;
+  }
+  async loadWordDisplay(asset) {
+    if (!asset || asset.display)
+      return (asset == null ? void 0 : asset.display) || "";
+    if (!asset.notePath)
+      return "";
+    const file = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (!(file instanceof import_obsidian2.TFile))
+      return "";
+    const content = await this.app.vault.read(file);
+    return extractWordCardDisplayFromContent(content, asset);
+  }
+  shouldAutoHighlightWords() {
+    return shouldAutoHighlightFile(this.file.path, this.plugin.settings);
   }
   getBookHighlights() {
     return getHighlightsForBook(this.plugin.settings, this.file.path);
@@ -49427,6 +51249,31 @@ var EpubView = class extends import_obsidian2.FileView {
       syncRenditionTheme: (rendition) => {
         this.startThemeSync(rendition);
       },
+      wordAssets: this.getWordAssets(),
+      translateSelection: (text) => {
+        return this.translateSelection(text);
+      },
+      saveWordAsset: (selection, translation) => {
+        return this.saveWordAsset(selection, translation);
+      },
+      openWordNote: (asset) => {
+        return this.openWordNote(asset);
+      },
+      setWordMastered: (asset, mastered) => {
+        return this.setWordMastered(asset, mastered);
+      },
+      deleteWordAsset: (asset) => {
+        return this.deleteWordAsset(asset);
+      },
+      loadWordDisplay: (asset) => {
+        return this.loadWordDisplay(asset);
+      },
+      autoWordHighlight: this.shouldAutoHighlightWords(),
+      speechLang: this.plugin.settings.speechLang,
+      enableWordAudio: !!this.plugin.settings.enableWordAudio,
+      wordAudioTemplate: this.plugin.settings.wordAudioTemplate,
+      wordAudioAccent: this.plugin.settings.wordAudioAccent,
+      blurWordCardBody: !!this.plugin.settings.blurWordCardBody,
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText) => {
@@ -50408,6 +52255,21 @@ var DEFAULT_SETTINGS = {
   readerLineHeight: 1.6,
   bookNoteFolder: "",
   bookNoteTemplate: "",
+  wordNoteFolder: "09 Books/Words",
+  wordAssets: {},
+  translationApi: {
+    provider: "openai-compatible",
+    baseUrl: "",
+    apiKey: "",
+    model: ""
+  },
+  translationPrompt: DEFAULT_TRANSLATION_PROMPT,
+  autoHighlightFolders: ["09 Books"],
+  enableWordAudio: true,
+  wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
+  wordAudioAccent: "us",
+  blurWordCardBody: true,
+  speechLang: "en-US",
   bookInitLocations: {},
   bookHighlights: {},
   bookProgress: {},
@@ -50554,6 +52416,34 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     if (!this.settings.bookProgress) {
       this.settings.bookProgress = {};
     }
+    if (!this.settings.wordAssets || typeof this.settings.wordAssets !== "object") {
+      this.settings.wordAssets = {};
+    }
+    for (const [lemma, asset] of Object.entries(this.settings.wordAssets)) {
+      if (asset && asset.blockId && asset.notePath && asset.display) {
+        this.settings.wordAssets[lemma] = getLightWordAsset(asset);
+      }
+    }
+    if (!this.settings.translationApi || typeof this.settings.translationApi !== "object") {
+      this.settings.translationApi = {
+        provider: "openai-compatible",
+        baseUrl: "",
+        apiKey: "",
+        model: ""
+      };
+    }
+    this.settings.translationApi.provider = normalizeTranslationProvider(this.settings.translationApi.provider, this.settings.translationApi.baseUrl);
+    this.settings.translationApi.baseUrl = String(this.settings.translationApi.baseUrl || "");
+    this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
+    this.settings.translationApi.model = String(this.settings.translationApi.model || "");
+    this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+    this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
+    this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];
+    this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
+    this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);
+    this.settings.wordAudioAccent = String(this.settings.wordAudioAccent || "us").toLowerCase() === "uk" ? "uk" : "us";
+    this.settings.blurWordCardBody = this.settings.blurWordCardBody !== false;
+    this.settings.speechLang = String(this.settings.speechLang || "en-US");
     if (!this.settings.bookCoverCache) {
       this.settings.bookCoverCache = {};
     }
@@ -50594,6 +52484,8 @@ var JarvisReaderSettingTab = class extends import_obsidian3.PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     containerEl.createEl("h2", { text: "Jarvis Reader \u8bbe\u7f6e" });
+    let translationBaseUrlText = null;
+    let translationModelText = null;
     new import_obsidian3.Setting(containerEl).setName("\u6eda\u52a8\u9605\u8bfb").setDesc("\u4f7f\u7528\u8fde\u7eed\u6eda\u52a8\u9605\u8bfb\u6a21\u5f0f").addToggle((toggle) => toggle.setValue(this.plugin.settings.scrolledView).onChange(async (value) => {
       this.plugin.settings.scrolledView = value;
       await this.plugin.saveSettings();
@@ -50636,6 +52528,128 @@ created: {{created}}
       });
       text.inputEl.rows = 8;
       text.inputEl.style.width = "100%";
+    });
+    new import_obsidian3.Setting(containerEl).setName("单词笔记文件夹").setDesc("保存全局单词卡片笔记的文件夹").addText((text) => {
+      text.setPlaceholder("09 Books/Words").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
+        this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian3.Setting(containerEl).setName("自动标记文件夹").setDesc("只在这些文件夹下的 EPUB 中自动标记已保存单词；多个文件夹用英文逗号分隔").addText((text) => {
+      text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
+        this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian3.Setting(containerEl).setName("翻译服务").setDesc("选择 API 请求格式；自定义会继续按 URL 自动识别").addDropdown((dropdown) => {
+      dropdown.addOption("openai-compatible", "OpenAI 兼容").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "自定义").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
+        const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
+        const defaults = getTranslationProviderDefaults(provider);
+        this.plugin.settings.translationApi.provider = provider;
+        if (!String(this.plugin.settings.translationApi.baseUrl || "").trim() && defaults.baseUrl) {
+          this.plugin.settings.translationApi.baseUrl = defaults.baseUrl;
+        }
+        if (!String(this.plugin.settings.translationApi.model || "").trim() && defaults.model) {
+          this.plugin.settings.translationApi.model = defaults.model;
+        }
+        await this.plugin.saveSettings();
+        if (translationBaseUrlText) {
+          translationBaseUrlText.setPlaceholder(defaults.baseUrl || "https://...");
+          translationBaseUrlText.setValue(this.plugin.settings.translationApi.baseUrl || "");
+        }
+        if (translationModelText) {
+          translationModelText.setPlaceholder(defaults.model || "模型 ID");
+          translationModelText.setValue(this.plugin.settings.translationApi.model || "");
+        }
+      });
+    });
+    new import_obsidian3.Setting(containerEl).setName("翻译 API 基础地址").setDesc("服务商基础地址；插件会按所选服务自动追加请求路径").addText((text) => {
+      translationBaseUrlText = text;
+      const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
+      text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
+        this.plugin.settings.translationApi.baseUrl = value.trim();
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.style.width = "100%";
+    });
+    new import_obsidian3.Setting(containerEl).setName("翻译 API 密钥").setDesc("用于请求翻译服务的访问密钥").addText((text) => {
+      text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
+        this.plugin.settings.translationApi.apiKey = value.trim();
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.type = "password";
+      text.inputEl.style.width = "100%";
+    });
+    new import_obsidian3.Setting(containerEl).setName("翻译模型").setDesc("当前服务使用的模型 ID").addText((text) => {
+      translationModelText = text;
+      const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
+      text.setPlaceholder(defaults.model || "模型 ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
+        this.plugin.settings.translationApi.model = value.trim();
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.style.width = "100%";
+    }).addButton((button) => button.setButtonText("测试").onClick(async () => {
+      try {
+        const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+        if (!promptCheck.ok) {
+          new import_obsidian3.Notice(`提示词 JSON 模板无效：${promptCheck.error}`);
+          return;
+        }
+        await translateSelectionWithApi(this.plugin.settings, "test");
+        new import_obsidian3.Notice("测试成功");
+      } catch (error) {
+        new import_obsidian3.Notice(`翻译测试失败：${error.message || error}`);
+      }
+    }));
+    containerEl.createDiv({
+      cls: "jarvis-reader-translation-prompt-help",
+      text: TRANSLATION_PROMPT_HELP_TEXT
+    });
+    let translationPromptText = null;
+    new import_obsidian3.Setting(containerEl).setName("翻译提示词").setDesc("用于生成单词释义的提示词").addTextArea((text) => {
+      translationPromptText = text;
+      text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
+        this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.rows = 6;
+      text.inputEl.style.width = "100%";
+    });
+    new import_obsidian3.Setting(containerEl).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590d\u9ed8\u8ba4\u63d0\u793a\u8bcd").onClick(async () => {
+      this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
+      await this.plugin.saveSettings();
+      if (translationPromptText) {
+        translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
+      }
+      new import_obsidian3.Notice("已恢复默认翻译提示词。");
+    }));
+    new import_obsidian3.Setting(containerEl).setName("模糊单词卡正文").setDesc("只模糊可滚动的单词卡正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      this.plugin.settings.blurWordCardBody = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian3.Setting(containerEl).setName("启用单词发音").setDesc("优先使用发音链接；失败时回退到浏览器语音合成").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+      this.plugin.settings.enableWordAudio = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian3.Setting(containerEl).setName("发音链接模板").setDesc("可用 {{word}}、{{type}}、{{accent}}。有道 type：1 英式，2 美式。").addText((text) => {
+      text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
+        this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.style.width = "100%";
+    });
+    new import_obsidian3.Setting(containerEl).setName("发音口音").setDesc("选择美式或英式发音").addDropdown((dropdown) => {
+      dropdown.addOption("us", "美式").addOption("uk", "英式").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
+        this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
+        this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian3.Setting(containerEl).setName("语音回退语言").setDesc("仅在发音链接无法播放时使用").addText((text) => {
+      text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
+        this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
+        await this.plugin.saveSettings();
+      });
     });
   }
 };
