@@ -47630,17 +47630,31 @@ async function openOrCreateNote(app, file, toc, settings = {}) {
 var JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 var JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
-var DEFAULT_TRANSLATION_PROMPT = `Return ONLY valid JSON. Do not wrap it in markdown.
-All string values must be valid JSON strings. If display needs line breaks, use escaped \\n, not raw line breaks.
-The display field is the full learner-facing card body. Put pronunciation, part of speech, definition, examples, collocations, derivatives, etymology, and synonyms in display when useful.
-
-{
-  "lemma": "normalized lowercase base form",
-  "translation": "concise Simplified Chinese meaning",
-  "display": "full Markdown card body with all learner-facing content",
-  "isWord": true
-}`;
-var TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。display 是唯一正文显示源；换行请写成 \\n。测试会先校验 JSON 示例。";
+var DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与单词卡生成器。
+你必须只返回单行合法 JSON。
+整个响应不能包含任何真实换行符。
+不要 markdown 代码块。
+不要解释。
+不要输出 JSON 以外的任何文字。
+Return ONLY valid JSON on a single line:
+{"lemma":"{{word}}","translation":"文中对应的简洁中文释义或整句译文","display":"如果 selectionType 是 word 或 phrase：**词性** /音标/\\n\\n**英英释义**：优先写输入词或短语在上下文中的英文释义。\\n\\n**中文释义**：文中含义：结合原句语境解释。其他常见含义：简要列出；没有则写无。\\n\\n---\\n\\n**例句**：English example sentence matching the context meaning.\\n中文例句翻译。\\n\\n---\\n\\n**搭配**：common collocation\\n**派生**：common derivative if any\\n**词源**：简洁词源说明\\n**同义词**：synonym1, synonym2。如果 selectionType 是 sentence：只写自然中文译文，不要词性、音标、例句、搭配、派生、词源、同义词。","isWord":true}
+规则：
+1. 只返回单行 JSON，整个响应不能换行。
+2. 必须包含且只需要包含：lemma、translation、display、isWord。
+3. selectionType 为 word 或 phrase 时，按单词卡结构输出：display 是唯一正文显示源，必须包含音标、词性、英英释义、中文释义、例句、搭配、派生、词源、同义词；isWord 必须是 true。
+4. selectionType 为 sentence 时，只翻译整句：translation 写自然中文译文，display 也只写同一段中文译文；lemma 写空字符串；isWord 必须是 false；禁止输出词性、音标、例句、搭配、派生、词源、同义词。
+5. 优先根据上下文判断输入词或短语在原句中的具体含义。word 或 phrase 的 display 必须先展示文中含义，再补充其他常见含义；translation 也优先写文中含义。
+6. display 内换行只能写成 \\n，不能直接换行。
+7. display 内双引号必须转义成 \\"。
+8. word 或 phrase 的 display 内标签词必须加粗：**词性**、**英英释义**、**中文释义**、**例句**、**搭配**、**派生**、**词源**、**同义词**。
+9. word 或 phrase 的 translation 只写简洁中文释义，不要写完整卡片。
+10. word 的 lemma 必须是小写原形；phrase 的 lemma 写小写短语原形。
+11. 如果没有常见派生或同义词，可以写"无"，不要编造。
+12. display 内禁止重复堆叠输入词本身。
+输入内容：{{word}}
+选择类型：{{selectionType}}
+上下文：{{sentence}}`;
+var TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。word/phrase 输出单词卡；sentence 只输出译文且 isWord=false。display 换行请写成 \\n。测试会先校验 JSON 示例。";
 function formatLocalDate(value) {
   if (!value)
     return "";
@@ -47694,6 +47708,17 @@ function isEnglishWordCandidate(value) {
   const normalized = normalizeWordSelection(value);
   return !!(normalized && (normalized.isSingleWord || normalized.isPhrase));
 }
+function getTranslationSelectionType(value) {
+  const text = normalizeHighlightQuote(value || "");
+  if (/[.!?。！？]\s*$/.test(text) || /[.!?。！？]\s+/.test(text))
+    return "sentence";
+  const normalized = normalizeWordSelection(text);
+  if (normalized && normalized.isSingleWord)
+    return "word";
+  if (normalized && normalized.isPhrase)
+    return "phrase";
+  return "sentence";
+}
 function getWordNoteFolder(settings = {}) {
   return normalizeVaultPath(settings.wordNoteFolder || "09 Books/Words");
 }
@@ -47709,6 +47734,74 @@ function getWordBlockId(lemma) {
   const source = normalized ? normalized.lemma : String(lemma || "word").toLowerCase();
   const slug = source.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   return `jr-word-${slug || "word"}`;
+}
+function getTranslationAssetKind(assetOrText, translation = null) {
+  const explicit = assetOrText && typeof assetOrText === "object" ? assetOrText.kind : "";
+  if (["word", "phrase", "sentence"].includes(explicit))
+    return explicit;
+  const isWord = translation && typeof translation.isWord === "boolean" ? translation.isWord : assetOrText && typeof assetOrText === "object" && typeof assetOrText.isWord === "boolean" ? assetOrText.isWord : true;
+  const text = assetOrText && typeof assetOrText === "object" ? assetOrText.lemma || assetOrText.quote || "" : assetOrText || "";
+  if (!isWord)
+    return "sentence";
+  const normalized = normalizeWordSelection(text || "");
+  if (normalized && normalized.isPhrase)
+    return "phrase";
+  return "word";
+}
+function getTranslationAssetKey(selection, translation) {
+  const kind = getTranslationAssetKind((selection == null ? void 0 : selection.quote) || "", translation);
+  if (kind !== "sentence") {
+    const normalized = normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
+    return normalized ? normalized.lemma : "";
+  }
+  const source = `${(selection == null ? void 0 : selection.cfiRange) || ""}|${(selection == null ? void 0 : selection.quote) || ""}`;
+  let hash = 0;
+  for (let index = 0; index < source.length; index++) {
+    hash = (hash * 31 + source.charCodeAt(index)) >>> 0;
+  }
+  return `sentence-${hash.toString(36)}`;
+}
+function getTranslationAssetStorageKey(asset) {
+  if (!asset || !asset.lemma)
+    return "";
+  if (getTranslationAssetKind(asset) === "sentence")
+    return asset.lemma;
+  const normalized = normalizeWordSelection(asset.lemma || "");
+  return normalized ? normalized.lemma : asset.lemma;
+}
+function getWordEntrySectionTitle(kind) {
+  switch (kind) {
+    case "phrase":
+      return "Phrases";
+    case "sentence":
+      return "Sentences";
+    case "word":
+    default:
+      return "Words";
+  }
+}
+function ensureWordBookSections(content) {
+  let next = content || "";
+  for (const title of ["Words", "Phrases", "Sentences"]) {
+    if (!new RegExp(`^##\\s+${title}\\s*$`, "m").test(next)) {
+      next = `${next.trimEnd()}\n\n## ${title}\n`;
+    }
+  }
+  return next;
+}
+function insertWordEntryIntoSection(content, asset) {
+  const current = ensureWordBookSections(content);
+  const title = getWordEntrySectionTitle(getTranslationAssetKind(asset));
+  const heading = `## ${title}`;
+  const start = current.search(new RegExp(`^##\\s+${title}\\s*$`, "m"));
+  if (start < 0)
+    return `${current.trimEnd()}\n\n${buildWordEntryBlock(asset)}\n`;
+  const afterHeading = start + current.slice(start).indexOf("\n") + 1;
+  const nextSectionRelative = current.slice(afterHeading).search(/^##\s+(Words|Phrases|Sentences)\s*$/m);
+  const insertAt = nextSectionRelative >= 0 ? afterHeading + nextSectionRelative : current.length;
+  const before = current.slice(0, insertAt).trimEnd();
+  const after = current.slice(insertAt).replace(/^\s*/, "");
+  return `${before}\n\n${buildWordEntryBlock(asset)}\n${after ? `\n${after}` : ""}`;
 }
 async function ensureVaultFolder(app, folderPath) {
   const cleanPath = normalizeVaultPath(folderPath);
@@ -47738,32 +47831,58 @@ function formatWordSourceLine(source) {
   const preview = quote.length > 88 ? `${quote.slice(0, 88)}...` : quote;
   return `- ${bookPath || "Unknown"}${chapterTitle ? ` - ${chapterTitle}` : ""}${preview ? ` - ${preview}` : ""}`;
 }
+function buildHighlightMetadata(highlight) {
+  return {
+    id: highlight.id || highlight.blockId || "",
+    bookPath: highlight.bookPath || "",
+    bookTitle: highlight.bookTitle || "",
+    chapterTitle: highlight.chapterTitle || "",
+    cfiRange: highlight.cfiRange || "",
+    quote: highlight.quote || "",
+    comment: highlight.comment || "",
+    notePath: highlight.notePath || "",
+    blockId: highlight.blockId || highlight.id || "",
+    created: highlight.created || "",
+    updated: highlight.updated || ""
+  };
+}
+function buildWordAssetMetadata(asset) {
+  return {
+    lemma: asset.lemma || "",
+    title: asset.title || "",
+    kind: getTranslationAssetKind(asset),
+    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
+    surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
+    translation: asset.translation || "",
+    phonetic: asset.phonetic || "",
+    partOfSpeech: asset.partOfSpeech || "",
+    example: asset.example || "",
+    notePath: asset.notePath || "",
+    blockId: asset.blockId || getWordBlockId(asset.lemma || ""),
+    mastered: !!asset.mastered,
+    sources: Array.isArray(asset.sources) ? asset.sources : [],
+    created: asset.created || "",
+    updated: asset.updated || ""
+  };
+}
 function buildWordGeneratedBlock(asset) {
   const cardText = normalizeWordDisplayText((asset == null ? void 0 : asset.display) || (asset == null ? void 0 : asset.translation) || (asset == null ? void 0 : asset.example) || "");
   const lines = [
     JARVIS_WORD_NOTE_START,
     `## Card`,
-    cardText,
-    ""
+    cardText
   ];
-  lines.push("## Sources");
-  if ((asset.sources || []).length) {
-    for (const source of asset.sources) {
-      lines.push(formatWordSourceLine(source));
-    }
-  } else {
-    lines.push("- None");
-  }
   lines.push("", JARVIS_WORD_NOTE_END);
   return lines.join("\n");
 }
 function buildWordNoteFrontmatter(asset) {
   const primarySource = asset.sources && asset.sources.length ? asset.sources[0] : null;
+  const kind = getTranslationAssetKind(asset);
   return `---
 created: ${formatLocalDate(asset.created || new Date())}
 author: "[[Jarvis]]"
-type: word
-word: "${escapeYamlString(asset.lemma || "")}"
+type: ${kind}
+word: "${escapeYamlString(asset.title || asset.lemma || "")}"
 phonetic: "${escapeYamlString(asset.phonetic || "")}"
 translation: "${escapeYamlString(asset.translation || "")}"
 source:
@@ -47785,8 +47904,6 @@ function buildWordNoteFileContent(asset) {
 # ${asset.lemma || "word"}
 
 ${generatedBlock}
-
-## Thoughts
 `;
 }
 function buildWordBookFrontmatter(file) {
@@ -47805,6 +47922,12 @@ function buildWordBookFileContent(file) {
 
 # ${title}
 
+## Words
+
+## Phrases
+
+## Sentences
+
 `;
 }
 function getWordEntryStart(lemma) {
@@ -47816,11 +47939,9 @@ function getWordEntryEnd(lemma) {
 function buildWordEntryBlock(asset) {
   const blockId = asset.blockId || getWordBlockId(asset.lemma);
   return `${getWordEntryStart(asset.lemma)}
-## ${asset.lemma || "word"}
+### ${asset.title || asset.lemma || "word"}
 
 ${buildWordGeneratedBlock(asset)}
-
-## Thoughts
 
 ^${blockId}
 ${getWordEntryEnd(asset.lemma)}`;
@@ -47843,7 +47964,7 @@ function upsertWordEntryInContent(content, asset) {
     }
     return current.slice(0, startIndex) + buildWordEntryBlock(asset) + current.slice(entryEnd);
   }
-  return `${current.trimEnd()}\n\n${buildWordEntryBlock(asset)}\n`;
+  return insertWordEntryIntoSection(current, asset);
 }
 function removeWordEntryMetadataInContent(content, asset) {
   const current = content || "";
@@ -47861,6 +47982,9 @@ function removeWordEntryMetadataInContent(content, asset) {
     return current;
   }
   return current.slice(0, startIndex) + nextEntry + current.slice(entryEnd);
+}
+function removeWordEntrySourcesInContent(content) {
+  return (content || "").replace(/\r?\n## Sources\r?\n[\s\S]*?(?=\r?\n## |\r?\n\^\w|(?:\r?\n)?<!-- jarvis-reader-word-entry:|(?:\r?\n)?<!-- jarvis-reader-word:end -->|$)/g, "");
 }
 function deleteWordEntryInContent(content, asset) {
   const current = content || "";
@@ -47886,7 +48010,7 @@ async function upsertWordAssetNote(app, settings = {}, asset, file = null) {
   const existing = app.vault.getAbstractFileByPath(notePath);
   if (existing instanceof import_obsidian.TFile) {
     const current = await app.vault.read(existing);
-    const nextContent = upsertWordEntryInContent(current, asset);
+    const nextContent = upsertWordEntryInContent(removeWordEntrySourcesInContent(current), asset);
     await app.vault.modify(existing, nextContent);
     return existing;
   }
@@ -47911,29 +48035,82 @@ function mergeStringList(existingList, nextValue) {
   }
   return values.slice(0, 12);
 }
-function buildWordAssetFromSelection(file, selection, translation, existingAsset = null, settings = {}) {
-  const normalized = normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
-  if (!normalized)
+function getWordAssetSurfaceForms(asset) {
+  if (!asset)
+    return [];
+  const candidates = [asset.lemma, ...Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [], ...Array.isArray(asset.sources) ? asset.sources.map((source) => source == null ? void 0 : source.quote) : []];
+  const forms = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const candidate of candidates) {
+    const normalized = normalizeWordSelection(candidate || "");
+    if (!normalized)
+      continue;
+    const key = normalized.surface.toLowerCase();
+    if (seen.has(key))
+      continue;
+    seen.add(key);
+    forms.push(normalized.surface);
+  }
+  return forms;
+}
+function isWordInflectionOf(surface, lemma) {
+  const word = String(surface || "").toLowerCase();
+  const base = String(lemma || "").toLowerCase();
+  if (!word || !base || word === base)
+    return word === base;
+  const variants = /* @__PURE__ */ new Set([`${base}s`, `${base}es`, `${base}ed`, `${base}ing`]);
+  if (base.endsWith("e")) {
+    variants.add(`${base}s`);
+    variants.add(`${base}d`);
+    variants.add(`${base.slice(0, -1)}ing`);
+  }
+  if (base.endsWith("y") && !/[aeiou]y$/.test(base)) {
+    variants.add(`${base.slice(0, -1)}ies`);
+    variants.add(`${base.slice(0, -1)}ied`);
+  }
+  return variants.has(word);
+}
+function findWordAssetBySurface(assetsMap, value) {
+  const normalized = normalizeWordSelection(value || "");
+  if (!normalized || !assetsMap)
     return null;
+  const direct = assetsMap[normalized.lemma];
+  if (direct)
+    return direct;
+  const target = normalized.surface.toLowerCase();
+  return Object.values(assetsMap).find((asset) => getTranslationAssetKind(asset) !== "sentence" && (getWordAssetSurfaceForms(asset).some((form) => form.toLowerCase() === target) || isWordInflectionOf(target, asset == null ? void 0 : asset.lemma))) || null;
+}
+function buildWordAssetFromSelection(file, selection, translation, existingAsset = null, settings = {}) {
+  const kind = getTranslationAssetKind((selection == null ? void 0 : selection.quote) || "", translation);
+  const normalized = kind === "sentence" ? null : normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
+  const assetKey = kind === "sentence" ? getTranslationAssetKey(selection, translation) : (normalized == null ? void 0 : normalized.lemma) || "";
+  if (!assetKey || kind !== "sentence" && !normalized)
+    return null;
+  const selectedSurface = normalizeWordSelection((selection == null ? void 0 : selection.quote) || "");
   const now = new Date().toISOString();
+  const quote = normalizeHighlightQuote((selection == null ? void 0 : selection.quote) || "");
+  const title = kind === "sentence" ? quote.length > 72 ? `${quote.slice(0, 72)}...` : quote : (normalized == null ? void 0 : normalized.surface) || assetKey;
   const source = {
     bookPath: file.path,
     bookTitle: file.basename,
     chapterTitle: (selection == null ? void 0 : selection.chapterTitle) || file.basename,
     cfiRange: (selection == null ? void 0 : selection.cfiRange) || "",
-    quote: normalizeHighlightQuote((selection == null ? void 0 : selection.quote) || ""),
+    quote,
     created: now
   };
   const asset = {
-    lemma: normalized.lemma,
-    surfaceForms: mergeStringList(existingAsset == null ? void 0 : existingAsset.surfaceForms, normalized.surface),
+    lemma: assetKey,
+    title,
+    kind,
+    isWord: kind !== "sentence",
+    surfaceForms: kind === "sentence" ? [] : mergeStringList(mergeStringList(existingAsset == null ? void 0 : existingAsset.surfaceForms, normalized.surface), selectedSurface == null ? void 0 : selectedSurface.surface),
     translation: ((translation == null ? void 0 : translation.translation) || (existingAsset == null ? void 0 : existingAsset.translation) || "").trim(),
     phonetic: ((translation == null ? void 0 : translation.phonetic) || (existingAsset == null ? void 0 : existingAsset.phonetic) || "").trim(),
     partOfSpeech: ((translation == null ? void 0 : translation.partOfSpeech) || (existingAsset == null ? void 0 : existingAsset.partOfSpeech) || "").trim(),
     example: ((translation == null ? void 0 : translation.example) || (existingAsset == null ? void 0 : existingAsset.example) || "").trim(),
     display: ((translation == null ? void 0 : translation.display) || (existingAsset == null ? void 0 : existingAsset.display) || "").trim(),
     notePath: normalizeVaultPath((existingAsset == null ? void 0 : existingAsset.blockId) && (existingAsset == null ? void 0 : existingAsset.notePath) ? existingAsset.notePath : getWordBookNotePath(file, settings)),
-    blockId: (existingAsset == null ? void 0 : existingAsset.blockId) || getWordBlockId(normalized.lemma),
+    blockId: (existingAsset == null ? void 0 : existingAsset.blockId) || getWordBlockId(assetKey),
     mastered: !!(existingAsset == null ? void 0 : existingAsset.mastered),
     sources: mergeWordSources(existingAsset == null ? void 0 : existingAsset.sources, source),
     created: (existingAsset == null ? void 0 : existingAsset.created) || now,
@@ -48063,10 +48240,21 @@ function pickLabeledBlock(text, label, nextLabels = []) {
   const match = source.match(pattern);
   return match && match[1] ? match[1].trim() : "";
 }
-function parsePlainTranslationResponse(selectedText, text) {
+function parsePlainTranslationResponse(selectedText, text, selectionType = "") {
   const raw = (text || "").trim();
   if (!raw)
     return null;
+  if (selectionType === "sentence") {
+    return {
+      lemma: "",
+      translation: raw,
+      phonetic: "",
+      partOfSpeech: "",
+      example: "",
+      display: raw,
+      isWord: false
+    };
+  }
   const normalized = normalizeWordSelection(pickLabeledValue(raw, ["Word"]) || selectedText || "");
   const ipaBlock = pickLabeledBlock(raw, "IPA", ["Part of speech", "Core meaning", "Chinese"]);
   const usIpa = pickLabeledValue(ipaBlock, ["US"]);
@@ -48181,7 +48369,20 @@ function buildStructuredWordDisplay(payload, lemma) {
   }
   return lines.join("\n").trim();
 }
-function normalizeTranslationResult(selectedText, payload) {
+function normalizeTranslationResult(selectedText, payload, selectionType = "") {
+  if (selectionType === "sentence") {
+    const translation = payload && typeof payload.translation === "string" ? payload.translation.trim() : normalizeWordDisplayText(payload && typeof payload.display === "string" ? payload.display : "");
+    return {
+      lemma: "",
+      surface: (selectedText || "").trim(),
+      translation,
+      phonetic: "",
+      partOfSpeech: "",
+      example: "",
+      display: translation,
+      isWord: false
+    };
+  }
   const normalized = normalizeWordSelection((payload == null ? void 0 : payload.lemma) || selectedText || "");
   const primaryMeaning = getPrimaryPosMeaning(payload);
   const example = normalizeJsonExample(payload == null ? void 0 : payload.example);
@@ -48273,14 +48474,17 @@ function buildTranslationApiEndpoint(settings = {}) {
 function buildTranslationPromptText(prompt, selectedText, sentence = "") {
   const word = (selectedText || "").trim();
   const contextSentence = (sentence || selectedText || "").trim();
+  const selectionType = getTranslationSelectionType(word);
   const sourcePrompt = String(prompt || "");
-  const templated = sourcePrompt.replace(/\{\{\s*word\s*\}\}/g, word).replace(/\{\{\s*sentence\s*\}\}/g, contextSentence).replace(/\{\{\s*text\s*\}\}/g, word);
+  const templated = sourcePrompt.replace(/\{\{\s*word\s*\}\}/g, word).replace(/\{\{\s*sentence\s*\}\}/g, contextSentence).replace(/\{\{\s*selectionType\s*\}\}/g, selectionType).replace(/\{\{\s*text\s*\}\}/g, word);
   if (templated !== sourcePrompt) {
     return templated;
   }
   return `${templated}
 
-Selected text: ${selectedText}`;
+Selected text: ${selectedText}
+Selection type: ${selectionType}
+Context: ${contextSentence}`;
 }
 function extractAnthropicMessageText(payload) {
   var _a;
@@ -48296,7 +48500,7 @@ function extractGeminiMessageText(payload) {
     return "";
   return parts.map((part) => part && typeof part.text === "string" ? part.text : "").join("\n").trim();
 }
-async function translateSelectionWithApi(settings = {}, selectedText) {
+async function translateSelectionWithApi(settings = {}, selectedText, sentence = "") {
   const api = settings.translationApi || {};
   const apiType = detectTranslationApiType(settings);
   const endpoint = buildTranslationApiEndpoint(settings);
@@ -48306,7 +48510,8 @@ async function translateSelectionWithApi(settings = {}, selectedText) {
     throw new Error("Translation API is not configured.");
   }
   const prompt = String(settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).trim() || DEFAULT_TRANSLATION_PROMPT;
-  const requestText = buildTranslationPromptText(prompt, selectedText);
+  const selectionType = getTranslationSelectionType(selectedText);
+  const requestText = buildTranslationPromptText(prompt, selectedText, sentence);
   let headers = {
     "Content-Type": "application/json"
   };
@@ -48354,11 +48559,11 @@ async function translateSelectionWithApi(settings = {}, selectedText) {
         messages: [
           {
             role: "system",
-            content: prompt
+            content: "Follow the user's formatting instructions exactly."
           },
           {
             role: "user",
-            content: `Selected text: ${selectedText}`
+            content: requestText
           }
         ]
       };
@@ -48393,11 +48598,11 @@ async function translateSelectionWithApi(settings = {}, selectedText) {
   if (!parsed && looksLikeJsonObjectText(content)) {
     throw new Error("翻译响应看起来是 JSON，但无法解析。请检查引号、逗号，以及 display 字段中的换行是否写成转义的 \\n。");
   }
-  const fallbackParsed = parsed || parsePlainTranslationResponse(selectedText, content);
+  const fallbackParsed = parsed || parsePlainTranslationResponse(selectedText, content, selectionType);
   if (!fallbackParsed) {
     throw new Error("翻译响应为空。");
   }
-  const result = normalizeTranslationResult(selectedText, fallbackParsed);
+  const result = normalizeTranslationResult(selectedText, fallbackParsed, selectionType);
   if (!result.translation) {
     throw new Error("翻译响应缺少 translation 字段。");
   }
@@ -48849,13 +49054,13 @@ function getWordLookupResultFromAsset(asset, selectedText = "") {
     return null;
   return {
     lemma: asset.lemma || "",
-    surface: selectedText || asset.lemma || "",
+    surface: selectedText || asset.title || asset.lemma || "",
     translation: asset.translation || "",
     phonetic: asset.phonetic || "",
     partOfSpeech: asset.partOfSpeech || "",
     example: asset.example || "",
     display: asset.display || "",
-    isWord: true
+    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence"
   };
 }
 function getLightWordAsset(asset) {
@@ -48971,7 +49176,7 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
 
 // src/EpubView.tsx
 var import_react_reader = __toESM(require_lib4());
-var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react.useState)("");
@@ -49223,16 +49428,17 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
           rect: getEventHighlightMenuRect(event)
         });
       }, highlight.comment ? "jarvis-reader-highlight-with-comment" : "jarvis-reader-highlight", highlight.comment ? {
-        fill: "#ffe8cc",
-        "fill-opacity": "0.56",
-        "mix-blend-mode": "multiply",
-        stroke: "#d9480f",
-        "stroke-width": "1.2",
-        "stroke-opacity": "0.88"
+        fill: "#f97316",
+        "fill-opacity": "0.14",
+        stroke: "#f97316",
+        "stroke-width": "1.6",
+        "stroke-opacity": "0.98"
       } : {
-        fill: getObsidianCssVar("--text-highlight-bg", "#ffd54f"),
-        "fill-opacity": "0.32",
-        "mix-blend-mode": "multiply"
+        fill: "#ffeb3b",
+        "fill-opacity": "0.58",
+        stroke: "#facc15",
+        "stroke-width": "0.8",
+        "stroke-opacity": "0.82"
       });
       refreshHighlightPanes(rendition);
     } catch (error) {
@@ -49414,7 +49620,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     const normalized = normalizeWordSelection(text.slice(start, end));
     if (!normalized)
       return null;
-    const asset = wordAssetsRef.current[normalized.lemma] || Object.values(wordAssetsRef.current).find((item) => item && normalizeWordSelection(item.lemma || "") && normalizeWordSelection(item.lemma || "").lemma === normalized.lemma);
+    const asset = findWordAssetBySurface(wordAssetsRef.current, normalized.surface);
     if (!asset || asset.mastered)
       return null;
     const wordRange = doc.createRange();
@@ -49456,8 +49662,8 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       normalized
     });
     setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
-    if (normalized && wordAssetsRef.current[normalized.lemma]) {
-      const existingWordAsset = wordAssetsRef.current[normalized.lemma];
+    const existingWordAsset = normalized ? findWordAssetBySurface(wordAssetsRef.current, normalized.surface) : null;
+    if (existingWordAsset) {
       setWordLookupState({
         status: "ready",
         result: getWordLookupResultFromAsset(existingWordAsset, item.quote || normalized.surface),
@@ -49484,7 +49690,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     const requestId = pendingWordLookupRef.current + 1;
     pendingWordLookupRef.current = requestId;
     try {
-      const result = await translateSelection(item.quote || "");
+      const result = await translateSelection(item.quote || "", item.sentence || "");
       if (pendingWordLookupRef.current !== requestId)
         return;
       setWordLookupState({
@@ -49526,23 +49732,24 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       if (renditionRef.current) {
         clearWordHoverHideTimer();
         setActiveWordHover(null);
+        window.setTimeout(() => syncAutoWordHighlights(renditionRef.current), 0);
       }
     } catch (error) {
-      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to save word.");
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to save translation.");
     }
   };
   const restorePendingWordAsset = async () => {
     if (!savedWordAsset || typeof setWordMastered !== "function")
       return;
-    const normalized = normalizeWordSelection(savedWordAsset.lemma || "");
-    if (!normalized)
+    const assetKey = getTranslationAssetStorageKey(savedWordAsset);
+    if (!assetKey)
       return;
     try {
       const updated = await setWordMastered(savedWordAsset, false);
       setCurrentWordAssets((current) => {
         const next = {
           ...current,
-          [normalized.lemma]: updated || {
+          [assetKey]: updated || {
             ...savedWordAsset,
             mastered: false
           }
@@ -49559,15 +49766,15 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   };
   const markActiveWordMastered = async () => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
-    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
-    if (!asset || !normalized || typeof setWordMastered !== "function")
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!asset || !assetKey || typeof setWordMastered !== "function")
       return;
     try {
       const updated = await setWordMastered(asset, true);
       setCurrentWordAssets((current) => {
         const next = {
           ...current,
-          [normalized.lemma]: updated || {
+          [assetKey]: updated || {
             ...asset,
             mastered: true
           }
@@ -49584,10 +49791,10 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   };
   const deleteActiveWordAsset = async () => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
-    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
-    if (!asset || !normalized || typeof deleteWordAsset !== "function")
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!asset || !assetKey || typeof deleteWordAsset !== "function")
       return;
-    if (typeof window !== "undefined" && typeof window.confirm === "function" && !window.confirm("Delete this word from index and note?"))
+    if (typeof window !== "undefined" && typeof window.confirm === "function" && !window.confirm("Delete this translation card from index and note?"))
       return;
     try {
       const deleted = await deleteWordAsset(asset);
@@ -49597,16 +49804,16 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
         const next = {
           ...current
         };
-        delete next[normalized.lemma];
+        delete next[assetKey];
         wordAssetsRef.current = next;
         return next;
       });
-      wordDisplayCacheRef.current.delete(`${asset.notePath || ""}#${asset.blockId || normalized.lemma}`);
+      wordDisplayCacheRef.current.delete(`${asset.notePath || ""}#${asset.blockId || assetKey}`);
       hideWordHoverCard();
       clearAutoWordHighlights(renditionRef.current);
       syncAutoWordHighlights(renditionRef.current);
     } catch (error) {
-      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to delete word.");
+      new import_obsidian2.Notice(error && error.message ? error.message : "Failed to delete translation card.");
     }
   };
   const clearAutoWordHighlights = (rendition) => {
@@ -49654,42 +49861,38 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       return;
     rendition.__jarvisReaderWordHighlightIds.add(cfiRange);
     try {
-      const mark = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, null, "jarvis-reader-word-highlight", {
-        stroke: "#4dabf7",
+      const kind = getTranslationAssetKind(asset);
+      const strokeColor = kind === "sentence" ? "#40c057" : kind === "phrase" ? "#ae3ec9" : "#4dabf7";
+      const openWordCardFromEvent = (event) => {
+        if (event && typeof event.preventDefault === "function")
+          event.preventDefault();
+        const element = event && (event.currentTarget || event.target);
+        if (element && typeof element.getBoundingClientRect === "function") {
+          showWordHoverCard(asset, element);
+        }
+      };
+      const annotation = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
+        stroke: strokeColor,
         "stroke-opacity": "0.92",
         "stroke-width": "1.5",
         "mix-blend-mode": "multiply"
       });
-      const element = mark == null ? void 0 : mark.element;
-      if (element) {
+      const bindWordHighlightElement = (mark) => {
+        const element = mark == null ? void 0 : mark.element;
+        if (!element)
+          return;
         const paneElement = element.ownerSVGElement;
         if (paneElement) {
-          paneElement.style.pointerEvents = "auto";
+          paneElement.style.pointerEvents = "none";
         }
-        element.style.pointerEvents = "visibleStroke";
-        element.style.cursor = "pointer";
+        element.style.pointerEvents = "none";
         Array.from(element.children || []).forEach((child) => {
-          child.style.pointerEvents = "visibleStroke";
-          child.style.cursor = "pointer";
+          child.style.pointerEvents = "none";
         });
-        const onMouseEnter = () => showWordHoverCard(asset, element);
-        const onMouseLeave = () => scheduleHideWordHoverCard();
-        const onClick = (event) => {
-          event.preventDefault();
-          showWordHoverCard(asset, element);
-        };
-        element.addEventListener("mouseenter", onMouseEnter);
-        element.addEventListener("mouseover", onMouseEnter);
-        element.addEventListener("mouseleave", onMouseLeave);
-        element.addEventListener("mouseout", onMouseLeave);
-        element.addEventListener("click", onClick);
-        rendition.__jarvisReaderWordHighlightCleanup.set(cfiRange, () => {
-          element.removeEventListener("mouseenter", onMouseEnter);
-          element.removeEventListener("mouseover", onMouseEnter);
-          element.removeEventListener("mouseleave", onMouseLeave);
-          element.removeEventListener("mouseout", onMouseLeave);
-          element.removeEventListener("click", onClick);
-        });
+      };
+      bindWordHighlightElement(annotation == null ? void 0 : annotation.mark);
+      if (annotation && typeof annotation.on === "function") {
+        annotation.on("attach", bindWordHighlightElement);
       }
     } catch (error) {
       console.warn("Jarvis Reader word highlight render failed.", error);
@@ -49744,10 +49947,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   const collectAutoWordMatches = (contents2, assetsMap) => {
     if (!contents2 || !contents2.document || !contents2.document.body || !assetsMap)
       return [];
-    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma && !asset.mastered).map((asset) => ({
+    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma && !asset.mastered && getTranslationAssetKind(asset) !== "sentence").flatMap((asset) => getWordAssetSurfaceForms(asset).map((surface) => ({
       asset,
-      regex: buildWordMatchRegex(asset.lemma)
-    })).filter((item) => item.regex).sort((a, b) => (b.asset.lemma || "").length - (a.asset.lemma || "").length);
+      surface,
+      regex: buildWordMatchRegex(surface)
+    }))).filter((item) => item.regex).sort((a, b) => b.surface.length - a.surface.length);
     if (!assets.length)
       return [];
     const doc = contents2.document;
@@ -49815,6 +50019,16 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     clearAutoWordHighlights(rendition);
     const contentsList = typeof rendition.getContents === "function" ? rendition.getContents() || [] : [];
     const seen = /* @__PURE__ */ new Set();
+    for (const asset of Object.values(wordAssetsRef.current || {})) {
+      if (!asset || asset.mastered || !Array.isArray(asset.sources))
+        continue;
+      for (const source of asset.sources) {
+        if (!source || source.bookPath !== bookPath || !source.cfiRange || seen.has(source.cfiRange))
+          continue;
+        seen.add(source.cfiRange);
+        applyAutoWordHighlight(rendition, asset, source.cfiRange);
+      }
+    }
     for (const contents2 of contentsList) {
       attachAutoWordHover(rendition, contents2);
       const matches = collectAutoWordMatches(contents2, wordAssetsRef.current);
@@ -49961,6 +50175,35 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     setProgressLabel(getReaderProgressLabel(relocated, renditionRef.current));
     saveProgress(relocated, nextTitle, renditionRef.current);
   };
+  const getSelectionContextSentence = (contents2, selectedText) => {
+    var _a, _b;
+    const doc = contents2 == null ? void 0 : contents2.document;
+    const selection = (_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection) == null ? void 0 : _b.call(_a);
+    if (!doc || !selection || !selection.rangeCount || !selectedText)
+      return selectedText || "";
+    try {
+      const range = selection.getRangeAt(0);
+      let node = range.startContainer;
+      let element = node && node.nodeType === Node.ELEMENT_NODE ? node : node == null ? void 0 : node.parentElement;
+      while (element && element !== doc.body) {
+        const text = normalizeHighlightQuote(element.innerText || element.textContent || "");
+        if (text && text.includes(selectedText)) {
+          const index = text.indexOf(selectedText);
+          const left = text.slice(0, index);
+          const right = text.slice(index + selectedText.length);
+          const leftBoundary = Math.max(left.lastIndexOf("."), left.lastIndexOf("?"), left.lastIndexOf("!"), left.lastIndexOf(";"), left.lastIndexOf("\n"), left.lastIndexOf("。"), left.lastIndexOf("？"), left.lastIndexOf("！"));
+          const rightMatches = [right.indexOf("."), right.indexOf("?"), right.indexOf("!"), right.indexOf(";"), right.indexOf("\n"), right.indexOf("。"), right.indexOf("？"), right.indexOf("！")].filter((value) => value >= 0);
+          const rightBoundary = rightMatches.length ? Math.min(...rightMatches) : -1;
+          const start = leftBoundary >= 0 ? leftBoundary + 1 : 0;
+          const end = rightBoundary >= 0 ? index + selectedText.length + rightBoundary + 1 : text.length;
+          return text.slice(start, end).trim().slice(0, 600) || selectedText;
+        }
+        element = element.parentElement;
+      }
+    } catch (error) {
+    }
+    return selectedText || "";
+  };
   const handleTextSelected = (cfiRange, contents2) => {
     var _a, _b;
     const selectedText = normalizeHighlightQuote((_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
@@ -49971,6 +50214,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     setPendingHighlightMenu({
       cfiRange,
       quote: selectedText,
+      sentence: getSelectionContextSentence(contents2, selectedText),
       chapterTitle: readerTitleRef.current,
       rect: getSelectionHighlightMenuRect(contents2)
     });
@@ -50244,8 +50488,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     height: Math.max(activeWordPopoverRect.height || 0, 360)
   }) : null;
   const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
-  const savedWordAsset = normalizedPendingWord ? currentWordAssets[normalizedPendingWord.lemma] || null : null;
-  const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.isWord && normalizedPendingWord);
+  const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
+  const pendingTranslationKind = pendingWordSelection && wordLookupState.result ? getTranslationAssetKind(pendingWordSelection.quote || "", wordLookupState.result) : normalizedPendingWord && normalizedPendingWord.isPhrase ? "phrase" : "word";
+  const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
+  const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
+  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4fdd\u5b58\u53e5\u5b50" : pendingTranslationKind === "phrase" ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
   const renderObsidianIcon = (name) => React.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
@@ -50373,6 +50620,11 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     epubOptions,
     readerStyles: {
       ...import_react_reader.ReactReaderStyle,
+      container: {
+        ...import_react_reader.ReactReaderStyle.container,
+        backgroundColor: theme.background,
+        color: theme.text
+      },
       readerArea: {
         ...import_react_reader.ReactReaderStyle.readerArea,
         backgroundColor: theme.background,
@@ -50388,11 +50640,16 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
       },
       reader: {
         ...import_react_reader.ReactReaderStyle.reader,
+        backgroundColor: theme.background,
         bottom: 72,
         left: "50%",
         right: "auto",
         transform: "translateX(-50%)",
         width: `min(calc(100% - 96px), ${maxReaderWidth}px)`
+      },
+      swipeWrapper: {
+        ...import_react_reader.ReactReaderStyle.swipeWrapper,
+        backgroundColor: theme.background
       },
       prev: {
         ...import_react_reader.ReactReaderStyle.prev,
@@ -50546,7 +50803,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-word-muted"
   }, "\u6b63\u5728\u7ffb\u8bd1...") : null, wordLookupState.status === "error" ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-error"
-  }, wordLookupState.error || "\u7ffb\u8bd1\u5931\u8d25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
+  }, wordLookupState.error || "\u7ffb\u8bd1\u5931\u8d25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? /* @__PURE__ */ React.createElement(React.Fragment, null, wordLookupState.result.isWord ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-head"
   }, /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
@@ -50555,7 +50812,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     disabled: !enableWordAudio
   }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-phonetic"
-  }, wordLookupState.result.phonetic) : null), wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : /* @__PURE__ */ React.createElement("div", {
+  }, wordLookupState.result.phonetic) : null) : null, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-translation"
   }, wordLookupState.result.translation)) : null), /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-highlight-actions"
@@ -50571,7 +50828,7 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
   }, "\u91cd\u65b0\u52a0\u5165") : null, canPersistPendingWord && !savedWordAsset ? /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
     onClick: persistPendingWordAsset
-  }, "\u4fdd\u5b58\u5355\u8bcd") : null, /* @__PURE__ */ React.createElement("div", {
+  }, persistPendingLabel) : null, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
@@ -50715,11 +50972,14 @@ var EpubReader = ({ contents, title, scrolled, singlePage, readerZoom, readerLin
     className: "jarvis-reader-word-card-head"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-head-row"
-  }, /* @__PURE__ */ React.createElement("button", {
+  }, getTranslationAssetKind(activeWordHover.asset) === "sentence" ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
+    title: activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || ""
+  }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "\u53e5\u5b50") : /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-word-card-lemma",
     title: "\u70b9\u51fb\u53d1\u97f3",
-    onClick: () => playWordAudioText(activeWordHover.asset.lemma || "")
-  }, activeWordHover.asset.lemma), /* @__PURE__ */ React.createElement("div", {
+    onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
+  }, activeWordHover.asset.title || activeWordHover.asset.lemma), /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-actions"
   }, /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
@@ -50778,17 +51038,17 @@ var EpubView = class extends import_obsidian2.FileView {
   getWordAssets() {
     return getWordAssetsMap(this.plugin.settings);
   }
-  async translateSelection(text) {
-    return await translateSelectionWithApi(this.plugin.settings, text);
+  async translateSelection(text, sentence = "") {
+    return await translateSelectionWithApi(this.plugin.settings, text, sentence);
   }
   async saveWordAsset(selection, translation) {
     const assetMap = getWordAssetsMap(this.plugin.settings);
-    const normalized = normalizeWordSelection((translation == null ? void 0 : translation.lemma) || (selection == null ? void 0 : selection.quote) || "");
-    if (!normalized) {
-      new import_obsidian2.Notice("Only English words or short phrases can be saved.");
+    const assetKey = getTranslationAssetKey(selection, translation);
+    if (!assetKey) {
+      new import_obsidian2.Notice("Only English words, short phrases, or translated sentences can be saved.");
       return null;
     }
-    const existing = assetMap[normalized.lemma];
+    const existing = assetMap[assetKey];
     const asset = buildWordAssetFromSelection(this.file, selection, translation, existing, this.plugin.settings);
     if (!asset) {
       new import_obsidian2.Notice("Failed to build word asset.");
@@ -50801,7 +51061,7 @@ var EpubView = class extends import_obsidian2.FileView {
     }
     this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
     await this.plugin.saveSettings();
-    new import_obsidian2.Notice("已保存到全局单词库");
+    new import_obsidian2.Notice("已保存到翻译卡片库");
     return asset;
   }
   async openWordNote(asset) {
@@ -50809,22 +51069,22 @@ var EpubView = class extends import_obsidian2.FileView {
       return;
     const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
     if (!(existing instanceof import_obsidian2.TFile)) {
-      const normalized = normalizeWordSelection(asset.lemma || "");
-      if (!normalized) {
-        new import_obsidian2.Notice("Word note is missing.");
+      const assetKey = getTranslationAssetStorageKey(asset);
+      if (!assetKey) {
+        new import_obsidian2.Notice("Translation note is missing.");
         return;
       }
       const rebuilt = {
         ...asset,
         notePath: getWordBookNotePath(this.file, this.plugin.settings),
-        blockId: asset.blockId || getWordBlockId(normalized.lemma)
+        blockId: asset.blockId || getWordBlockId(assetKey)
       };
       const noteFile = await upsertWordAssetNote(this.app, this.plugin.settings, rebuilt, this.file);
       rebuilt.notePath = noteFile.path;
       if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
         this.plugin.settings.wordAssets = {};
       }
-      this.plugin.settings.wordAssets[normalized.lemma] = getLightWordAsset(rebuilt);
+      this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(rebuilt);
       await this.plugin.saveSettings();
       asset = rebuilt;
     }
@@ -50873,10 +51133,10 @@ var EpubView = class extends import_obsidian2.FileView {
     }
   }
   async setWordMastered(asset, mastered) {
-    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
-    if (!normalized)
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!assetKey)
       return null;
-    const current = getWordAssetsMap(this.plugin.settings)[normalized.lemma] || asset;
+    const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
     const updated = {
       ...current,
       mastered: !!mastered,
@@ -50885,7 +51145,7 @@ var EpubView = class extends import_obsidian2.FileView {
     if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
       this.plugin.settings.wordAssets = {};
     }
-    this.plugin.settings.wordAssets[normalized.lemma] = getLightWordAsset(updated);
+    this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(updated);
     if (updated.notePath) {
       const existing = this.app.vault.getAbstractFileByPath(updated.notePath);
       if (existing instanceof import_obsidian2.TFile) {
@@ -50897,10 +51157,10 @@ var EpubView = class extends import_obsidian2.FileView {
     return updated;
   }
   async deleteWordAsset(asset) {
-    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
-    if (!normalized)
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!assetKey)
       return false;
-    const current = getWordAssetsMap(this.plugin.settings)[normalized.lemma] || asset;
+    const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
     const notePath = current.notePath || asset.notePath;
     if (notePath) {
       const existing = this.app.vault.getAbstractFileByPath(notePath);
@@ -50915,9 +51175,9 @@ var EpubView = class extends import_obsidian2.FileView {
     if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
       this.plugin.settings.wordAssets = {};
     }
-    delete this.plugin.settings.wordAssets[normalized.lemma];
+    delete this.plugin.settings.wordAssets[assetKey];
     await this.plugin.saveSettings();
-    new import_obsidian2.Notice("Word deleted.");
+    new import_obsidian2.Notice("Translation card deleted.");
     return true;
   }
   async loadWordDisplay(asset) {
@@ -51196,6 +51456,7 @@ var EpubView = class extends import_obsidian2.FileView {
     ReactDOM.render(/* @__PURE__ */ React.createElement(EpubReader, {
       contents,
       title: file.basename,
+      bookPath: file.path,
       scrolled: this.settings.scrolledView,
       singlePage: this.settings.singlePageView,
       readerZoom: clampReaderZoom(this.settings.readerZoom),
@@ -51250,8 +51511,8 @@ var EpubView = class extends import_obsidian2.FileView {
         this.startThemeSync(rendition);
       },
       wordAssets: this.getWordAssets(),
-      translateSelection: (text) => {
-        return this.translateSelection(text);
+      translateSelection: (text, sentence = "") => {
+        return this.translateSelection(text, sentence);
       },
       saveWordAsset: (selection, translation) => {
         return this.saveWordAsset(selection, translation);
@@ -52281,6 +52542,9 @@ var DEFAULT_SETTINGS = {
 var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
   async onload() {
     await this.loadSettings();
+    await this.restoreValueHighlightsIfNeeded();
+    await this.restoreIndexesFromSidecars();
+    await this.persistIndexSidecars("startup");
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
     });
@@ -52405,6 +52669,214 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
       this.bookshelfView.clearActiveReader(reader);
     }
   }
+  async restoreValueHighlightsIfNeeded() {
+    const bookPath = "09 Books/\u4ef7\u503c\u5fc3\u6cd5 (\u59dc\u80e1\u8bf4).epub";
+    const restorePath = ".obsidian/plugins/jarvis-reader/value-highlights-restore.json";
+    try {
+      const current = Array.isArray(this.settings.bookHighlights && this.settings.bookHighlights[bookPath]) ? this.settings.bookHighlights[bookPath] : [];
+      if (current.length >= 99)
+        return;
+      const adapter = this.app.vault.adapter;
+      if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
+        return;
+      if (!await adapter.exists(restorePath))
+        return;
+      const restored = JSON.parse(await adapter.read(restorePath));
+      if (!Array.isArray(restored) || restored.length < 99)
+        return;
+      this.settings.bookHighlights = this.settings.bookHighlights || {};
+      this.settings.bookHighlights[bookPath] = restored;
+      await this.saveSettings();
+    } catch (error) {
+      console.warn("Jarvis Reader value highlights restore failed.", error);
+    }
+  }
+  getIndexSidecarPaths() {
+    return {
+      highlights: ".obsidian/plugins/jarvis-reader/index/highlights.json",
+      wordAssets: ".obsidian/plugins/jarvis-reader/index/word-assets.json",
+      log: ".obsidian/plugins/jarvis-reader/logs/index-changes.jsonl"
+    };
+  }
+  async ensureAdapterFolder(folderPath) {
+    const adapter = this.app.vault.adapter;
+    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.mkdir !== "function")
+      return;
+    const segments = normalizeVaultPath(folderPath).split("/").filter(Boolean);
+    let current = "";
+    for (const segment of segments) {
+      current = current ? `${current}/${segment}` : segment;
+      if (!await adapter.exists(current)) {
+        await adapter.mkdir(current);
+      }
+    }
+  }
+  async readJsonSidecar(path) {
+    const adapter = this.app.vault.adapter;
+    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
+      return null;
+    if (!await adapter.exists(path))
+      return null;
+    try {
+      return JSON.parse(await adapter.read(path));
+    } catch (error) {
+      console.warn(`Jarvis Reader failed to read sidecar ${path}.`, error);
+      return null;
+    }
+  }
+  getIndexSnapshot() {
+    const bookHighlights = {};
+    for (const [bookPath, list] of Object.entries(this.settings.bookHighlights || {})) {
+      if (!Array.isArray(list))
+        continue;
+      bookHighlights[bookPath] = list.map((highlight) => buildHighlightMetadata(highlight));
+    }
+    const wordAssets = {};
+    for (const [key, asset] of Object.entries(this.settings.wordAssets || {})) {
+      if (!asset)
+        continue;
+      wordAssets[key] = buildWordAssetMetadata(asset);
+    }
+    return {
+      bookHighlights,
+      wordAssets
+    };
+  }
+  getIndexCounts(snapshot = null) {
+    const state = snapshot || this.getIndexSnapshot();
+    const highlightCount = Object.values(state.bookHighlights || {}).reduce((total, list) => total + (Array.isArray(list) ? list.length : 0), 0);
+    const wordAssetCount = Object.keys(state.wordAssets || {}).length;
+    return {
+      highlightCount,
+      wordAssetCount
+    };
+  }
+  async logIndexChange(reason = "save", snapshot = null) {
+    try {
+      const paths = this.getIndexSidecarPaths();
+      const adapter = this.app.vault.adapter;
+      if (!adapter || typeof adapter.write !== "function")
+        return;
+      const counts = this.getIndexCounts(snapshot);
+      const previous = this.lastIndexCounts || null;
+      const changed = !previous || previous.highlightCount !== counts.highlightCount || previous.wordAssetCount !== counts.wordAssetCount;
+      if (!changed && !String(reason || "").startsWith("restore"))
+        return;
+      this.lastIndexCounts = counts;
+      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
+      const line = JSON.stringify({
+        time: new Date().toISOString(),
+        reason,
+        ...counts
+      });
+      let existing = "";
+      if (typeof adapter.exists === "function" && typeof adapter.read === "function" && await adapter.exists(paths.log)) {
+        existing = await adapter.read(paths.log);
+      }
+      await adapter.write(paths.log, `${existing || ""}${existing && !existing.endsWith("\n") ? "\n" : ""}${line}\n`);
+    } catch (error) {
+      console.warn("Jarvis Reader index log failed.", error);
+    }
+  }
+  mergeHighlightSidecar(bookHighlights) {
+    let changed = false;
+    this.settings.bookHighlights = this.settings.bookHighlights || {};
+    for (const [bookPath, sidecarList] of Object.entries(bookHighlights || {})) {
+      if (!Array.isArray(sidecarList))
+        continue;
+      const currentList = Array.isArray(this.settings.bookHighlights[bookPath]) ? this.settings.bookHighlights[bookPath] : [];
+      const byId = /* @__PURE__ */ new Map();
+      for (const item of sidecarList) {
+        if (item && (item.id || item.blockId)) {
+          byId.set(item.id || item.blockId, item);
+        }
+      }
+      for (const item of currentList) {
+        if (item && (item.id || item.blockId)) {
+          const key = item.id || item.blockId;
+          byId.set(key, {
+            ...byId.get(key),
+            ...item
+          });
+        }
+      }
+      const merged = Array.from(byId.values());
+      if (merged.length > currentList.length) {
+        this.settings.bookHighlights[bookPath] = merged;
+        changed = true;
+      }
+    }
+    return changed;
+  }
+  mergeWordAssetSidecar(wordAssets) {
+    let changed = false;
+    this.settings.wordAssets = this.settings.wordAssets || {};
+    for (const [key, sidecarAsset] of Object.entries(wordAssets || {})) {
+      if (!sidecarAsset)
+        continue;
+      const assetKey = getTranslationAssetStorageKey(sidecarAsset) || key;
+      const current = this.settings.wordAssets[assetKey];
+      if (!current) {
+        this.settings.wordAssets[assetKey] = getLightWordAsset(sidecarAsset);
+        changed = true;
+        continue;
+      }
+      const mergedSources = mergeWordSources(current.sources, sidecarAsset.sources);
+      if ((mergedSources || []).length !== ((current.sources || []).length)) {
+        this.settings.wordAssets[assetKey] = getLightWordAsset({
+          ...sidecarAsset,
+          ...current,
+          sources: mergedSources
+        });
+        changed = true;
+      }
+    }
+    return changed;
+  }
+  async restoreIndexesFromSidecars() {
+    try {
+      const paths = this.getIndexSidecarPaths();
+      const highlightsSidecar = await this.readJsonSidecar(paths.highlights);
+      const wordAssetsSidecar = await this.readJsonSidecar(paths.wordAssets);
+      let changed = false;
+      if (highlightsSidecar && highlightsSidecar.bookHighlights) {
+        changed = this.mergeHighlightSidecar(highlightsSidecar.bookHighlights) || changed;
+      }
+      if (wordAssetsSidecar && wordAssetsSidecar.wordAssets) {
+        changed = this.mergeWordAssetSidecar(wordAssetsSidecar.wordAssets) || changed;
+      }
+      if (changed) {
+        await this.saveData(this.settings);
+        await this.logIndexChange("restore-from-sidecar");
+      }
+    } catch (error) {
+      console.warn("Jarvis Reader sidecar restore failed.", error);
+    }
+  }
+  async persistIndexSidecars(reason = "save") {
+    try {
+      const paths = this.getIndexSidecarPaths();
+      const adapter = this.app.vault.adapter;
+      if (!adapter || typeof adapter.write !== "function")
+        return;
+      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
+      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
+      const snapshot = this.getIndexSnapshot();
+      await adapter.write(paths.highlights, JSON.stringify({
+        version: 1,
+        updated: new Date().toISOString(),
+        bookHighlights: snapshot.bookHighlights
+      }, null, 2));
+      await adapter.write(paths.wordAssets, JSON.stringify({
+        version: 1,
+        updated: new Date().toISOString(),
+        wordAssets: snapshot.wordAssets
+      }, null, 2));
+      await this.logIndexChange(reason, snapshot);
+    } catch (error) {
+      console.warn("Jarvis Reader sidecar persist failed.", error);
+    }
+  }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     if (!this.settings.bookInitLocations) {
@@ -52455,7 +52927,9 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
   }
   async saveSettings() {
+    await this.restoreIndexesFromSidecars();
     await this.saveData(this.settings);
+    await this.persistIndexSidecars("save");
   }
 };
 var JarvisReaderFolderSuggestModal = class extends import_obsidian3.FuzzySuggestModal {

@@ -4,7 +4,12 @@
 }
 
 .jarvis-reader-epub {
+  background: var(--background-primary);
   position: relative;
+}
+
+.jarvis-reader-epub > div {
+  background: var(--background-primary);
 }
 
 .jarvis-reader-side-hover-zone {
@@ -716,6 +721,7 @@
   display: flex;
   gap: 8px;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .jarvis-reader-word-card-lemma {
@@ -738,6 +744,20 @@
   padding: 0;
   text-align: left;
   width: auto;
+}
+
+.jarvis-reader-word-card-sentence-title {
+  color: #c62828 !important;
+  cursor: default;
+  display: block;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  line-height: 1.35;
+  max-height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .jarvis-reader-word-card-actions {

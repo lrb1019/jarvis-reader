@@ -1,10 +1,26 @@
 # Jarvis Reader
 
-Current version: v0.2.0
+Current version: v0.3.0
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 ## Release Notes
+
+### v0.3.0
+
+- Word translation now passes the selected text's surrounding sentence into `{{sentence}}`, so card meanings can prioritize the current context.
+- Selected phrases use the same context-aware translation flow and can still be saved into the global vocabulary-card workflow.
+- Automatically distinguishes words, phrases, and sentences: words and phrases create vocabulary cards, while full sentences show only a Chinese translation and provide a save-sentence action.
+- Source underlines use different colors for words, phrases, and sentences, and Markdown output is grouped into `Words`, `Phrases`, and `Sentences` sections.
+- Aggregated translation notes no longer repeat `Sources` under every entry; the source is represented by the file name and frontmatter.
+- Vocabulary cards now store the lemma, selected surface form, and EPUB CFI source to avoid missed source underlines for forms such as `fracture/fractures`.
+- The original selected source location is restored by EPUB CFI first; additional occurrences are scanned by known word forms.
+- Hover cards now resolve from the real EPUB text under the pointer instead of relying on the SVG underline stroke, improving trigger reliability without blocking text selection.
+- Hover lookup supports common inflected forms such as `fractures -> fracture` and `shattered -> shatter`.
+- Adds plugin-local sidecar index files for annotation and vocabulary-card source locations, reducing the risk of losing links when `data.json` is overwritten.
+- Makes the reader outer background follow Obsidian light and dark themes.
+- Uses a brighter highlighter yellow for plain highlights and a clearer orange outline for reflection highlights.
+- New vocabulary cards no longer include empty `## Thoughts` sections.
 
 ### v0.2.0
 
@@ -49,8 +65,12 @@ The upstream Awesome Reader project was created by awesomedog and is licensed un
 - Use Obsidian-style wiki links in reflection text.
 - Open linked notes from annotation previews.
 - Translate selected English words or short phrases and save them as global vocabulary cards.
+- Use the surrounding sentence to prioritize the meaning that fits the current context.
 - Preview vocabulary cards on hover, play pronunciation, open the word note, mark mastered, or delete the entry.
-- Store vocabulary-card content in Markdown `## Card` sections for later review and personal notes.
+- Show blue underlines for saved words in the source text, with hover lookup for common inflected forms.
+- Saved phrases and sentences are also underlined in the source text with their own type colors.
+- Store vocabulary-card content in Markdown `## Card` sections with fewer empty sections and repeated source blocks.
+- Keep a local sidecar index for annotation and vocabulary source locations, so link data can be recovered if `data.json` is overwritten.
 - Filter annotations by all, highlight, or reflection, and use the more menu for current chapter, linked items, and sorting.
 - Click an annotation card to jump to the source text, or double-click it to edit the reflection.
 - Write book-note timestamps in local time.
@@ -95,6 +115,9 @@ styles.css
 - Open an EPUB from the bookshelf.
 - Select text while reading, then choose `Highlight` or `Write reflection`.
 - Plain highlights save only the selected text; reflections save both the selected text and your note.
+- Select an English word or phrase and choose `Translate` to create a context-aware vocabulary card.
+- Select a full sentence and choose `Translate` to show only the sentence translation.
+- Saved translation cards are grouped by words, phrases, and sentences in the book vocabulary note.
 - Use `[[note name]]` inside reflections to connect your reading notes with the rest of your vault.
 - Configure the book note folder and template from the plugin settings.
 
