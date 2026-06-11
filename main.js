@@ -49678,6 +49678,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     clearWordHoverHideTimer();
     const startX = event.clientX;
     const startY = event.clientY;
+    const target = event.target;
+    target.setPointerCapture(event.pointerId);
     setActiveWordHover((prev) => {
       if (!prev) return null;
       const startLeft = prev.left || 0;
@@ -49687,12 +49689,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         const nextTop = startTop + moveEvent.clientY - startY;
         setActiveWordHover((current) => current ? { ...current, left: nextLeft, top: nextTop, isPinned: true } : null);
       };
-      const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
+      const onUp = (upEvent) => {
+        target.removeEventListener("pointermove", onMove);
+        target.removeEventListener("pointerup", onUp);
+        target.releasePointerCapture(event.pointerId);
       };
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp, { once: true });
+      target.addEventListener("pointermove", onMove);
+      target.addEventListener("pointerup", onUp, { once: true });
       return { ...prev, isPinned: true };
     });
   };
