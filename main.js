@@ -47882,17 +47882,17 @@ function getTranslationAssetStorageKey(asset) {
 function getWordEntrySectionTitle(kind) {
   switch (kind) {
     case "phrase":
-      return "Phrases";
+      return "\u77ed\u8bed"; // 短语
     case "sentence":
-      return "Sentences";
+      return "\u53e5\u5b50"; // 句子
     case "word":
     default:
-      return "Words";
+      return "\u5355\u8bcd"; // 单词
   }
 }
 function ensureWordBookSections(content) {
   let next = content || "";
-  for (const title of ["Words", "Phrases", "Sentences"]) {
+  for (const title of ["\u5355\u8bcd", "\u77ed\u8bed", "\u53e5\u5b50"]) {
     if (!new RegExp(`^##\\s+${title}\\s*$`, "m").test(next)) {
       next = `${next.trimEnd()}\n\n## ${title}\n`;
     }
@@ -47907,7 +47907,7 @@ function insertWordEntryIntoSection(content, asset) {
   if (start < 0)
     return `${current.trimEnd()}\n\n${buildWordEntryBlock(asset)}\n`;
   const afterHeading = start + current.slice(start).indexOf("\n") + 1;
-  const nextSectionRelative = current.slice(afterHeading).search(/^##\s+(Words|Phrases|Sentences)\s*$/m);
+  const nextSectionRelative = current.slice(afterHeading).search(/^##\s+(\u5355\u8bcd|\u77ed\u8bed|\u53e5\u5b50)\s*$/m);
   const insertAt = nextSectionRelative >= 0 ? afterHeading + nextSectionRelative : current.length;
   const before = current.slice(0, insertAt).trimEnd();
   const after = current.slice(insertAt).replace(/^\s*/, "");
@@ -48199,7 +48199,7 @@ function buildWordAssetFromSelection(file, selection, translation, existingAsset
   const selectedSurface = normalizeWordSelection((selection == null ? void 0 : selection.quote) || "");
   const now = new Date().toISOString();
   const quote = normalizeHighlightQuote((selection == null ? void 0 : selection.quote) || "");
-  const title = kind === "sentence" ? quote.length > 72 ? `${quote.slice(0, 72)}...` : quote : (normalized == null ? void 0 : normalized.surface) || assetKey;
+  const title = kind === "sentence" ? quote : (normalized == null ? void 0 : normalized.surface) || assetKey;
   const source = {
     bookPath: file.path,
     bookTitle: file.basename,
@@ -49597,7 +49597,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const scheduleHideWordHoverCard = () => {
     clearWordHoverHideTimer();
     wordHoverHideTimerRef.current = window.setTimeout(() => {
-      setActiveWordHover(null);
+      setActiveWordHover((prev) => (prev && prev.isPinned) ? prev : null);
     }, 120);
   };
   const loadWordDisplayIntoHover = (asset) => {
@@ -49671,7 +49671,39 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       console.warn("Jarvis Reader word audio failed.", error);
     }
   };
-  const showWordHoverCard = (asset, element) => {
+  
+  const beginWordHoverCardMove = (event) => {
+    if (event.button != null && event.button !== 0) return;
+    event.preventDefault();
+    clearWordHoverHideTimer();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    setActiveWordHover((prev) => {
+      if (!prev) return null;
+      const startLeft = prev.left || 0;
+      const startTop = prev.top || 0;
+      const onMove = (moveEvent) => {
+        const nextLeft = startLeft + moveEvent.clientX - startX;
+        const nextTop = startTop + moveEvent.clientY - startY;
+        setActiveWordHover((current) => current ? { ...current, left: nextLeft, top: nextTop, isPinned: true } : null);
+      };
+      const onUp = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp, { once: true });
+      return { ...prev, isPinned: true };
+    });
+  };
+  const resetWordHoverCardPosition = () => {
+    setActiveWordHover((prev) => {
+      if (!prev) return null;
+      scheduleHideWordHoverCard();
+      return { ...prev, isPinned: false };
+    });
+  };
+const showWordHoverCard = (asset, element) => {
     if (!asset || !element)
       return;
     clearWordHoverHideTimer();
@@ -51184,7 +51216,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
   }))) : null, activeWordHover ? /* @__PURE__ */ React.createElement("div", {
-    className: "jarvis-reader-word-card",
+    className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
     style: {
       left: activeWordHover.left,
       top: activeWordHover.top
@@ -51192,18 +51224,27 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     onMouseEnter: clearWordHoverHideTimer,
     onMouseLeave: scheduleHideWordHoverCard
   }, /* @__PURE__ */ React.createElement("div", {
-    className: "jarvis-reader-word-card-head"
+    className: "jarvis-reader-word-card-head",
+    style: { cursor: "grab" },
+    onPointerDown: beginWordHoverCardMove,
+    onDoubleClick: resetWordHoverCardPosition
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-head-row"
   }, getTranslationAssetKind(activeWordHover.asset) === "sentence" ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
-    title: activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || ""
-  }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "\u53e5\u5b50") : /* @__PURE__ */ React.createElement("button", {
+    style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
+    onPointerDown: (e) => e.stopPropagation()
+  }, "\u539f\u53e5\u7ffb\u8bd1") : /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-word-card-lemma",
     title: "\u70b9\u51fb\u53d1\u97f3",
+    style: { flex: "0 0 auto", cursor: "pointer" },
+    onPointerDown: (e) => e.stopPropagation(),
     onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
   }, activeWordHover.asset.title || activeWordHover.asset.lemma), /* @__PURE__ */ React.createElement("div", {
-    className: "jarvis-reader-word-card-actions"
+    style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
+  }), /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-actions",
+    onPointerDown: (e) => e.stopPropagation()
   }, /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
     title: "\u6807\u8bb0\u5df2\u638c\u63e1",
@@ -51220,13 +51261,18 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: "jarvis-reader-word-phonetic"
   }, activeWordHover.asset.phonetic) : null), /* @__PURE__ */ React.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
+  }, (getTranslationAssetKind(activeWordHover.asset) === "sentence" || (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30) ? /* @__PURE__ */ React.createElement("div", {
+    className: "jarvis-reader-word-card-original-sentence",
+    style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
+  }, activeWordHover.asset.title || (activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote) || "") : null, /* @__PURE__ */ React.createElement("div", {
+    style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
   }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-translation"
   }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-pos"
   }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-example"
-  }, activeWordHover.asset.example) : null), activeWordHover.asset.sources && activeWordHover.asset.sources.length ? /* @__PURE__ */ React.createElement("div", {
+  }, activeWordHover.asset.example) : null)), activeWordHover.asset.sources && activeWordHover.asset.sources.length ? /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-sources"
   }, /* @__PURE__ */ React.createElement("div", {
     className: "jarvis-reader-word-card-section-title"
