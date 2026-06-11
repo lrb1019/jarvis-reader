@@ -1,16 +1,23 @@
 # Jarvis Reader
 
-Current version: v0.3.0
+Current version: v0.3.1
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 ## Release Notes
+
+### v0.3.1
+
+- Adds experimental offline translation support: can look up words in a local JSON dictionary first, falling back to AI if not found.
+- Fixes a sidebar annotation sync bug where deleted annotations were resurrected by background re-reads.
+- Simplifies dictionary configuration settings.
 
 ### v0.3.0
 
 - Word translation now passes the selected text's surrounding sentence into `{{sentence}}`, so card meanings can prioritize the current context.
 - Selected phrases use the same context-aware translation flow and can still be saved into the global vocabulary-card workflow.
 - Automatically distinguishes words, phrases, and sentences: words and phrases create vocabulary cards, while full sentences show only a Chinese translation and provide a save-sentence action.
+- Adds experimental offline translation support: can look up words in a local JSON dictionary first, falling back to AI if not found.
 - Source underlines use different colors for words, phrases, and sentences, and Markdown output is grouped into `Words`, `Phrases`, and `Sentences` sections.
 - Aggregated translation notes no longer repeat `Sources` under every entry; the source is represented by the file name and frontmatter.
 - Vocabulary cards now store the lemma, selected surface form, and EPUB CFI source to avoid missed source underlines for forms such as `fracture/fractures`.

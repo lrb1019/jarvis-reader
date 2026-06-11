@@ -47630,6 +47630,8 @@ async function openOrCreateNote(app, file, toc, settings = {}) {
 var JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 var JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
+var DEFAULT_LOCAL_DICTIONARY_PATH = ".obsidian/plugins/jarvis-reader/dictionaries/user-dictionary.json";
+var LOCAL_DICTIONARY_CACHE = /* @__PURE__ */ new Map();
 var DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与单词卡生成器。
 你必须只返回单行合法 JSON。
 整个响应不能包含任何真实换行符。
@@ -47718,6 +47720,114 @@ function getTranslationSelectionType(value) {
   if (normalized && normalized.isPhrase)
     return "phrase";
   return "sentence";
+}
+function getExperimentalTranslationSettings(settings = {}) {
+  const experimental = settings.experimentalInstantTranslation && typeof settings.experimentalInstantTranslation === "object" ? settings.experimentalInstantTranslation : {};
+  return {
+    enabled: experimental.enabled === true,
+    localDictionaryEnabled: experimental.localDictionaryEnabled === true,
+    localDictionaryPath: normalizeVaultPath(experimental.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH)
+  };
+}
+async function readJsonFromVault(app, path) {
+  const adapter = app && app.vault ? app.vault.adapter : null;
+  if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
+    return null;
+  const normalizedPath = normalizeVaultPath(path || "");
+  if (!normalizedPath || !await adapter.exists(normalizedPath))
+    return null;
+  if (LOCAL_DICTIONARY_CACHE.has(normalizedPath))
+    return LOCAL_DICTIONARY_CACHE.get(normalizedPath);
+  const payload = JSON.parse(await adapter.read(normalizedPath));
+  LOCAL_DICTIONARY_CACHE.set(normalizedPath, payload);
+  return payload;
+}
+function getDictionaryLookupKeys(selectedText) {
+  const normalized = normalizeWordSelection(selectedText || "");
+  if (!normalized || !normalized.isSingleWord)
+    return [];
+  const word = normalized.lemma;
+  const keys = [word];
+  if (word.endsWith("ies") && word.length > 3)
+    keys.push(`${word.slice(0, -3)}y`);
+  if (word.endsWith("ied") && word.length > 3)
+    keys.push(`${word.slice(0, -3)}y`);
+  if (word.endsWith("ing") && word.length > 4) {
+    keys.push(word.slice(0, -3));
+    keys.push(`${word.slice(0, -3)}e`);
+  }
+  if (word.endsWith("ed") && word.length > 3) {
+    keys.push(word.slice(0, -2));
+    keys.push(word.slice(0, -1));
+  }
+  if (word.endsWith("es") && word.length > 3)
+    keys.push(word.slice(0, -2));
+  if (word.endsWith("s") && word.length > 2)
+    keys.push(word.slice(0, -1));
+  return [...new Set(keys.filter(Boolean))];
+}
+function normalizeDictionaryEntry(selectedText, key, entry) {
+  if (!entry)
+    return null;
+  const selected = normalizeWordSelection(selectedText || "");
+  const lemma = String(key || (selected ? selected.lemma : selectedText || "")).trim().toLowerCase();
+  if (typeof entry === "string") {
+    const translation = entry.trim();
+    if (!translation)
+      return null;
+    return {
+      lemma,
+      surface: selected ? selected.surface : selectedText,
+      translation,
+      phonetic: "",
+      partOfSpeech: "",
+      example: "",
+      display: `**中文释义**：${translation}`,
+      isWord: true,
+      sourceType: "local-dictionary"
+    };
+  }
+  if (entry && typeof entry === "object") {
+    const translation = String(entry.translation || entry.meaning || entry.zh || "").trim();
+    const phonetic = String(entry.phonetic || entry.uk || entry.us || "").trim();
+    const partOfSpeech = String(entry.partOfSpeech || entry.pos || "").trim();
+    const display = normalizeWordDisplayText(String(entry.display || "").trim() || [
+      partOfSpeech || phonetic ? `**词性** ${partOfSpeech}${phonetic ? ` /${phonetic}/` : ""}`.trim() : "",
+      translation ? `**中文释义**：${translation}` : ""
+    ].filter(Boolean).join("\n\n"));
+    if (!translation && !display)
+      return null;
+    return {
+      lemma: String(entry.lemma || lemma).trim().toLowerCase(),
+      surface: selected ? selected.surface : selectedText,
+      translation: translation || display,
+      phonetic,
+      partOfSpeech,
+      example: String(entry.example || "").trim(),
+      display: display || translation,
+      isWord: entry.isWord !== false,
+      sourceType: "local-dictionary"
+    };
+  }
+  return null;
+}
+async function lookupLocalDictionary(settings = {}, selectedText, app = null) {
+  const experimental = getExperimentalTranslationSettings(settings);
+  if (!experimental.localDictionaryEnabled || !app)
+    return null;
+  const keys = getDictionaryLookupKeys(selectedText);
+  if (!keys.length)
+    return null;
+  const dictionary = await readJsonFromVault(app, experimental.localDictionaryPath);
+  if (!dictionary || typeof dictionary !== "object")
+    return null;
+  for (const key of keys) {
+    const entry = dictionary[key] || dictionary[key.toLowerCase()] || dictionary[key.toUpperCase()];
+    const result = normalizeDictionaryEntry(selectedText, key, entry);
+    if (result)
+      return result;
+  }
+  return null;
 }
 function getWordNoteFolder(settings = {}) {
   return normalizeVaultPath(settings.wordNoteFolder || "09 Books/Words");
@@ -48500,7 +48610,18 @@ function extractGeminiMessageText(payload) {
     return "";
   return parts.map((part) => part && typeof part.text === "string" ? part.text : "").join("\n").trim();
 }
-async function translateSelectionWithApi(settings = {}, selectedText, sentence = "") {
+async function translateSelectionWithApi(settings = {}, selectedText, sentence = "", app = null, options = {}) {
+  const selectionType = getTranslationSelectionType(selectedText);
+  if (options.localOnly) {
+    return selectionType === "word" ? await lookupLocalDictionary(settings, selectedText, app) : null;
+  }
+  if (!options.forceAi) {
+    if (selectionType === "word") {
+      const dictionaryResult = await lookupLocalDictionary(settings, selectedText, app);
+      if (dictionaryResult)
+        return dictionaryResult;
+    }
+  }
   const api = settings.translationApi || {};
   const apiType = detectTranslationApiType(settings);
   const endpoint = buildTranslationApiEndpoint(settings);
@@ -48510,7 +48631,6 @@ async function translateSelectionWithApi(settings = {}, selectedText, sentence =
     throw new Error("Translation API is not configured.");
   }
   const prompt = String(settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).trim() || DEFAULT_TRANSLATION_PROMPT;
-  const selectionType = getTranslationSelectionType(selectedText);
   const requestText = buildTranslationPromptText(prompt, selectedText, sentence);
   let headers = {
     "Content-Type": "application/json"
@@ -49176,7 +49296,7 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
 
 // src/EpubView.tsx
 var import_react_reader = __toESM(require_lib4());
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react.useState)("");
@@ -49648,10 +49768,38 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     setPendingWordSelection(null);
     setWordLookupState({ status: "idle", result: null, error: "", savedLemma: "" });
   };
-  const openWordTranslator = async (item) => {
+  const openWordTranslator = async (item, options = {}) => {
     if (!item || typeof translateSelection !== "function")
-      return;
+      return false;
     const normalized = normalizeWordSelection(item.quote || "");
+    if (options.autoLocalOnly) {
+      if (!normalized || !normalized.isSingleWord)
+        return false;
+      try {
+        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
+        if (!localDictionaryResult)
+          return false;
+        setPendingSelection(null);
+        setPendingHighlightMenu(null);
+        setHighlightComment("");
+        setWikiSuggest(null);
+        setWikiEditRange(null);
+        setPendingWordSelection({
+          ...item,
+          normalized
+        });
+        setWordLookupState({
+          status: "ready",
+          result: localDictionaryResult,
+          error: "",
+          savedLemma: ""
+        });
+        return true;
+      } catch (error) {
+        console.warn("Jarvis Reader automatic local dictionary lookup failed.", error);
+        return false;
+      }
+    }
     setPendingSelection(null);
     setPendingHighlightMenu(null);
     setHighlightComment("");
@@ -49662,6 +49810,22 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       normalized
     });
     setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
+    if (normalized && normalized.isSingleWord) {
+      try {
+        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
+        if (localDictionaryResult) {
+          setWordLookupState({
+            status: "ready",
+            result: localDictionaryResult,
+            error: "",
+            savedLemma: ""
+          });
+          return true;
+        }
+      } catch (error) {
+        console.warn("Jarvis Reader local dictionary lookup failed; trying saved card or AI.", error);
+      }
+    }
     const existingWordAsset = normalized ? findWordAssetBySurface(wordAssetsRef.current, normalized.surface) : null;
     if (existingWordAsset) {
       setWordLookupState({
@@ -49685,7 +49849,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         }).catch(() => {
         });
       }
-      return;
+      return true;
     }
     const requestId = pendingWordLookupRef.current + 1;
     pendingWordLookupRef.current = requestId;
@@ -49714,7 +49878,20 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!pendingWordSelection || !wordLookupState.result || typeof saveWordAsset !== "function")
       return;
     try {
-      const asset = await saveWordAsset(pendingWordSelection, wordLookupState.result);
+      let resultToSave = wordLookupState.result;
+      if (resultToSave.sourceType === "online-translation" && typeof translateSelection === "function") {
+        setWordLookupState((current) => ({
+          ...current,
+          status: "loading"
+        }));
+        resultToSave = await translateSelection(pendingWordSelection.quote || "", pendingWordSelection.sentence || "", { forceAi: true });
+        setWordLookupState((current) => ({
+          ...current,
+          status: "ready",
+          result: resultToSave
+        }));
+      }
+      const asset = await saveWordAsset(pendingWordSelection, resultToSave);
       if (!asset)
         return;
       setCurrentWordAssets((current) => {
@@ -49736,6 +49913,39 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       }
     } catch (error) {
       new import_obsidian2.Notice(error && error.message ? error.message : "Failed to save translation.");
+    }
+  };
+  const translatePendingWordWithAi = async () => {
+    if (!pendingWordSelection || typeof translateSelection !== "function")
+      return;
+    const requestId = pendingWordLookupRef.current + 1;
+    pendingWordLookupRef.current = requestId;
+    setWordLookupState((current) => ({
+      ...current,
+      status: "loading",
+      error: ""
+    }));
+    try {
+      const result = await translateSelection(pendingWordSelection.quote || "", pendingWordSelection.sentence || "", { forceAi: true });
+      if (pendingWordLookupRef.current !== requestId)
+        return;
+      setWordLookupState({
+        status: "ready",
+        result,
+        error: "",
+        savedLemma: ""
+      });
+      return true;
+    } catch (error) {
+      if (pendingWordLookupRef.current !== requestId)
+        return;
+      setWordLookupState({
+        status: "error",
+        result: null,
+        error: error && error.message ? error.message : String(error || "Translation failed."),
+        savedLemma: ""
+      });
+      return true;
     }
   };
   const restorePendingWordAsset = async () => {
@@ -50209,15 +50419,24 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const selectedText = normalizeHighlightQuote((_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
     if (!selectedText)
       return;
-    clearWordLookup();
-    setPendingSelection(null);
-    setPendingHighlightMenu({
+    const selectionItem = {
       cfiRange,
       quote: selectedText,
       sentence: getSelectionContextSentence(contents2, selectedText),
       chapterTitle: readerTitleRef.current,
       rect: getSelectionHighlightMenuRect(contents2)
-    });
+    };
+    clearWordLookup();
+    setPendingSelection(null);
+    if (autoTranslateSelection) {
+      Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
+        if (!opened) {
+          setPendingHighlightMenu(selectionItem);
+        }
+      });
+    } else {
+      setPendingHighlightMenu(selectionItem);
+    }
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
@@ -50492,6 +50711,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const pendingTranslationKind = pendingWordSelection && wordLookupState.result ? getTranslationAssetKind(pendingWordSelection.quote || "", wordLookupState.result) : normalizedPendingWord && normalizedPendingWord.isPhrase ? "phrase" : "word";
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
+  const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
   const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4fdd\u5b58\u53e5\u5b50" : pendingTranslationKind === "phrase" ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
   const renderObsidianIcon = (name) => React.createElement("span", {
     "aria-hidden": "true",
@@ -50822,7 +51042,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }, "\u53d6\u6d88"), savedWordAsset ? /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-highlight-button",
     onClick: () => openWordNote(savedWordAsset)
-  }, "\u6253\u5f00\u8bcd\u6761") : null, savedWordAsset && savedWordAsset.mastered ? /* @__PURE__ */ React.createElement("button", {
+  }, "\u6253\u5f00\u8bcd\u6761") : null, canSwitchPendingWordToAi ? /* @__PURE__ */ React.createElement("button", {
+    className: "jarvis-reader-highlight-button",
+    onClick: translatePendingWordWithAi
+  }, "AI\u7ffb\u8bd1") : null, savedWordAsset && savedWordAsset.mastered ? /* @__PURE__ */ React.createElement("button", {
     className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
     onClick: restorePendingWordAsset
   }, "\u91cd\u65b0\u52a0\u5165") : null, canPersistPendingWord && !savedWordAsset ? /* @__PURE__ */ React.createElement("button", {
@@ -51038,8 +51261,8 @@ var EpubView = class extends import_obsidian2.FileView {
   getWordAssets() {
     return getWordAssetsMap(this.plugin.settings);
   }
-  async translateSelection(text, sentence = "") {
-    return await translateSelectionWithApi(this.plugin.settings, text, sentence);
+  async translateSelection(text, sentence = "", options = {}) {
+    return await translateSelectionWithApi(this.plugin.settings, text, sentence, this.app, options);
   }
   async saveWordAsset(selection, translation) {
     const assetMap = getWordAssetsMap(this.plugin.settings);
@@ -51511,8 +51734,8 @@ var EpubView = class extends import_obsidian2.FileView {
         this.startThemeSync(rendition);
       },
       wordAssets: this.getWordAssets(),
-      translateSelection: (text, sentence = "") => {
-        return this.translateSelection(text, sentence);
+      translateSelection: (text, sentence = "", options = {}) => {
+        return this.translateSelection(text, sentence, options);
       },
       saveWordAsset: (selection, translation) => {
         return this.saveWordAsset(selection, translation);
@@ -51530,6 +51753,7 @@ var EpubView = class extends import_obsidian2.FileView {
         return this.loadWordDisplay(asset);
       },
       autoWordHighlight: this.shouldAutoHighlightWords(),
+      autoTranslateSelection: !!(this.plugin.settings.experimentalInstantTranslation && this.plugin.settings.experimentalInstantTranslation.enabled),
       speechLang: this.plugin.settings.speechLang,
       enableWordAudio: !!this.plugin.settings.enableWordAudio,
       wordAudioTemplate: this.plugin.settings.wordAudioTemplate,
@@ -52524,6 +52748,11 @@ var DEFAULT_SETTINGS = {
     apiKey: "",
     model: ""
   },
+  experimentalInstantTranslation: {
+    enabled: false,
+    localDictionaryEnabled: false,
+    localDictionaryPath: DEFAULT_LOCAL_DICTIONARY_PATH
+  },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   autoHighlightFolders: ["09 Books"],
   enableWordAudio: true,
@@ -52782,27 +53011,11 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     let changed = false;
     this.settings.bookHighlights = this.settings.bookHighlights || {};
     for (const [bookPath, sidecarList] of Object.entries(bookHighlights || {})) {
-      if (!Array.isArray(sidecarList))
+      if (!Array.isArray(sidecarList) || !sidecarList.length)
         continue;
       const currentList = Array.isArray(this.settings.bookHighlights[bookPath]) ? this.settings.bookHighlights[bookPath] : [];
-      const byId = /* @__PURE__ */ new Map();
-      for (const item of sidecarList) {
-        if (item && (item.id || item.blockId)) {
-          byId.set(item.id || item.blockId, item);
-        }
-      }
-      for (const item of currentList) {
-        if (item && (item.id || item.blockId)) {
-          const key = item.id || item.blockId;
-          byId.set(key, {
-            ...byId.get(key),
-            ...item
-          });
-        }
-      }
-      const merged = Array.from(byId.values());
-      if (merged.length > currentList.length) {
-        this.settings.bookHighlights[bookPath] = merged;
+      if (currentList.length === 0) {
+        this.settings.bookHighlights[bookPath] = sidecarList;
         changed = true;
       }
     }
@@ -52857,8 +53070,10 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     try {
       const paths = this.getIndexSidecarPaths();
       const adapter = this.app.vault.adapter;
-      if (!adapter || typeof adapter.write !== "function")
+      if (!adapter || typeof adapter.write !== "function") {
+        console.warn("Jarvis Reader sidecar persist skipped: vault adapter not available.");
         return;
+      }
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
       const snapshot = this.getIndexSnapshot();
@@ -52908,6 +53123,18 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.settings.translationApi.baseUrl = String(this.settings.translationApi.baseUrl || "");
     this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
+    const legacyLocalDictionary = this.settings.localDictionary && typeof this.settings.localDictionary === "object" ? this.settings.localDictionary : {};
+    if (!this.settings.experimentalInstantTranslation || typeof this.settings.experimentalInstantTranslation !== "object") {
+      const legacyLocalEnabled = legacyLocalDictionary.enabled === true;
+      this.settings.experimentalInstantTranslation = {
+        enabled: legacyLocalEnabled,
+        localDictionaryEnabled: legacyLocalEnabled,
+        localDictionaryPath: legacyLocalDictionary.path || DEFAULT_LOCAL_DICTIONARY_PATH
+      };
+    }
+    this.settings.experimentalInstantTranslation.enabled = this.settings.experimentalInstantTranslation.enabled === true;
+    this.settings.experimentalInstantTranslation.localDictionaryEnabled = this.settings.experimentalInstantTranslation.localDictionaryEnabled === true;
+    this.settings.experimentalInstantTranslation.localDictionaryPath = normalizeVaultPath(this.settings.experimentalInstantTranslation.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH);
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
     this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];
@@ -52927,7 +53154,6 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
   }
   async saveSettings() {
-    await this.restoreIndexesFromSidecars();
     await this.saveData(this.settings);
     await this.persistIndexSidecars("save");
   }
@@ -53015,6 +53241,45 @@ created: {{created}}
         await this.plugin.saveSettings();
       });
     });
+    const experimental = this.plugin.settings.experimentalInstantTranslation || {};
+    new import_obsidian3.Setting(containerEl).setName("实验：选中即翻译").setDesc("默认关闭。开启后选中文本会直接打开翻译弹窗，不再先显示操作菜单").addToggle((toggle) => toggle.setValue(experimental.enabled === true).onChange(async (value) => {
+      this.plugin.settings.experimentalInstantTranslation.enabled = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian3.Setting(containerEl).setName("实验：本地词典").setDesc("选中单词时先查本地 JSON 词典；未命中再走 AI").addToggle((toggle) => toggle.setValue(experimental.localDictionaryEnabled === true).onChange(async (value) => {
+      this.plugin.settings.experimentalInstantTranslation.localDictionaryEnabled = value;
+      await this.plugin.saveSettings();
+    }));
+    let experimentalDictionaryPathText = null;
+    new import_obsidian3.Setting(containerEl).setName("本地词典路径").setDesc("JSON 对象格式，支持 \"word\": \"释义\" 或对象字段 translation/display").addText((text) => {
+      experimentalDictionaryPathText = text;
+      text.setPlaceholder(DEFAULT_LOCAL_DICTIONARY_PATH).setValue(experimental.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH).onChange(async (value) => {
+        this.plugin.settings.experimentalInstantTranslation.localDictionaryPath = normalizeVaultPath(value || DEFAULT_LOCAL_DICTIONARY_PATH);
+        await this.plugin.saveSettings();
+      });
+      text.inputEl.style.width = "100%";
+    }).addButton((button) => button.setButtonText("创建示例").onClick(async () => {
+      const path = normalizeVaultPath(this.plugin.settings.experimentalInstantTranslation.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH);
+      await ensureVaultFolder(this.app, path.split("/").slice(0, -1).join("/"));
+      const existing = this.app.vault.getAbstractFileByPath(path);
+      if (!existing) {
+        await this.app.vault.create(path, JSON.stringify({
+          patience: "耐心；忍耐力",
+          fracture: "骨折；断裂",
+          shatter: {
+            translation: "粉碎；使破裂",
+            partOfSpeech: "v.",
+            display: "**词性** v.\\n\\n**中文释义**：粉碎；使破裂"
+          }
+        }, null, 2));
+      }
+      this.plugin.settings.experimentalInstantTranslation.localDictionaryPath = path;
+      await this.plugin.saveSettings();
+      if (experimentalDictionaryPathText) {
+        experimentalDictionaryPathText.setValue(path);
+      }
+      new import_obsidian3.Notice("本地词典示例已创建。");
+    }));
     new import_obsidian3.Setting(containerEl).setName("翻译服务").setDesc("选择 API 请求格式；自定义会继续按 URL 自动识别").addDropdown((dropdown) => {
       dropdown.addOption("openai-compatible", "OpenAI 兼容").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "自定义").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
         const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
