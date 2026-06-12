@@ -6,6 +6,8 @@
 
 Jarvis Reader 是一个面向 Obsidian 的个人化 EPUB 阅读插件。它把书架、目录导航、阅读进度、高亮标注、读书笔记和双链想法整合到同一个阅读流程里。
 
+插件内置 ECDICT 离线词典，选中英文单词时可直接查询，无需导入词典或配置本地路径。词典数据按首字母分片加载，来源与许可见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
+
 ## 版本记录
 
 ### v0.3.2

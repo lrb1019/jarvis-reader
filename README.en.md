@@ -4,6 +4,8 @@ Current version: v0.3.2
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
+Jarvis Reader includes the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded in alphabetical shards; attribution is in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
 ## Release Notes
 
 ### v0.3.2

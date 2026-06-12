@@ -47630,7 +47630,7 @@ async function openOrCreateNote(app, file, toc, settings = {}) {
 var JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 var JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
-var DEFAULT_LOCAL_DICTIONARY_PATH = ".obsidian/plugins/jarvis-reader/dictionaries/user-dictionary.json";
+var BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 var LOCAL_DICTIONARY_CACHE = /* @__PURE__ */ new Map();
 var DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与单词卡生成器。
 你必须只返回单行合法 JSON。
@@ -47725,9 +47725,13 @@ function getExperimentalTranslationSettings(settings = {}) {
   const experimental = settings.experimentalInstantTranslation && typeof settings.experimentalInstantTranslation === "object" ? settings.experimentalInstantTranslation : {};
   return {
     enabled: experimental.enabled === true,
-    localDictionaryEnabled: experimental.localDictionaryEnabled === true,
-    localDictionaryPath: normalizeVaultPath(experimental.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH)
+    localDictionaryEnabled: true
   };
+}
+function getBuiltinDictionaryShardPath(word) {
+  const first = String(word || "").trim().charAt(0).toLowerCase();
+  const shard = /^[a-z]$/.test(first) ? first : "_";
+  return `${BUILTIN_DICTIONARY_FOLDER}/${shard}.json`;
 }
 async function readJsonFromVault(app, path) {
   const adapter = app && app.vault ? app.vault.adapter : null;
@@ -47818,10 +47822,10 @@ async function lookupLocalDictionary(settings = {}, selectedText, app = null) {
   const keys = getDictionaryLookupKeys(selectedText);
   if (!keys.length)
     return null;
-  const dictionary = await readJsonFromVault(app, experimental.localDictionaryPath);
-  if (!dictionary || typeof dictionary !== "object")
-    return null;
   for (const key of keys) {
+    const dictionary = await readJsonFromVault(app, getBuiltinDictionaryShardPath(key));
+    if (!dictionary || typeof dictionary !== "object")
+      continue;
     const entry = dictionary[key] || dictionary[key.toLowerCase()] || dictionary[key.toUpperCase()];
     const result = normalizeDictionaryEntry(selectedText, key, entry);
     if (result)
@@ -52785,9 +52789,7 @@ var DEFAULT_SETTINGS = {
     model: ""
   },
   experimentalInstantTranslation: {
-    enabled: false,
-    localDictionaryEnabled: false,
-    localDictionaryPath: DEFAULT_LOCAL_DICTIONARY_PATH
+    enabled: false
   },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   autoHighlightFolders: ["09 Books"],
@@ -53244,18 +53246,15 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.settings.translationApi.baseUrl = String(this.settings.translationApi.baseUrl || "");
     this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
-    const legacyLocalDictionary = this.settings.localDictionary && typeof this.settings.localDictionary === "object" ? this.settings.localDictionary : {};
     if (!this.settings.experimentalInstantTranslation || typeof this.settings.experimentalInstantTranslation !== "object") {
-      const legacyLocalEnabled = legacyLocalDictionary.enabled === true;
       this.settings.experimentalInstantTranslation = {
-        enabled: legacyLocalEnabled,
-        localDictionaryEnabled: legacyLocalEnabled,
-        localDictionaryPath: legacyLocalDictionary.path || DEFAULT_LOCAL_DICTIONARY_PATH
+        enabled: false
       };
     }
     this.settings.experimentalInstantTranslation.enabled = this.settings.experimentalInstantTranslation.enabled === true;
-    this.settings.experimentalInstantTranslation.localDictionaryEnabled = this.settings.experimentalInstantTranslation.localDictionaryEnabled === true;
-    this.settings.experimentalInstantTranslation.localDictionaryPath = normalizeVaultPath(this.settings.experimentalInstantTranslation.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH);
+    delete this.settings.experimentalInstantTranslation.localDictionaryEnabled;
+    delete this.settings.experimentalInstantTranslation.localDictionaryPath;
+    delete this.settings.localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
     this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];
@@ -53386,40 +53385,7 @@ created: {{created}}
       this.plugin.settings.experimentalInstantTranslation.enabled = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian3.Setting(containerEl).setName("实验：本地词典").setDesc("选中单词时先查本地 JSON 词典；未命中再走 AI").addToggle((toggle) => toggle.setValue(experimental.localDictionaryEnabled === true).onChange(async (value) => {
-      this.plugin.settings.experimentalInstantTranslation.localDictionaryEnabled = value;
-      await this.plugin.saveSettings();
-    }));
-    let experimentalDictionaryPathText = null;
-    new import_obsidian3.Setting(containerEl).setName("本地词典路径").setDesc("JSON 对象格式，支持 \"word\": \"释义\" 或对象字段 translation/display").addText((text) => {
-      experimentalDictionaryPathText = text;
-      text.setPlaceholder(DEFAULT_LOCAL_DICTIONARY_PATH).setValue(experimental.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH).onChange(async (value) => {
-        this.plugin.settings.experimentalInstantTranslation.localDictionaryPath = normalizeVaultPath(value || DEFAULT_LOCAL_DICTIONARY_PATH);
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.style.width = "100%";
-    }).addButton((button) => button.setButtonText("创建示例").onClick(async () => {
-      const path = normalizeVaultPath(this.plugin.settings.experimentalInstantTranslation.localDictionaryPath || DEFAULT_LOCAL_DICTIONARY_PATH);
-      await ensureVaultFolder(this.app, path.split("/").slice(0, -1).join("/"));
-      const existing = this.app.vault.getAbstractFileByPath(path);
-      if (!existing) {
-        await this.app.vault.create(path, JSON.stringify({
-          patience: "耐心；忍耐力",
-          fracture: "骨折；断裂",
-          shatter: {
-            translation: "粉碎；使破裂",
-            partOfSpeech: "v.",
-            display: "**词性** v.\\n\\n**中文释义**：粉碎；使破裂"
-          }
-        }, null, 2));
-      }
-      this.plugin.settings.experimentalInstantTranslation.localDictionaryPath = path;
-      await this.plugin.saveSettings();
-      if (experimentalDictionaryPathText) {
-        experimentalDictionaryPathText.setValue(path);
-      }
-      new import_obsidian3.Notice("本地词典示例已创建。");
-    }));
+    new import_obsidian3.Setting(containerEl).setName("内置离线词典").setDesc("固定使用 Jarvis Reader 自带的 ECDICT 词典；无需导入或配置路径。");
     new import_obsidian3.Setting(containerEl).setName("翻译服务").setDesc("选择 API 请求格式；自定义会继续按 URL 自动识别").addDropdown((dropdown) => {
       dropdown.addOption("openai-compatible", "OpenAI 兼容").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "自定义").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
         const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
