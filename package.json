@@ -1,0 +1,21 @@
+{
+  "name": "jarvis-reader",
+  "version": "0.4.0",
+  "private": true,
+  "description": "TypeScript source migration workspace for Jarvis Reader",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "verify": "npm run typecheck && npm run build && node --check build/migration/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "^1.8.0",
+    "react": "^19.0.0",
+    "typescript": "^5.8.0"
+  }
+}
