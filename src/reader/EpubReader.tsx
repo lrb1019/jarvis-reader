@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ReactReader } from "react-reader";
 import type { Rendition } from "epubjs";
-import type { BookHighlight, BookProgress, HighlightColor } from "../domain/index.ts";
+import type { BookHighlight, BookProgress, HighlightColor, WordAsset } from "../domain/index.ts";
 import { HIGHLIGHT_COLORS } from "../domain/index.ts";
 import {
   DEFAULT_HIGHLIGHT_COLOR,
@@ -23,10 +23,17 @@ import {
   type HighlightRenditionLike,
 } from "./highlights.ts";
 import { applyReaderTheme } from "./theme.ts";
+import type { TranslationResult } from "../translation/core.ts";
+import {
+  removeWordAssetMarks,
+  renderWordAssets,
+  type WordAssetRenditionLike,
+} from "./word-assets.ts";
 
 interface SelectionDraft {
   cfiRange: string;
   quote: string;
+  sentence?: string;
   chapterTitle: string;
   comment: string;
   markColor: HighlightColor;
@@ -34,6 +41,25 @@ interface SelectionDraft {
 
 interface SelectionContents {
   window?: Window;
+}
+
+function getSelectionSentence(contents: SelectionContents, selectedText: string): string {
+  const selection = contents.window?.getSelection();
+  const node = selection?.anchorNode;
+  const text = node?.parentElement?.textContent?.replace(/\s+/g, " ").trim() || selectedText;
+  const index = text.indexOf(selectedText);
+  if (index < 0) return selectedText;
+  const left = text.slice(0, index);
+  const right = text.slice(index + selectedText.length);
+  const leftBoundary = Math.max(...[".", "?", "!", ";", "。", "？", "！"].map((mark) => left.lastIndexOf(mark)));
+  const rightBoundaries = [".", "?", "!", ";", "。", "？", "！"]
+    .map((mark) => right.indexOf(mark))
+    .filter((value) => value >= 0);
+  const start = leftBoundary >= 0 ? leftBoundary + 1 : 0;
+  const end = rightBoundaries.length
+    ? index + selectedText.length + Math.min(...rightBoundaries) + 1
+    : text.length;
+  return text.slice(start, end).trim().slice(0, 600) || selectedText;
 }
 
 export interface JarvisEpubReaderProps {
@@ -45,6 +71,9 @@ export interface JarvisEpubReaderProps {
   readerLineHeight: number;
   initLocation: string | number | null;
   highlights: BookHighlight[];
+  bookPath: string;
+  wordAssets: WordAsset[];
+  instantTranslation: boolean;
   onLocationChange(location: string | number): void;
   onProgress(progress: BookProgress): void;
   onTocChange(toc: EpubTocItem[]): void;
@@ -57,6 +86,9 @@ export interface JarvisEpubReaderProps {
     changes: { comment: string; markColor: HighlightColor },
   ): Promise<BookHighlight>;
   onDeleteHighlight(highlight: BookHighlight): Promise<void>;
+  onTranslate(selection: SelectionDraft, forceAi: boolean): Promise<TranslationResult>;
+  onSaveWordAsset(selection: SelectionDraft, translation: TranslationResult): Promise<WordAsset>;
+  onDeleteWordAsset(asset: WordAsset): Promise<void>;
 }
 
 export function JarvisEpubReader(props: JarvisEpubReaderProps) {
@@ -68,6 +100,12 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
   const [editing, setEditing] = useState<BookHighlight | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translation, setTranslation] = useState<TranslationResult | null>(null);
+  const [savedAsset, setSavedAsset] = useState<WordAsset | null>(null);
+  const [translationError, setTranslationError] = useState("");
+  const [wordAssets, setWordAssets] = useState(props.wordAssets);
+  const [activeWordAsset, setActiveWordAsset] = useState<WordAsset | null>(null);
   const renditionRef = useRef<Rendition | null>(null);
   const relocatedHandlerRef = useRef<((relocated: RelocatedLocation) => void) | null>(null);
   const selectedHandlerRef = useRef<((cfiRange: string, contents: SelectionContents) => void) | null>(null);
@@ -84,10 +122,19 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
   }, [props.highlights]);
 
   useEffect(() => {
+    setWordAssets(props.wordAssets);
+  }, [props.wordAssets]);
+
+  useEffect(() => {
     highlightsRef.current = highlights;
     const rendition = renditionRef.current;
     if (rendition) renderCurrentHighlights(rendition);
   }, [highlights]);
+
+  useEffect(() => {
+    const rendition = renditionRef.current;
+    if (rendition) renderCurrentWordAssets(rendition);
+  }, [wordAssets]);
 
   useEffect(() => {
     chapterTitleRef.current = chapterTitle;
@@ -115,6 +162,9 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
   const openEditor = (highlight: BookHighlight): void => {
     setDraft(null);
     setEditing(highlight);
+    setTranslation(null);
+    setSavedAsset(null);
+    setTranslationError("");
   };
 
   const renderCurrentHighlights = (rendition: Rendition): void => {
@@ -122,6 +172,15 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
       rendition as unknown as HighlightRenditionLike,
       highlightsRef.current,
       (highlight) => openEditor(highlight),
+    );
+  };
+
+  const renderCurrentWordAssets = (rendition: Rendition): void => {
+    renderWordAssets(
+      rendition as unknown as WordAssetRenditionLike,
+      wordAssets,
+      props.bookPath,
+      (asset) => setActiveWordAsset(asset),
     );
   };
 
@@ -136,6 +195,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
     renditionRef.current = rendition;
     applyReaderTheme(rendition, props.readerZoom, props.readerLineHeight);
     renderCurrentHighlights(rendition);
+    renderCurrentWordAssets(rendition);
 
     const relocated = (next: RelocatedLocation): void => {
       const nextChapter = findChapterTitle(tocRef.current, next.start?.href) || props.title;
@@ -155,9 +215,13 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
       const quote = normalizeHighlightQuote(contents.window?.getSelection()?.toString());
       if (!quote) return;
       setEditing(null);
+      setTranslation(null);
+      setSavedAsset(null);
+      setTranslationError("");
       setDraft({
         cfiRange,
         quote,
+        sentence: getSelectionSentence(contents, quote),
         chapterTitle: chapterTitleRef.current,
         comment: "",
         markColor: DEFAULT_HIGHLIGHT_COLOR,
@@ -238,6 +302,65 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
     openEditor(highlight);
   };
 
+  const runTranslation = async (forceAi = false): Promise<void> => {
+    if (!draft || translating) return;
+    setTranslating(true);
+    setTranslationError("");
+    try {
+      setTranslation(await props.onTranslate(draft, forceAi));
+      setSavedAsset(null);
+    } catch (error) {
+      setTranslationError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  const saveTranslation = async (): Promise<void> => {
+    if (!draft || !translation || saving) return;
+    setSaving(true);
+    try {
+      const asset = await props.onSaveWordAsset(draft, translation);
+      setSavedAsset(asset);
+      setWordAssets((current) => [...current.filter((item) => item.lemma !== asset.lemma), asset]);
+      setActiveWordAsset(asset);
+      setTranslationError("");
+    } catch (error) {
+      setTranslationError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteSavedAsset = async (): Promise<void> => {
+    if (!savedAsset || saving) return;
+    setSaving(true);
+    try {
+      await props.onDeleteWordAsset(savedAsset);
+      if (renditionRef.current) {
+        removeWordAssetMarks(
+          renditionRef.current as unknown as WordAssetRenditionLike,
+          savedAsset,
+          props.bookPath,
+        );
+      }
+      setWordAssets((current) => current.filter((item) => item.lemma !== savedAsset.lemma));
+      setSavedAsset(null);
+      setActiveWordAsset(null);
+      setTranslationError("");
+    } catch (error) {
+      setTranslationError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (draft && props.instantTranslation && !translation && !translating) {
+      void runTranslation(false);
+    }
+  }, [draft?.cfiRange]);
+
   const active = editing
     ? {
         quote: editing.quote,
@@ -307,10 +430,55 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
                 onChange={(event) => updateActive({ comment: event.currentTarget.value })}
                 style={{ width: "100%", minHeight: 70, resize: "vertical" }}
               />
+              {!editing ? (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button type="button" disabled={translating} onClick={() => void runTranslation(false)}>
+                      {translating ? "翻译中" : "翻译"}
+                    </button>
+                    {translation?.sourceType === "local-dictionary" ? (
+                      <button type="button" disabled={translating} onClick={() => void runTranslation(true)}>AI 翻译</button>
+                    ) : null}
+                  </div>
+                  {translationError ? <div style={{ color: "var(--text-error)", marginTop: 8 }}>{translationError}</div> : null}
+                  {translation ? (
+                    <div style={{ marginTop: 8, padding: 10, borderRadius: 8, background: "var(--background-secondary)", maxHeight: 220, overflow: "auto" }}>
+                      <strong style={{ display: "block", marginBottom: 6 }}>{translation.surface || draft?.quote || ""}</strong>
+                      <div style={{ whiteSpace: "pre-wrap" }}>{translation.display}</div>
+                      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
+                        {savedAsset ? <button type="button" disabled={saving} onClick={() => void deleteSavedAsset()}>彻底删除</button> : null}
+                        <button type="button" disabled={saving || Boolean(savedAsset)} onClick={() => void saveTranslation()}>
+                          {savedAsset ? "已保存" : "保存词卡"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
                 {editing ? <button type="button" disabled={saving} onClick={deleteEditing}>删除</button> : null}
                 <button type="button" disabled={saving} onClick={() => { setDraft(null); setEditing(null); }}>取消</button>
                 <button type="button" disabled={saving} onClick={editing ? saveEditing : saveDraft}>保存</button>
+              </div>
+            </div>
+          ) : null}
+          {activeWordAsset && !active ? (
+            <div style={editorStyle}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>{activeWordAsset.title || activeWordAsset.lemma}</div>
+              <div style={{ whiteSpace: "pre-wrap", maxHeight: 260, overflow: "auto" }}>{activeWordAsset.display || activeWordAsset.translation}</div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
+                <button type="button" onClick={() => setActiveWordAsset(null)}>关闭</button>
+                <button type="button" disabled={saving} onClick={async () => {
+                  setSaving(true);
+                  try {
+                    await props.onDeleteWordAsset(activeWordAsset);
+                    if (renditionRef.current) removeWordAssetMarks(renditionRef.current as unknown as WordAssetRenditionLike, activeWordAsset, props.bookPath);
+                    setWordAssets((current) => current.filter((item) => item.lemma !== activeWordAsset.lemma));
+                    setActiveWordAsset(null);
+                  } finally {
+                    setSaving(false);
+                  }
+                }}>彻底删除</button>
               </div>
             </div>
           ) : null}

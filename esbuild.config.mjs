@@ -1,5 +1,5 @@
 import { builtinModules } from "node:module";
-import { mkdir, copyFile } from "node:fs/promises";
+import { cp, mkdir, copyFile } from "node:fs/promises";
 import process from "node:process";
 import esbuild from "esbuild";
 
@@ -24,6 +24,8 @@ const context = await esbuild.context({
 
 await mkdir(outputDirectory, { recursive: true });
 await copyFile("manifest.json", `${outputDirectory}/manifest.json`);
+await copyFile("THIRD_PARTY_NOTICES.md", `${outputDirectory}/THIRD_PARTY_NOTICES.md`);
+await cp("dictionaries", `${outputDirectory}/dictionaries`, { recursive: true });
 
 if (production) {
   await context.rebuild();

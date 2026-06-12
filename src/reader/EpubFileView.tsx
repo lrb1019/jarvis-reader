@@ -1,4 +1,4 @@
-import { FileView, normalizePath, Notice, TFile, WorkspaceLeaf } from "obsidian";
+import { FileView, normalizePath, Notice, requestUrl, TFile, WorkspaceLeaf } from "obsidian";
 import { createRoot, type Root } from "react-dom/client";
 import type { BookHighlight, BookProgress, JarvisReaderSettings } from "../domain/index.ts";
 import {
@@ -9,6 +9,10 @@ import {
   upsertBookHighlight,
   upsertHighlightNoteBlock,
 } from "../core/highlights.ts";
+import { buildWordAsset } from "../core/word-assets.ts";
+import { deleteWordEntryInContent, upsertWordEntryInContent } from "../core/word-markdown.ts";
+import type { TranslationResult } from "../translation/core.ts";
+import { translateSelection } from "../translation/service.ts";
 import { clampReaderLineHeight, clampReaderZoom, type EpubTocItem } from "./core.ts";
 import { JarvisEpubReader } from "./EpubReader.tsx";
 
@@ -67,6 +71,9 @@ export class EpubFileView extends FileView {
         readerLineHeight={clampReaderLineHeight(settings.readerLineHeight)}
         initLocation={settings.bookInitLocations[file.path] ?? null}
         highlights={settings.bookHighlights[file.path] || []}
+        bookPath={file.path}
+        wordAssets={Object.values(settings.wordAssets)}
+        instantTranslation={settings.experimentalInstantTranslation.enabled}
         onLocationChange={(location) => {
           settings.bookInitLocations[file.path] = location;
           void this.pluginBridge.saveSettings();
@@ -131,6 +138,63 @@ export class EpubFileView extends FileView {
           await this.pluginBridge.saveSettings("highlight-delete");
           new Notice("标注已删除");
         }}
+        onTranslate={async (selection, forceAi) => {
+          return translateSelection(
+            settings,
+            selection.quote,
+            selection.sentence || selection.quote,
+            { read: (path) => this.app.vault.adapter.read(path) },
+            {
+              post: async ({ url, headers, body }) => {
+                const response = await requestUrl({
+                  url,
+                  method: "POST",
+                  headers,
+                  body: JSON.stringify(body),
+                });
+                if (response.status >= 400) {
+                  throw new Error((response.text || `HTTP ${response.status}`).slice(0, 280));
+                }
+                return response.json;
+              },
+            },
+            forceAi,
+          );
+        }}
+        onSaveWordAsset={async (selection, translation) => {
+          const key = this.getTranslationKey(selection, translation);
+          const previous = key ? settings.wordAssets[key] : undefined;
+          const asset = buildWordAsset(
+            { path: file.path, title: file.basename },
+            selection,
+            translation,
+            settings,
+            previous,
+          );
+          settings.wordAssets[asset.lemma] = asset;
+          try {
+            await this.pluginBridge.saveSettings("word-asset-save");
+          } catch (error) {
+            if (previous) settings.wordAssets[asset.lemma] = previous;
+            else delete settings.wordAssets[asset.lemma];
+            throw error;
+          }
+          await this.writeWordAssetNote(asset);
+          new Notice("已保存到翻译卡片库");
+          return asset;
+        }}
+        onDeleteWordAsset={async (asset) => {
+          const previous = settings.wordAssets[asset.lemma];
+          delete settings.wordAssets[asset.lemma];
+          try {
+            await this.pluginBridge.saveSettings("word-asset-delete");
+          } catch (error) {
+            if (previous) settings.wordAssets[asset.lemma] = previous;
+            throw error;
+          }
+          await this.deleteWordAssetNote(asset);
+          new Notice("词条已彻底删除");
+        }}
       />,
     );
   }
@@ -173,5 +237,42 @@ export class EpubFileView extends FileView {
       existing,
       deleteHighlightNoteBlock(content, highlight.blockId),
     );
+  }
+
+  private getTranslationKey(
+    selection: { quote: string; cfiRange: string },
+    translation: TranslationResult,
+  ): string {
+    if (!translation.isWord) {
+      let hash = 0;
+      const source = `${selection.cfiRange}|${selection.quote}`;
+      for (let index = 0; index < source.length; index += 1) {
+        hash = (hash * 31 + source.charCodeAt(index)) >>> 0;
+      }
+      return `sentence-${hash.toString(36)}`;
+    }
+    return translation.lemma;
+  }
+
+  private async writeWordAssetNote(asset: import("../domain/index.ts").WordAsset): Promise<void> {
+    await this.ensureParentFolder(asset.notePath);
+    const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (existing instanceof TFile) {
+      const content = await this.app.vault.read(existing);
+      await this.app.vault.modify(existing, upsertWordEntryInContent(content, asset));
+      return;
+    }
+    await this.app.vault.create(
+      asset.notePath,
+      upsertWordEntryInContent(`# ${this.file?.basename || "Words"}\n`, asset),
+    );
+  }
+
+  private async deleteWordAssetNote(asset: import("../domain/index.ts").WordAsset): Promise<void> {
+    const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (!(existing instanceof TFile)) return;
+    const content = await this.app.vault.read(existing);
+    const next = deleteWordEntryInContent(content, asset);
+    if (next !== content) await this.app.vault.modify(existing, next);
   }
 }
