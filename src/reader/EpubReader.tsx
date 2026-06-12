@@ -321,7 +321,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
             {highlights.length ? highlights.map((highlight) => (
               <button key={highlight.id} type="button" onClick={() => jumpToHighlight(highlight)} style={highlightItemStyle}>
                 <span style={{ width: 7, alignSelf: "stretch", borderRadius: 4, background: HIGHLIGHT_COLOR_STYLES[normalizeHighlightColor(highlight.markColor)].fill }} />
-                <span style={{ minWidth: 0, textAlign: "left" }}>
+                <span style={{ minWidth: 0, textAlign: "left", whiteSpace: "normal", overflowWrap: "anywhere" }}>
                   <strong style={{ display: "block", marginBottom: 4 }}>{highlight.chapterTitle || props.title}</strong>
                   <span style={{ display: "block", color: "var(--text-muted)" }}>{highlight.quote}</span>
                   {highlight.comment ? <span style={{ display: "block", marginTop: 6 }}>{highlight.comment}</span> : null}
@@ -358,7 +358,10 @@ const editorStyle = {
 } as const;
 
 const sidebarStyle = {
-  width: 280,
+  width: 320,
+  minWidth: 260,
+  maxWidth: "34%",
+  flex: "0 0 320px",
   overflow: "auto",
   borderLeft: "1px solid var(--background-modifier-border)",
   background: "var(--background-secondary)",
@@ -366,7 +369,10 @@ const sidebarStyle = {
 
 const highlightItemStyle = {
   width: "100%",
+  height: "auto",
+  minHeight: 0,
   display: "flex",
+  alignItems: "flex-start",
   gap: 9,
   padding: 10,
   border: 0,
@@ -374,4 +380,6 @@ const highlightItemStyle = {
   borderRadius: 0,
   background: "transparent",
   whiteSpace: "normal",
+  lineHeight: 1.45,
+  overflow: "visible",
 } as const;
