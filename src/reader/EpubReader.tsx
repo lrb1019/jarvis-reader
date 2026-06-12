@@ -9,6 +9,7 @@ import {
   normalizeHighlightColor,
 } from "../core/highlights.ts";
 import { normalizeHighlightQuote } from "../core/text.ts";
+import { playWordAudio, stopWordAudio, type WordAudioOptions } from "../core/word-audio.ts";
 import {
   findChapterTitle,
   getReaderOptions,
@@ -82,6 +83,7 @@ export interface JarvisEpubReaderProps {
   bookPath: string;
   wordAssets: WordAsset[];
   instantTranslation: boolean;
+  wordAudio: WordAudioOptions;
   onLocationChange(location: string | number): void;
   onProgress(progress: BookProgress): void;
   onTocChange(toc: EpubTocItem[]): void;
@@ -171,6 +173,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
         rendition.off("selected", selectedHandlerRef.current as never);
       }
       renditionRef.current = null;
+      stopWordAudio();
     },
     [],
   );
@@ -548,6 +551,8 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
     else if (commentDraft) setCommentDraft({ ...commentDraft, ...changes });
   };
 
+  const pronounce = (text: string): void => playWordAudio(text, props.wordAudio);
+
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <div style={toolbarStyle}>
@@ -618,7 +623,19 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
               <div style={{ maxHeight: 72, overflow: "auto", color: "var(--text-muted)", marginBottom: 8 }}>{translationSelection.quote}</div>
               {translating ? <div>正在翻译...</div> : null}
               {translationError ? <div style={{ color: "var(--text-error)", marginTop: 8 }}>{translationError}</div> : null}
-              {translation ? <div style={{ whiteSpace: "pre-wrap", maxHeight: 260, overflow: "auto" }}>{translation.display}</div> : null}
+              {translation ? (
+                <>
+                  {translation.isWord ? (
+                    <div className="jarvis-reader-word-head">
+                      <button className="jarvis-reader-word-lemma jarvis-reader-word-lemma-button" type="button" title="点击发音" disabled={!props.wordAudio.enabled} onClick={() => pronounce(translation.surface || translation.lemma || translationSelection.quote)}>
+                        {translation.surface || translation.lemma || translationSelection.quote}
+                      </button>
+                      {translation.phonetic ? <div className="jarvis-reader-word-phonetic">{translation.phonetic}</div> : null}
+                    </div>
+                  ) : null}
+                  <div style={{ whiteSpace: "pre-wrap", maxHeight: 260, overflow: "auto" }}>{translation.display}</div>
+                </>
+              ) : null}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
                 <button type="button" onClick={clearTransientUi}>取消</button>
                 {translation?.sourceType === "local-dictionary" ? <button type="button" disabled={translating} onClick={() => void runTranslation(true)}>AI 翻译</button> : null}
@@ -629,7 +646,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
           ) : null}
           {activeWordAsset && !active && !translationSelection && !pendingMenu ? (
             <div style={editorStyle}>
-              <div style={{ fontWeight: 600, marginBottom: 8 }}>{activeWordAsset.title || activeWordAsset.lemma}</div>
+              <button className="jarvis-reader-word-lemma jarvis-reader-word-lemma-button" type="button" title="点击发音" disabled={!props.wordAudio.enabled} onClick={() => pronounce(activeWordAsset.title || activeWordAsset.lemma)}>{activeWordAsset.title || activeWordAsset.lemma}</button>
               <div style={{ whiteSpace: "pre-wrap", maxHeight: 260, overflow: "auto" }}>{activeWordAsset.display || activeWordAsset.translation}</div>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
                 <button type="button" onClick={() => setActiveWordAsset(null)}>关闭</button>

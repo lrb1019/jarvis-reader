@@ -33,7 +33,17 @@ export default class JarvisReaderMigrationPlugin extends Plugin {
         const selected = workspaceDocument.defaultView?.getSelection()?.toString() || "";
         const asset = findWordAssetBySurface(this.settings.wordAssets, selected);
         if (asset) {
-          new WordCardModal(this.app, asset, (entry) => this.openWordAsset(entry)).open();
+          new WordCardModal(
+            this.app,
+            asset,
+            (entry) => this.openWordAsset(entry),
+            {
+              enabled: this.settings.enableWordAudio,
+              template: this.settings.wordAudioTemplate,
+              accent: this.settings.wordAudioAccent,
+              speechLang: this.settings.speechLang,
+            },
+          ).open();
         }
       }, 0);
     });

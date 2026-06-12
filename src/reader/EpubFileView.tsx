@@ -74,6 +74,12 @@ export class EpubFileView extends FileView {
         bookPath={file.path}
         wordAssets={Object.values(settings.wordAssets)}
         instantTranslation={settings.experimentalInstantTranslation.enabled}
+        wordAudio={{
+          enabled: settings.enableWordAudio,
+          template: settings.wordAudioTemplate,
+          accent: settings.wordAudioAccent,
+          speechLang: settings.speechLang,
+        }}
         onLocationChange={(location) => {
           settings.bookInitLocations[file.path] = location;
           void this.pluginBridge.saveSettings();
