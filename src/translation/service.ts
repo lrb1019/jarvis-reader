@@ -23,12 +23,15 @@ export async function translateSelection(
   dictionary: DictionaryTextReader,
   http: TranslationHttpClient,
   forceAi = false,
+  localOnly = false,
 ): Promise<TranslationResult> {
   const selectionType = getTranslationSelectionType(selectedText);
   if (!forceAi && selectionType === "word") {
     const local = await lookupEcdict(dictionary, selectedText);
     if (local) return local;
+    if (localOnly) throw new Error("Local dictionary entry not found.");
   }
+  if (localOnly) throw new Error("Local dictionary lookup only supports single words.");
   const api = settings.translationApi;
   const endpoint = buildTranslationEndpoint(api);
   if (!endpoint || !api.apiKey.trim() || !api.model.trim()) {

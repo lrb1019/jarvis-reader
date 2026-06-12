@@ -71,3 +71,21 @@ test("translation service prefers ECDICT before HTTP", async () => {
   assert.equal(result.sourceType, "local-dictionary");
   assert.equal(posted, false);
 });
+
+test("local-only translation never falls through to HTTP", async () => {
+  const settings = createSettings();
+  let posted = false;
+  await assert.rejects(
+    translateSelection(
+      settings,
+      "missingword",
+      "context",
+      { read: async () => "{}" },
+      { post: async () => { posted = true; return {}; } },
+      false,
+      true,
+    ),
+    /Local dictionary entry not found/,
+  );
+  assert.equal(posted, false);
+});

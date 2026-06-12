@@ -138,7 +138,7 @@ export class EpubFileView extends FileView {
           await this.pluginBridge.saveSettings("highlight-delete");
           new Notice("标注已删除");
         }}
-        onTranslate={async (selection, forceAi) => {
+        onTranslate={async (selection, forceAi, localOnly) => {
           return translateSelection(
             settings,
             selection.quote,
@@ -159,6 +159,7 @@ export class EpubFileView extends FileView {
               },
             },
             forceAi,
+            localOnly,
           );
         }}
         onSaveWordAsset={async (selection, translation) => {
