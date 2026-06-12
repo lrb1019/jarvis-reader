@@ -1,12 +1,19 @@
 # Jarvis Reader
 
-Current version: v0.3.2
+Current version: v0.4.0
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 Jarvis Reader includes the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded in alphabetical shards; attribution is in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
 ## Release Notes
+
+### v0.4.0
+
+- Makes `index/word-assets.json` the sole persistent source for translation assets and stops merging assets from `data.json`.
+- Adds one-way Markdown synchronization, automatic note rebuilding, and permanent asset deletion.
+- Bundles 400,850 ECDICT entries in alphabetical shards with no import or path configuration required.
+- Uses Chinese Word, Phrase, and Sentence sections in aggregated translation notes.
 
 ### v0.3.2
 
