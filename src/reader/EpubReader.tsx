@@ -106,6 +106,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
   const [translationError, setTranslationError] = useState("");
   const [wordAssets, setWordAssets] = useState(props.wordAssets);
   const [activeWordAsset, setActiveWordAsset] = useState<WordAsset | null>(null);
+  const [selectionMode, setSelectionMode] = useState<"highlight" | "translation">("highlight");
   const renditionRef = useRef<Rendition | null>(null);
   const relocatedHandlerRef = useRef<((relocated: RelocatedLocation) => void) | null>(null);
   const selectedHandlerRef = useRef<((cfiRange: string, contents: SelectionContents) => void) | null>(null);
@@ -218,6 +219,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
       setTranslation(null);
       setSavedAsset(null);
       setTranslationError("");
+      setSelectionMode(props.instantTranslation ? "translation" : "highlight");
       setDraft({
         cfiRange,
         quote,
@@ -304,6 +306,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
 
   const runTranslation = async (forceAi = false): Promise<void> => {
     if (!draft || translating) return;
+    setSelectionMode("translation");
     setTranslating(true);
     setTranslationError("");
     try {
@@ -356,10 +359,16 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
   };
 
   useEffect(() => {
-    if (draft && props.instantTranslation && !translation && !translating) {
+    if (
+      draft &&
+      selectionMode === "translation" &&
+      props.instantTranslation &&
+      !translation &&
+      !translating
+    ) {
       void runTranslation(false);
     }
-  }, [draft?.cfiRange]);
+  }, [draft?.cfiRange, selectionMode]);
 
   const active = editing
     ? {
@@ -405,32 +414,38 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
           />
           {active ? (
             <div style={editorStyle}>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>{editing ? "编辑标注" : "新建标注"}</div>
-              <div style={{ maxHeight: 72, overflow: "auto", color: "var(--text-muted)", marginBottom: 8 }}>{active.quote}</div>
-              <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                {HIGHLIGHT_COLORS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    aria-label={color}
-                    onClick={() => updateActive({ markColor: color })}
-                    style={{
-                      width: 26,
-                      height: 26,
-                      borderRadius: "50%",
-                      border: active.markColor === color ? "2px solid var(--text-normal)" : "1px solid var(--background-modifier-border)",
-                      background: HIGHLIGHT_COLOR_STYLES[color].fill,
-                    }}
-                  />
-                ))}
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                {editing ? "编辑标注" : selectionMode === "translation" ? "翻译" : "新建标注"}
               </div>
-              <textarea
-                value={active.comment}
-                placeholder="写下想法（可选）"
-                onChange={(event) => updateActive({ comment: event.currentTarget.value })}
-                style={{ width: "100%", minHeight: 70, resize: "vertical" }}
-              />
-              {!editing ? (
+              <div style={{ maxHeight: 72, overflow: "auto", color: "var(--text-muted)", marginBottom: 8 }}>{active.quote}</div>
+              {editing || selectionMode === "highlight" ? (
+                <>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                    {HIGHLIGHT_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        aria-label={color}
+                        onClick={() => updateActive({ markColor: color })}
+                        style={{
+                          width: 26,
+                          height: 26,
+                          borderRadius: "50%",
+                          border: active.markColor === color ? "2px solid var(--text-normal)" : "1px solid var(--background-modifier-border)",
+                          background: HIGHLIGHT_COLOR_STYLES[color].fill,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <textarea
+                    value={active.comment}
+                    placeholder="写下想法（可选）"
+                    onChange={(event) => updateActive({ comment: event.currentTarget.value })}
+                    style={{ width: "100%", minHeight: 70, resize: "vertical" }}
+                  />
+                </>
+              ) : null}
+              {!editing && selectionMode === "translation" ? (
                 <div style={{ marginTop: 8 }}>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button type="button" disabled={translating} onClick={() => void runTranslation(false)}>
@@ -457,8 +472,22 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
               ) : null}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
                 {editing ? <button type="button" disabled={saving} onClick={deleteEditing}>删除</button> : null}
+                {!editing ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = selectionMode === "translation" ? "highlight" : "translation";
+                      setSelectionMode(next);
+                      if (next === "translation" && !translation) void runTranslation(false);
+                    }}
+                  >
+                    {selectionMode === "translation" ? "转为标注" : "翻译"}
+                  </button>
+                ) : null}
                 <button type="button" disabled={saving} onClick={() => { setDraft(null); setEditing(null); }}>取消</button>
-                <button type="button" disabled={saving} onClick={editing ? saveEditing : saveDraft}>保存</button>
+                {editing || selectionMode === "highlight" ? (
+                  <button type="button" disabled={saving} onClick={editing ? saveEditing : saveDraft}>保存</button>
+                ) : null}
               </div>
             </div>
           ) : null}
