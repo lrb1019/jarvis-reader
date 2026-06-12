@@ -163,6 +163,7 @@ test("persist writes normalized highlight metadata", async () => {
       "Book.epub": [
         {
           ...settings.bookHighlights["Book.epub"]?.[0],
+          markColor: "yellow",
           updated: "",
         },
       ],

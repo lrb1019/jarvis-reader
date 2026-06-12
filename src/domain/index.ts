@@ -9,9 +9,11 @@ export type {
 export type {
   BookHighlight,
   BookHighlightsMap,
+  HighlightColor,
   PersistedBookHighlight,
   PersistedBookHighlightsMap,
 } from "./highlights";
+export { HIGHLIGHT_COLORS } from "./highlights";
 export type {
   TranslationAssetKind,
   WordAsset,

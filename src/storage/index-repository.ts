@@ -10,6 +10,7 @@ import type {
   WordAssetSidecar,
 } from "../domain";
 import { getTranslationAssetKind, getTranslationAssetStorageKey, getWordBlockId } from "../core/text.ts";
+import { normalizeHighlightColor } from "../core/highlights.ts";
 import { ensureStorageFolder, type TextFileStore } from "./contracts.ts";
 
 export const INDEX_PATHS = {
@@ -63,6 +64,7 @@ function normalizeHighlight(value: unknown): PersistedBookHighlight | null {
     cfiRange: text(value.cfiRange),
     quote: text(value.quote),
     comment: text(value.comment),
+    markColor: normalizeHighlightColor(value.markColor),
     notePath: text(value.notePath),
     blockId: text(value.blockId) || id,
     created: text(value.created),
@@ -227,6 +229,7 @@ export class IndexRepository {
       cfiRange: highlight.cfiRange || "",
       quote: highlight.quote || "",
       comment: highlight.comment || "",
+      markColor: normalizeHighlightColor(highlight.markColor),
       notePath: highlight.notePath || "",
       blockId: highlight.blockId || id,
       created: highlight.created || "",

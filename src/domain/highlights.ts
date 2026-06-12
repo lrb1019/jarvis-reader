@@ -1,3 +1,7 @@
+export const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "pink", "purple"] as const;
+
+export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
+
 export interface BookHighlight {
   id: string;
   bookPath: string;
@@ -6,6 +10,7 @@ export interface BookHighlight {
   cfiRange: string;
   quote: string;
   comment: string;
+  markColor?: HighlightColor;
   notePath: string;
   blockId: string;
   created: string;
