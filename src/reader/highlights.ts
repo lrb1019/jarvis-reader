@@ -55,7 +55,7 @@ export function renderHighlight(
     highlight.cfiRange,
     { id: highlight.id },
     (event) => onClick(highlight, event),
-    `jarvis-reader-highlight jarvis-reader-highlight-${color}`,
+    `jarvis-reader-highlight-${color}`,
     {
       fill: palette.fill,
       "fill-opacity": highlight.comment ? "0.42" : "0.56",
