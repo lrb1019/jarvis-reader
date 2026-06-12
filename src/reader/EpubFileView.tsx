@@ -80,6 +80,7 @@ export class EpubFileView extends FileView {
           accent: settings.wordAudioAccent,
           speechLang: settings.speechLang,
         }}
+        blurWordCardBody={settings.blurWordCardBody}
         onLocationChange={(location) => {
           settings.bookInitLocations[file.path] = location;
           void this.pluginBridge.saveSettings();
@@ -201,6 +202,16 @@ export class EpubFileView extends FileView {
           }
           await this.deleteWordAssetNote(asset);
           new Notice("词条已彻底删除");
+        }}
+        onSetWordMastered={async (asset, mastered) => {
+          const updated = { ...asset, mastered, updated: new Date().toISOString() };
+          settings.wordAssets[asset.lemma] = updated;
+          await this.pluginBridge.saveSettings("word-asset-mastered");
+          return updated;
+        }}
+        onOpenWordAsset={async (asset) => {
+          await this.writeWordAssetNote(asset);
+          await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", true);
         }}
       />,
     );

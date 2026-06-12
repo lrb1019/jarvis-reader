@@ -36,6 +36,7 @@ export function renderWordAssets(
     rendered.set(rendition as object, ids);
   }
   for (const asset of assets) {
+    if (asset.mastered) continue;
     for (const source of asset.sources || []) {
       if (source.bookPath !== bookPath || !source.cfiRange || ids.has(source.cfiRange)) continue;
       rendition.annotations.underline(
