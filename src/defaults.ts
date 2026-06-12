@@ -1,0 +1,33 @@
+import type { JarvisReaderSettings } from "./domain/index.ts";
+
+export const DEFAULT_SETTINGS: JarvisReaderSettings = {
+  scrolledView: false,
+  singlePageView: false,
+  readerZoom: 1,
+  readerLineHeight: 1.6,
+  bookNoteFolder: "",
+  bookNoteTemplate: "",
+  wordNoteFolder: "09 Books/Words",
+  wordAssets: {},
+  translationApi: {
+    provider: "openai-compatible",
+    baseUrl: "",
+    apiKey: "",
+    model: "",
+  },
+  experimentalInstantTranslation: { enabled: false },
+  translationPrompt: "",
+  autoHighlightFolders: ["09 Books"],
+  enableWordAudio: true,
+  wordAudioTemplate: "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}",
+  wordAudioAccent: "us",
+  blurWordCardBody: true,
+  speechLang: "en-US",
+  bookInitLocations: {},
+  bookHighlights: {},
+  bookProgress: {},
+  bookCoverCache: {},
+  sidebarLayoutMode: "single",
+  sidebarPaneSplit: 48,
+  bookshelfCoverOnly: false,
+};
