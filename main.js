@@ -47891,7 +47891,7 @@ function getWordEntrySectionTitle(kind) {
   }
 }
 function ensureWordBookSections(content) {
-  let next = content || "";
+  let next = String(content || "").replace(/^##\s+Words\s*$/gmi, "## \u5355\u8bcd").replace(/^##\s+Phrases\s*$/gmi, "## \u77ed\u8bed").replace(/^##\s+Sentences\s*$/gmi, "## \u53e5\u5b50");
   for (const title of ["\u5355\u8bcd", "\u77ed\u8bed", "\u53e5\u5b50"]) {
     if (!new RegExp(`^##\\s+${title}\\s*$`, "m").test(next)) {
       next = `${next.trimEnd()}\n\n## ${title}\n`;
@@ -47964,6 +47964,7 @@ function buildWordAssetMetadata(asset) {
     isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
     surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
     translation: asset.translation || "",
+    display: asset.display || "",
     phonetic: asset.phonetic || "",
     partOfSpeech: asset.partOfSpeech || "",
     example: asset.example || "",
@@ -48032,11 +48033,11 @@ function buildWordBookFileContent(file) {
 
 # ${title}
 
-## Words
+## 单词
 
-## Phrases
+## 短语
 
-## Sentences
+## 句子
 
 `;
 }
@@ -49186,13 +49187,9 @@ function getWordLookupResultFromAsset(asset, selectedText = "") {
 function getLightWordAsset(asset) {
   if (!asset)
     return asset;
-  const next = {
+  return {
     ...asset
   };
-  if (next.display && next.notePath && next.blockId) {
-    delete next.display;
-  }
-  return next;
 }
 function extractWordCardDisplayFromContent(content, asset) {
   if (!content || !asset || !asset.lemma)
@@ -50043,8 +50040,6 @@ const showWordHoverCard = (asset, element) => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!asset || !assetKey || typeof deleteWordAsset !== "function")
-      return;
-    if (typeof window !== "undefined" && typeof window.confirm === "function" && !window.confirm("Delete this translation card from index and note?"))
       return;
     try {
       const deleted = await deleteWordAsset(asset);
@@ -51342,28 +51337,14 @@ var EpubView = class extends import_obsidian2.FileView {
     return asset;
   }
   async openWordNote(asset) {
-    if (!asset || !asset.notePath)
+    if (!asset)
       return;
-    const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
-    if (!(existing instanceof import_obsidian2.TFile)) {
-      const assetKey = getTranslationAssetStorageKey(asset);
-      if (!assetKey) {
-        new import_obsidian2.Notice("Translation note is missing.");
-        return;
-      }
-      const rebuilt = {
-        ...asset,
-        notePath: getWordBookNotePath(this.file, this.plugin.settings),
-        blockId: asset.blockId || getWordBlockId(assetKey)
-      };
-      const noteFile = await upsertWordAssetNote(this.app, this.plugin.settings, rebuilt, this.file);
-      rebuilt.notePath = noteFile.path;
-      if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-        this.plugin.settings.wordAssets = {};
-      }
-      this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(rebuilt);
-      await this.plugin.saveSettings();
-      asset = rebuilt;
+    try {
+      asset = await this.plugin.ensureWordAssetMarkdown(asset);
+    } catch (error) {
+      console.error("Jarvis Reader failed to rebuild translation note.", error);
+      new import_obsidian2.Notice("词条 Markdown 重建失败。");
+      return;
     }
     if (asset.blockId && this.app.workspace && typeof this.app.workspace.openLinkText === "function") {
       const markdownLeaves = typeof this.app.workspace.getLeavesOfType === "function" ? this.app.workspace.getLeavesOfType("markdown") || [] : [];
@@ -51438,6 +51419,12 @@ var EpubView = class extends import_obsidian2.FileView {
     if (!assetKey)
       return false;
     const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
+    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
+      this.plugin.settings.wordAssets = {};
+    }
+    delete this.plugin.settings.wordAssets[assetKey];
+    await this.plugin.persistWordAssetSidecar("delete");
+    await this.plugin.saveSettingsData();
     const notePath = current.notePath || asset.notePath;
     if (notePath) {
       const existing = this.app.vault.getAbstractFileByPath(notePath);
@@ -51449,12 +51436,7 @@ var EpubView = class extends import_obsidian2.FileView {
         }
       }
     }
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    delete this.plugin.settings.wordAssets[assetKey];
-    await this.plugin.saveSettings();
-    new import_obsidian2.Notice("Translation card deleted.");
+    new import_obsidian2.Notice("词条已彻底删除。");
     return true;
   }
   async loadWordDisplay(asset) {
@@ -52828,6 +52810,7 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
     await this.persistIndexSidecars("startup");
+    await this.saveSettingsData();
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
     });
@@ -53075,58 +53058,75 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     }
     return changed;
   }
-  mergeWordAssetSidecar(wordAssets) {
-    let changed = false;
-    this.settings.wordAssets = this.settings.wordAssets || {};
-    for (const [key, sidecarAsset] of Object.entries(wordAssets || {})) {
-      if (!sidecarAsset)
+  normalizeWordAssetSidecar(wordAssets) {
+    const normalized = {};
+    for (const [key, asset] of Object.entries(wordAssets || {})) {
+      if (!asset)
         continue;
-      const assetKey = getTranslationAssetStorageKey(sidecarAsset) || key;
-      const current = this.settings.wordAssets[assetKey];
-      if (!current) {
-        this.settings.wordAssets[assetKey] = getLightWordAsset(sidecarAsset);
-        changed = true;
-        continue;
-      }
-      const mergedSources = mergeWordSources(current.sources, sidecarAsset.sources);
-      if ((mergedSources || []).length !== ((current.sources || []).length)) {
-        this.settings.wordAssets[assetKey] = getLightWordAsset({
-          ...sidecarAsset,
-          ...current,
-          sources: mergedSources
-        });
-        changed = true;
+      const assetKey = getTranslationAssetStorageKey(asset) || key;
+      if (assetKey) {
+        normalized[assetKey] = getLightWordAsset(asset);
       }
     }
-    return changed;
+    return normalized;
   }
   async restoreIndexesFromSidecars() {
     try {
       const paths = this.getIndexSidecarPaths();
       const highlightsSidecar = await this.readJsonSidecar(paths.highlights);
-      const wordAssetsSidecar = await this.readJsonSidecar(paths.wordAssets);
       let changed = false;
       if (highlightsSidecar && highlightsSidecar.bookHighlights) {
         changed = this.mergeHighlightSidecar(highlightsSidecar.bookHighlights) || changed;
       }
-      if (wordAssetsSidecar && wordAssetsSidecar.wordAssets) {
-        changed = this.mergeWordAssetSidecar(wordAssetsSidecar.wordAssets) || changed;
+      const adapter = this.app.vault.adapter;
+      const hasWordAssetSidecar = adapter && typeof adapter.exists === "function" && await adapter.exists(paths.wordAssets);
+      if (hasWordAssetSidecar) {
+        const raw = await adapter.read(paths.wordAssets);
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.wordAssets || typeof parsed.wordAssets !== "object") {
+          throw new Error("word-assets.json does not contain a wordAssets object.");
+        }
+        this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
+      } else {
+        this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets);
+        await this.persistWordAssetSidecar("migrate-from-data");
       }
       if (changed) {
-        await this.saveData(this.settings);
         await this.logIndexChange("restore-from-sidecar");
       }
     } catch (error) {
-      console.warn("Jarvis Reader sidecar restore failed.", error);
+      this.settings.wordAssets = {};
+      console.error("Jarvis Reader word asset sidecar load failed.", error);
+      new import_obsidian3.Notice("词条主数据读取失败；已停止加载词条，请检查 word-assets.json。", 0);
+      throw error;
     }
+  }
+  async persistWordAssetSidecar(reason = "save") {
+    const paths = this.getIndexSidecarPaths();
+    const adapter = this.app.vault.adapter;
+    if (!adapter || typeof adapter.write !== "function") {
+      throw new Error("Vault adapter is not available.");
+    }
+    await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
+    const wordAssets = {};
+    for (const [key, asset] of Object.entries(this.settings.wordAssets || {})) {
+      if (asset) {
+        wordAssets[key] = buildWordAssetMetadata(asset);
+      }
+    }
+    await adapter.write(paths.wordAssets, JSON.stringify({
+      version: 2,
+      updated: new Date().toISOString(),
+      wordAssets
+    }, null, 2));
+    await this.logIndexChange(reason);
   }
   async persistIndexSidecars(reason = "save") {
     try {
       const paths = this.getIndexSidecarPaths();
       const adapter = this.app.vault.adapter;
       if (!adapter || typeof adapter.write !== "function") {
-        console.warn("Jarvis Reader sidecar persist skipped: vault adapter not available.");
-        return;
+        throw new Error("Jarvis Reader sidecar persist failed: vault adapter not available.");
       }
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
@@ -53136,15 +53136,82 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
         updated: new Date().toISOString(),
         bookHighlights: snapshot.bookHighlights
       }, null, 2));
-      await adapter.write(paths.wordAssets, JSON.stringify({
-        version: 1,
-        updated: new Date().toISOString(),
-        wordAssets: snapshot.wordAssets
-      }, null, 2));
+      await this.persistWordAssetSidecar(reason);
       await this.logIndexChange(reason, snapshot);
     } catch (error) {
-      console.warn("Jarvis Reader sidecar persist failed.", error);
+      console.error("Jarvis Reader sidecar persist failed.", error);
+      throw error;
     }
+  }
+  getWordAssetSourceFile(asset) {
+    const source = asset && Array.isArray(asset.sources) ? asset.sources[0] : null;
+    const sourcePath = source && source.bookPath ? source.bookPath : "";
+    const sourceFile = sourcePath ? this.app.vault.getAbstractFileByPath(sourcePath) : null;
+    if (sourceFile instanceof import_obsidian3.TFile) {
+      return sourceFile;
+    }
+    const notePath = normalizeVaultPath(asset && asset.notePath ? asset.notePath : "");
+    const basename = (notePath.split("/").pop() || asset.title || asset.lemma || "Words").replace(/\.md$/i, "");
+    return {
+      basename,
+      path: sourcePath
+    };
+  }
+  async syncWordAssetToMarkdown(asset, persist = true) {
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!assetKey) {
+      throw new Error("Translation asset has no storage key.");
+    }
+    const current = this.settings.wordAssets && this.settings.wordAssets[assetKey] ? this.settings.wordAssets[assetKey] : asset;
+    const normalized = {
+      ...current,
+      lemma: current.lemma || assetKey,
+      blockId: current.blockId || getWordBlockId(assetKey),
+      display: current.display || current.translation || ""
+    };
+    const noteFile = await upsertWordAssetNote(this.app, this.settings, normalized, this.getWordAssetSourceFile(normalized));
+    normalized.notePath = noteFile.path;
+    this.settings.wordAssets = this.settings.wordAssets || {};
+    this.settings.wordAssets[assetKey] = getLightWordAsset(normalized);
+    if (persist) {
+      await this.persistWordAssetSidecar("sync-markdown");
+    }
+    return normalized;
+  }
+  async ensureWordAssetMarkdown(asset) {
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!assetKey) {
+      throw new Error("Translation asset has no storage key.");
+    }
+    const current = this.settings.wordAssets && this.settings.wordAssets[assetKey] ? this.settings.wordAssets[assetKey] : asset;
+    const notePath = normalizeVaultPath(current.notePath || "");
+    const file = notePath ? this.app.vault.getAbstractFileByPath(notePath) : null;
+    if (file instanceof import_obsidian3.TFile) {
+      const content = await this.app.vault.read(file);
+      if (content.includes(getWordEntryStart(current.lemma || assetKey)) && content.includes(getWordEntryEnd(current.lemma || assetKey))) {
+        return current;
+      }
+    }
+    return await this.syncWordAssetToMarkdown(current);
+  }
+  async syncAllWordAssetsToMarkdown() {
+    const assets = Object.values(this.settings.wordAssets || {}).filter(Boolean);
+    const result = {
+      total: assets.length,
+      synced: 0,
+      failed: 0
+    };
+    for (const asset of assets) {
+      try {
+        await this.syncWordAssetToMarkdown(asset, false);
+        result.synced += 1;
+      } catch (error) {
+        result.failed += 1;
+        console.error("Jarvis Reader word asset Markdown sync failed.", asset, error);
+      }
+    }
+    await this.persistWordAssetSidecar("sync-markdown");
+    return result;
   }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -53208,8 +53275,15 @@ var JarvisReaderPlugin = class extends import_obsidian3.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
   }
   async saveSettings() {
-    await this.saveData(this.settings);
     await this.persistIndexSidecars("save");
+    await this.saveSettingsData();
+  }
+  async saveSettingsData() {
+    const settingsData = {
+      ...this.settings
+    };
+    delete settingsData.wordAssets;
+    await this.saveData(settingsData);
   }
 };
 var JarvisReaderFolderSuggestModal = class extends import_obsidian3.FuzzySuggestModal {
@@ -53289,6 +53363,18 @@ created: {{created}}
         await this.plugin.saveSettings();
       });
     });
+    new import_obsidian3.Setting(containerEl).setName("同步词条到 Markdown").setDesc("从词条主数据单向重建或更新 Markdown，不从 Markdown 反向导入。").addButton((button) => button.setButtonText("同步词条").onClick(async () => {
+      button.setDisabled(true);
+      try {
+        const result = await this.plugin.syncAllWordAssetsToMarkdown();
+        new import_obsidian3.Notice(`词条同步完成：成功 ${result.synced} 条，失败 ${result.failed} 条。`);
+      } catch (error) {
+        console.error("Jarvis Reader word asset sync failed.", error);
+        new import_obsidian3.Notice("词条同步失败，请查看开发者错误。");
+      } finally {
+        button.setDisabled(false);
+      }
+    }));
     new import_obsidian3.Setting(containerEl).setName("自动标记文件夹").setDesc("只在这些文件夹下的 EPUB 中自动标记已保存单词；多个文件夹用英文逗号分隔").addText((text) => {
       text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
         this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
