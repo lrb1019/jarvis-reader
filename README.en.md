@@ -1,10 +1,16 @@
 # Jarvis Reader
 
-Current version: v0.3.1
+Current version: v0.3.2
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a bookshelf, chapter navigation, reading progress, highlights, annotations, reflections, and book notes inside the vault.
 
 ## Release Notes
+
+### v0.3.2
+
+- Fixes the JavaScript syntax error introduced by the drag update and restores plugin loading.
+- Restores accidentally removed EPUB options, reading-location persistence, and highlight rendering logic.
+- Retains pointer-capture dragging for annotation and translation cards.
 
 ### v0.3.1
 

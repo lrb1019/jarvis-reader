@@ -49442,7 +49442,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (event.button != null && event.button !== 0)
       return;
     event.preventDefault();
-    const target = event.target;
+    const target = event.currentTarget;
     target.setPointerCapture(event.pointerId);
     const startRect = highlightPopoverRectRef.current || getDefaultHighlightPopoverRect();
     highlightPopoverRectRef.current = startRect;
@@ -49458,14 +49458,226 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       highlightPopoverRectRef.current = next;
       setHighlightPopoverRect(next);
     };
-    const onUp = (upEvent) => {
+    const onUp = () => {
       target.removeEventListener("pointermove", onMove);
       target.removeEventListener("pointerup", onUp);
-      target.releasePointerCapture(event.pointerId);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
     };
     target.addEventListener("pointermove", onMove);
     target.addEventListener("pointerup", onUp, { once: true });
-  };\n  const beginWordHoverCardMove = (event) => {
+  };
+  const beginHighlightPopoverResize = (event) => {
+    if (event.button != null && event.button !== 0)
+      return;
+    event.preventDefault();
+    event.stopPropagation();
+    const startRect = highlightPopoverRectRef.current || getDefaultHighlightPopoverRect();
+    highlightPopoverRectRef.current = startRect;
+    setHighlightPopoverRect(startRect);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const onMove = (moveEvent) => {
+      const next = clampHighlightPopoverRect({
+        ...startRect,
+        width: startRect.width + moveEvent.clientX - startX,
+        height: startRect.height + moveEvent.clientY - startY
+      });
+      highlightPopoverRectRef.current = next;
+      setHighlightPopoverRect(next);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp, { once: true });
+  };
+  const epubOptions = effectiveScrolled ? {
+    allowPopups: false,
+    flow: "scrolled",
+    manager: "continuous"
+  } : {
+    allowPopups: false
+  };
+  if (!effectiveScrolled && singlePage) {
+    epubOptions.spread = "none";
+  }
+  const locationChanged = (epubcifi) => {
+    setLocation(epubcifi);
+    saveLocation(epubcifi);
+  };
+  const refreshHighlightPanes = (rendition) => {
+    window.setTimeout(() => {
+      window.requestAnimationFrame(() => {
+        var _a, _b;
+        try {
+          const views = ((_b = (_a = rendition == null ? void 0 : rendition.manager) == null ? void 0 : _a.visible) == null ? void 0 : _b.call(_a)) || [];
+          for (const view of views) {
+            if (view && view.pane && typeof view.pane.render === "function") {
+              view.pane.render();
+            }
+          }
+        } catch (error) {
+          console.warn("Jarvis Reader highlight refresh failed.", error);
+        }
+      });
+    }, 80);
+  };
+  const applyHighlight = (rendition, highlight) => {
+    if (!rendition || !rendition.annotations || !highlight || !highlight.cfiRange)
+      return;
+    if (!rendition.__awesomeReaderHighlightIds) {
+      rendition.__awesomeReaderHighlightIds = /* @__PURE__ */ new Set();
+    }
+    const key = highlight.id || highlight.cfiRange;
+    if (rendition.__awesomeReaderHighlightIds.has(key))
+      return;
+    rendition.__awesomeReaderHighlightIds.add(key);
+    try {
+      rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, (event) => {
+        const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
+        selectHighlight(liveHighlight);
+        if ((liveHighlight.comment || "").trim()) {
+          openHighlightCommentEditor(liveHighlight);
+          return;
+        }
+        setPendingSelection(null);
+        setHighlightComment("");
+        setWikiSuggest(null);
+        setWikiEditRange(null);
+        setPendingHighlightMenu({
+          ...liveHighlight,
+          chapterTitle: liveHighlight.chapterTitle || readerTitleRef.current,
+          rect: getEventHighlightMenuRect(event)
+        });
+      }, highlight.comment ? "jarvis-reader-highlight-with-comment" : "jarvis-reader-highlight", highlight.comment ? {
+        fill: "#f97316",
+        "fill-opacity": "0.14",
+        stroke: "#f97316",
+        "stroke-width": "1.6",
+        "stroke-opacity": "0.98"
+      } : {
+        fill: "#ffeb3b",
+        "fill-opacity": "0.58",
+        stroke: "#facc15",
+        "stroke-width": "0.8",
+        "stroke-opacity": "0.82"
+      });
+      refreshHighlightPanes(rendition);
+    } catch (error) {
+      console.warn("Jarvis Reader highlight render failed.", error);
+    }
+  };
+  const applyHighlights = (rendition, list) => {
+    for (const highlight of list || []) {
+      applyHighlight(rendition, highlight);
+    }
+    refreshHighlightPanes(rendition);
+  };
+  const removeHighlightMark = (rendition, highlight) => {
+    if (!rendition || !rendition.annotations || !highlight || !highlight.cfiRange)
+      return;
+    try {
+      rendition.annotations.remove(highlight.cfiRange, "highlight");
+      if (rendition.__awesomeReaderHighlightIds) {
+        rendition.__awesomeReaderHighlightIds.delete(highlight.id || highlight.cfiRange);
+      }
+      refreshHighlightPanes(rendition);
+    } catch (error) {
+      console.warn("Jarvis Reader highlight remove failed.", error);
+    }
+  };
+  const clearWordHoverHideTimer = () => {
+    if (wordHoverHideTimerRef.current) {
+      window.clearTimeout(wordHoverHideTimerRef.current);
+      wordHoverHideTimerRef.current = null;
+    }
+  };
+  const hideWordHoverCard = () => {
+    clearWordHoverHideTimer();
+    setActiveWordHover(null);
+  };
+  const scheduleHideWordHoverCard = () => {
+    clearWordHoverHideTimer();
+    wordHoverHideTimerRef.current = window.setTimeout(() => {
+      setActiveWordHover((prev) => (prev && prev.isPinned) ? prev : null);
+    }, 120);
+  };
+  const loadWordDisplayIntoHover = (asset) => {
+    const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
+    if (!normalized || !asset || asset.display || typeof loadWordDisplay !== "function")
+      return;
+    const cacheKey = `${asset.notePath || ""}#${asset.blockId || normalized.lemma}`;
+    const cache = wordDisplayCacheRef.current;
+    if (cache.has(cacheKey)) {
+      const cachedDisplay = cache.get(cacheKey);
+      cache.delete(cacheKey);
+      cache.set(cacheKey, cachedDisplay);
+      setActiveWordHover((current) => current && current.asset && normalizeWordSelection(current.asset.lemma || "") && normalizeWordSelection(current.asset.lemma || "").lemma === normalized.lemma ? {
+        ...current,
+        asset: {
+          ...current.asset,
+          display: cachedDisplay
+        }
+      } : current);
+      return;
+    }
+    Promise.resolve(loadWordDisplay(asset)).then((display) => {
+      const nextDisplay = truncateWordDisplay(display);
+      if (!nextDisplay)
+        return;
+      cache.set(cacheKey, nextDisplay);
+      while (cache.size > WORD_DISPLAY_CACHE_LIMIT) {
+        const oldestKey = cache.keys().next().value;
+        cache.delete(oldestKey);
+      }
+      setActiveWordHover((current) => current && current.asset && normalizeWordSelection(current.asset.lemma || "") && normalizeWordSelection(current.asset.lemma || "").lemma === normalized.lemma ? {
+        ...current,
+        asset: {
+          ...current.asset,
+          display: nextDisplay
+        }
+      } : current);
+    }).catch(() => {
+    });
+  };
+  const playWordAudioText = (text) => {
+    if (!enableWordAudio || !text)
+      return;
+    const audioUrl = buildWordAudioUrl(wordAudioTemplate, text, wordAudioAccent);
+    if (audioUrl) {
+      try {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {
+          if (typeof speechSynthesis === "undefined")
+            return;
+          speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = speechLang || (String(wordAudioAccent || "us").toLowerCase() === "uk" ? "en-GB" : "en-US");
+          utterance.rate = 0.92;
+          speechSynthesis.speak(utterance);
+        });
+        return;
+      } catch (error) {
+        console.warn("Jarvis Reader word audio URL failed.", error);
+      }
+    }
+    if (typeof speechSynthesis === "undefined")
+      return;
+    try {
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang || (String(wordAudioAccent || "us").toLowerCase() === "uk" ? "en-GB" : "en-US");
+      utterance.rate = 0.92;
+      speechSynthesis.speak(utterance);
+    } catch (error) {
+      console.warn("Jarvis Reader word audio failed.", error);
+    }
+  };
+
+  const beginWordHoverCardMove = (event) => {
     if (event.button != null && event.button !== 0) return;
     event.preventDefault();
     clearWordHoverHideTimer();
