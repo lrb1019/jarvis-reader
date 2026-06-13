@@ -82,6 +82,15 @@ export default class JarvisReaderMigrationPlugin extends Plugin {
         upsertWordEntryInContent(`# 翻译卡片\n`, asset),
       );
     }
+    const openedLeaf = this.app.workspace.getLeavesOfType("markdown").find((leaf) => {
+      const view = leaf.view as { file?: TFile };
+      return view.file?.path === asset.notePath;
+    });
+    if (openedLeaf) {
+      await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
+      await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
+      return;
+    }
     await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", true);
   }
 }

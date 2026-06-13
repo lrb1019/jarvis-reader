@@ -60,6 +60,26 @@ export function buildWordGeneratedBlock(asset: WordEntryAsset): string {
   );
 }
 
+export function extractWordCardDisplayFromContent(
+  content: string | null | undefined,
+  asset: Pick<WordEntryAsset, "lemma">,
+): string {
+  const current = String(content || "");
+  const entryStart = current.indexOf(getWordEntryStart(asset.lemma));
+  const entryEnd = current.indexOf(getWordEntryEnd(asset.lemma));
+  const scope = entryStart >= 0 && entryEnd > entryStart
+    ? current.slice(entryStart, entryEnd)
+    : current;
+  const start = scope.indexOf(JARVIS_WORD_NOTE_START);
+  const end = scope.indexOf(JARVIS_WORD_NOTE_END);
+  if (start < 0 || end <= start) return "";
+  return normalizeWordDisplayText(
+    scope
+      .slice(start + JARVIS_WORD_NOTE_START.length, end)
+      .replace(/^\s*##\s+Card\s*(?:\r?\n)?/i, ""),
+  );
+}
+
 export function buildWordEntryBlock(asset: WordEntryAsset): string {
   const blockId = asset.blockId || getWordBlockId(asset.lemma);
   return `${getWordEntryStart(asset.lemma)}

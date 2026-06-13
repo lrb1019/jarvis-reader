@@ -710,8 +710,11 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
           ) : null}
           {translationSelection ? (
             <div className="jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate" style={editorStyle}>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>翻译</div>
-              <div style={{ maxHeight: 72, overflow: "auto", color: "var(--text-muted)", marginBottom: 8 }}>{translationSelection.quote}</div>
+              <div className="jarvis-reader-word-card-head">
+                <div className="jarvis-reader-word-card-head-row">
+                  <div className="jarvis-reader-highlight-title">翻译</div>
+                </div>
+              </div>
               {translating ? <div>正在翻译...</div> : null}
               {translationError ? <div style={{ color: "var(--text-error)", marginTop: 8 }}>{translationError}</div> : null}
               {translation ? (
@@ -724,7 +727,11 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
                       {translation.phonetic ? <div className="jarvis-reader-word-phonetic">{translation.phonetic}</div> : null}
                     </div>
                   ) : null}
-                  <div style={{ whiteSpace: "pre-wrap", maxHeight: 260, overflow: "auto" }}>{translation.display}</div>
+                  <div className="jarvis-reader-word-card-body">
+                    <div className="jarvis-reader-word-card-translation-box">
+                      {renderWordDisplay(translation.display || translation.translation)}
+                    </div>
+                  </div>
                 </>
               ) : null}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 8 }}>

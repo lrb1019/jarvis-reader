@@ -10,7 +10,8 @@ import {
   upsertHighlightNoteBlock,
 } from "../core/highlights.ts";
 import { buildWordAsset } from "../core/word-assets.ts";
-import { deleteWordEntryInContent, upsertWordEntryInContent } from "../core/word-markdown.ts";
+import { findWordAssetBySurface } from "../core/word-assets.ts";
+import { deleteWordEntryInContent, extractWordCardDisplayFromContent, upsertWordEntryInContent } from "../core/word-markdown.ts";
 import type { TranslationResult } from "../translation/core.ts";
 import { translateSelection } from "../translation/service.ts";
 import { clampReaderLineHeight, clampReaderZoom, type EpubTocItem } from "./core.ts";
@@ -146,6 +147,23 @@ export class EpubFileView extends FileView {
           new Notice("标注已删除");
         }}
         onTranslate={async (selection, forceAi, localOnly) => {
+          const existing = !forceAi
+            ? findWordAssetBySurface(settings.wordAssets, selection.quote)
+            : null;
+          if (existing) {
+            const display = await this.loadWordAssetDisplay(existing);
+            return {
+              lemma: existing.lemma,
+              surface: selection.quote,
+              translation: existing.translation,
+              display: display || existing.display || existing.translation,
+              phonetic: existing.phonetic,
+              partOfSpeech: existing.partOfSpeech,
+              example: existing.example,
+              isWord: existing.isWord,
+              sourceType: "local-dictionary" as const,
+            };
+          }
           return translateSelection(
             settings,
             selection.quote,
@@ -211,6 +229,15 @@ export class EpubFileView extends FileView {
         }}
         onOpenWordAsset={async (asset) => {
           await this.writeWordAssetNote(asset);
+          const openedLeaf = this.app.workspace.getLeavesOfType("markdown").find((leaf) => {
+            const view = leaf.view as { file?: TFile };
+            return view.file?.path === asset.notePath;
+          });
+          if (openedLeaf) {
+            await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
+            await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
+            return;
+          }
           await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", true);
         }}
       />,
@@ -284,6 +311,14 @@ export class EpubFileView extends FileView {
       asset.notePath,
       upsertWordEntryInContent(`# ${this.file?.basename || "Words"}\n`, asset),
     );
+  }
+
+  private async loadWordAssetDisplay(asset: import("../domain/index.ts").WordAsset): Promise<string> {
+    if (!asset.notePath) return asset.display || "";
+    const existing = this.app.vault.getAbstractFileByPath(asset.notePath);
+    if (!(existing instanceof TFile)) return asset.display || "";
+    const content = await this.app.vault.read(existing);
+    return extractWordCardDisplayFromContent(content, asset) || asset.display || "";
   }
 
   private async deleteWordAssetNote(asset: import("../domain/index.ts").WordAsset): Promise<void> {
