@@ -56,8 +56,6 @@ interface ActiveWordCard {
   left: number;
   top: number;
   pinned: boolean;
-  originLeft: number;
-  originTop: number;
 }
 
 type SelectionItem = SelectionDraft | BookHighlight;
@@ -361,7 +359,7 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
           Math.max(16, (bounds?.height || 600) - height - 16),
           Math.max(16, (rect?.bottom || event.clientY) - (bounds?.top || 0) + 10),
         );
-        setActiveWordCard({ asset, left, top, pinned: false, originLeft: left, originTop: top });
+        setActiveWordCard({ asset, left, top, pinned: false });
       },
     );
   };
@@ -739,10 +737,14 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
           ) : null}
           {activeWordCard && !active && !translationSelection && !pendingMenu ? (
             <div className={`jarvis-reader-word-card${activeWordCard.pinned ? " is-pinned" : ""}`} style={{ left: activeWordCard.left, top: activeWordCard.top }}>
-              <div className="jarvis-reader-word-card-head" onPointerDown={beginWordCardMove} onDoubleClick={() => setActiveWordCard((current) => current ? { ...current, left: current.originLeft, top: current.originTop, pinned: false } : null)}>
+              <div className="jarvis-reader-word-card-head">
                 <div className="jarvis-reader-word-card-head-row">
-                  <button className="jarvis-reader-word-card-lemma" type="button" title="点击发音" disabled={!props.wordAudio.enabled} onPointerDown={(event) => event.stopPropagation()} onClick={() => pronounce(activeWordCard.asset.title || activeWordCard.asset.lemma)}>{activeWordCard.asset.title || activeWordCard.asset.lemma}</button>
-                  <div style={{ flex: "1 1 auto", minWidth: 20, minHeight: 24 }} />
+                  {activeWordCard.asset.kind === "sentence" ? (
+                    <div className="jarvis-reader-word-card-sentence-title">原句翻译</div>
+                  ) : (
+                    <button className="jarvis-reader-word-card-lemma" type="button" title="点击发音" disabled={!props.wordAudio.enabled} onPointerDown={(event) => event.stopPropagation()} onClick={() => pronounce(activeWordCard.asset.title || activeWordCard.asset.lemma)}>{activeWordCard.asset.title || activeWordCard.asset.lemma}</button>
+                  )}
+                  <div className="jarvis-reader-word-card-drag-handle" title="拖动卡片" onPointerDown={beginWordCardMove} />
                   <div className="jarvis-reader-word-card-actions" onPointerDown={(event) => event.stopPropagation()}>
                     <button className="jarvis-reader-word-card-action jarvis-reader-word-card-mastered" type="button" title="标记已掌握" disabled={saving} onClick={() => void markActiveWordMastered()}>{renderIcon("check")}</button>
                     <button className="jarvis-reader-word-card-action jarvis-reader-word-card-delete" type="button" title="删除词条" disabled={saving} onClick={async () => {
@@ -760,12 +762,19 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
                     <button className="jarvis-reader-word-card-action" type="button" title="关闭" onClick={() => setActiveWordCard(null)}>{renderIcon("x")}</button>
                   </div>
                 </div>
-                {activeWordCard.asset.phonetic ? <div className="jarvis-reader-word-phonetic">{activeWordCard.asset.phonetic}</div> : null}
+                {activeWordCard.asset.kind !== "sentence" && activeWordCard.asset.phonetic ? <div className="jarvis-reader-word-phonetic">{activeWordCard.asset.phonetic}</div> : null}
               </div>
               <div className={`jarvis-reader-word-card-body${props.blurWordCardBody ? " is-blurred" : ""}`}>
-                <div style={{ background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: 10, padding: "10px 12px" }}>
-                  {activeWordCard.asset.display ? renderWordDisplay(activeWordCard.asset.display) : <div className="jarvis-reader-word-translation">{activeWordCard.asset.translation}</div>}
-                </div>
+                {activeWordCard.asset.kind === "sentence" ? (
+                  <>
+                    <div className="jarvis-reader-word-card-original-sentence">{activeWordCard.asset.title || activeWordCard.asset.sources?.[0]?.quote}</div>
+                    <div className="jarvis-reader-word-card-translation-box"><div className="jarvis-reader-word-translation">{activeWordCard.asset.translation || activeWordCard.asset.display}</div></div>
+                  </>
+                ) : (
+                  <div className="jarvis-reader-word-card-translation-box">
+                    {activeWordCard.asset.display ? renderWordDisplay(activeWordCard.asset.display) : <div className="jarvis-reader-word-translation">{activeWordCard.asset.translation}</div>}
+                  </div>
+                )}
               </div>
               {activeWordCard.asset.sources?.length ? <div className="jarvis-reader-word-card-sources"><div className="jarvis-reader-word-card-section-title">来源</div><div className="jarvis-reader-word-card-source">{activeWordCard.asset.sources[0]?.bookTitle || activeWordCard.asset.sources[0]?.bookPath}{activeWordCard.asset.sources[0]?.chapterTitle ? ` · ${activeWordCard.asset.sources[0].chapterTitle}` : ""}</div></div> : null}
               </div>
