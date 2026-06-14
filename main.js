@@ -53557,7 +53557,8 @@ async function translateSelectionWithApi(settings = {}, selectedText, sentence =
 
 // src/theme.ts
 function getObsidianCssVar(name, fallback = "") {
-  const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+  const el = document.querySelector(".app-container") || document.body;
+  const value = getComputedStyle(el).getPropertyValue(name).trim();
   return value || fallback;
 }
 function getCssPixelValue(value) {
@@ -54320,12 +54321,24 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const wordAssetsRef = (0, import_react2.useRef)(wordAssets || {});
   const wordDisplayCacheRef = (0, import_react2.useRef)(/* @__PURE__ */ new Map());
   const pendingWordLookupRef = (0, import_react2.useRef)(0);
+  const [theme, setTheme] = (0, import_react2.useState)(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
+  (0, import_react2.useEffect)(() => {
+    let lastThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
+    const intervalId = setInterval(() => {
+      const nextTheme = getJarvisReaderTheme(readerZoom, readerLineHeight);
+      const nextThemeKey = `${nextTheme.background}|${nextTheme.text}|${nextTheme.fontFamily}|${nextTheme.fontSize}|${nextTheme.lineHeight}|${readerZoom}`;
+      if (nextThemeKey !== lastThemeKey) {
+        setTheme(nextTheme);
+        lastThemeKey = nextThemeKey;
+      }
+    }, 1e3);
+    return () => clearInterval(intervalId);
+  }, [readerZoom, readerLineHeight]);
   const wordHoverHideTimerRef = (0, import_react2.useRef)(null);
   const pendingHighlightMenuRef = (0, import_react2.useRef)(null);
   const pendingWordSelectionRef = (0, import_react2.useRef)(null);
   const readerTitleRef = (0, import_react2.useRef)(title);
   const tocRef = (0, import_react2.useRef)([]);
-  const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
   const effectiveScrolled = scrolled && singlePage;
   const maxReaderWidth = !effectiveScrolled && singlePage ? 760 : 1120;
   const getHighlightPopoverBounds = () => {
@@ -54536,7 +54549,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     rendition.__awesomeReaderHighlightIds.add(key);
     try {
-      rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, (event) => {
+      const eventHandler = (event) => {
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
         if ((liveHighlight.comment || "").trim()) {
@@ -54552,19 +54565,26 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           chapterTitle: liveHighlight.chapterTitle || readerTitleRef.current,
           rect: getEventHighlightMenuRect(event)
         });
-      }, highlight.comment ? "jarvis-reader-highlight-with-comment" : "jarvis-reader-highlight", highlight.comment ? {
-        fill: "#f97316",
-        "fill-opacity": "0.14",
-        stroke: "#f97316",
-        "stroke-width": "1.6",
-        "stroke-opacity": "0.98"
-      } : {
-        fill: "#ffeb3b",
-        "fill-opacity": "0.58",
-        stroke: "#facc15",
-        "stroke-width": "0.8",
-        "stroke-opacity": "0.82"
-      });
+      };
+      if (highlight.comment) {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
+          fill: "#f97316",
+          "fill-opacity": "0.15",
+          "mix-blend-mode": "multiply"
+        });
+        rendition.annotations.underline(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment", {
+          stroke: "#f97316",
+          "stroke-opacity": "0.98",
+          "stroke-width": "2.0",
+          "mix-blend-mode": "multiply"
+        });
+      } else {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
+          fill: "#ffeb3b",
+          "fill-opacity": "0.45",
+          "mix-blend-mode": "multiply"
+        });
+      }
       refreshHighlightPanes(rendition);
     } catch (error) {
       console.warn("Jarvis Reader highlight render failed.", error);
@@ -54581,6 +54601,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     try {
       rendition.annotations.remove(highlight.cfiRange, "highlight");
+      rendition.annotations.remove(highlight.cfiRange, "underline");
       if (rendition.__awesomeReaderHighlightIds) {
         rendition.__awesomeReaderHighlightIds.delete(highlight.id || highlight.cfiRange);
       }
@@ -55089,6 +55110,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       ids.forEach((cfiRange) => {
         try {
           rendition.annotations.remove(cfiRange, "underline");
+          rendition.annotations.remove(cfiRange, "highlight");
         } catch (error) {
         }
       });
@@ -55118,10 +55140,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           showWordHoverCard(asset, element);
         }
       };
-      const annotation = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
+      const annotationBg = rendition.annotations.highlight(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight-bg", {
+        fill: strokeColor,
+        "fill-opacity": "0.15",
+        "mix-blend-mode": "multiply"
+      });
+      const annotationUl = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
         stroke: strokeColor,
         "stroke-opacity": "0.92",
-        "stroke-width": "1.5",
+        "stroke-width": "2.0",
         "mix-blend-mode": "multiply"
       });
       const bindWordHighlightElement = (mark) => {
@@ -55137,9 +55164,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           child.style.pointerEvents = "none";
         });
       };
-      bindWordHighlightElement(annotation == null ? void 0 : annotation.mark);
-      if (annotation && typeof annotation.on === "function") {
-        annotation.on("attach", bindWordHighlightElement);
+      bindWordHighlightElement(annotationBg == null ? void 0 : annotationBg.mark);
+      if (annotationBg && typeof annotationBg.on === "function") {
+        annotationBg.on("attach", bindWordHighlightElement);
+      }
+      bindWordHighlightElement(annotationUl == null ? void 0 : annotationUl.mark);
+      if (annotationUl && typeof annotationUl.on === "function") {
+        annotationUl.on("attach", bindWordHighlightElement);
       }
     } catch (error) {
       console.warn("Jarvis Reader word highlight render failed.", error);
@@ -55871,11 +55902,21 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
+        const handleRenditionClick = (e) => {
+          const selection = rendition.getContents()[0]?.window?.getSelection();
+          if (selection && selection.toString().trim().length > 0) {
+            return;
+          }
+          clearHighlightUi();
+          hideWordHoverCard();
+        };
+        rendition.on("click", handleRenditionClick);
+        rendition.on("touchend", handleRenditionClick);
       }
     },
     handleTextSelected,
     epubOptions,
-    readerStyles: {
+    styles: {
       ...import_react_reader.ReactReaderStyle,
       container: {
         ...import_react_reader.ReactReaderStyle.container,
@@ -55910,15 +55951,43 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       },
       prev: {
         ...import_react_reader.ReactReaderStyle.prev,
-        left: "calc(50% - 36px)",
+        left: "calc(50% - 44px)",
         right: "auto",
-        textIndent: 0
+        top: "auto",
+        bottom: 20,
+        transform: "none",
+        marginTop: 0,
+        width: 36,
+        height: 36,
+        background: "var(--interactive-normal)",
+        borderRadius: "50%",
+        border: "1px solid var(--background-modifier-border)",
+        color: "var(--text-normal)",
+        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer"
       },
       next: {
         ...import_react_reader.ReactReaderStyle.next,
         left: "calc(50% + 8px)",
         right: "auto",
-        textIndent: 0
+        top: "auto",
+        bottom: 20,
+        transform: "none",
+        marginTop: 0,
+        width: 36,
+        height: 36,
+        background: "var(--interactive-normal)",
+        borderRadius: "50%",
+        border: "1px solid var(--background-modifier-border)",
+        color: "var(--text-normal)",
+        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer"
       },
       arrow: {
         ...import_react_reader.ReactReaderStyle.arrow,
@@ -56258,7 +56327,11 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
     title: "\u5220\u9664\u8BCD\u6761",
     onClick: deleteActiveWordAsset
-  }, renderObsidianIcon("trash")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {
+  }, renderObsidianIcon("trash")), import_react2.default.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
+    title: "\u5173\u95ED\u5361\u7247",
+    onClick: hideWordHoverCard
+  }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {
     className: "jarvis-reader-word-phonetic"
   }, activeWordHover.asset.phonetic) : null), import_react2.default.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"

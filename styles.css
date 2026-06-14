@@ -1,15 +1,51 @@
-/* src/styles.css */
 .is-mobile div.jarvis-reader-epub button {
   width: auto !important;
 }
 
 .jarvis-reader-epub {
-  background: var(--background-primary);
   position: relative;
 }
 
 .jarvis-reader-epub > div {
-  background: var(--background-primary);
+  background: transparent !important;
+}
+
+.jarvis-reader-epub button[class*="prev"],
+.jarvis-reader-epub button[class*="next"] {
+  position: absolute !important;
+  top: auto !important;
+  bottom: 20px !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  width: 36px !important;
+  height: 36px !important;
+  background: var(--interactive-normal) !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--background-modifier-border) !important;
+  color: var(--text-normal) !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.jarvis-reader-epub button[class*="prev"]:hover,
+.jarvis-reader-epub button[class*="next"]:hover {
+  background: var(--interactive-hover) !important;
+  opacity: 1;
+}
+
+.jarvis-reader-epub button[class*="prev"] {
+  left: calc(50% - 44px) !important;
+  right: auto !important;
+}
+
+.jarvis-reader-epub button[class*="next"] {
+  left: calc(50% + 8px) !important;
+  right: auto !important;
 }
 
 .jarvis-reader-side-hover-zone {
@@ -1757,5 +1793,15 @@
   background-color: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
   border-bottom: 2px solid var(--interactive-accent);
   cursor: pointer;
+}
+
+g.jarvis-reader-word-highlight rect,
+g.jarvis-reader-highlight-with-comment rect {
+  stroke: none !important;
+}
+
+g.jarvis-reader-word-highlight line,
+g.jarvis-reader-highlight-with-comment line {
+  stroke: inherit !important;
 }
 

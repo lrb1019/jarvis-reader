@@ -1,7 +1,8 @@
 // Extracted from main.js L48929-49010 — Obsidian theme sync for epub rendition
 
 export function getObsidianCssVar(name: string, fallback: string = ""): string {
-  const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+  const el = document.querySelector(".app-container") || document.body;
+  const value = getComputedStyle(el).getPropertyValue(name).trim();
   return value || fallback;
 }
 

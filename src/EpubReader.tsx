@@ -172,12 +172,26 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const wordAssetsRef = useRef<any>(wordAssets || {});
   const wordDisplayCacheRef = useRef<any>( new Map());
   const pendingWordLookupRef = useRef<any>(0);
+  const [theme, setTheme] = useState(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
+
+  useEffect(() => {
+    let lastThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
+    const intervalId = setInterval(() => {
+      const nextTheme = getJarvisReaderTheme(readerZoom, readerLineHeight);
+      const nextThemeKey = `${nextTheme.background}|${nextTheme.text}|${nextTheme.fontFamily}|${nextTheme.fontSize}|${nextTheme.lineHeight}|${readerZoom}`;
+      if (nextThemeKey !== lastThemeKey) {
+        setTheme(nextTheme);
+        lastThemeKey = nextThemeKey;
+      }
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [readerZoom, readerLineHeight]);
+
   const wordHoverHideTimerRef = useRef<any>(null);
   const pendingHighlightMenuRef = useRef<any>(null);
   const pendingWordSelectionRef = useRef<any>(null);
   const readerTitleRef = useRef<any>(title);
   const tocRef = useRef<any[]>([]);
-  const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
   const effectiveScrolled = scrolled && singlePage;
   const maxReaderWidth = !effectiveScrolled && singlePage ? 760 : 1120;
   const getHighlightPopoverBounds = () => {
@@ -388,7 +402,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       return;
     rendition.__awesomeReaderHighlightIds.add(key);
     try {
-      rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, (event) => {
+      const eventHandler = (event) => {
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
         if ((liveHighlight.comment || "").trim()) {
@@ -404,19 +418,27 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
           chapterTitle: liveHighlight.chapterTitle || readerTitleRef.current,
           rect: getEventHighlightMenuRect(event)
         });
-      }, highlight.comment ? "jarvis-reader-highlight-with-comment" : "jarvis-reader-highlight", highlight.comment ? {
-        fill: "#f97316",
-        "fill-opacity": "0.14",
-        stroke: "#f97316",
-        "stroke-width": "1.6",
-        "stroke-opacity": "0.98"
-      } : {
-        fill: "#ffeb3b",
-        "fill-opacity": "0.58",
-        stroke: "#facc15",
-        "stroke-width": "0.8",
-        "stroke-opacity": "0.82"
-      });
+      };
+
+      if (highlight.comment) {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
+          fill: "#f97316",
+          "fill-opacity": "0.15",
+          "mix-blend-mode": "multiply"
+        });
+        rendition.annotations.underline(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment", {
+          stroke: "#f97316",
+          "stroke-opacity": "0.98",
+          "stroke-width": "2.0",
+          "mix-blend-mode": "multiply"
+        });
+      } else {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
+          fill: "#ffeb3b",
+          "fill-opacity": "0.45",
+          "mix-blend-mode": "multiply"
+        });
+      }
       refreshHighlightPanes(rendition);
     } catch (error) {
       console.warn("Jarvis Reader highlight render failed.", error);
@@ -433,6 +455,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       return;
     try {
       rendition.annotations.remove(highlight.cfiRange, "highlight");
+      rendition.annotations.remove(highlight.cfiRange, "underline");
       if (rendition.__awesomeReaderHighlightIds) {
         rendition.__awesomeReaderHighlightIds.delete(highlight.id || highlight.cfiRange);
       }
@@ -942,6 +965,7 @@ const showWordHoverCard = (asset, element) => {
       ids.forEach((cfiRange) => {
         try {
           rendition.annotations.remove(cfiRange, "underline");
+          rendition.annotations.remove(cfiRange, "highlight");
         } catch (error) {
         }
       });
@@ -971,10 +995,15 @@ const showWordHoverCard = (asset, element) => {
           showWordHoverCard(asset, element);
         }
       };
-      const annotation = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
+      const annotationBg = rendition.annotations.highlight(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight-bg", {
+        fill: strokeColor,
+        "fill-opacity": "0.15",
+        "mix-blend-mode": "multiply"
+      });
+      const annotationUl = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
         stroke: strokeColor,
         "stroke-opacity": "0.92",
-        "stroke-width": "1.5",
+        "stroke-width": "2.0",
         "mix-blend-mode": "multiply"
       });
       const bindWordHighlightElement = (mark) => {
@@ -990,9 +1019,13 @@ const showWordHoverCard = (asset, element) => {
           child.style.pointerEvents = "none";
         });
       };
-      bindWordHighlightElement(annotation == null ? void 0 : annotation.mark);
-      if (annotation && typeof annotation.on === "function") {
-        annotation.on("attach", bindWordHighlightElement);
+      bindWordHighlightElement(annotationBg == null ? void 0 : annotationBg.mark);
+      if (annotationBg && typeof annotationBg.on === "function") {
+        annotationBg.on("attach", bindWordHighlightElement);
+      }
+      bindWordHighlightElement(annotationUl == null ? void 0 : annotationUl.mark);
+      if (annotationUl && typeof annotationUl.on === "function") {
+        annotationUl.on("attach", bindWordHighlightElement);
       }
     } catch (error) {
       console.warn("Jarvis Reader word highlight render failed.", error);
@@ -1724,11 +1757,22 @@ const showWordHoverCard = (asset, element) => {
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
+        const handleRenditionClick = (e: any) => {
+          const selection = rendition.getContents()[0]?.window?.getSelection();
+          if (selection && selection.toString().trim().length > 0) {
+            return;
+          }
+          clearHighlightUi();
+          hideWordHoverCard();
+        };
+
+        rendition.on("click", handleRenditionClick);
+        rendition.on("touchend", handleRenditionClick);
       }
     },
     handleTextSelected,
     epubOptions,
-    readerStyles: {
+    styles: {
       ...ReactReaderStyle,
       container: {
         ...ReactReaderStyle.container,
@@ -1763,15 +1807,43 @@ const showWordHoverCard = (asset, element) => {
       },
       prev: {
         ...ReactReaderStyle.prev,
-        left: "calc(50% - 36px)",
+        left: "calc(50% - 44px)",
         right: "auto",
-        textIndent: 0
+        top: "auto",
+        bottom: 20,
+        transform: "none",
+        marginTop: 0,
+        width: 36,
+        height: 36,
+        background: "var(--interactive-normal)",
+        borderRadius: "50%",
+        border: "1px solid var(--background-modifier-border)",
+        color: "var(--text-normal)",
+        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer"
       },
       next: {
         ...ReactReaderStyle.next,
         left: "calc(50% + 8px)",
         right: "auto",
-        textIndent: 0
+        top: "auto",
+        bottom: 20,
+        transform: "none",
+        marginTop: 0,
+        width: 36,
+        height: 36,
+        background: "var(--interactive-normal)",
+        borderRadius: "50%",
+        border: "1px solid var(--background-modifier-border)",
+        color: "var(--text-normal)",
+        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer"
       },
       arrow: {
         ...ReactReaderStyle.arrow,
@@ -2111,7 +2183,11 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
     title: "\u5220\u9664\u8bcd\u6761",
     onClick: deleteActiveWordAsset
-  }, renderObsidianIcon("trash")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
+  }, renderObsidianIcon("trash")),  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
+    title: "\u5173\u95ed\u5361\u7247",
+    onClick: hideWordHoverCard
+  }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
     className: "jarvis-reader-word-phonetic"
   }, activeWordHover.asset.phonetic) : null),  React.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
