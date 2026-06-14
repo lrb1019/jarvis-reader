@@ -6,12 +6,12 @@ import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
 import { openOrCreateNote, getOrCreateBookNote } from "./book-notes";
 import { getEpubTocMd, createHighlightId, getHighlightsForBook, appendHighlightToBookNote, replaceHighlightInBookNote, deleteHighlightFromBookNote } from "./highlights";
-import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection, upsertWordAssetNote, removeWordEntryMetadataInContent, deleteWordEntryInContent, getWordEntryStart, getWordEntryEnd } from "./word-assets";
+import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { getReaderProgress } from "./progress";
 import { getMarkdownLinkCandidates } from "./wiki-editor";
-import { EpubReader, extractWordCardDisplayFromContent, getLightWordAsset } from "./EpubReader";
+import { EpubReader, getLightWordAsset } from "./EpubReader";
 import type { JarvisReaderSettings, BookHighlight } from "./types";
 
 function getWordAssetsMap(settings: any): Record<string, any> {
@@ -74,64 +74,20 @@ export class EpubView extends FileView {
       new Notice("Failed to build word asset.");
       return null;
     }
-    const noteFile = await upsertWordAssetNote(this.app, this.plugin.settings, asset, this.file!);
-    asset.notePath = noteFile.path;
+    
+    // FILELESS: Note generation is fully removed
     if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
       this.plugin.settings.wordAssets = {};
     }
     this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
+    await this.plugin.persistWordAssetSidecar("save");
     await this.plugin.saveSettings();
-    new Notice("已保存到翻译卡片库");
+    new Notice("已保存到全局字典");
     return asset;
   }
 
   async openWordNote(asset: any): Promise<void> {
-    if (!asset)
-      return;
-    try {
-      asset = await this.plugin.ensureWordAssetMarkdown(asset);
-    } catch (error) {
-      console.error("Jarvis Reader failed to rebuild translation note.", error);
-      new Notice("词条 Markdown 重建失败。");
-      return;
-    }
-    if (asset.blockId && this.app.workspace && typeof this.app.workspace.openLinkText === "function") {
-      const markdownLeaves = typeof this.app.workspace.getLeavesOfType === "function" ? this.app.workspace.getLeavesOfType("markdown") || [] : [];
-      const openedLeaf = markdownLeaves.find((leaf: any) => leaf?.view?.file?.path === asset.notePath);
-      if (openedLeaf instanceof WorkspaceLeaf) {
-        await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
-        await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
-      } else {
-        const activeLeaf = this.app.workspace.getMostRecentLeaf();
-        const targetLeaf = activeLeaf instanceof WorkspaceLeaf ? this.app.workspace.createLeafBySplit(activeLeaf, "vertical") : null;
-        if (targetLeaf instanceof WorkspaceLeaf) {
-          await this.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
-          await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", false);
-        } else {
-          await this.app.workspace.openLinkText(`${asset.notePath}#^${asset.blockId}`, "", true);
-        }
-      }
-      return;
-    }
-    const target = this.app.vault.getAbstractFileByPath(asset.notePath);
-    if (!(target instanceof TFile)) {
-      new Notice("Word note is missing.");
-      return;
-    }
-    const markdownLeaves = typeof this.app.workspace.getLeavesOfType === "function" ? this.app.workspace.getLeavesOfType("markdown") || [] : [];
-    const openedLeaf = markdownLeaves.find((leaf2: any) => leaf2?.view?.file?.path === asset.notePath);
-    if (openedLeaf instanceof WorkspaceLeaf) {
-      await this.app.workspace.setActiveLeaf(openedLeaf, { focus: true });
-      await (openedLeaf as any).openFile(target, { active: true });
-    } else {
-      const leaf = this.app.workspace.getMostRecentLeaf();
-      const targetLeaf = leaf instanceof WorkspaceLeaf ? this.app.workspace.createLeafBySplit(leaf, "vertical") : null;
-      if (targetLeaf instanceof WorkspaceLeaf) {
-        await (targetLeaf as any).openFile(target, { active: true });
-      } else if (leaf instanceof WorkspaceLeaf) {
-        await (leaf as any).openFile(target, { active: true });
-      }
-    }
+    new Notice("单词卡现已无文件化，请在右侧边栏查阅");
   }
 
   async setWordMastered(asset: any, mastered: boolean): Promise<any> {
@@ -148,13 +104,9 @@ export class EpubView extends FileView {
       this.plugin.settings.wordAssets = {};
     }
     this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(updated);
-    if (updated.notePath) {
-      const existing = this.app.vault.getAbstractFileByPath(updated.notePath);
-      if (existing instanceof TFile) {
-        const content = await this.app.vault.read(existing);
-        await this.app.vault.modify(existing, removeWordEntryMetadataInContent(content, updated));
-      }
-    }
+    
+    // FILELESS: No markdown modification
+    await this.plugin.persistWordAssetSidecar("save");
     await this.plugin.saveSettings();
     return updated;
   }
@@ -163,38 +115,20 @@ export class EpubView extends FileView {
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!assetKey)
       return false;
-    const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
     if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
       this.plugin.settings.wordAssets = {};
     }
     delete this.plugin.settings.wordAssets[assetKey];
     await this.plugin.persistWordAssetSidecar("delete");
     await this.plugin.saveSettingsData();
-    const notePath = current.notePath || asset.notePath;
-    if (notePath) {
-      const existing = this.app.vault.getAbstractFileByPath(notePath);
-      if (existing instanceof TFile) {
-        const content = await this.app.vault.read(existing);
-        const nextContent = deleteWordEntryInContent(content, current);
-        if (nextContent !== content) {
-          await this.app.vault.modify(existing, nextContent);
-        }
-      }
-    }
+    
+    // FILELESS: No markdown modification
     new Notice("词条已彻底删除。");
     return true;
   }
 
   async loadWordDisplay(asset: any): Promise<string> {
-    if (!asset || asset.display)
-      return asset?.display || "";
-    if (!asset.notePath)
-      return "";
-    const file = this.app.vault.getAbstractFileByPath(asset.notePath);
-    if (!(file instanceof TFile))
-      return "";
-    const content = await this.app.vault.read(file);
-    return extractWordCardDisplayFromContent(content, asset);
+    return asset?.display || "";
   }
 
   shouldAutoHighlightWords(): boolean {

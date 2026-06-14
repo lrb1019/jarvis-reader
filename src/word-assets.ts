@@ -242,25 +242,13 @@ export async function lookupLocalDictionary(settings: any = {}, selectedText: st
   return null;
 }
 
-export function getWordNoteFolder(settings: any = {}): string {
-  return normalizeVaultPath(settings.wordNoteFolder || "09 Books/Words");
-}
 
-export function getWordNotePath(lemma: string, settings: any = {}): string {
-  return joinVaultPath(getWordNoteFolder(settings), `${sanitizeWordAssetFilename(lemma)}.md`);
-}
 
-export function getWordBookNotePath(file: any, settings: any = {}): string {
-  const baseName = file && file.basename ? file.basename : "Words";
-  return joinVaultPath(getWordNoteFolder(settings), `${sanitizeWordAssetFilename(baseName)}.md`);
-}
 
-export function getWordBlockId(lemma: string): string {
-  const normalized = normalizeWordSelection(lemma);
-  const source = normalized ? normalized.lemma : String(lemma || "word").toLowerCase();
-  const slug = source.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return `jr-word-${slug || "word"}`;
-}
+
+
+
+
 
 export function getTranslationAssetKind(assetOrText: any, translation: any = null): TranslationAssetKind {
   const explicit = assetOrText && typeof assetOrText === "object" ? assetOrText.kind : "";
@@ -299,55 +287,15 @@ export function getTranslationAssetStorageKey(asset: any): string {
   return normalized ? normalized.lemma : asset.lemma;
 }
 
-export function getWordEntrySectionTitle(kind: TranslationAssetKind): string {
-  switch (kind) {
-    case "phrase":
-      return "\u77ed\u8bed";
-    case "sentence":
-      return "\u53e5\u5b50";
-    case "word":
-    default:
-      return "\u5355\u8bcd";
-  }
-}
 
-export function ensureWordBookSections(content: string): string {
-  let next = String(content || "").replace(/^##\s+Words\s*$/gmi, "## \u5355\u8bcd").replace(/^##\s+Phrases\s*$/gmi, "## \u77ed\u8bed").replace(/^##\s+Sentences\s*$/gmi, "## \u53e5\u5b50");
-  for (const title of ["\u5355\u8bcd", "\u77ed\u8bed", "\u53e5\u5b50"]) {
-    if (!new RegExp(`^##\\s+${title}\\s*$`, "m").test(next)) {
-      next = `${next.trimEnd()}\n\n## ${title}\n`;
-    }
-  }
-  return next;
-}
 
-export function insertWordEntryIntoSection(content: string, asset: any): string {
-  const current = ensureWordBookSections(content);
-  const title = getWordEntrySectionTitle(getTranslationAssetKind(asset));
-  const heading = `## ${title}`;
-  const start = current.search(new RegExp(`^##\\s+${title}\\s*$`, "m"));
-  if (start < 0)
-    return `${current.trimEnd()}\n\n${buildWordEntryBlock(asset)}\n`;
-  const afterHeading = start + current.slice(start).indexOf("\n") + 1;
-  const nextSectionRelative = current.slice(afterHeading).search(/^##\s+(\u5355\u8bcd|\u77ed\u8bed|\u53e5\u5b50)\s*$/m);
-  const insertAt = nextSectionRelative >= 0 ? afterHeading + nextSectionRelative : current.length;
-  const before = current.slice(0, insertAt).trimEnd();
-  const after = current.slice(insertAt).replace(/^\s*/, "");
-  return `${before}\n\n${buildWordEntryBlock(asset)}\n${after ? `\n${after}` : ""}`;
-}
 
-export function formatWordSourceLink(source: any): string {
-  const target = source && source.bookPath ? source.bookPath : "";
-  return target ? `"[[${escapeYamlString(target)}]]"` : '""';
-}
 
-export function formatWordSourceLine(source: any): string {
-  const bookPath = source && source.bookPath ? source.bookPath : "";
-  const chapterTitle = source && source.chapterTitle ? source.chapterTitle : "";
-  const quote = source && source.quote ? source.quote : "";
-  const preview = quote.length > 88 ? `${quote.slice(0, 88)}...` : quote;
-  return `- ${bookPath || "Unknown"}${chapterTitle ? ` - ${chapterTitle}` : ""}${preview ? ` - ${preview}` : ""}`;
-}
+
+
+
+
+
 
 export function buildWordAssetMetadata(asset: any): WordAsset {
   return {
@@ -361,8 +309,6 @@ export function buildWordAssetMetadata(asset: any): WordAsset {
     phonetic: asset.phonetic || "",
     partOfSpeech: asset.partOfSpeech || "",
     example: asset.example || "",
-    notePath: asset.notePath || "",
-    blockId: asset.blockId || getWordBlockId(asset.lemma || ""),
     mastered: !!asset.mastered,
     sources: Array.isArray(asset.sources) ? asset.sources : [],
     created: asset.created || "",
@@ -370,171 +316,33 @@ export function buildWordAssetMetadata(asset: any): WordAsset {
   };
 }
 
-export function buildWordGeneratedBlock(asset: any): string {
-  const cardText = normalizeWordDisplayText(asset?.display || asset?.translation || asset?.example || "");
-  const lines = [
-    JARVIS_WORD_NOTE_START,
-    `## Card`,
-    cardText,
-  ];
-  lines.push("", JARVIS_WORD_NOTE_END);
-  return lines.join("\n");
-}
 
-export function buildWordNoteFrontmatter(asset: any): string {
-  const primarySource = asset.sources && asset.sources.length ? asset.sources[0] : null;
-  const kind = getTranslationAssetKind(asset);
-  return `---
-created: ${formatLocalDate(asset.created || new Date())}
-author: "[[Jarvis]]"
-type: ${kind}
-word: "${escapeYamlString(asset.title || asset.lemma || "")}"
-phonetic: "${escapeYamlString(asset.phonetic || "")}"
-translation: "${escapeYamlString(asset.translation || "")}"
-source:
-  - ${formatWordSourceLink(primarySource)}
----`;
-}
 
-export function syncWordNoteFrontmatter(content: string, asset: any): string {
-  const frontmatter = buildWordNoteFrontmatter(asset);
-  if (/^---\r?\n[\s\S]*?\r?\n---/.test(content || "")) {
-    const body = (content || "").replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
-    return `${frontmatter}\n\n${body.trimStart()}`;
-  }
-  return `${frontmatter}\n\n${(content || "").trimStart()}`;
-}
 
-export function buildWordNoteFileContent(asset: any): string {
-  const generatedBlock = buildWordGeneratedBlock(asset);
-  return `${buildWordNoteFrontmatter(asset)}
 
-# ${asset.lemma || "word"}
 
-${generatedBlock}
-`;
-}
 
-export function buildWordBookFrontmatter(file: any): string {
-  return `---
-created: ${formatLocalDate(new Date())}
-author: "[[Jarvis]]"
-type: wordbook
-book: "${escapeYamlString(file && file.basename ? file.basename : "Words")}"
-source:
-  - "${file && file.path ? `[[${escapeYamlString(file.path)}]]` : ""}"
----`;
-}
 
-export function buildWordBookFileContent(file: any): string {
-  const title = file && file.basename ? file.basename : "Words";
-  return `${buildWordBookFrontmatter(file)}
 
-# ${title}
 
-## 单词
 
-## 短语
 
-## 句子
 
-`;
-}
 
-export function getWordEntryStart(lemma: string): string {
-  return `<!-- jarvis-reader-word-entry:${getWordBlockId(lemma)}:start -->`;
-}
 
-export function getWordEntryEnd(lemma: string): string {
-  return `<!-- jarvis-reader-word-entry:${getWordBlockId(lemma)}:end -->`;
-}
 
-export function buildWordEntryBlock(asset: any): string {
-  const blockId = asset.blockId || getWordBlockId(asset.lemma);
-  return `${getWordEntryStart(asset.lemma)}
-### ${asset.title || asset.lemma || "word"}
 
-${buildWordGeneratedBlock(asset)}
 
-^${blockId}
-${getWordEntryEnd(asset.lemma)}`;
-}
 
-export function upsertWordEntryInContent(content: string, asset: any): string {
-  const current = content || "";
-  const startMarker = getWordEntryStart(asset.lemma);
-  const endMarker = getWordEntryEnd(asset.lemma);
-  const startIndex = current.indexOf(startMarker);
-  const endIndex = current.indexOf(endMarker);
-  if (startIndex >= 0 && endIndex > startIndex) {
-    const entryEnd = endIndex + endMarker.length;
-    const entry = current.slice(startIndex, entryEnd);
-    const generatedBlock = buildWordGeneratedBlock(asset);
-    const generatedStart = entry.indexOf(JARVIS_WORD_NOTE_START);
-    const generatedEnd = entry.indexOf(JARVIS_WORD_NOTE_END);
-    if (generatedStart >= 0 && generatedEnd > generatedStart) {
-      const nextEntry = entry.slice(0, generatedStart) + generatedBlock + entry.slice(generatedEnd + JARVIS_WORD_NOTE_END.length);
-      return current.slice(0, startIndex) + nextEntry + current.slice(entryEnd);
-    }
-    return current.slice(0, startIndex) + buildWordEntryBlock(asset) + current.slice(entryEnd);
-  }
-  return insertWordEntryIntoSection(current, asset);
-}
 
-export function removeWordEntryMetadataInContent(content: string, asset: any): string {
-  const current = content || "";
-  const startMarker = getWordEntryStart(asset.lemma);
-  const endMarker = getWordEntryEnd(asset.lemma);
-  const startIndex = current.indexOf(startMarker);
-  const endIndex = current.indexOf(endMarker);
-  if (startIndex < 0 || endIndex <= startIndex) {
-    return upsertWordEntryInContent(current, asset);
-  }
-  const entryEnd = endIndex + endMarker.length;
-  const entry = current.slice(startIndex, entryEnd);
-  const nextEntry = entry.replace(/\r?\n## Metadata\r?\n[\s\S]*?(?=\r?\n## |\r?\n<!-- jarvis-reader-word:end -->|$)/i, "");
-  if (nextEntry === entry) {
-    return current;
-  }
-  return current.slice(0, startIndex) + nextEntry + current.slice(entryEnd);
-}
 
-export function removeWordEntrySourcesInContent(content: string): string {
-  return (content || "").replace(/\r?\n## Sources\r?\n[\s\S]*?(?=\r?\n## |\r?\n\^\w|(?:\r?\n)?<!-- jarvis-reader-word-entry:|(?:\r?\n)?<!-- jarvis-reader-word:end -->|$)/g, "");
-}
 
-export function deleteWordEntryInContent(content: string, asset: any): string {
-  const current = content || "";
-  if (!asset || !asset.lemma)
-    return current;
-  const startMarker = getWordEntryStart(asset.lemma);
-  const endMarker = getWordEntryEnd(asset.lemma);
-  const startIndex = current.indexOf(startMarker);
-  const endIndex = current.indexOf(endMarker);
-  if (startIndex < 0 || endIndex <= startIndex)
-    return current;
-  const entryEnd = endIndex + endMarker.length;
-  const before = current.slice(0, startIndex).replace(/[ \t]*(?:\r?\n[ \t]*){0,2}$/, "");
-  const after = current.slice(entryEnd).replace(/^(?:[ \t]*\r?\n){0,2}/, "");
-  if (before && after)
-    return `${before}\n\n${after}`;
-  return before || after;
-}
 
-export async function upsertWordAssetNote(app: App, settings: any = {}, asset: any, file: TFile | null = null): Promise<TFile> {
-  const folder = getWordNoteFolder(settings);
-  await ensureVaultFolder(app, folder);
-  const notePath = normalizeVaultPath(asset.notePath || getWordBookNotePath(file, settings));
-  const existing = app.vault.getAbstractFileByPath(notePath);
-  if (existing instanceof TFile) {
-    const current = await app.vault.read(existing);
-    const nextContent = upsertWordEntryInContent(removeWordEntrySourcesInContent(current), asset);
-    await app.vault.modify(existing, nextContent);
-    return existing;
-  }
-  const initialContent = upsertWordEntryInContent(buildWordBookFileContent(file), asset);
-  return await app.vault.create(notePath, initialContent);
-}
+
+
+
+
+
 
 export function mergeWordSources(existingSources: WordAssetSource[] | undefined, nextSource: WordAssetSource | null): WordAssetSource[] {
   const list = Array.isArray(existingSources) ? [...existingSources] : [];
@@ -633,8 +441,6 @@ export function buildWordAssetFromSelection(file: TFile, selection: any, transla
     partOfSpeech: (translation?.partOfSpeech || existingAsset?.partOfSpeech || "").trim(),
     example: (translation?.example || existingAsset?.example || "").trim(),
     display: (translation?.display || existingAsset?.display || "").trim(),
-    notePath: normalizeVaultPath(existingAsset?.blockId && existingAsset?.notePath ? existingAsset.notePath : getWordBookNotePath(file, settings)),
-    blockId: existingAsset?.blockId || getWordBlockId(assetKey),
     mastered: !!existingAsset?.mastered,
     sources: mergeWordSources(existingAsset?.sources, source),
     created: existingAsset?.created || now,

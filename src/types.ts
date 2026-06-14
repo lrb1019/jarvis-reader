@@ -53,12 +53,14 @@ export interface WordAsset {
   phonetic: string;
   partOfSpeech: string;
   example: string;
-  notePath: string;
-  blockId: string;
   mastered: boolean;
   sources: WordAssetSource[];
   created: string;
   updated: string;
+  // Anki-style review fields (optional for now)
+  nextReviewDate?: string;
+  interval?: number;
+  ease?: number;
 }
 
 export type WordAssetMap = Record<string, WordAsset>;

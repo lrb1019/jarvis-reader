@@ -75,33 +75,6 @@ export function getLightWordAsset(asset) {
     ...asset
   };
 }
-export function extractWordCardDisplayFromContent(content, asset) {
-  if (!content || !asset || !asset.lemma)
-    return "";
-  const startMarker = getWordEntryStart(asset.lemma);
-  const endMarker = getWordEntryEnd(asset.lemma);
-  const startIndex = content.indexOf(startMarker);
-  const endIndex = content.indexOf(endMarker);
-  const source = startIndex >= 0 && endIndex > startIndex ? content.slice(startIndex, endIndex) : content;
-  const lines = source.split(/\r?\n/);
-  const cardStart = lines.findIndex((line) => /^##\s+Card\s*$/i.test((line || "").trim()));
-  if (cardStart < 0)
-    return "";
-  const cardLines = [];
-  for (let index = cardStart + 1; index < lines.length; index++) {
-    const line = lines[index] || "";
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed))
-      break;
-    if (/^<!--\s*jarvis-reader-word/.test(trimmed))
-      continue;
-    if (/^\^jr-word-/.test(trimmed))
-      continue;
-    cardLines.push(line);
-  }
-  return normalizeWordDisplayText(cardLines.join("\n"));
-}
-export const WORD_DISPLAY_CACHE_LIMIT = 50;
 export const WORD_DISPLAY_MAX_CHARS = 8e3;
 
 export function truncateWordDisplay(value) {
@@ -488,7 +461,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     const normalized = normalizeWordSelection((asset == null ? void 0 : asset.lemma) || "");
     if (!normalized || !asset || asset.display || typeof loadWordDisplay !== "function")
       return;
-    const cacheKey = `${asset.notePath || ""}#${asset.blockId || normalized.lemma}`;
+    const cacheKey = normalized.lemma;
     const cache = wordDisplayCacheRef.current;
     if (cache.has(cacheKey)) {
       const cachedDisplay = cache.get(cacheKey);
@@ -935,7 +908,7 @@ const showWordHoverCard = (asset, element) => {
         wordAssetsRef.current = next;
         return next;
       });
-      wordDisplayCacheRef.current.delete(`${asset.notePath || ""}#${asset.blockId || assetKey}`);
+      wordDisplayCacheRef.current.delete(assetKey);
       hideWordHoverCard();
       clearAutoWordHighlights(renditionRef.current);
       syncAutoWordHighlights(renditionRef.current);
@@ -2138,11 +2111,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
     title: "\u5220\u9664\u8bcd\u6761",
     onClick: deleteActiveWordAsset
-  }, renderObsidianIcon("trash")), activeWordHover.asset.notePath ?  React.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
-    title: "\u6253\u5f00\u8bcd\u6761",
-    onClick: () => openWordNote(activeWordHover.asset)
-  }, renderObsidianIcon("book-open")) : null)), activeWordHover.asset.phonetic ?  React.createElement("div", {
+  }, renderObsidianIcon("trash")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
     className: "jarvis-reader-word-phonetic"
   }, activeWordHover.asset.phonetic) : null),  React.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"

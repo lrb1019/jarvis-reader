@@ -5,7 +5,7 @@ import { JarvisReaderHighlightsView } from "./sidebar/HighlightsView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
-import { getTranslationAssetStorageKey, getWordBlockId, upsertWordAssetNote, getWordEntryStart, getWordEntryEnd, buildWordAssetMetadata } from "./word-assets";
+import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
 import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
@@ -356,76 +356,7 @@ export default class JarvisReaderPlugin extends Plugin {
       throw error;
     }
   }
-  getWordAssetSourceFile(asset) {
-    const source = asset && Array.isArray(asset.sources) ? asset.sources[0] : null;
-    const sourcePath = source && source.bookPath ? source.bookPath : "";
-    const sourceFile = sourcePath ? this.app.vault.getAbstractFileByPath(sourcePath) : null;
-    if (sourceFile instanceof TFile) {
-      return sourceFile;
-    }
-    const notePath = normalizeVaultPath(asset && asset.notePath ? asset.notePath : "");
-    const basename = (notePath.split("/").pop() || asset.title || asset.lemma || "Words").replace(/\.md$/i, "");
-    return {
-      basename,
-      path: sourcePath
-    };
-  }
-  async syncWordAssetToMarkdown(asset, persist = true) {
-    const assetKey = getTranslationAssetStorageKey(asset);
-    if (!assetKey) {
-      throw new Error("Translation asset has no storage key.");
-    }
-    const current = this.settings.wordAssets && this.settings.wordAssets[assetKey] ? this.settings.wordAssets[assetKey] : asset;
-    const normalized = {
-      ...current,
-      lemma: current.lemma || assetKey,
-      blockId: current.blockId || getWordBlockId(assetKey),
-      display: current.display || current.translation || ""
-    };
-    const noteFile = await upsertWordAssetNote(this.app, this.settings, normalized, this.getWordAssetSourceFile(normalized));
-    normalized.notePath = noteFile.path;
-    this.settings.wordAssets = this.settings.wordAssets || {};
-    this.settings.wordAssets[assetKey] = getLightWordAsset(normalized);
-    if (persist) {
-      await this.persistWordAssetSidecar("sync-markdown");
-    }
-    return normalized;
-  }
-  async ensureWordAssetMarkdown(asset) {
-    const assetKey = getTranslationAssetStorageKey(asset);
-    if (!assetKey) {
-      throw new Error("Translation asset has no storage key.");
-    }
-    const current = this.settings.wordAssets && this.settings.wordAssets[assetKey] ? this.settings.wordAssets[assetKey] : asset;
-    const notePath = normalizeVaultPath(current.notePath || "");
-    const file = notePath ? this.app.vault.getAbstractFileByPath(notePath) : null;
-    if (file instanceof TFile) {
-      const content = await this.app.vault.read(file);
-      if (content.includes(getWordEntryStart(current.lemma || assetKey)) && content.includes(getWordEntryEnd(current.lemma || assetKey))) {
-        return current;
-      }
-    }
-    return await this.syncWordAssetToMarkdown(current);
-  }
-  async syncAllWordAssetsToMarkdown() {
-    const assets = Object.values(this.settings.wordAssets || {}).filter(Boolean);
-    const result = {
-      total: assets.length,
-      synced: 0,
-      failed: 0
-    };
-    for (const asset of assets) {
-      try {
-        await this.syncWordAssetToMarkdown(asset, false);
-        result.synced += 1;
-      } catch (error) {
-        result.failed += 1;
-        console.error("Jarvis Reader word asset Markdown sync failed.", asset, error);
-      }
-    }
-    await this.persistWordAssetSidecar("sync-markdown");
-    return result;
-  }
+
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     if (!this.settings.bookInitLocations) {
@@ -441,7 +372,7 @@ export default class JarvisReaderPlugin extends Plugin {
       this.settings.wordAssets = {};
     }
     for (const [lemma, asset] of Object.entries(this.settings.wordAssets)) {
-      if (asset && asset.blockId && asset.notePath && asset.display) {
+      if (asset && asset.display) {
         this.settings.wordAssets[lemma] = getLightWordAsset(asset);
       }
     }
