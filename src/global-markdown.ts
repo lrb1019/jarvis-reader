@@ -613,6 +613,12 @@ export function createWordHighlighterExtension(plugin: any): any {
     {
       decorations: (pluginInst: any) => pluginInst.decorations,
       eventHandlers: {
+        mousedown(event: MouseEvent, view: any) {
+          const target = event.target as HTMLElement;
+          if (!target.closest('.jarvis-reader-word-card') && !target.closest('.jarvis-reader-word-translate')) {
+            plugin.globalTranslationManager.closeCard();
+          }
+        },
         mouseover(event: MouseEvent, view: any) {
           const target = event.target as HTMLElement;
           if (target && target.classList.contains("jarvis-reader-md-word-highlight")) {

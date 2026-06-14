@@ -58528,6 +58528,12 @@ function createWordHighlighterExtension(plugin) {
     {
       decorations: (pluginInst) => pluginInst.decorations,
       eventHandlers: {
+        mousedown(event, view) {
+          const target = event.target;
+          if (!target.closest(".jarvis-reader-word-card") && !target.closest(".jarvis-reader-word-translate")) {
+            plugin.globalTranslationManager.closeCard();
+          }
+        },
         mouseover(event, view) {
           const target = event.target;
           if (target && target.classList.contains("jarvis-reader-md-word-highlight")) {
