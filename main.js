@@ -58027,6 +58027,40 @@ var GlobalTranslationCard = ({
       }
     });
   };
+  const handleDragStart = (event) => {
+    if (event.button != null && event.button !== 0) return;
+    event.preventDefault();
+    if (hoverMode) {
+      plugin.globalTranslationManager.clearHideTimeout();
+    }
+    const card = cardRef.current;
+    if (!card) return;
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const cardRect = card.getBoundingClientRect();
+    const startLeft = cardRect.left;
+    const startTop = cardRect.top;
+    const onPointerMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      card.style.left = `${startLeft + deltaX}px`;
+      card.style.top = `${startTop + deltaY}px`;
+    };
+    const onPointerUp = () => {
+      target.removeEventListener("pointermove", onPointerMove);
+      target.removeEventListener("pointerup", onPointerUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+      if (hoverMode) {
+        plugin.globalTranslationManager.hideHoverCardDelay();
+      }
+    };
+    target.addEventListener("pointermove", onPointerMove);
+    target.addEventListener("pointerup", onPointerUp);
+  };
   const getSavedAsset = () => {
     const assets = plugin.settings.wordAssets || {};
     return assets[word.toLowerCase()];
@@ -58214,6 +58248,11 @@ var GlobalTranslationCard = ({
             title: "\u70B9\u51FB\u53D1\u97F3",
             style: { color: "#c62828", background: "none", border: "none", cursor: "pointer", fontWeight: "bold", padding: 0 }
           }, word),
+          // Drag spacer handle
+          import_react4.default.createElement("div", {
+            style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" },
+            onPointerDown: handleDragStart
+          }),
           import_react4.default.createElement(
             "div",
             { className: "jarvis-reader-word-card-actions" },
@@ -58282,12 +58321,14 @@ var GlobalTranslationCard = ({
       "div",
       {
         className: "jarvis-reader-highlight-title",
-        style: { display: "flex", justifyContent: "space-between", alignItems: "center" }
+        style: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+        onPointerDown: handleDragStart
       },
       import_react4.default.createElement("span", null, "\u7FFB\u8BD1"),
       import_react4.default.createElement("button", {
         className: "jarvis-reader-word-card-action",
         onClick: onClose,
+        onPointerDown: (e) => e.stopPropagation(),
         style: { border: "none", background: "transparent", cursor: "pointer" }
       }, "\u2715")
     ),

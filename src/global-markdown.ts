@@ -99,6 +99,49 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
     });
   };
 
+  // Dragging Implementation
+  const handleDragStart = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.button != null && event.button !== 0) return;
+    event.preventDefault();
+    
+    if (hoverMode) {
+      plugin.globalTranslationManager.clearHideTimeout();
+    }
+    
+    const card = cardRef.current;
+    if (!card) return;
+    
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
+    
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const cardRect = card.getBoundingClientRect();
+    const startLeft = cardRect.left;
+    const startTop = cardRect.top;
+    
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      card.style.left = `${startLeft + deltaX}px`;
+      card.style.top = `${startTop + deltaY}px`;
+    };
+    
+    const onPointerUp = () => {
+      target.removeEventListener("pointermove", onPointerMove);
+      target.removeEventListener("pointerup", onPointerUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+      if (hoverMode) {
+        plugin.globalTranslationManager.hideHoverCardDelay();
+      }
+    };
+    
+    target.addEventListener("pointermove", onPointerMove);
+    target.addEventListener("pointerup", onPointerUp);
+  };
+
   // Check if already in dictionary
   const getSavedAsset = () => {
     const assets = plugin.settings.wordAssets || {};
@@ -128,7 +171,6 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
           setStatus("error");
           return;
         }
-        // Selection mode -> prompt for AI or offline query
         setError("未找到离线释义。");
         setStatus("error");
       }
@@ -173,7 +215,6 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       setIsSaved(true);
       new Notice("已保存到全局词库");
       
-      // Force refresh current CodeMirror views to reflect new highlights
       plugin.app.workspace.iterateAllLeaves((leaf: any) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
@@ -218,7 +259,6 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       setIsMastered(nextMastered);
       new Notice(nextMastered ? "已标记掌握" : "已重新加入词库");
       
-      // Force refresh highlights
       plugin.app.workspace.iterateAllLeaves((leaf: any) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
@@ -238,7 +278,6 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       new Notice("词条已彻底删除。");
       onClose();
       
-      // Force refresh highlights
       plugin.app.workspace.iterateAllLeaves((leaf: any) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
@@ -311,6 +350,11 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
             title: "点击发音",
             style: { color: "#c62828", background: "none", border: "none", cursor: "pointer", fontWeight: "bold", padding: 0 }
           }, word),
+          // Drag spacer handle
+          React.createElement("div", {
+            style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" },
+            onPointerDown: handleDragStart
+          }),
           React.createElement("div", { className: "jarvis-reader-word-card-actions" },
             React.createElement("button", {
               className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
@@ -367,12 +411,14 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
   }, 
     React.createElement("div", {
       className: "jarvis-reader-highlight-title",
-      style: { display: "flex", justifyContent: "space-between", alignItems: "center" }
+      style: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+      onPointerDown: handleDragStart
     }, 
       React.createElement("span", null, "翻译"),
       React.createElement("button", {
         className: "jarvis-reader-word-card-action",
         onClick: onClose,
+        onPointerDown: (e) => e.stopPropagation(),
         style: { border: "none", background: "transparent", cursor: "pointer" }
       }, "✕")
     ),
