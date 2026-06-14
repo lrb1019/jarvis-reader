@@ -53625,6 +53625,19 @@ function applyObsidianThemeToRendition(rendition, readerZoom = 1, readerLineHeig
       },
       "a": {
         "color": "var(--link-color, inherit) !important"
+      },
+      ".jarvis-reader-word-highlight": {
+        "background-color": "color-mix(in srgb, var(--interactive-accent) 18%, transparent) !important",
+        "border-bottom": "2px solid var(--interactive-accent) !important",
+        "cursor": "pointer !important"
+      },
+      ".jarvis-reader-word-highlight rect": {
+        "fill": "color-mix(in srgb, var(--interactive-accent) 18%, transparent) !important",
+        "stroke": "none !important"
+      },
+      ".jarvis-reader-word-highlight line": {
+        "stroke": "var(--interactive-accent) !important",
+        "stroke-width": "2px !important"
       }
     });
     rendition.themes.select("obsidian");
@@ -58053,9 +58066,6 @@ var GlobalTranslationCard = ({
       target.removeEventListener("pointerup", onPointerUp);
       if (target.hasPointerCapture(event.pointerId)) {
         target.releasePointerCapture(event.pointerId);
-      }
-      if (hoverMode) {
-        plugin.globalTranslationManager.hideHoverCardDelay();
       }
     };
     target.addEventListener("pointermove", onPointerMove);

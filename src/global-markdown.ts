@@ -133,9 +133,6 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       if (target.hasPointerCapture(event.pointerId)) {
         target.releasePointerCapture(event.pointerId);
       }
-      if (hoverMode) {
-        plugin.globalTranslationManager.hideHoverCardDelay();
-      }
     };
     
     target.addEventListener("pointermove", onPointerMove);
