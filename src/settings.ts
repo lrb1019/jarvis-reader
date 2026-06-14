@@ -260,25 +260,6 @@ created: {{created}}
     }
 
     if (this.activeTab === "words") {
-      new Setting(contentDiv).setName("单词笔记文件夹").setDesc("保存全局单词卡片笔记的文件夹").addText((text) => {
-        text.setPlaceholder("09 Books/Words").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      });
-
-      new Setting(contentDiv).setName("同步词条到 Markdown").setDesc("从词条主数据单向重建或更新 Markdown，不从 Markdown 反向导入。").addButton((button) => button.setButtonText("同步词条").onClick(async () => {
-        button.setDisabled(true);
-        try {
-          const result = await this.plugin.syncAllWordAssetsToMarkdown();
-          new Notice(`词条同步完成：成功 ${result.synced} 条，失败 ${result.failed} 条。`);
-        } catch (error) {
-          console.error("Jarvis Reader word asset sync failed.", error);
-          new Notice("词条同步失败，请查看开发者错误。");
-        } finally {
-          button.setDisabled(false);
-        }
-      }));
 
       new Setting(contentDiv).setName("模糊单词卡正文").setDesc("只模糊可滚动的单词卡正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;

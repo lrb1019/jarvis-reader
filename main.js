@@ -58059,24 +58059,6 @@ created: {{created}}
       }));
     }
     if (this.activeTab === "words") {
-      new import_obsidian8.Setting(contentDiv).setName("\u5355\u8BCD\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u5168\u5C40\u5355\u8BCD\u5361\u7247\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-        text.setPlaceholder("09 Books/Words").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      });
-      new import_obsidian8.Setting(contentDiv).setName("\u540C\u6B65\u8BCD\u6761\u5230 Markdown").setDesc("\u4ECE\u8BCD\u6761\u4E3B\u6570\u636E\u5355\u5411\u91CD\u5EFA\u6216\u66F4\u65B0 Markdown\uFF0C\u4E0D\u4ECE Markdown \u53CD\u5411\u5BFC\u5165\u3002").addButton((button) => button.setButtonText("\u540C\u6B65\u8BCD\u6761").onClick(async () => {
-        button.setDisabled(true);
-        try {
-          const result = await this.plugin.syncAllWordAssetsToMarkdown();
-          new import_obsidian8.Notice(`\u8BCD\u6761\u540C\u6B65\u5B8C\u6210\uFF1A\u6210\u529F ${result.synced} \u6761\uFF0C\u5931\u8D25 ${result.failed} \u6761\u3002`);
-        } catch (error) {
-          console.error("Jarvis Reader word asset sync failed.", error);
-          new import_obsidian8.Notice("\u8BCD\u6761\u540C\u6B65\u5931\u8D25\uFF0C\u8BF7\u67E5\u770B\u5F00\u53D1\u8005\u9519\u8BEF\u3002");
-        } finally {
-          button.setDisabled(false);
-        }
-      }));
       new import_obsidian8.Setting(contentDiv).setName("\u6A21\u7CCA\u5355\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u5355\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
