@@ -58000,6 +58000,7 @@ function getWordCardDisplayLineMeta2(line) {
 }
 var GlobalTranslationCard = ({
   word,
+  sentence = "",
   rect,
   plugin,
   onClose,
@@ -58009,7 +58010,23 @@ var GlobalTranslationCard = ({
   const [result, setResult] = import_react4.default.useState(null);
   const [error, setError] = import_react4.default.useState("");
   const [isSaved, setIsSaved] = import_react4.default.useState(false);
+  const [isMastered, setIsMastered] = import_react4.default.useState(false);
   const cardRef = import_react4.default.useRef(null);
+  const renderObsidianIcon = (name) => {
+    return import_react4.default.createElement("span", {
+      "aria-hidden": "true",
+      className: "jarvis-reader-word-card-action-icon",
+      ref: (element) => {
+        if (!element) return;
+        while (element.firstChild) {
+          element.removeChild(element.firstChild);
+        }
+        if (typeof import_obsidian9.setIcon === "function") {
+          (0, import_obsidian9.setIcon)(element, name);
+        }
+      }
+    });
+  };
   const getSavedAsset = () => {
     const assets = plugin.settings.wordAssets || {};
     return assets[word.toLowerCase()];
@@ -58020,6 +58037,7 @@ var GlobalTranslationCard = ({
       if (saved) {
         setResult(saved);
         setIsSaved(true);
+        setIsMastered(!!saved.mastered);
         setStatus("ready");
         return;
       }
@@ -58034,15 +58052,8 @@ var GlobalTranslationCard = ({
           setStatus("error");
           return;
         }
-        setStatus("loading");
-        const onlineResult = await translateSelectionWithApi(plugin.settings, word, "", plugin.app);
-        if (onlineResult) {
-          setResult(onlineResult);
-          setStatus("ready");
-        } else {
-          setError("Translation failed.");
-          setStatus("error");
-        }
+        setError("\u672A\u627E\u5230\u79BB\u7EBF\u91CA\u4E49\u3002");
+        setStatus("error");
       }
     } catch (err) {
       setError(err?.message || "Translation failed.");
@@ -58055,16 +58066,17 @@ var GlobalTranslationCard = ({
   const handleSave = async () => {
     if (!result) return;
     try {
-      const assetKey = getTranslationAssetKey({ quote: word }, result);
+      const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
         new import_obsidian9.Notice("Failed to save word.");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
-      const dummyFile = { path: "markdown_selection", basename: "Markdown File" };
+      const activeFile = plugin.app.workspace.getActiveFile();
+      const dummyFile = activeFile || { path: "markdown_selection", basename: "Markdown File" };
       const asset = buildWordAssetFromSelection(
         dummyFile,
-        { quote: word },
+        { quote: word, sentence },
         result,
         existing,
         plugin.settings
@@ -58088,6 +58100,61 @@ var GlobalTranslationCard = ({
       new import_obsidian9.Notice("Save failed.");
     }
   };
+  const handleAiTranslate = async () => {
+    try {
+      setStatus("loading");
+      const onlineResult = await translateSelectionWithApi(plugin.settings, word, sentence, plugin.app, { forceAi: true });
+      if (onlineResult) {
+        setResult(onlineResult);
+        setStatus("ready");
+      } else {
+        setError("AI \u7FFB\u8BD1\u5931\u8D25\u3002");
+        setStatus("error");
+      }
+    } catch (err) {
+      setError(err?.message || "AI \u7FFB\u8BD1\u5931\u8D25\u3002");
+      setStatus("error");
+    }
+  };
+  const handleToggleMastered = async () => {
+    if (!result) return;
+    try {
+      const nextMastered = !isMastered;
+      const updated = {
+        ...result,
+        mastered: nextMastered,
+        updated: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      plugin.settings.wordAssets[word.toLowerCase()] = updated;
+      await plugin.persistWordAssetSidecar("save");
+      await plugin.saveSettings();
+      setIsMastered(nextMastered);
+      new import_obsidian9.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
+      plugin.app.workspace.iterateAllLeaves((leaf) => {
+        if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
+          leaf.view.editor.cm.dispatch({});
+        }
+      });
+    } catch (err) {
+      new import_obsidian9.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
+    }
+  };
+  const handleDeleteWord = async () => {
+    try {
+      delete plugin.settings.wordAssets[word.toLowerCase()];
+      await plugin.persistWordAssetSidecar("delete");
+      await plugin.saveSettingsData();
+      new import_obsidian9.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+      onClose();
+      plugin.app.workspace.iterateAllLeaves((leaf) => {
+        if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
+          leaf.view.editor.cm.dispatch({});
+        }
+      });
+    } catch (err) {
+      new import_obsidian9.Notice("\u5220\u9664\u5931\u8D25\u3002");
+    }
+  };
   const handlePlayAudio = () => {
     if (!result) return;
     const accent = plugin.settings.wordAudioAccent || "us";
@@ -58100,7 +58167,7 @@ var GlobalTranslationCard = ({
     const card = cardRef.current;
     if (!card) return;
     const width = 360;
-    const height = hoverMode ? 160 : 220;
+    const height = hoverMode ? 180 : 240;
     let x = rect.left;
     let topPos = rect.bottom + 8;
     if (x + width > window.innerWidth) {
@@ -58126,6 +58193,83 @@ var GlobalTranslationCard = ({
       }, renderWordCardDisplayText2(meta.text));
     }));
   };
+  if (hoverMode) {
+    return import_react4.default.createElement(
+      "div",
+      {
+        className: "jarvis-reader-word-card",
+        ref: cardRef,
+        style: { position: "fixed" },
+        onClick: (e) => e.stopPropagation()
+      },
+      import_react4.default.createElement(
+        "div",
+        { className: "jarvis-reader-word-card-head" },
+        import_react4.default.createElement(
+          "div",
+          { className: "jarvis-reader-word-card-head-row" },
+          import_react4.default.createElement("button", {
+            className: "jarvis-reader-word-card-lemma",
+            onClick: handlePlayAudio,
+            title: "\u70B9\u51FB\u53D1\u97F3",
+            style: { color: "#c62828", background: "none", border: "none", cursor: "pointer", fontWeight: "bold", padding: 0 }
+          }, word),
+          import_react4.default.createElement(
+            "div",
+            { className: "jarvis-reader-word-card-actions" },
+            import_react4.default.createElement("button", {
+              className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
+              title: isMastered ? "\u6807\u8BB0\u672A\u638C\u63E1" : "\u6807\u8BB0\u5DF2\u638C\u63E1",
+              onClick: handleToggleMastered,
+              style: { color: isMastered ? "var(--interactive-accent)" : "" }
+            }, renderObsidianIcon("check")),
+            import_react4.default.createElement("button", {
+              className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
+              title: "\u5220\u9664\u8BCD\u6761",
+              onClick: handleDeleteWord
+            }, renderObsidianIcon("trash"))
+          )
+        ),
+        result && import_react4.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, result.phonetic ? `/${result.phonetic}/` : "")
+      ),
+      import_react4.default.createElement(
+        "div",
+        {
+          className: plugin.settings.blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body",
+          style: { marginTop: "4px" }
+        },
+        import_react4.default.createElement(
+          "div",
+          {
+            style: {
+              background: "var(--background-primary)",
+              border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)",
+              borderRadius: "10px",
+              padding: "10px 12px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px"
+            }
+          },
+          result?.display ? renderWordDisplayContent(result.display) : import_react4.default.createElement("div", { className: "jarvis-reader-word-translation" }, result?.translation || "")
+        )
+      ),
+      result?.sources && result.sources.length > 0 && import_react4.default.createElement(
+        "div",
+        {
+          className: "jarvis-reader-word-card-sources",
+          style: { fontSize: "11px", color: "var(--text-faint)", marginTop: "6px" }
+        },
+        import_react4.default.createElement(
+          "div",
+          { className: "jarvis-reader-word-card-source" },
+          "\u6765\u6E90: ",
+          result.sources[0].bookTitle || result.sources[0].bookPath.split("/").pop().replace(/\.epub$/i, "").replace(/\.md$/i, ""),
+          result.sources[0].chapterTitle ? ` \xB7 ${result.sources[0].chapterTitle}` : ""
+        )
+      )
+    );
+  }
   return import_react4.default.createElement(
     "div",
     {
@@ -58140,13 +58284,17 @@ var GlobalTranslationCard = ({
         className: "jarvis-reader-highlight-title",
         style: { display: "flex", justifyContent: "space-between", alignItems: "center" }
       },
-      import_react4.default.createElement("span", null, hoverMode ? "\u8BCD\u6761\u9884\u89C8" : "\u5212\u8BCD\u7FFB\u8BD1"),
+      import_react4.default.createElement("span", null, "\u7FFB\u8BD1"),
       import_react4.default.createElement("button", {
         className: "jarvis-reader-word-card-action",
         onClick: onClose,
         style: { border: "none", background: "transparent", cursor: "pointer" }
       }, "\u2715")
     ),
+    sentence && import_react4.default.createElement("div", {
+      className: "jarvis-reader-highlight-quote",
+      style: { fontSize: "0.9em", color: "var(--text-muted)", background: "var(--background-secondary)", borderRadius: "8px", padding: "6px 8px", maxHeight: "60px", overflowY: "auto" }
+    }, sentence),
     import_react4.default.createElement(
       "div",
       {
@@ -58154,7 +58302,19 @@ var GlobalTranslationCard = ({
         style: { marginTop: "8px" }
       },
       status === "loading" && import_react4.default.createElement("div", { className: "jarvis-reader-word-muted" }, "\u6B63\u5728\u7FFB\u8BD1..."),
-      status === "error" && import_react4.default.createElement("div", { className: "jarvis-reader-word-error" }, error),
+      status === "error" && import_react4.default.createElement(
+        "div",
+        {
+          className: "jarvis-reader-word-error",
+          style: { display: "flex", flexDirection: "column", gap: "8px" }
+        },
+        import_react4.default.createElement("span", null, error),
+        import_react4.default.createElement("button", {
+          className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+          onClick: handleAiTranslate,
+          style: { alignSelf: "flex-start" }
+        }, "AI\u7FFB\u8BD1")
+      ),
       status === "ready" && result && import_react4.default.createElement(
         import_react4.default.Fragment,
         null,
@@ -58171,11 +58331,16 @@ var GlobalTranslationCard = ({
         result.display ? renderWordDisplayContent(result.display) : import_react4.default.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
     ),
-    !hoverMode && import_react4.default.createElement(
+    import_react4.default.createElement(
       "div",
       { className: "jarvis-reader-highlight-actions", style: { marginTop: "10px" } },
       import_react4.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: onClose }, "\u53D6\u6D88"),
-      isSaved ? import_react4.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react4.default.createElement("button", { className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary", onClick: handleSave }, "\u52A0\u5165\u8BCD\u5E93")
+      status === "ready" && import_react4.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: handleAiTranslate }, "AI\u7FFB\u8BD1"),
+      isSaved ? import_react4.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react4.default.createElement("button", {
+        className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+        onClick: handleSave,
+        disabled: status !== "ready"
+      }, "\u4FDD\u5B58\u5355\u8BCD")
     )
   );
 };
@@ -58193,13 +58358,14 @@ var GlobalTranslationManager = class {
       document.body.appendChild(this.containerEl);
     }
   }
-  showSelectionCard(rect, word) {
+  showSelectionCard(rect, word, sentence = "") {
     this.clearHideTimeout();
     this.ensureContainer();
     import_react_dom2.default.unmountComponentAtNode(this.containerEl);
     import_react_dom2.default.render(
       import_react4.default.createElement(GlobalTranslationCard, {
         word,
+        sentence,
         rect,
         plugin: this.plugin,
         onClose: () => this.closeCard(),
@@ -58310,7 +58476,7 @@ function createWordHighlighterExtension(plugin) {
         },
         mouseout(event, view) {
           const target = event.target;
-          if (target && (target.classList.contains("jarvis-reader-md-word-highlight") || target.closest(".jarvis-reader-highlight-popover"))) {
+          if (target && (target.classList.contains("jarvis-reader-md-word-highlight") || target.closest(".jarvis-reader-word-card"))) {
             plugin.globalTranslationManager.hideHoverCardDelay();
           }
         },
@@ -58320,9 +58486,31 @@ function createWordHighlighterExtension(plugin) {
             if (!selection || selection.empty) return;
             const selectedText = view.state.sliceDoc(selection.from, selection.to).trim();
             if (/^[a-zA-Z]+(?:'[a-zA-Z]+)?$/.test(selectedText) && selectedText.length >= 2 && selectedText.length <= 30) {
+              const docStr = view.state.doc.toString();
+              const head = selection.head;
+              let startOfSentence = 0;
+              for (let i = head; i >= 0; i--) {
+                const char = docStr[i];
+                if (char === "." || char === "?" || char === "!" || char === "\n") {
+                  startOfSentence = i + 1;
+                  break;
+                }
+              }
+              let endOfSentence = docStr.length;
+              for (let i = head; i < docStr.length; i++) {
+                const char = docStr[i];
+                if (char === "." || char === "?" || char === "!") {
+                  endOfSentence = i + 1;
+                  break;
+                } else if (char === "\n") {
+                  endOfSentence = i;
+                  break;
+                }
+              }
+              const sentence = docStr.slice(startOfSentence, endOfSentence).trim();
               const rect = view.coordsAtPos(selection.head);
               if (rect) {
-                plugin.globalTranslationManager.showSelectionCard(rect, selectedText);
+                plugin.globalTranslationManager.showSelectionCard(rect, selectedText, sentence);
               }
             }
           }, 20);

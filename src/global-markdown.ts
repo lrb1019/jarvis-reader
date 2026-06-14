@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Notice } from "obsidian";
+import { Notice, setIcon } from "obsidian";
 import { getJarvisReaderCodeMirrorModules } from "./wiki-editor";
 import { lookupLocalDictionary } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
@@ -60,6 +60,7 @@ export function getWordCardDisplayLineMeta(line: string) {
 
 export interface GlobalTranslationCardProps {
   word: string;
+  sentence?: string;
   rect: { left: number; top: number; right: number; bottom: number };
   plugin: any;
   onClose: () => void;
@@ -68,6 +69,7 @@ export interface GlobalTranslationCardProps {
 
 export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
   word,
+  sentence = "",
   rect,
   plugin,
   onClose,
@@ -77,8 +79,25 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
   const [result, setResult] = React.useState<any>(null);
   const [error, setError] = React.useState<string>("");
   const [isSaved, setIsSaved] = React.useState<boolean>(false);
+  const [isMastered, setIsMastered] = React.useState<boolean>(false);
   
   const cardRef = React.useRef<HTMLDivElement | null>(null);
+
+  const renderObsidianIcon = (name: string) => {
+    return React.createElement("span", {
+      "aria-hidden": "true",
+      className: "jarvis-reader-word-card-action-icon",
+      ref: (element) => {
+        if (!element) return;
+        while (element.firstChild) {
+          element.removeChild(element.firstChild);
+        }
+        if (typeof setIcon === "function") {
+          setIcon(element, name);
+        }
+      }
+    });
+  };
 
   // Check if already in dictionary
   const getSavedAsset = () => {
@@ -92,6 +111,7 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       if (saved) {
         setResult(saved);
         setIsSaved(true);
+        setIsMastered(!!saved.mastered);
         setStatus("ready");
         return;
       }
@@ -103,21 +123,14 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
         setResult(localResult);
         setStatus("ready");
       } else {
-        // Fallback or request online
         if (hoverMode) {
           setError("No offline translation found.");
           setStatus("error");
           return;
         }
-        setStatus("loading");
-        const onlineResult = await translateSelectionWithApi(plugin.settings, word, "", plugin.app);
-        if (onlineResult) {
-          setResult(onlineResult);
-          setStatus("ready");
-        } else {
-          setError("Translation failed.");
-          setStatus("error");
-        }
+        // Selection mode -> prompt for AI or offline query
+        setError("未找到离线释义。");
+        setStatus("error");
       }
     } catch (err: any) {
       setError(err?.message || "Translation failed.");
@@ -133,17 +146,18 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
   const handleSave = async () => {
     if (!result) return;
     try {
-      const assetKey = getTranslationAssetKey({ quote: word }, result);
+      const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
         new Notice("Failed to save word.");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
       // Build dummy file reference for source
-      const dummyFile = { path: "markdown_selection", basename: "Markdown File" };
+      const activeFile = plugin.app.workspace.getActiveFile();
+      const dummyFile = activeFile || { path: "markdown_selection", basename: "Markdown File" };
       const asset = buildWordAssetFromSelection(
         dummyFile as any,
-        { quote: word },
+        { quote: word, sentence },
         result,
         existing,
         plugin.settings
@@ -170,6 +184,71 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
     }
   };
 
+  // Handle AI Translation
+  const handleAiTranslate = async () => {
+    try {
+      setStatus("loading");
+      const onlineResult = await translateSelectionWithApi(plugin.settings, word, sentence, plugin.app, { forceAi: true });
+      if (onlineResult) {
+        setResult(onlineResult);
+        setStatus("ready");
+      } else {
+        setError("AI 翻译失败。");
+        setStatus("error");
+      }
+    } catch (err: any) {
+      setError(err?.message || "AI 翻译失败。");
+      setStatus("error");
+    }
+  };
+
+  // Toggle Mastered (Hover Mode)
+  const handleToggleMastered = async () => {
+    if (!result) return;
+    try {
+      const nextMastered = !isMastered;
+      const updated = {
+        ...result,
+        mastered: nextMastered,
+        updated: new Date().toISOString()
+      };
+      plugin.settings.wordAssets[word.toLowerCase()] = updated;
+      await plugin.persistWordAssetSidecar("save");
+      await plugin.saveSettings();
+      setIsMastered(nextMastered);
+      new Notice(nextMastered ? "已标记掌握" : "已重新加入词库");
+      
+      // Force refresh highlights
+      plugin.app.workspace.iterateAllLeaves((leaf: any) => {
+        if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
+          leaf.view.editor.cm.dispatch({});
+        }
+      });
+    } catch (err) {
+      new Notice("操作失败。");
+    }
+  };
+
+  // Delete Word (Hover Mode)
+  const handleDeleteWord = async () => {
+    try {
+      delete plugin.settings.wordAssets[word.toLowerCase()];
+      await plugin.persistWordAssetSidecar("delete");
+      await plugin.saveSettingsData();
+      new Notice("词条已彻底删除。");
+      onClose();
+      
+      // Force refresh highlights
+      plugin.app.workspace.iterateAllLeaves((leaf: any) => {
+        if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
+          leaf.view.editor.cm.dispatch({});
+        }
+      });
+    } catch (err) {
+      new Notice("删除失败。");
+    }
+  };
+
   // Play pronunciation
   const handlePlayAudio = () => {
     if (!result) return;
@@ -184,13 +263,11 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
     const card = cardRef.current;
     if (!card) return;
     const width = 360;
-    const height = hoverMode ? 160 : 220;
+    const height = hoverMode ? 180 : 240;
     
-    // Default positioning near selection rect
     let x = rect.left;
     let topPos = rect.bottom + 8;
     
-    // Ensure doesn't overflow window
     if (x + width > window.innerWidth) {
       x = window.innerWidth - width - 16;
     }
@@ -218,6 +295,70 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
     }));
   };
 
+  if (hoverMode) {
+    // FIGURE 3 (Hover Card for Saved Words)
+    return React.createElement("div", {
+      className: "jarvis-reader-word-card",
+      ref: cardRef,
+      style: { position: "fixed" },
+      onClick: (e) => e.stopPropagation()
+    },
+      React.createElement("div", { className: "jarvis-reader-word-card-head" },
+        React.createElement("div", { className: "jarvis-reader-word-card-head-row" },
+          React.createElement("button", {
+            className: "jarvis-reader-word-card-lemma",
+            onClick: handlePlayAudio,
+            title: "点击发音",
+            style: { color: "#c62828", background: "none", border: "none", cursor: "pointer", fontWeight: "bold", padding: 0 }
+          }, word),
+          React.createElement("div", { className: "jarvis-reader-word-card-actions" },
+            React.createElement("button", {
+              className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
+              title: isMastered ? "标记未掌握" : "标记已掌握",
+              onClick: handleToggleMastered,
+              style: { color: isMastered ? "var(--interactive-accent)" : "" }
+            }, renderObsidianIcon("check")),
+            React.createElement("button", {
+              className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
+              title: "删除词条",
+              onClick: handleDeleteWord
+            }, renderObsidianIcon("trash"))
+          )
+        ),
+        result && React.createElement("div", { className: "jarvis-reader-word-phonetic" }, result.phonetic ? `/${result.phonetic}/` : "")
+      ),
+      React.createElement("div", {
+        className: plugin.settings.blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body",
+        style: { marginTop: "4px" }
+      },
+        React.createElement("div", {
+          style: {
+            background: "var(--background-primary)",
+            border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)",
+            borderRadius: "10px",
+            padding: "10px 12px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px"
+          }
+        },
+          result?.display ? renderWordDisplayContent(result.display) : React.createElement("div", { className: "jarvis-reader-word-translation" }, result?.translation || "")
+        )
+      ),
+      result?.sources && result.sources.length > 0 && React.createElement("div", {
+        className: "jarvis-reader-word-card-sources",
+        style: { fontSize: "11px", color: "var(--text-faint)", marginTop: "6px" }
+      },
+        React.createElement("div", { className: "jarvis-reader-word-card-source" },
+          "来源: ", 
+          result.sources[0].bookTitle || result.sources[0].bookPath.split("/").pop().replace(/\.epub$/i, "").replace(/\.md$/i, ""),
+          result.sources[0].chapterTitle ? ` · ${result.sources[0].chapterTitle}` : ""
+        )
+      )
+    );
+  }
+
+  // FIGURE 2 (Selection Translation Card)
   return React.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
     ref: cardRef,
@@ -228,19 +369,33 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
       className: "jarvis-reader-highlight-title",
       style: { display: "flex", justifyContent: "space-between", alignItems: "center" }
     }, 
-      React.createElement("span", null, hoverMode ? "词条预览" : "划词翻译"),
+      React.createElement("span", null, "翻译"),
       React.createElement("button", {
         className: "jarvis-reader-word-card-action",
         onClick: onClose,
         style: { border: "none", background: "transparent", cursor: "pointer" }
       }, "✕")
     ),
+    sentence && React.createElement("div", {
+      className: "jarvis-reader-highlight-quote",
+      style: { fontSize: "0.9em", color: "var(--text-muted)", background: "var(--background-secondary)", borderRadius: "8px", padding: "6px 8px", maxHeight: "60px", overflowY: "auto" }
+    }, sentence),
     React.createElement("div", {
       className: "jarvis-reader-word-panel",
       style: { marginTop: "8px" }
     },
       status === "loading" && React.createElement("div", { className: "jarvis-reader-word-muted" }, "正在翻译..."),
-      status === "error" && React.createElement("div", { className: "jarvis-reader-word-error" }, error),
+      status === "error" && React.createElement("div", { 
+        className: "jarvis-reader-word-error", 
+        style: { display: "flex", flexDirection: "column", gap: "8px" } 
+      }, 
+        React.createElement("span", null, error),
+        React.createElement("button", { 
+          className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary", 
+          onClick: handleAiTranslate, 
+          style: { alignSelf: "flex-start" } 
+        }, "AI翻译")
+      ),
       status === "ready" && result && React.createElement(React.Fragment, null,
         React.createElement("div", { className: "jarvis-reader-word-head" },
           React.createElement("button", {
@@ -253,10 +408,15 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
         result.display ? renderWordDisplayContent(result.display) : React.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
     ),
-    !hoverMode && React.createElement("div", { className: "jarvis-reader-highlight-actions", style: { marginTop: "10px" } },
+    React.createElement("div", { className: "jarvis-reader-highlight-actions", style: { marginTop: "10px" } },
       React.createElement("button", { className: "jarvis-reader-highlight-button", onClick: onClose }, "取消"),
+      status === "ready" && React.createElement("button", { className: "jarvis-reader-highlight-button", onClick: handleAiTranslate }, "AI翻译"),
       isSaved ? React.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "✓ 已加入词库") :
-        React.createElement("button", { className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary", onClick: handleSave }, "加入词库")
+        React.createElement("button", { 
+          className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary", 
+          onClick: handleSave,
+          disabled: status !== "ready"
+        }, "保存单词")
     )
   );
 };
@@ -278,7 +438,7 @@ export class GlobalTranslationManager {
     }
   }
 
-  showSelectionCard(rect: { left: number; top: number; right: number; bottom: number }, word: string) {
+  showSelectionCard(rect: { left: number; top: number; right: number; bottom: number }, word: string, sentence: string = "") {
     this.clearHideTimeout();
     this.ensureContainer();
     
@@ -286,6 +446,7 @@ export class GlobalTranslationManager {
     ReactDOM.render(
       React.createElement(GlobalTranslationCard, {
         word,
+        sentence,
         rect,
         plugin: this.plugin,
         onClose: () => this.closeCard(),
@@ -414,7 +575,7 @@ export function createWordHighlighterExtension(plugin: any): any {
         },
         mouseout(event: MouseEvent, view: any) {
           const target = event.target as HTMLElement;
-          if (target && (target.classList.contains("jarvis-reader-md-word-highlight") || target.closest(".jarvis-reader-highlight-popover"))) {
+          if (target && (target.classList.contains("jarvis-reader-md-word-highlight") || target.closest(".jarvis-reader-word-card"))) {
             plugin.globalTranslationManager.hideHoverCardDelay();
           }
         },
@@ -426,9 +587,36 @@ export function createWordHighlighterExtension(plugin: any): any {
             const selectedText = view.state.sliceDoc(selection.from, selection.to).trim();
             // Validate: single word, only letters, length >= 2
             if (/^[a-zA-Z]+(?:'[a-zA-Z]+)?$/.test(selectedText) && selectedText.length >= 2 && selectedText.length <= 30) {
+              const docStr = view.state.doc.toString();
+              const head = selection.head;
+              
+              // Look backward for sentence start (e.g. '.', '?', '!', '\n')
+              let startOfSentence = 0;
+              for (let i = head; i >= 0; i--) {
+                const char = docStr[i];
+                if (char === '.' || char === '?' || char === '!' || char === '\n') {
+                  startOfSentence = i + 1;
+                  break;
+                }
+              }
+              
+              // Look forward for sentence end
+              let endOfSentence = docStr.length;
+              for (let i = head; i < docStr.length; i++) {
+                const char = docStr[i];
+                if (char === '.' || char === '?' || char === '!') {
+                  endOfSentence = i + 1;
+                  break;
+                } else if (char === '\n') {
+                  endOfSentence = i;
+                  break;
+                }
+              }
+              
+              const sentence = docStr.slice(startOfSentence, endOfSentence).trim();
               const rect = view.coordsAtPos(selection.head);
               if (rect) {
-                plugin.globalTranslationManager.showSelectionCard(rect, selectedText);
+                plugin.globalTranslationManager.showSelectionCard(rect, selectedText, sentence);
               }
             }
           }, 20);
