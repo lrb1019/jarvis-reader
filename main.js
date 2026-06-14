@@ -57893,10 +57893,10 @@ var JarvisReaderSettingTab = class extends import_obsidian8.PluginSettingTab {
     tabsContainer.style.gap = "20px";
     tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     const tabs = [
-      { id: "general", label: "\u{1F4DA} \u901A\u7528" },
-      { id: "translation", label: "\u{1F310} AI \u4E0E\u7FFB\u8BD1" },
-      { id: "words", label: "\u{1F4C7} \u5355\u8BCD\u5361" },
-      { id: "appearance", label: "\u{1F3A8} \u5916\u89C2" }
+      { id: "general", label: "\u901A\u7528" },
+      { id: "translation", label: "AI \u4E0E\u7FFB\u8BD1" },
+      { id: "words", label: "\u5355\u8BCD\u5361" },
+      { id: "appearance", label: "\u5916\u89C2" }
     ];
     tabs.forEach((tab) => {
       const tabEl = tabsContainer.createDiv("jarvis-settings-tab");

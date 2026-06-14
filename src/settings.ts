@@ -87,10 +87,10 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     
     const tabs = [
-      { id: "general", label: "📚 通用" },
-      { id: "translation", label: "🌐 AI 与翻译" },
-      { id: "words", label: "📇 单词卡" },
-      { id: "appearance", label: "🎨 外观" }
+      { id: "general", label: "通用" },
+      { id: "translation", label: "AI 与翻译" },
+      { id: "words", label: "单词卡" },
+      { id: "appearance", label: "外观" }
     ];
 
     tabs.forEach(tab => {
