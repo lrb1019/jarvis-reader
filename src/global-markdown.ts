@@ -557,6 +557,12 @@ export function createWordHighlighterExtension(plugin: any): any {
 
   const buildDecorations = (view: any) => {
     const builder = new RangeSetBuilder();
+    
+    // Check if the feature is enabled in settings
+    if (plugin.settings.enableGlobalMarkdownTranslation === false) {
+      return builder.finish();
+    }
+    
     const assets = plugin.settings.wordAssets || {};
     
     // Filter to get unique set of saved single words
@@ -637,6 +643,7 @@ export function createWordHighlighterExtension(plugin: any): any {
         mouseup(event: MouseEvent, view: any) {
           // Trigger selection translation popup on single words
           setTimeout(() => {
+            if (plugin.settings.enableGlobalMarkdownTranslation === false) return;
             const selection = view.state.selection.main;
             if (!selection || selection.empty) return;
             const selectedText = view.state.sliceDoc(selection.from, selection.to).trim();

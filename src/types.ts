@@ -162,6 +162,7 @@ export interface JarvisReaderSettings {
   sidebarPaneSplit: number;
   bookshelfCoverOnly: boolean;
   highlightColors: Record<string, string>;
+  enableGlobalMarkdownTranslation: boolean;
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &

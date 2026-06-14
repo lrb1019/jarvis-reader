@@ -57886,6 +57886,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian8.FuzzySuggest
 };
 var JarvisReaderSettingTab = class extends import_obsidian8.PluginSettingTab {
   plugin;
+  activeTab = "general";
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -57893,211 +57894,244 @@ var JarvisReaderSettingTab = class extends import_obsidian8.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Jarvis Reader \u8BBE\u7F6E" });
-    let translationBaseUrlText = null;
-    let translationModelText = null;
-    new import_obsidian8.Setting(containerEl).setName("\u6EDA\u52A8\u9605\u8BFB").setDesc("\u4F7F\u7528\u8FDE\u7EED\u6EDA\u52A8\u9605\u8BFB\u6A21\u5F0F").addToggle((toggle) => toggle.setValue(this.plugin.settings.scrolledView).onChange(async (value) => {
-      this.plugin.settings.scrolledView = value;
-      await this.plugin.saveSettings();
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u5355\u9875\u9605\u8BFB").setDesc("\u4F7F\u7528\u5355\u9875\u9605\u8BFB\u6A21\u5F0F").addToggle((toggle) => toggle.setValue(this.plugin.settings.singlePageView).onChange(async (value) => {
-      this.plugin.settings.singlePageView = value;
-      await this.plugin.saveSettings();
-    }));
-    let folderText = null;
-    new import_obsidian8.Setting(containerEl).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-      folderText = text;
-      text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
-        this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
-        await this.plugin.saveSettings();
-      });
-    }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-      new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-        this.plugin.settings.bookNoteFolder = path;
+    const headerDiv = containerEl.createDiv();
+    headerDiv.style.display = "flex";
+    headerDiv.style.flexDirection = "column";
+    headerDiv.style.gap = "15px";
+    headerDiv.style.marginBottom = "20px";
+    headerDiv.createEl("h2", { text: "Jarvis Reader \u8BBE\u7F6E", cls: "jarvis-reader-settings-title" });
+    const tabsContainer = headerDiv.createDiv("jarvis-settings-tabs-container");
+    tabsContainer.style.display = "flex";
+    tabsContainer.style.gap = "20px";
+    tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
+    const tabs = [
+      { id: "general", label: "\u{1F4DA} \u901A\u7528" },
+      { id: "translation", label: "\u{1F310} AI \u4E0E\u7FFB\u8BD1" },
+      { id: "words", label: "\u{1F4C7} \u5355\u8BCD\u5361" },
+      { id: "appearance", label: "\u{1F3A8} \u5916\u89C2" }
+    ];
+    tabs.forEach((tab) => {
+      const tabEl = tabsContainer.createDiv("jarvis-settings-tab");
+      tabEl.setText(tab.label);
+      tabEl.style.cursor = "pointer";
+      tabEl.style.padding = "8px 4px";
+      tabEl.style.fontWeight = "600";
+      tabEl.style.fontSize = "1.1em";
+      tabEl.style.color = this.activeTab === tab.id ? "var(--text-accent)" : "var(--text-muted)";
+      tabEl.style.borderBottom = this.activeTab === tab.id ? "3px solid var(--text-accent)" : "3px solid transparent";
+      tabEl.style.transition = "all 0.2s ease";
+      tabEl.onclick = () => {
+        this.activeTab = tab.id;
+        this.display();
+      };
+    });
+    const contentDiv = containerEl.createDiv("jarvis-settings-content");
+    if (this.activeTab === "general") {
+      let folderText = null;
+      new import_obsidian8.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+        folderText = text;
+        text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.bookNoteFolder = path;
+          await this.plugin.saveSettings();
+          if (folderText) {
+            folderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
+        this.plugin.settings.bookNoteFolder = "";
         await this.plugin.saveSettings();
         if (folderText) {
-          folderText.setValue(path);
+          folderText.setValue("");
         }
-      }).open();
-    })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
-      this.plugin.settings.bookNoteFolder = "";
-      await this.plugin.saveSettings();
-      if (folderText) {
-        folderText.setValue("");
-      }
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
-      text.setPlaceholder(`---
+      }));
+      new import_obsidian8.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
+        text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 created: {{created}}
 ---
 
 {{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value) => {
-        this.plugin.settings.bookNoteTemplate = value;
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.rows = 8;
-      text.inputEl.style.width = "100%";
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u5355\u8BCD\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u5168\u5C40\u5355\u8BCD\u5361\u7247\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-      text.setPlaceholder("09 Books/Words").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
-        this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
-        await this.plugin.saveSettings();
-      });
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u540C\u6B65\u8BCD\u6761\u5230 Markdown").setDesc("\u4ECE\u8BCD\u6761\u4E3B\u6570\u636E\u5355\u5411\u91CD\u5EFA\u6216\u66F4\u65B0 Markdown\uFF0C\u4E0D\u4ECE Markdown \u53CD\u5411\u5BFC\u5165\u3002").addButton((button) => button.setButtonText("\u540C\u6B65\u8BCD\u6761").onClick(async () => {
-      button.setDisabled(true);
-      try {
-        const result = await this.plugin.syncAllWordAssetsToMarkdown();
-        new import_obsidian8.Notice(`\u8BCD\u6761\u540C\u6B65\u5B8C\u6210\uFF1A\u6210\u529F ${result.synced} \u6761\uFF0C\u5931\u8D25 ${result.failed} \u6761\u3002`);
-      } catch (error) {
-        console.error("Jarvis Reader word asset sync failed.", error);
-        new import_obsidian8.Notice("\u8BCD\u6761\u540C\u6B65\u5931\u8D25\uFF0C\u8BF7\u67E5\u770B\u5F00\u53D1\u8005\u9519\u8BEF\u3002");
-      } finally {
-        button.setDisabled(false);
-      }
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u81EA\u52A8\u6807\u8BB0\u6587\u4EF6\u5939").setDesc("\u53EA\u5728\u8FD9\u4E9B\u6587\u4EF6\u5939\u4E0B\u7684 EPUB \u4E2D\u81EA\u52A8\u6807\u8BB0\u5DF2\u4FDD\u5B58\u5355\u8BCD\uFF1B\u591A\u4E2A\u6587\u4EF6\u5939\u7528\u82F1\u6587\u9017\u53F7\u5206\u9694").addText((text) => {
-      text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
-        this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
-        await this.plugin.saveSettings();
-      });
-    });
-    const experimental = this.plugin.settings.experimentalInstantTranslation || {};
-    new import_obsidian8.Setting(containerEl).setName("\u5B9E\u9A8C\uFF1A\u9009\u4E2D\u5373\u7FFB\u8BD1").setDesc("\u9ED8\u8BA4\u5173\u95ED\u3002\u5F00\u542F\u540E\u9009\u4E2D\u6587\u672C\u4F1A\u76F4\u63A5\u6253\u5F00\u7FFB\u8BD1\u5F39\u7A97\uFF0C\u4E0D\u518D\u5148\u663E\u793A\u64CD\u4F5C\u83DC\u5355").addToggle((toggle) => toggle.setValue(experimental.enabled === true).onChange(async (value) => {
-      this.plugin.settings.experimentalInstantTranslation.enabled = value;
-      await this.plugin.saveSettings();
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u5185\u7F6E\u79BB\u7EBF\u8BCD\u5178").setDesc("\u56FA\u5B9A\u4F7F\u7528 Jarvis Reader \u81EA\u5E26\u7684 ECDICT \u8BCD\u5178\uFF1B\u65E0\u9700\u5BFC\u5165\u6216\u914D\u7F6E\u8DEF\u5F84\u3002");
-    new import_obsidian8.Setting(containerEl).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u8BF7\u6C42\u683C\u5F0F\uFF1B\u81EA\u5B9A\u4E49\u4F1A\u7EE7\u7EED\u6309 URL \u81EA\u52A8\u8BC6\u522B").addDropdown((dropdown) => {
-      dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
-        const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
-        const defaults = getTranslationProviderDefaults(provider);
-        this.plugin.settings.translationApi.provider = provider;
-        if (!String(this.plugin.settings.translationApi.baseUrl || "").trim() && defaults.baseUrl) {
-          this.plugin.settings.translationApi.baseUrl = defaults.baseUrl;
-        }
-        if (!String(this.plugin.settings.translationApi.model || "").trim() && defaults.model) {
-          this.plugin.settings.translationApi.model = defaults.model;
-        }
-        await this.plugin.saveSettings();
-        if (translationBaseUrlText) {
-          translationBaseUrlText.setPlaceholder(defaults.baseUrl || "https://...");
-          translationBaseUrlText.setValue(this.plugin.settings.translationApi.baseUrl || "");
-        }
-        if (translationModelText) {
-          translationModelText.setPlaceholder(defaults.model || "\u6A21\u578B ID");
-          translationModelText.setValue(this.plugin.settings.translationApi.model || "");
-        }
-      });
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
-      translationBaseUrlText = text;
-      const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
-      text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
-        this.plugin.settings.translationApi.baseUrl = value.trim();
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.style.width = "100%";
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
-      text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
-        this.plugin.settings.translationApi.apiKey = value.trim();
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.type = "password";
-      text.inputEl.style.width = "100%";
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
-      translationModelText = text;
-      const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
-      text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
-        this.plugin.settings.translationApi.model = value.trim();
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.style.width = "100%";
-    }).addButton((button) => button.setButtonText("\u6D4B\u8BD5").onClick(async () => {
-      try {
-        const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
-        if (!promptCheck.ok) {
-          new import_obsidian8.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
-          return;
-        }
-        await translateSelectionWithApi(this.plugin.settings, "test");
-        new import_obsidian8.Notice("\u6D4B\u8BD5\u6210\u529F");
-      } catch (error) {
-        new import_obsidian8.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
-      }
-    }));
-    containerEl.createDiv({
-      cls: "jarvis-reader-translation-prompt-help",
-      text: TRANSLATION_PROMPT_HELP_TEXT
-    });
-    let translationPromptText = null;
-    new import_obsidian8.Setting(containerEl).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
-      translationPromptText = text;
-      text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
-        this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.rows = 6;
-      text.inputEl.style.width = "100%";
-    });
-    new import_obsidian8.Setting(containerEl).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
-      this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
-      await this.plugin.saveSettings();
-      if (translationPromptText) {
-        translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
-      }
-      new import_obsidian8.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u6A21\u7CCA\u5355\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u5355\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
-      this.plugin.settings.blurWordCardBody = value;
-      await this.plugin.saveSettings();
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
-      this.plugin.settings.enableWordAudio = value;
-      await this.plugin.saveSettings();
-    }));
-    new import_obsidian8.Setting(containerEl).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
-      text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
-        this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
-        await this.plugin.saveSettings();
-      });
-      text.inputEl.style.width = "100%";
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
-      dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
-        this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
-        this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
-        await this.plugin.saveSettings();
-      });
-    });
-    new import_obsidian8.Setting(containerEl).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
-      text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
-        this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
-        await this.plugin.saveSettings();
-      });
-    });
-    containerEl.createEl("h3", { text: "\u9AD8\u4EAE\u989C\u8272\u8BBE\u7F6E" });
-    const createColorPicker = (name, desc, key) => {
-      new import_obsidian8.Setting(containerEl).setName(name).setDesc(desc).addColorPicker(
-        (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
-          this.plugin.settings.highlightColors = {
-            ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
-            [key]: value
-          };
+          this.plugin.settings.bookNoteTemplate = value;
           await this.plugin.saveSettings();
-          const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
-          window.dispatchEvent(event);
-        })
-      );
-    };
-    createColorPicker("\u5355\u8BCD\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u5355\u8BCD\u9AD8\u4EAE\u5E95\u8272", "word");
-    createColorPicker("\u77ED\u8BED\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u77ED\u8BED\u9AD8\u4EAE\u5E95\u8272", "phrase");
-    createColorPicker("\u53E5\u5B50\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u53E5\u5B50\u9AD8\u4EAE\u5E95\u8272", "sentence");
-    createColorPicker("\u611F\u60F3\u989C\u8272", "\u5E26\u6709\u611F\u60F3\u7B14\u8BB0\u7684\u5212\u7EBF\u989C\u8272", "comment");
-    createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
+        });
+        text.inputEl.rows = 8;
+        text.inputEl.style.width = "100%";
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u5168\u5C40 Markdown \u5212\u8BCD\u7FFB\u8BD1").setDesc("\u5728 Obsidian \u666E\u901A Markdown \u7B14\u8BB0\u4E2D\uFF0C\u81EA\u52A8\u8BC6\u522B\u5E76\u53EF\u60AC\u505C\u7FFB\u8BD1\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableGlobalMarkdownTranslation !== false).onChange(async (value) => {
+        this.plugin.settings.enableGlobalMarkdownTranslation = value;
+        await this.plugin.saveSettings();
+      }));
+    }
+    if (this.activeTab === "translation") {
+      let translationBaseUrlText = null;
+      let translationModelText = null;
+      let translationPromptText = null;
+      new import_obsidian8.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u8BF7\u6C42\u683C\u5F0F\uFF1B\u81EA\u5B9A\u4E49\u4F1A\u7EE7\u7EED\u6309 URL \u81EA\u52A8\u8BC6\u522B").addDropdown((dropdown) => {
+        dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
+          const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
+          const defaults = getTranslationProviderDefaults(provider);
+          this.plugin.settings.translationApi.provider = provider;
+          if (!String(this.plugin.settings.translationApi.baseUrl || "").trim() && defaults.baseUrl) {
+            this.plugin.settings.translationApi.baseUrl = defaults.baseUrl;
+          }
+          if (!String(this.plugin.settings.translationApi.model || "").trim() && defaults.model) {
+            this.plugin.settings.translationApi.model = defaults.model;
+          }
+          await this.plugin.saveSettings();
+          if (translationBaseUrlText) {
+            translationBaseUrlText.setPlaceholder(defaults.baseUrl || "https://...");
+            translationBaseUrlText.setValue(this.plugin.settings.translationApi.baseUrl || "");
+          }
+          if (translationModelText) {
+            translationModelText.setPlaceholder(defaults.model || "\u6A21\u578B ID");
+            translationModelText.setValue(this.plugin.settings.translationApi.model || "");
+          }
+        });
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
+        translationBaseUrlText = text;
+        const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
+        text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
+          this.plugin.settings.translationApi.baseUrl = value.trim();
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.style.width = "100%";
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
+        text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
+          this.plugin.settings.translationApi.apiKey = value.trim();
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.type = "password";
+        text.inputEl.style.width = "100%";
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
+        translationModelText = text;
+        const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
+        text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
+          this.plugin.settings.translationApi.model = value.trim();
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.style.width = "100%";
+      }).addButton((button) => button.setButtonText("\u6D4B\u8BD5").onClick(async () => {
+        try {
+          const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+          if (!promptCheck.ok) {
+            new import_obsidian8.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
+            return;
+          }
+          await translateSelectionWithApi(this.plugin.settings, "test");
+          new import_obsidian8.Notice("\u6D4B\u8BD5\u6210\u529F");
+        } catch (error) {
+          new import_obsidian8.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
+        }
+      }));
+      contentDiv.createDiv({
+        cls: "jarvis-reader-translation-prompt-help",
+        text: TRANSLATION_PROMPT_HELP_TEXT
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
+        translationPromptText = text;
+        text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
+          this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.rows = 6;
+        text.inputEl.style.width = "100%";
+      });
+      new import_obsidian8.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
+        this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
+        await this.plugin.saveSettings();
+        if (translationPromptText) {
+          translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
+        }
+        new import_obsidian8.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
+      }));
+      const experimental = this.plugin.settings.experimentalInstantTranslation || {};
+      new import_obsidian8.Setting(contentDiv).setName("\u5B9E\u9A8C\uFF1A\u9009\u4E2D\u5373\u7FFB\u8BD1").setDesc("\u9ED8\u8BA4\u5173\u95ED\u3002\u5F00\u542F\u540E\u9009\u4E2D\u6587\u672C\u4F1A\u76F4\u63A5\u6253\u5F00\u7FFB\u8BD1\u5F39\u7A97\uFF0C\u4E0D\u518D\u5148\u663E\u793A\u64CD\u4F5C\u83DC\u5355").addToggle((toggle) => toggle.setValue(experimental.enabled === true).onChange(async (value) => {
+        this.plugin.settings.experimentalInstantTranslation.enabled = value;
+        await this.plugin.saveSettings();
+      }));
+    }
+    if (this.activeTab === "words") {
+      new import_obsidian8.Setting(contentDiv).setName("\u5355\u8BCD\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u5168\u5C40\u5355\u8BCD\u5361\u7247\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+        text.setPlaceholder("09 Books/Words").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u540C\u6B65\u8BCD\u6761\u5230 Markdown").setDesc("\u4ECE\u8BCD\u6761\u4E3B\u6570\u636E\u5355\u5411\u91CD\u5EFA\u6216\u66F4\u65B0 Markdown\uFF0C\u4E0D\u4ECE Markdown \u53CD\u5411\u5BFC\u5165\u3002").addButton((button) => button.setButtonText("\u540C\u6B65\u8BCD\u6761").onClick(async () => {
+        button.setDisabled(true);
+        try {
+          const result = await this.plugin.syncAllWordAssetsToMarkdown();
+          new import_obsidian8.Notice(`\u8BCD\u6761\u540C\u6B65\u5B8C\u6210\uFF1A\u6210\u529F ${result.synced} \u6761\uFF0C\u5931\u8D25 ${result.failed} \u6761\u3002`);
+        } catch (error) {
+          console.error("Jarvis Reader word asset sync failed.", error);
+          new import_obsidian8.Notice("\u8BCD\u6761\u540C\u6B65\u5931\u8D25\uFF0C\u8BF7\u67E5\u770B\u5F00\u53D1\u8005\u9519\u8BEF\u3002");
+        } finally {
+          button.setDisabled(false);
+        }
+      }));
+      new import_obsidian8.Setting(contentDiv).setName("\u6A21\u7CCA\u5355\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u5355\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+        this.plugin.settings.blurWordCardBody = value;
+        await this.plugin.saveSettings();
+      }));
+      new import_obsidian8.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+        this.plugin.settings.enableWordAudio = value;
+        await this.plugin.saveSettings();
+      }));
+      new import_obsidian8.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
+        text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
+          this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.style.width = "100%";
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
+        dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
+          this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
+          this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
+          await this.plugin.saveSettings();
+        });
+      });
+      new import_obsidian8.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
+        text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
+          this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
+          await this.plugin.saveSettings();
+        });
+      });
+    }
+    if (this.activeTab === "appearance") {
+      new import_obsidian8.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u6587\u4EF6\u5939").setDesc("\u53EA\u5728\u8FD9\u4E9B\u6587\u4EF6\u5939\u4E0B\u7684 EPUB \u4E2D\u81EA\u52A8\u6807\u8BB0\u5DF2\u4FDD\u5B58\u5355\u8BCD\uFF1B\u591A\u4E2A\u6587\u4EF6\u5939\u7528\u82F1\u6587\u9017\u53F7\u5206\u9694").addText((text) => {
+        text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
+          this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
+          await this.plugin.saveSettings();
+        });
+      });
+      const createColorPicker = (name, desc, key) => {
+        new import_obsidian8.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
+          (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+            this.plugin.settings.highlightColors = {
+              ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
+              [key]: value
+            };
+            await this.plugin.saveSettings();
+            const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
+            window.dispatchEvent(event);
+          })
+        );
+      };
+      createColorPicker("\u5355\u8BCD\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u5355\u8BCD\u9AD8\u4EAE\u5E95\u8272", "word");
+      createColorPicker("\u77ED\u8BED\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u77ED\u8BED\u9AD8\u4EAE\u5E95\u8272", "phrase");
+      createColorPicker("\u53E5\u5B50\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u53E5\u5B50\u9AD8\u4EAE\u5E95\u8272", "sentence");
+      createColorPicker("\u611F\u60F3\u989C\u8272", "\u5E26\u6709\u611F\u60F3\u7B14\u8BB0\u7684\u5212\u7EBF\u989C\u8272", "comment");
+      createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
+    }
   }
 };
 
@@ -58617,6 +58651,9 @@ function createWordHighlighterExtension(plugin) {
   const { RangeSetBuilder } = cm.state;
   const buildDecorations = (view) => {
     const builder = new RangeSetBuilder();
+    if (plugin.settings.enableGlobalMarkdownTranslation === false) {
+      return builder.finish();
+    }
     const assets = plugin.settings.wordAssets || {};
     const savedWords = /* @__PURE__ */ new Set();
     for (const key of Object.keys(assets)) {
@@ -58688,6 +58725,7 @@ function createWordHighlighterExtension(plugin) {
         },
         mouseup(event, view) {
           setTimeout(() => {
+            if (plugin.settings.enableGlobalMarkdownTranslation === false) return;
             const selection = view.state.selection.main;
             if (!selection || selection.empty) return;
             const selectedText = view.state.sliceDoc(selection.from, selection.to).trim();
