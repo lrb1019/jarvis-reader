@@ -8,8 +8,16 @@ import { normalizeVaultPath } from "./utils";
 import { getTranslationAssetStorageKey, getWordBlockId, upsertWordAssetNote, getWordEntryStart, getWordEntryEnd, buildWordAssetMetadata } from "./word-assets";
 import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
+import { normalizeTranslationProvider } from "./translation";
+import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
 
 export default class JarvisReaderPlugin extends Plugin {
+  settings: any;
+  bookshelfView: any;
+  highlightsView: any;
+  activeReaderView: any;
+  lastIndexCounts: any;
+
   async onload() {
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();

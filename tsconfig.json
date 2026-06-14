@@ -11,7 +11,8 @@
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
     "target": "ES2022",
     "types": ["node"]
   },

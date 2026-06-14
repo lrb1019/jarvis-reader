@@ -2,7 +2,14 @@ import { ItemView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { EpubView } from "../EpubView";
 import { getBookshelfProgressLabel } from "../progress";
 import { JarvisReaderHighlightsView } from "./HighlightsView";
-import type { JarvisReaderPlugin } from "../main";
+import type JarvisReaderPlugin from "../main";
+
+declare global {
+  interface Window {
+    _arCoverQueue: any;
+    JarvisReader_ePub: any;
+  }
+}
 
 export const HIGHLIGHTS_VIEW_TYPE = "jarvis-reader-highlights";
 export const BOOKSHELF_VIEW_TYPE = "jarvis-reader-bookshelf";
@@ -10,7 +17,17 @@ export function isReadableBook(file) {
   return file instanceof TFile && ["epub", "pdf"].includes(file.extension.toLowerCase());
 }
 export class JarvisReaderBookshelfView extends ItemView {
-  constructor(leaf, plugin) {
+  plugin: JarvisReaderPlugin;
+  activePanel: string;
+  dualHighlightsMode: boolean;
+  panelScroll: Record<string, number>;
+  pendingRevealHighlightId: string | null;
+  highlightsPanel: any;
+  sidebarResizeObserver: any;
+  sidebarResizeTargets: HTMLElement[];
+  sidebarWidthGuardOriginal: Map<HTMLElement, any>;
+
+  constructor(leaf: WorkspaceLeaf, plugin: JarvisReaderPlugin) {
     super(leaf);
     this.plugin = plugin;
     this.activePanel = "bookshelf";

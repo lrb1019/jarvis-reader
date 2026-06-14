@@ -174,36 +174,36 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
 }
 
 // src/EpubView.tsx
-var import_react_reader = __toESM(require_lib4());
+
 export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
-  const [location, setLocation] = useState(initLocation);
-  const [readerTitle, setReaderTitle] = useState(title);
-  const [progressLabel, setProgressLabel] = useState("");
-  const [highlightList, setHighlightList] = useState(highlights || []);
-  const [pendingSelection, setPendingSelection] = useState(null);
-  const [highlightComment, setHighlightComment] = useState("");
-  const [currentWordAssets, setCurrentWordAssets] = useState(wordAssets || {});
-  const [pendingWordSelection, setPendingWordSelection] = useState(null);
-  const [wordLookupState, setWordLookupState] = useState({ status: "idle", result: null, error: "", savedLemma: "" });
-  const [activeWordHover, setActiveWordHover] = useState(null);
-  const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = useState(wikiLinkCandidates || []);
-  const [pendingHighlightMenu, setPendingHighlightMenu] = useState(null);
-  const [wikiSuggest, setWikiSuggest] = useState(null);
-  const [wikiEditRange, setWikiEditRange] = useState(null);
-  const [highlightPopoverRect, setHighlightPopoverRect] = useState(null);
-  const containerRef = useRef(null);
-  const highlightInputRef = useRef(null);
-  const highlightPopoverRectRef = useRef(null);
-  const renditionRef = useRef(null);
-  const highlightListRef = useRef(highlights || []);
-  const wordAssetsRef = useRef(wordAssets || {});
-  const wordDisplayCacheRef = useRef( new Map());
-  const pendingWordLookupRef = useRef(0);
-  const wordHoverHideTimerRef = useRef(null);
-  const pendingHighlightMenuRef = useRef(null);
-  const pendingWordSelectionRef = useRef(null);
-  const readerTitleRef = useRef(title);
-  const tocRef = useRef([]);
+  const [location, setLocation] = useState<any>(initLocation);
+  const [readerTitle, setReaderTitle] = useState<any>(title);
+  const [progressLabel, setProgressLabel] = useState<any>("");
+  const [highlightList, setHighlightList] = useState<any[]>(highlights || []);
+  const [pendingSelection, setPendingSelection] = useState<any>(null);
+  const [highlightComment, setHighlightComment] = useState<any>("");
+  const [currentWordAssets, setCurrentWordAssets] = useState<any>(wordAssets || {});
+  const [pendingWordSelection, setPendingWordSelection] = useState<any>(null);
+  const [wordLookupState, setWordLookupState] = useState<any>({ status: "idle", result: null, error: "", savedLemma: "" });
+  const [activeWordHover, setActiveWordHover] = useState<any>(null);
+  const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = useState<any[]>(wikiLinkCandidates || []);
+  const [pendingHighlightMenu, setPendingHighlightMenu] = useState<any>(null);
+  const [wikiSuggest, setWikiSuggest] = useState<any>(null);
+  const [wikiEditRange, setWikiEditRange] = useState<any>(null);
+  const [highlightPopoverRect, setHighlightPopoverRect] = useState<any>(null);
+  const containerRef = useRef<any>(null);
+  const highlightInputRef = useRef<any>(null);
+  const highlightPopoverRectRef = useRef<any>(null);
+  const renditionRef = useRef<any>(null);
+  const highlightListRef = useRef<any[]>(highlights || []);
+  const wordAssetsRef = useRef<any>(wordAssets || {});
+  const wordDisplayCacheRef = useRef<any>( new Map());
+  const pendingWordLookupRef = useRef<any>(0);
+  const wordHoverHideTimerRef = useRef<any>(null);
+  const pendingHighlightMenuRef = useRef<any>(null);
+  const pendingWordSelectionRef = useRef<any>(null);
+  const readerTitleRef = useRef<any>(title);
+  const tocRef = useRef<any[]>([]);
   const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
   const effectiveScrolled = scrolled && singlePage;
   const maxReaderWidth = !effectiveScrolled && singlePage ? 760 : 1120;
@@ -1639,7 +1639,7 @@ const showWordHoverCard = (asset, element) => {
       while (element.firstChild) {
         element.removeChild(element.firstChild);
       }
-      if (typeof import_obsidian2.setIcon === "function") {
+      if (typeof setIcon === "function") {
         setIcon(element, name);
       }
     }

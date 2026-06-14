@@ -1,8 +1,8 @@
 import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
 import { normalizeVaultPath } from "./utils";
-import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
-import { normalizeTranslationProvider, getTranslationProviderDefaults } from "./translation";
-import type { JarvisReaderPlugin } from "./main";
+import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
+import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
+import type JarvisReaderPlugin from "./main";
 
 export const DEFAULT_SETTINGS = {
   scrolledView: false,
@@ -37,8 +37,10 @@ export const DEFAULT_SETTINGS = {
   sidebarPaneSplit: 48,
   bookshelfCoverOnly: false
 };
-export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal {
-  constructor(app, onChoose) {
+export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
+  onChoose: (path: string) => void;
+  folders: string[];
+  constructor(app: App, onChoose: (path: string) => void) {
     super(app);
     this.onChoose = onChoose;
     this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
@@ -55,7 +57,8 @@ export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal {
   }
 };
 export class JarvisReaderSettingTab extends PluginSettingTab {
-  constructor(app, plugin) {
+  plugin: JarvisReaderPlugin;
+  constructor(app: App, plugin: JarvisReaderPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

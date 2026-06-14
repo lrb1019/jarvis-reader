@@ -1,9 +1,20 @@
 import { ItemView, WorkspaceLeaf, Menu } from "obsidian";
 import { HIGHLIGHTS_VIEW_TYPE } from "./BookshelfView";
-import type { JarvisReaderPlugin } from "../main";
+import type JarvisReaderPlugin from "../main";
 
 export class JarvisReaderHighlightsView extends ItemView {
-  constructor(leaf, plugin) {
+  plugin: JarvisReaderPlugin;
+  reader: any;
+  searchQuery: string;
+  typeFilter: string;
+  linksOnly: boolean;
+  currentChapterOnly: boolean;
+  sortMode: string;
+  focusSearchOnRender: boolean;
+  listScrollTop: number;
+  pendingRevealHighlightId: string | null;
+
+  constructor(leaf: WorkspaceLeaf, plugin: JarvisReaderPlugin) {
     super(leaf);
     this.plugin = plugin;
     this.reader = null;
