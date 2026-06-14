@@ -54,6 +54,7 @@ export function getJarvisReaderTheme(readerZoom: number = 1, readerLineHeight: n
     fontFamily: getObsidianCssVar("--font-text", getObsidianCssVar("--font-interface", "system-ui, sans-serif")),
     fontSize: scaleCssPixelValue(baseFontSize, readerZoom),
     lineHeight: clampReaderLineHeight(readerLineHeight).toString(),
+    interactiveAccent: getObsidianCssVar("--interactive-accent", "#4dabf7"),
   };
 }
 
@@ -78,17 +79,22 @@ export function applyObsidianThemeToRendition(rendition: any, readerZoom: number
         "color": "var(--link-color, inherit) !important",
       },
       ".jarvis-reader-word-highlight": {
-        "background-color": "color-mix(in srgb, var(--interactive-accent) 18%, transparent) !important",
-        "border-bottom": "2px solid var(--interactive-accent) !important",
+        "background-color": `color-mix(in srgb, ${theme.interactiveAccent} 18%, transparent) !important`,
+        "border-bottom": `2px solid ${theme.interactiveAccent} !important`,
         "cursor": "pointer !important",
       },
       ".jarvis-reader-word-highlight rect": {
-        "fill": "color-mix(in srgb, var(--interactive-accent) 18%, transparent) !important",
+        "fill": `color-mix(in srgb, ${theme.interactiveAccent} 18%, transparent) !important`,
         "stroke": "none !important",
       },
       ".jarvis-reader-word-highlight line": {
-        "stroke": "var(--interactive-accent) !important",
+        "stroke": `${theme.interactiveAccent} !important`,
         "stroke-width": "2px !important",
+      },
+      ".jarvis-reader-word-highlight path": {
+        "stroke": `${theme.interactiveAccent} !important`,
+        "stroke-width": "2px !important",
+        "fill": "none !important"
       }
     });
     rendition.themes.select("obsidian");
