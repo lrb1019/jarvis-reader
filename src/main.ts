@@ -10,6 +10,7 @@ import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
+import { registerGlobalMarkdownFeatures } from "./global-markdown";
 
 export default class JarvisReaderPlugin extends Plugin {
   settings: any;
@@ -76,6 +77,7 @@ export default class JarvisReaderPlugin extends Plugin {
       }
       this.openBookshelfPane(false);
     });
+    registerGlobalMarkdownFeatures(this);
     this.addSettingTab(new JarvisReaderSettingTab(this.app, this));
   }
   onunload() {

@@ -11,7 +11,15 @@ const context = await esbuild.context({
   },
   bundle: true,
   entryPoints: ["src/main.ts"],
-  external: ["obsidian", "electron", ...builtinModules],
+  external: [
+    "obsidian",
+    "electron",
+    "@codemirror/state",
+    "@codemirror/view",
+    "@codemirror/autocomplete",
+    "@codemirror/commands",
+    ...builtinModules
+  ],
   format: "cjs",
   logLevel: "info",
   outfile: "main.js",

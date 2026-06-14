@@ -1752,3 +1752,10 @@
 .workspace-leaf-content[data-type="epub"] .view-header .view-actions {
   display: none !important;
 }
+
+.jarvis-reader-md-word-highlight {
+  background-color: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
+  border-bottom: 2px solid var(--interactive-accent);
+  cursor: pointer;
+}
+
