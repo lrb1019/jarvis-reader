@@ -434,6 +434,12 @@ export class GlobalTranslationManager {
     if (!this.containerEl) {
       this.containerEl = document.createElement("div");
       this.containerEl.className = "jarvis-reader-global-translator-container";
+      this.containerEl.addEventListener("mouseenter", () => {
+        this.clearHideTimeout();
+      });
+      this.containerEl.addEventListener("mouseleave", () => {
+        this.hideHoverCardDelay();
+      });
       document.body.appendChild(this.containerEl);
     }
   }
