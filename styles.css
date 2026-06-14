@@ -724,19 +724,6 @@
   min-width: 0;
 }
 
-.jarvis-reader-word-card-drag-handle {
-  align-self: stretch;
-  cursor: grab;
-  flex: 1 1 auto;
-  min-height: 24px;
-  min-width: 36px;
-  touch-action: none;
-}
-
-.jarvis-reader-word-card-drag-handle:active {
-  cursor: grabbing;
-}
-
 .jarvis-reader-word-card-lemma {
   appearance: none !important;
   align-self: flex-start;
@@ -760,7 +747,7 @@
 }
 
 .jarvis-reader-word-card-sentence-title {
-  color: var(--text-muted) !important;
+  color: #c62828 !important;
   cursor: default;
   display: block;
   font-size: var(--font-ui-small);
@@ -771,23 +758,6 @@
   text-overflow: ellipsis;
   white-space: normal;
   word-break: break-word;
-}
-
-.jarvis-reader-word-card-original-sentence {
-  background: color-mix(in srgb, var(--background-secondary) 78%, transparent);
-  border-radius: 10px;
-  color: var(--text-normal);
-  font: 500 var(--font-ui-small) / 1.55 var(--font-text);
-  margin-bottom: 10px;
-  overflow-wrap: anywhere;
-  padding: 10px 12px;
-}
-
-.jarvis-reader-word-card-translation-box {
-  background: var(--background-primary);
-  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
-  border-radius: 12px;
-  padding: 10px 12px;
 }
 
 .jarvis-reader-word-card-actions {

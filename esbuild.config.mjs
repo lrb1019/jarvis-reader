@@ -4,7 +4,6 @@ import process from "node:process";
 import esbuild from "esbuild";
 
 const production = process.argv[2] === "production";
-const outputDirectory = "build/migration";
 
 const context = await esbuild.context({
   banner: {
@@ -15,22 +14,19 @@ const context = await esbuild.context({
   external: ["obsidian", "electron", ...builtinModules],
   format: "cjs",
   logLevel: "info",
-  outfile: `${outputDirectory}/main.js`,
+  outfile: "main.js",
   platform: "browser",
   sourcemap: production ? false : "inline",
   target: "es2022",
   treeShaking: true,
 });
 
-await mkdir(outputDirectory, { recursive: true });
-await copyFile("manifest.json", `${outputDirectory}/manifest.json`);
-await copyFile("THIRD_PARTY_NOTICES.md", `${outputDirectory}/THIRD_PARTY_NOTICES.md`);
-await cp("dictionaries", `${outputDirectory}/dictionaries`, { recursive: true });
+
 
 if (production) {
   await context.rebuild();
   await context.dispose();
 } else {
   await context.watch();
-  console.log(`Watching TypeScript sources; output: ${outputDirectory}`);
+  console.log(`Watching TypeScript sources; output: ./main.js`);
 }

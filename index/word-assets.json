@@ -1,0 +1,3276 @@
+{
+  "version": 2,
+  "updated": "2026-06-14T05:33:16.988Z",
+  "wordAssets": {
+    "my": {
+      "lemma": "my",
+      "title": "",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "my"
+      ],
+      "translation": "我的",
+      "display": "我的",
+      "phonetic": "/maɪ/",
+      "partOfSpeech": "Possessive adjective (determiner)",
+      "example": "This is my book.",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-my",
+      "mastered": true,
+      "sources": [
+        {
+          "bookPath": "Word: my",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "",
+          "cfiRange": "",
+          "quote": "my",
+          "created": "2026-06-04T13:12:38.794Z"
+        }
+      ],
+      "created": "2026-06-04T13:12:38.794Z",
+      "updated": "2026-06-04T13:12:38.794Z"
+    },
+    "cellar": {
+      "lemma": "cellar",
+      "title": "",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "cellar"
+      ],
+      "translation": "地窖",
+      "display": "地窖",
+      "phonetic": "/ˈsɛlər/",
+      "partOfSpeech": "noun",
+      "example": "The wine is stored in the cellar.；葡萄酒存放在地窖里。",
+      "notePath": "09 Books/Words/The Complete Wizard Of Oz（作者不详）.md",
+      "blockId": "jr-word-cellar",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Complete Wizard Of Oz（作者不详）.epub",
+          "bookTitle": "The Complete Wizard Of Oz（作者不详）",
+          "chapterTitle": "\n        The Wonderful Wizard of Oz\n      ",
+          "cfiRange": "epubcfi(/6/6!/4/56,/1:45,/1:51)",
+          "quote": "cellar",
+          "created": "2026-06-04T15:10:34.295Z"
+        }
+      ],
+      "created": "2026-06-04T15:10:34.295Z",
+      "updated": "2026-06-04T15:10:34.295Z"
+    },
+    "rolled around": {
+      "lemma": "rolled around",
+      "title": "rolled around",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "rolled around"
+      ],
+      "translation": "到来",
+      "display": "到来",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-rolled-around",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/56,/1:58,/1:71)",
+          "quote": "rolled around",
+          "created": "2026-06-06T10:49:12.272Z"
+        }
+      ],
+      "created": "2026-06-06T10:49:12.272Z",
+      "updated": "2026-06-06T10:49:12.272Z"
+    },
+    "junior": {
+      "lemma": "junior",
+      "title": "junior",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "junior"
+      ],
+      "translation": "三年级学生",
+      "display": "三年级学生",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-junior",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/56,/1:88,/1:94)",
+          "quote": "junior",
+          "created": "2026-06-06T10:50:03.048Z"
+        }
+      ],
+      "created": "2026-06-06T10:50:03.048Z",
+      "updated": "2026-06-06T10:50:03.048Z"
+    },
+    "varsity": {
+      "lemma": "varsity",
+      "title": "varsity",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "varsity"
+      ],
+      "translation": "校队",
+      "display": "校队",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-varsity",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/56,/1:114,/1:121)",
+          "quote": "varsity",
+          "created": "2026-06-06T10:50:31.662Z"
+        }
+      ],
+      "created": "2026-06-06T10:50:31.662Z",
+      "updated": "2026-06-06T10:50:31.662Z"
+    },
+    "humiliating": {
+      "lemma": "humiliating",
+      "title": "humiliating",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "humiliating"
+      ],
+      "translation": "令人羞辱的，丢脸的",
+      "display": "令人羞辱的，丢脸的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-humiliating",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/56,/1:319,/1:330)",
+          "quote": "humiliating",
+          "created": "2026-06-06T10:51:15.987Z"
+        }
+      ],
+      "created": "2026-06-06T10:51:15.987Z",
+      "updated": "2026-06-06T10:51:15.987Z"
+    },
+    "flip through": {
+      "lemma": "flip through",
+      "title": "flip through",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "flip through",
+        "flipped through"
+      ],
+      "translation": "快速切换（电台频道）",
+      "display": "快速切换（电台频道）",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-flip-through",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/56,/1:403,/1:418)",
+          "quote": "flipped through",
+          "created": "2026-06-06T10:52:15.405Z"
+        }
+      ],
+      "created": "2026-06-06T10:52:15.405Z",
+      "updated": "2026-06-06T10:52:15.405Z"
+    },
+    "senior": {
+      "lemma": "senior",
+      "title": "senior",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "senior"
+      ],
+      "translation": "高年级学生",
+      "display": "高年级学生",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-senior",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/58,/1:68,/1:74)",
+          "quote": "senior",
+          "created": "2026-06-06T10:53:16.543Z"
+        }
+      ],
+      "created": "2026-06-06T10:53:16.543Z",
+      "updated": "2026-06-06T10:53:16.543Z"
+    },
+    "inning": {
+      "lemma": "inning",
+      "title": "inning",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "inning"
+      ],
+      "translation": "局",
+      "display": "局",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-inning",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/58,/1:137,/1:143)",
+          "quote": "inning",
+          "created": "2026-06-06T10:53:59.134Z"
+        }
+      ],
+      "created": "2026-06-06T10:53:59.134Z",
+      "updated": "2026-06-06T10:53:59.134Z"
+    },
+    "lackluster": {
+      "lemma": "lackluster",
+      "title": "lackluster",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "lackluster"
+      ],
+      "translation": "平淡的，平庸的",
+      "display": "平淡的，平庸的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-lackluster",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/60,/1:11,/1:21)",
+          "quote": "lackluster",
+          "created": "2026-06-06T10:54:37.609Z"
+        }
+      ],
+      "created": "2026-06-06T10:54:37.609Z",
+      "updated": "2026-06-06T10:54:37.609Z"
+    },
+    "pitch": {
+      "lemma": "pitch",
+      "title": "pitch",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "pitch"
+      ],
+      "translation": "投球",
+      "display": "投球",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-pitch",
+      "mastered": true,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/70,/1:66,/1:71)",
+          "quote": "pitch",
+          "created": "2026-06-06T15:52:11.730Z"
+        }
+      ],
+      "created": "2026-06-06T15:52:11.730Z",
+      "updated": "2026-06-13T00:40:23.427Z"
+    },
+    "boastful": {
+      "lemma": "boastful",
+      "title": "boastful",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "boastful"
+      ],
+      "translation": "自夸的",
+      "display": "自夸的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-boastful",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/74,/1:40,/1:48)",
+          "quote": "boastful",
+          "created": "2026-06-06T15:53:46.642Z"
+        }
+      ],
+      "created": "2026-06-06T15:53:46.642Z",
+      "updated": "2026-06-06T15:53:46.642Z"
+    },
+    "setback": {
+      "lemma": "setback",
+      "title": "setback",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "setback"
+      ],
+      "translation": "挫折",
+      "display": "挫折",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-setback",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/76,/5:17,/5:24)",
+          "quote": "setback",
+          "created": "2026-06-06T15:56:40.901Z"
+        }
+      ],
+      "created": "2026-06-06T15:56:40.901Z",
+      "updated": "2026-06-06T15:56:40.901Z"
+    },
+    "expand": {
+      "lemma": "expand",
+      "title": "expand",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "expand"
+      ],
+      "translation": "扩大；扩展",
+      "display": "扩大；扩展",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-expand",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/84,/1:23,/1:29)",
+          "quote": "expand",
+          "created": "2026-06-06T16:03:23.812Z"
+        }
+      ],
+      "created": "2026-06-06T16:03:23.812Z",
+      "updated": "2026-06-06T16:03:23.812Z"
+    },
+    "impostor": {
+      "lemma": "impostor",
+      "title": "impostor",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "impostor"
+      ],
+      "translation": "冒名顶替者",
+      "display": "冒名顶替者",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-impostor",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/84,/1:163,/1:171)",
+          "quote": "impostor",
+          "created": "2026-06-06T16:05:59.564Z"
+        }
+      ],
+      "created": "2026-06-06T16:05:59.564Z",
+      "updated": "2026-06-06T16:05:59.564Z"
+    },
+    "premier": {
+      "lemma": "premier",
+      "title": "premier",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "premier"
+      ],
+      "translation": "首要的",
+      "display": "首要的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-premier",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/90,/1:70,/1:77)",
+          "quote": "premier",
+          "created": "2026-06-06T16:07:47.629Z"
+        }
+      ],
+      "created": "2026-06-06T16:07:47.629Z",
+      "updated": "2026-06-06T16:07:47.629Z"
+    },
+    "start-up": {
+      "lemma": "start-up",
+      "title": "start-up",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "start-up"
+      ],
+      "translation": "初创公司",
+      "display": "初创公司",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-start-up",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/90,/3:35,/3:43)",
+          "quote": "start-up",
+          "created": "2026-06-06T16:09:23.641Z"
+        }
+      ],
+      "created": "2026-06-06T16:09:23.641Z",
+      "updated": "2026-06-06T16:09:23.641Z"
+    },
+    "enroll": {
+      "lemma": "enroll",
+      "title": "enroll",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "enroll"
+      ],
+      "translation": "招收；注册",
+      "display": "招收；注册",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-enroll",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/90,/3:54,/3:60)",
+          "quote": "enroll",
+          "created": "2026-06-06T16:10:03.617Z"
+        }
+      ],
+      "created": "2026-06-06T16:10:03.617Z",
+      "updated": "2026-06-06T16:10:03.617Z"
+    },
+    "manual": {
+      "lemma": "manual",
+      "title": "manual",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "manual"
+      ],
+      "translation": "n. 手册, 指南",
+      "display": "n. 手册, 指南",
+      "phonetic": "/'mænjuәl/",
+      "partOfSpeech": "n.",
+      "example": "Please refer to the user manual for instructions.；请参阅用户手册获取说明。",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-manual",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/98,/1:240,/1:246)",
+          "quote": "manual",
+          "created": "2026-06-04T14:56:19.442Z"
+        }
+      ],
+      "created": "2026-06-04T14:56:19.442Z",
+      "updated": "2026-06-07T05:18:27.921Z"
+    },
+    "entrepreneur": {
+      "lemma": "entrepreneur",
+      "title": "entrepreneur",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "entrepreneur"
+      ],
+      "translation": "企业家",
+      "display": "企业家",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-entrepreneur",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/96,/1:4,/1:16)",
+          "quote": "entrepreneur",
+          "created": "2026-06-07T05:40:02.613Z"
+        }
+      ],
+      "created": "2026-06-07T05:40:02.613Z",
+      "updated": "2026-06-07T05:40:02.613Z"
+    },
+    "psychology": {
+      "lemma": "psychology",
+      "title": "psychology",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "psychology"
+      ],
+      "translation": "n. 心理学, 心理状态",
+      "display": "n. 心理学, 心理状态",
+      "phonetic": "/sai'kɒlәdʒi/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-psychology",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/100,/1:56,/1:66)",
+          "quote": "psychology",
+          "created": "2026-06-07T05:43:22.711Z"
+        }
+      ],
+      "created": "2026-06-07T05:43:22.711Z",
+      "updated": "2026-06-07T05:43:22.711Z"
+    },
+    "synthesis": {
+      "lemma": "synthesis",
+      "title": "synthesis",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "synthesis"
+      ],
+      "translation": "综合，整合",
+      "display": "综合，整合",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-synthesis",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/100,/1:132,/1:141)",
+          "quote": "synthesis",
+          "created": "2026-06-07T05:44:14.433Z"
+        }
+      ],
+      "created": "2026-06-07T05:44:14.433Z",
+      "updated": "2026-06-07T05:44:14.433Z"
+    },
+    "compelling": {
+      "lemma": "compelling",
+      "title": "compelling",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "compelling"
+      ],
+      "translation": "令人信服的，引人注目的",
+      "display": "令人信服的，引人注目的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-compelling",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/100,/1:221,/1:231)",
+          "quote": "compelling",
+          "created": "2026-06-07T05:45:16.757Z"
+        }
+      ],
+      "created": "2026-06-07T05:45:16.757Z",
+      "updated": "2026-06-07T05:45:16.757Z"
+    },
+    "precede": {
+      "lemma": "precede",
+      "title": "precede",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "precede",
+        "preceded"
+      ],
+      "translation": "先于",
+      "display": "先于",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-precede",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/100,/1:462,/1:470)",
+          "quote": "preceded",
+          "created": "2026-06-07T05:47:13.235Z"
+        }
+      ],
+      "created": "2026-06-07T05:47:13.235Z",
+      "updated": "2026-06-07T05:47:13.235Z"
+    },
+    "evolve": {
+      "lemma": "evolve",
+      "title": "evolve",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "evolve"
+      ],
+      "translation": "演化",
+      "display": "演化",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-evolve",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/102,/1:135,/1:141)",
+          "quote": "evolve",
+          "created": "2026-06-07T05:53:59.934Z"
+        }
+      ],
+      "created": "2026-06-07T05:53:59.934Z",
+      "updated": "2026-06-07T05:53:59.934Z"
+    },
+    "operant": {
+      "lemma": "operant",
+      "title": "operant",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "operant"
+      ],
+      "translation": "操作行为",
+      "display": "操作行为",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-operant",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/102,/1:238,/1:245)",
+          "quote": "operant",
+          "created": "2026-06-07T05:55:01.348Z"
+        }
+      ],
+      "created": "2026-06-07T05:55:01.348Z",
+      "updated": "2026-06-07T05:55:01.348Z"
+    },
+    "backbone": {
+      "lemma": "backbone",
+      "title": "backbone",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "backbone"
+      ],
+      "translation": "n. 脊椎, 志气, 骨干, 支柱",
+      "display": "n. 脊椎, 志气, 骨干, 支柱",
+      "phonetic": "/'bækbәun/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-backbone",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/102,/1:4,/1:12)",
+          "quote": "backbone",
+          "created": "2026-06-07T05:55:16.134Z"
+        }
+      ],
+      "created": "2026-06-07T05:55:16.134Z",
+      "updated": "2026-06-07T05:55:16.134Z"
+    },
+    "popularize": {
+      "lemma": "popularize",
+      "title": "popularize",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "popularize"
+      ],
+      "translation": "vt. 使成通俗性, 使平易, 使普及",
+      "display": "vt. 使成通俗性, 使平易, 使普及",
+      "phonetic": "/'pɒpjulәraiz/",
+      "partOfSpeech": "vt. vi. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-popularize",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/102,/3:71,/3:81)",
+          "quote": "popularize",
+          "created": "2026-06-07T05:55:33.065Z"
+        }
+      ],
+      "created": "2026-06-07T05:55:33.065Z",
+      "updated": "2026-06-07T05:55:33.065Z"
+    },
+    "external": {
+      "lemma": "external",
+      "title": "external",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "external"
+      ],
+      "translation": "n. 外部, 外面",
+      "display": "n. 外部, 外面",
+      "phonetic": "/ik'stә:nl/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-external",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/104,/1:207,/1:215)",
+          "quote": "external",
+          "created": "2026-06-07T05:56:03.994Z"
+        }
+      ],
+      "created": "2026-06-07T05:56:03.994Z",
+      "updated": "2026-06-07T05:56:03.994Z"
+    },
+    "stimuli": {
+      "lemma": "stimuli",
+      "title": "stimuli",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "stimuli"
+      ],
+      "translation": "剌激, 剌激物, 促进因素, 动因",
+      "display": "剌激, 剌激物, 促进因素, 动因",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-stimuli",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/104,/1:216,/1:223)",
+          "quote": "stimuli",
+          "created": "2026-06-07T05:56:12.849Z"
+        }
+      ],
+      "created": "2026-06-07T05:56:12.849Z",
+      "updated": "2026-06-07T05:56:12.849Z"
+    },
+    "integrated": {
+      "lemma": "integrated",
+      "title": "integrated",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "integrated"
+      ],
+      "translation": "a. 综合的, 完整的, 互相协调的",
+      "display": "a. 综合的, 完整的, 互相协调的",
+      "phonetic": "/'intәgreitid/",
+      "partOfSpeech": "adjective",
+      "example": "The system is fully integrated. 这个系统是完全集成的。",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-integrated",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/106,/1:38,/1:48)",
+          "quote": "integrated",
+          "created": "2026-06-04T15:04:30.333Z"
+        }
+      ],
+      "created": "2026-06-04T15:04:30.333Z",
+      "updated": "2026-06-07T05:56:52.672Z"
+    },
+    "fare": {
+      "lemma": "fare",
+      "title": "fare",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "fare"
+      ],
+      "translation": "进展，表现",
+      "display": "进展，表现",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-fare",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/8,/5:60,/5:64)",
+          "quote": "fare",
+          "created": "2026-06-07T07:55:23.950Z"
+        }
+      ],
+      "created": "2026-06-07T07:55:23.950Z",
+      "updated": "2026-06-07T07:55:23.950Z"
+    },
+    "trajectory": {
+      "lemma": "trajectory",
+      "title": "trajectory",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "trajectory"
+      ],
+      "translation": "轨道，轨迹",
+      "display": "轨道，轨迹",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-trajectory",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/12,/1:58,/1:68)",
+          "quote": "trajectory",
+          "created": "2026-06-07T07:57:24.398Z"
+        }
+      ],
+      "created": "2026-06-07T07:57:24.398Z",
+      "updated": "2026-06-07T07:57:24.398Z"
+    },
+    "aggregation": {
+      "lemma": "aggregation",
+      "title": "aggregation",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "aggregation"
+      ],
+      "translation": "n. 集合, 聚合, 集合体",
+      "display": "n. 集合, 聚合, 集合体",
+      "phonetic": "/ægri'geiʃәn/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-aggregation",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/12,/1:188,/1:199)",
+          "quote": "aggregation",
+          "created": "2026-06-07T08:00:13.072Z"
+        }
+      ],
+      "created": "2026-06-07T08:00:13.072Z",
+      "updated": "2026-06-07T08:00:13.072Z"
+    },
+    "marginal": {
+      "lemma": "marginal",
+      "title": "marginal",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "marginal"
+      ],
+      "translation": "微小的，边缘的",
+      "display": "微小的，边缘的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-marginal",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/12,/1:203,/1:211)",
+          "quote": "marginal",
+          "created": "2026-06-07T08:00:47.075Z"
+        }
+      ],
+      "created": "2026-06-07T08:00:47.075Z",
+      "updated": "2026-06-07T08:00:47.075Z"
+    },
+    "margin": {
+      "lemma": "margin",
+      "title": "margin",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "margin"
+      ],
+      "translation": "微小增量；边缘；余地",
+      "display": "微小增量；边缘；余地",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-margin",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/12,/1:269,/1:275)",
+          "quote": "margin",
+          "created": "2026-06-07T08:01:56.287Z"
+        }
+      ],
+      "created": "2026-06-07T08:01:56.287Z",
+      "updated": "2026-06-07T08:01:56.287Z"
+    },
+    "tire": {
+      "lemma": "tire",
+      "title": "tire",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "tire"
+      ],
+      "translation": "n. 轮胎, 头饰",
+      "display": "n. 轮胎, 头饰",
+      "phonetic": "/taiә/",
+      "partOfSpeech": "n. vt. vi. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-tire",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/14,/1:199,/1:203)",
+          "quote": "tire",
+          "created": "2026-06-07T08:05:26.600Z"
+        }
+      ],
+      "created": "2026-06-07T08:05:26.600Z",
+      "updated": "2026-06-07T08:05:26.600Z"
+    },
+    "rub": {
+      "lemma": "rub",
+      "title": "rub",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "rub"
+      ],
+      "translation": "n. 摩擦, 困难, 障碍, 磨损处",
+      "display": "n. 摩擦, 困难, 障碍, 磨损处",
+      "phonetic": "/rʌb/",
+      "partOfSpeech": "n. vt. vi. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-rub",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/14,/1:177,/1:180)",
+          "quote": "rub",
+          "created": "2026-06-07T08:05:49.888Z"
+        }
+      ],
+      "created": "2026-06-07T08:05:49.888Z",
+      "updated": "2026-06-07T08:05:49.888Z"
+    },
+    "overshort": {
+      "lemma": "overshort",
+      "title": "overshort",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "overshort"
+      ],
+      "translation": "电加热外套短裤",
+      "display": "电加热外套短裤",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-overshort",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/14,/1:270,/1:279)",
+          "quote": "overshort",
+          "created": "2026-06-07T08:06:55.065Z"
+        }
+      ],
+      "created": "2026-06-07T08:06:55.065Z",
+      "updated": "2026-06-07T08:06:55.065Z"
+    },
+    "fabric": {
+      "lemma": "fabric",
+      "title": "fabric",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "fabric"
+      ],
+      "translation": "n. 织物, 布, 结构, 构造, 建筑物",
+      "display": "n. 织物, 布, 结构, 构造, 建筑物",
+      "phonetic": "/'fæbrik/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-fabric",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/14,/1:447,/1:453)",
+          "quote": "fabric",
+          "created": "2026-06-07T08:07:28.824Z"
+        }
+      ],
+      "created": "2026-06-07T08:07:28.824Z",
+      "updated": "2026-06-07T08:07:28.824Z"
+    },
+    "aerodynamic": {
+      "lemma": "aerodynamic",
+      "title": "aerodynamic",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "aerodynamic"
+      ],
+      "translation": "a. 空气动力学的",
+      "display": "a. 空气动力学的",
+      "phonetic": "/,eәrәudai'næmik/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-aerodynamic",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/14,/1:568,/1:579)",
+          "quote": "aerodynamic",
+          "created": "2026-06-07T08:08:04.301Z"
+        }
+      ],
+      "created": "2026-06-07T08:08:04.301Z",
+      "updated": "2026-06-07T08:08:04.301Z"
+    },
+    "gel": {
+      "lemma": "gel",
+      "title": "gel",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "gel"
+      ],
+      "translation": "n. 胶化体, 凝胶",
+      "display": "n. 胶化体, 凝胶",
+      "phonetic": "/dʒel/",
+      "partOfSpeech": "n. vi. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-gel",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/16,/1:168,/1:171)",
+          "quote": "gel",
+          "created": "2026-06-07T08:08:33.563Z"
+        }
+      ],
+      "created": "2026-06-07T08:08:33.563Z",
+      "updated": "2026-06-07T08:08:33.563Z"
+    },
+    "degrade": {
+      "lemma": "degrade",
+      "title": "degrade",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "degrade"
+      ],
+      "translation": "v. (使)降级, (使)退化",
+      "display": "v. (使)降级, (使)退化",
+      "phonetic": "/di'greid/",
+      "partOfSpeech": "v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-degrade",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/16,/3:145,/3:152)",
+          "quote": "degrade",
+          "created": "2026-06-07T08:09:23.438Z"
+        }
+      ],
+      "created": "2026-06-07T08:09:23.438Z",
+      "updated": "2026-06-07T08:09:23.438Z"
+    },
+    "astounding": {
+      "lemma": "astounding",
+      "title": "astounding",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "astounding"
+      ],
+      "translation": "惊人的",
+      "display": "惊人的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-astounding",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/20,/1:169,/1:179)",
+          "quote": "astounding",
+          "created": "2026-06-07T08:10:04.809Z"
+        }
+      ],
+      "created": "2026-06-07T08:10:04.809Z",
+      "updated": "2026-06-07T08:10:04.809Z"
+    },
+    "span": {
+      "lemma": "span",
+      "title": "span",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "span"
+      ],
+      "translation": "一段时间",
+      "display": "一段时间",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-span",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/24,/1:20,/1:24)",
+          "quote": "span",
+          "created": "2026-06-07T08:11:12.954Z"
+        }
+      ],
+      "created": "2026-06-07T08:11:12.954Z",
+      "updated": "2026-06-07T08:11:12.954Z"
+    },
+    "replicate": {
+      "lemma": "replicate",
+      "title": "replicate",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "replicate"
+      ],
+      "translation": "复制",
+      "display": "复制",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-replicate",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/26,/1:273,/1:282)",
+          "quote": "replicate",
+          "created": "2026-06-07T08:12:03.357Z"
+        }
+      ],
+      "created": "2026-06-07T08:12:03.357Z",
+      "updated": "2026-06-07T08:12:03.357Z"
+    },
+    "vaporize": {
+      "lemma": "vaporize",
+      "title": "vaporize",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "vaporize",
+        "VAPORIZE"
+      ],
+      "translation": "汽化；突然消失",
+      "display": "汽化；突然消失",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-vaporize",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/2,/1:18,/1:26)",
+          "quote": "VAPORIZE",
+          "created": "2026-06-07T08:24:49.438Z"
+        }
+      ],
+      "created": "2026-06-07T08:24:49.438Z",
+      "updated": "2026-06-07T08:24:49.438Z"
+    },
+    "pre-algebra": {
+      "lemma": "pre-algebra",
+      "title": "pre-algebra",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "pre-algebra",
+        "PRE-ALGEBRA"
+      ],
+      "translation": "预代数",
+      "display": "预代数",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-pre-algebra",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/4,/1:3,/1:14)",
+          "quote": "PRE-ALGEBRA",
+          "created": "2026-06-07T08:25:13.447Z"
+        }
+      ],
+      "created": "2026-06-07T08:25:13.447Z",
+      "updated": "2026-06-07T08:25:13.447Z"
+    },
+    "stirring": {
+      "lemma": "stirring",
+      "title": "stirring",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "stirring"
+      ],
+      "translation": "萌动",
+      "display": "萌动",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-stirring",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/14,/1:67,/1:75)",
+          "quote": "stirring",
+          "created": "2026-06-07T08:28:00.472Z"
+        }
+      ],
+      "created": "2026-06-07T08:28:00.472Z",
+      "updated": "2026-06-07T08:28:00.472Z"
+    },
+    "boarding": {
+      "lemma": "boarding",
+      "title": "boarding",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "boarding"
+      ],
+      "translation": "寄宿的",
+      "display": "寄宿的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-boarding",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/20,/1:54,/1:62)",
+          "quote": "boarding",
+          "created": "2026-06-07T08:44:29.570Z"
+        }
+      ],
+      "created": "2026-06-07T08:44:29.570Z",
+      "updated": "2026-06-07T08:44:29.570Z"
+    },
+    "mental-case": {
+      "lemma": "mental-case",
+      "title": "mental-case",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "mental-case"
+      ],
+      "translation": "精神有问题的孩子",
+      "display": "精神有问题的孩子",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-mental-case",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/26,/1:185,/1:196)",
+          "quote": "mental-case",
+          "created": "2026-06-07T08:45:35.480Z"
+        }
+      ],
+      "created": "2026-06-07T08:45:35.480Z",
+      "updated": "2026-06-07T08:45:35.480Z"
+    },
+    "thinning hair": {
+      "lemma": "thinning hair",
+      "title": "thinning hair",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "thinning hair"
+      ],
+      "translation": "稀疏的头发",
+      "display": "稀疏的头发",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-thinning-hair",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/32,/1:71,/1:84)",
+          "quote": "thinning hair",
+          "created": "2026-06-07T08:47:07.902Z"
+        }
+      ],
+      "created": "2026-06-07T08:47:07.902Z",
+      "updated": "2026-06-07T08:47:07.902Z"
+    },
+    "thinning": {
+      "lemma": "thinning",
+      "title": "thinning",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "thinning"
+      ],
+      "translation": "稀疏的",
+      "display": "稀疏的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-thinning",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/32,/1:71,/1:79)",
+          "quote": "thinning",
+          "created": "2026-06-07T08:47:41.964Z"
+        }
+      ],
+      "created": "2026-06-07T08:47:41.964Z",
+      "updated": "2026-06-07T08:47:41.964Z"
+    },
+    "scruffy": {
+      "lemma": "scruffy",
+      "title": "scruffy",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "scruffy"
+      ],
+      "translation": "邋遢的",
+      "display": "邋遢的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-scruffy",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/32,/1:91,/1:98)",
+          "quote": "scruffy",
+          "created": "2026-06-07T08:47:59.931Z"
+        }
+      ],
+      "created": "2026-06-07T08:47:59.931Z",
+      "updated": "2026-06-07T08:47:59.931Z"
+    },
+    "frayed": {
+      "lemma": "frayed",
+      "title": "frayed",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "frayed"
+      ],
+      "translation": "a. 磨损的",
+      "display": "a. 磨损的",
+      "phonetic": "/freɪd/",
+      "partOfSpeech": "v.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-frayed",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/32,/1:111,/1:117)",
+          "quote": "frayed",
+          "created": "2026-06-07T08:48:19.258Z"
+        }
+      ],
+      "created": "2026-06-07T08:48:19.258Z",
+      "updated": "2026-06-07T08:48:19.258Z"
+    },
+    "tweed": {
+      "lemma": "tweed",
+      "title": "tweed",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "tweed"
+      ],
+      "translation": "n. (粗)花呢, 花呢服装",
+      "display": "n. (粗)花呢, 花呢服装",
+      "phonetic": "/twi:d/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-tweed",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/32,/1:118,/1:123)",
+          "quote": "tweed",
+          "created": "2026-06-07T08:48:27.390Z"
+        }
+      ],
+      "created": "2026-06-07T08:48:27.390Z",
+      "updated": "2026-06-07T08:48:27.390Z"
+    },
+    "cannon": {
+      "lemma": "cannon",
+      "title": "cannon",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "cannon"
+      ],
+      "translation": "n. 大炮, 加农炮",
+      "display": "n. 大炮, 加农炮",
+      "phonetic": "/'kænәn/",
+      "partOfSpeech": "n. v.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-cannon",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/38,/1:163,/1:169)",
+          "quote": "cannon",
+          "created": "2026-06-07T08:49:27.424Z"
+        }
+      ],
+      "created": "2026-06-07T08:49:27.424Z",
+      "updated": "2026-06-07T08:49:27.424Z"
+    },
+    "expel": {
+      "lemma": "expel",
+      "title": "expel",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "expel"
+      ],
+      "translation": "vt. 驱逐, 逐出, 排出, 开除",
+      "display": "vt. 驱逐, 逐出, 排出, 开除",
+      "phonetic": "/ik'spel/",
+      "partOfSpeech": "vt. v.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-expel",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/38,/1:227,/1:232)",
+          "quote": "expel",
+          "created": "2026-06-07T08:49:42.906Z"
+        }
+      ],
+      "created": "2026-06-07T08:49:42.906Z",
+      "updated": "2026-06-07T08:49:42.906Z"
+    },
+    "catwalk": {
+      "lemma": "catwalk",
+      "title": "catwalk",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "catwalk"
+      ],
+      "translation": "n. 狭小通道",
+      "display": "n. 狭小通道",
+      "phonetic": "/'kætwɒ:k/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-catwalk",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/38,/1:395,/1:402)",
+          "quote": "catwalk",
+          "created": "2026-06-07T08:50:05.536Z"
+        }
+      ],
+      "created": "2026-06-07T08:50:05.536Z",
+      "updated": "2026-06-07T08:50:05.536Z"
+    },
+    "freckly": {
+      "lemma": "freckly",
+      "title": "freckly",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "freckly"
+      ],
+      "translation": "a. 多雀斑的",
+      "display": "a. 多雀斑的",
+      "phonetic": "/'frekli/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-freckly",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/42,/1:60,/1:67)",
+          "quote": "freckly",
+          "created": "2026-06-07T08:50:54.872Z"
+        }
+      ],
+      "created": "2026-06-07T08:50:54.872Z",
+      "updated": "2026-06-07T08:50:54.872Z"
+    },
+    "redheaded": {
+      "lemma": "redheaded",
+      "title": "redheaded",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "redheaded"
+      ],
+      "translation": "a. 红发的, 红头羽毛的",
+      "display": "a. 红发的, 红头羽毛的",
+      "phonetic": "/'red'hedid/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-redheaded",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/42,/1:69,/1:78)",
+          "quote": "redheaded",
+          "created": "2026-06-07T08:51:04.760Z"
+        }
+      ],
+      "created": "2026-06-07T08:51:04.760Z",
+      "updated": "2026-06-07T08:51:04.760Z"
+    },
+    "kleptomaniac": {
+      "lemma": "kleptomaniac",
+      "title": "kleptomaniac",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "kleptomaniac"
+      ],
+      "translation": "盗窃癖患者",
+      "display": "盗窃癖患者",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-kleptomaniac",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/42,/1:79,/1:91)",
+          "quote": "kleptomaniac",
+          "created": "2026-06-07T08:54:17.416Z"
+        }
+      ],
+      "created": "2026-06-07T08:54:17.416Z",
+      "updated": "2026-06-07T08:54:17.416Z"
+    },
+    "ketchup": {
+      "lemma": "ketchup",
+      "title": "ketchup",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "ketchup"
+      ],
+      "translation": "n. 蕃茄酱",
+      "display": "n. 蕃茄酱",
+      "phonetic": "/'ketʃәp/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-ketchup",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/42,/1:185,/1:192)",
+          "quote": "ketchup",
+          "created": "2026-06-07T08:55:15.602Z"
+        }
+      ],
+      "created": "2026-06-07T08:55:15.602Z",
+      "updated": "2026-06-07T08:55:15.602Z"
+    },
+    "scrawny": {
+      "lemma": "scrawny",
+      "title": "scrawny",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "scrawny"
+      ],
+      "translation": "a. 瘦的, 骨瘦如柴的",
+      "display": "a. 瘦的, 骨瘦如柴的",
+      "phonetic": "/'skrɒ:ni/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-scrawny",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:34,/1:41)",
+          "quote": "scrawny",
+          "created": "2026-06-07T08:55:38.152Z"
+        }
+      ],
+      "created": "2026-06-07T08:55:38.152Z",
+      "updated": "2026-06-07T08:55:38.152Z"
+    },
+    "held back": {
+      "lemma": "held back",
+      "title": "held back",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "held back"
+      ],
+      "translation": "被留级",
+      "display": "被留级",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-held-back",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:92,/1:101)",
+          "quote": "held back",
+          "created": "2026-06-07T09:07:48.491Z"
+        }
+      ],
+      "created": "2026-06-07T09:07:48.491Z",
+      "updated": "2026-06-07T09:07:48.491Z"
+    },
+    "put up with": {
+      "lemma": "put up with",
+      "title": "put up with",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "put up with"
+      ],
+      "translation": "忍受",
+      "display": "忍受",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-put-up-with",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/42,/1:29,/1:40)",
+          "quote": "put up with",
+          "created": "2026-06-07T09:08:04.117Z"
+        }
+      ],
+      "created": "2026-06-07T09:08:04.117Z",
+      "updated": "2026-06-07T09:08:04.117Z"
+    },
+    "grader": {
+      "lemma": "grader",
+      "title": "grader",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "grader"
+      ],
+      "translation": "（某年级的）学生",
+      "display": "（某年级的）学生",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-grader",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:148,/1:154)",
+          "quote": "grader",
+          "created": "2026-06-07T09:08:56.467Z"
+        }
+      ],
+      "created": "2026-06-07T09:08:56.467Z",
+      "updated": "2026-06-07T09:08:56.467Z"
+    },
+    "acne": {
+      "lemma": "acne",
+      "title": "acne",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "acne"
+      ],
+      "translation": "n. 痤疮, 粉刺",
+      "display": "n. 痤疮, 粉刺",
+      "phonetic": "/'ækni/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-acne",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:160,/1:164)",
+          "quote": "acne",
+          "created": "2026-06-07T09:09:10.699Z"
+        }
+      ],
+      "created": "2026-06-07T09:09:10.699Z",
+      "updated": "2026-06-07T09:09:10.699Z"
+    },
+    "wispy": {
+      "lemma": "wispy",
+      "title": "wispy",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "wispy"
+      ],
+      "translation": "a. 小束状的, 细微的, 飘渺的",
+      "display": "a. 小束状的, 细微的, 飘渺的",
+      "phonetic": "/'wispi/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-wispy",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:184,/1:189)",
+          "quote": "wispy",
+          "created": "2026-06-07T09:09:29.343Z"
+        }
+      ],
+      "created": "2026-06-07T09:09:29.343Z",
+      "updated": "2026-06-07T09:09:29.343Z"
+    },
+    "crippled": {
+      "lemma": "crippled",
+      "title": "crippled",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "crippled"
+      ],
+      "translation": "a. 跛腿的, 残废的",
+      "display": "a. 跛腿的, 残废的",
+      "phonetic": "/'krɪpld/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/The Lightning Thief（Rick Riordan）.md",
+      "blockId": "jr-word-crippled",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/The Lightning Thief（Rick Riordan）.epub",
+          "bookTitle": "The Lightning Thief（Rick Riordan）",
+          "chapterTitle": "\n        1 I ACCIDENTALLY VAPORIZE\n      ",
+          "cfiRange": "epubcfi(/6/8!/4/4/44,/1:236,/1:244)",
+          "quote": "crippled",
+          "created": "2026-06-07T09:09:55.795Z"
+        }
+      ],
+      "created": "2026-06-07T09:09:55.795Z",
+      "updated": "2026-06-07T09:09:55.795Z"
+    },
+    "cognitive": {
+      "lemma": "cognitive",
+      "title": "cognitive",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "cognitive"
+      ],
+      "translation": "认知的",
+      "display": "认知的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-cognitive",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/106,/1:62,/1:71)",
+          "quote": "cognitive",
+          "created": "2026-06-08T08:37:11.383Z"
+        }
+      ],
+      "created": "2026-06-08T08:37:11.383Z",
+      "updated": "2026-06-08T08:37:11.383Z"
+    },
+    "mediocrity": {
+      "lemma": "mediocrity",
+      "title": "mediocrity",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "mediocrity"
+      ],
+      "translation": "平庸",
+      "display": "平庸",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-mediocrity",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "THE FUNDAMENTALS: Why Tiny Changes Make a Big Difference",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/8,/3:291,/3:301)",
+          "quote": "mediocrity",
+          "created": "2026-06-08T10:16:01.933Z"
+        }
+      ],
+      "created": "2026-06-08T10:16:01.933Z",
+      "updated": "2026-06-08T10:16:01.933Z"
+    },
+    "at first glance": {
+      "lemma": "at first glance",
+      "title": "at first glance",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "at first glance"
+      ],
+      "translation": "乍一看，初看之下",
+      "display": "乍一看，初看之下",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-at-first-glance",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/26,/1:125,/1:140)",
+          "quote": "at first glance",
+          "created": "2026-06-08T10:26:07.115Z"
+        }
+      ],
+      "created": "2026-06-08T10:26:07.115Z",
+      "updated": "2026-06-08T10:26:07.115Z"
+    },
+    "overestimate": {
+      "lemma": "overestimate",
+      "title": "overestimate",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "overestimate"
+      ],
+      "translation": "高估",
+      "display": "高估",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-overestimate",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/30,/1:17,/1:29)",
+          "quote": "overestimate",
+          "created": "2026-06-08T10:29:32.975Z"
+        }
+      ],
+      "created": "2026-06-08T10:29:32.975Z",
+      "updated": "2026-06-08T10:29:32.975Z"
+    },
+    "underestimate": {
+      "lemma": "underestimate",
+      "title": "underestimate",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "underestimate"
+      ],
+      "translation": "n. 低估",
+      "display": "n. 低估",
+      "phonetic": "/.ʌndәr'estimeit/",
+      "partOfSpeech": "n. vt. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-underestimate",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/30,/1:72,/1:85)",
+          "quote": "underestimate",
+          "created": "2026-06-08T10:29:52.654Z"
+        }
+      ],
+      "created": "2026-06-08T10:29:52.654Z",
+      "updated": "2026-06-08T10:29:52.654Z"
+    },
+    "earth-shattering": {
+      "lemma": "earth-shattering",
+      "title": "earth-shattering",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "earth-shattering"
+      ],
+      "translation": "a. 惊天动地的；令人震惊的",
+      "display": "a. 惊天动地的；令人震惊的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-earth-shattering",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/30,/1:383,/1:399)",
+          "quote": "earth-shattering",
+          "created": "2026-06-08T10:30:28.895Z"
+        }
+      ],
+      "created": "2026-06-08T10:30:28.895Z",
+      "updated": "2026-06-08T10:30:28.895Z"
+    },
+    "compound": {
+      "lemma": "compound",
+      "title": "compound",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "compound"
+      ],
+      "translation": "积累",
+      "display": "积累",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-compound",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/40/4/2,/1:38,/1:46)",
+          "quote": "compound",
+          "created": "2026-06-08T10:33:06.690Z"
+        }
+      ],
+      "created": "2026-06-08T10:33:06.690Z",
+      "updated": "2026-06-08T10:33:06.690Z"
+    },
+    "compound interest": {
+      "lemma": "compound interest",
+      "title": "compound interest",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "compound interest"
+      ],
+      "translation": "复利",
+      "display": "复利",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-compound-interest",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/42,/1:14,/1:32)",
+          "quote": "compound interest",
+          "created": "2026-06-08T10:35:02.167Z"
+        }
+      ],
+      "created": "2026-06-08T10:35:02.167Z",
+      "updated": "2026-06-08T10:35:02.167Z"
+    },
+    "multiply": {
+      "lemma": "multiply",
+      "title": "multiply",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "multiply"
+      ],
+      "translation": "v. 繁殖, 乘, 增加",
+      "display": "v. 繁殖, 乘, 增加",
+      "phonetic": "/'mʌltiplai/",
+      "partOfSpeech": "v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-multiply",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/42,/1:143,/1:151)",
+          "quote": "multiply",
+          "created": "2026-06-08T10:35:37.228Z"
+        }
+      ],
+      "created": "2026-06-08T10:35:37.228Z",
+      "updated": "2026-06-08T10:35:37.228Z"
+    },
+    "enormous": {
+      "lemma": "enormous",
+      "title": "enormous",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "enormous"
+      ],
+      "translation": "a. 巨大的, 庞大的",
+      "display": "a. 巨大的, 庞大的",
+      "phonetic": "/i'nɒ:mәs/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-enormous",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/42,/1:290,/1:298)",
+          "quote": "enormous",
+          "created": "2026-06-08T10:36:00.816Z"
+        }
+      ],
+      "created": "2026-06-08T10:36:00.816Z",
+      "updated": "2026-06-08T10:36:00.816Z"
+    },
+    "procrastinate": {
+      "lemma": "procrastinate",
+      "title": "procrastinate",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "procrastinate"
+      ],
+      "translation": "拖延",
+      "display": "拖延",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-procrastinate",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/46,/1:236,/1:249)",
+          "quote": "procrastinate",
+          "created": "2026-06-08T10:38:59.768Z"
+        }
+      ],
+      "created": "2026-06-08T10:38:59.768Z",
+      "updated": "2026-06-08T10:38:59.768Z"
+    },
+    "duplicate": {
+      "lemma": "duplicate",
+      "title": "duplicate",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "duplicate",
+        "duplicating"
+      ],
+      "translation": "重复，复制",
+      "display": "重复，复制",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-duplicate",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/48,/1:83,/1:94)",
+          "quote": "duplicating",
+          "created": "2026-06-08T10:41:06.724Z"
+        }
+      ],
+      "created": "2026-06-08T10:41:06.724Z",
+      "updated": "2026-06-08T10:41:06.724Z"
+    },
+    "sentence-1tnhfi6": {
+      "lemma": "sentence-1tnhfi6",
+      "title": "I was scheduled for surgery one week later, which would allow me some ad...",
+      "kind": "word",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "我预定一周后做手术，这样我就能有额外的时间来康复。",
+      "display": "我预定一周后做手术，这样我就能有额外的时间来康复。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-1tnhfi6",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/50,/1:143,/1:237)",
+          "quote": "I was scheduled for surgery one week later, which would allow me some additional time to heal.",
+          "created": "2026-06-06T10:43:28.371Z"
+        }
+      ],
+      "created": "2026-06-06T10:43:28.371Z",
+      "updated": "2026-06-06T10:43:28.371Z"
+    },
+    "sentence-1wucf6s": {
+      "lemma": "sentence-1wucf6s",
+      "title": "Success is the product of daily habits—not once-in-a-lifetime transforma...",
+      "kind": "word",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "成功是日常习惯的产物，而不是一生一次的转变。",
+      "display": "成功是日常习惯的产物，而不是一生一次的转变。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-1wucf6s",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/52,/3:116,/3:194)",
+          "quote": "Success is the product of daily habits—not once-in-a-lifetime transformations.",
+          "created": "2026-06-08T10:55:23.709Z"
+        }
+      ],
+      "created": "2026-06-08T10:55:23.709Z",
+      "updated": "2026-06-08T10:55:23.709Z"
+    },
+    "underwhelming": {
+      "lemma": "underwhelming",
+      "title": "underwhelming",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "underwhelming"
+      ],
+      "translation": "令人失望的，平平无奇的",
+      "display": "令人失望的，平平无奇的",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-underwhelming",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "1: The Surprising Power of Atomic Habits",
+          "cfiRange": "epubcfi(/6/16!/4[x9780735211308_EPUB-6]/10,/1:55,/1:68)",
+          "quote": "underwhelming",
+          "created": "2026-06-08T14:22:30.658Z"
+        }
+      ],
+      "created": "2026-06-08T14:22:30.658Z",
+      "updated": "2026-06-08T14:22:30.658Z"
+    },
+    "sentence-7uzmpr": {
+      "lemma": "sentence-7uzmpr",
+      "title": "I was scheduled for surgery one week later, which would allow me some additional time to heal.",
+      "kind": "sentence",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "一周后我安排了手术，这可以让我有更多时间来康复。",
+      "display": "一周后我安排了手术，这可以让我有更多时间来康复。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-7uzmpr",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/50,/1:143,/1:238)",
+          "quote": "I was scheduled for surgery one week later, which would allow me some additional time to heal.",
+          "created": "2026-06-11T13:28:50.123Z"
+        }
+      ],
+      "created": "2026-06-11T13:28:50.123Z",
+      "updated": "2026-06-11T13:28:50.123Z"
+    },
+    "sentence-14ul3d2": {
+      "lemma": "sentence-14ul3d2",
+      "title": "was voted team captain and at the end of the season,",
+      "kind": "sentence",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "被选为队长，并且在赛季结束时，",
+      "display": "被选为队长，并且在赛季结束时，",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-14ul3d2",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/70,/1:102,/1:155)",
+          "quote": "was voted team captain and at the end of the season,",
+          "created": "2026-06-12T02:15:55.367Z"
+        }
+      ],
+      "created": "2026-06-12T02:15:55.367Z",
+      "updated": "2026-06-12T02:15:55.367Z"
+    },
+    "stretcher": {
+      "lemma": "stretcher",
+      "title": "stretcher",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "stretcher"
+      ],
+      "translation": "n. 担架, 延伸器",
+      "display": "**词性** n. /'stretʃә/\n\n**英英释义**：n. a wooden framework on which canvas is stretched and fixed for oil painting\nn. a mechanical device used to make something larger (as shoes or gloves) by stretching it\nn. a litter for transporting people who are ill or wounded or dead; usually consists of a sheet of canvas stretched between two poles\n\n**中文释义**：n. 担架, 延伸器\n[医] 担架",
+      "phonetic": "/'stretʃә/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-stretcher",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/34,/1:91,/1:100)",
+          "quote": "stretcher",
+          "created": "2026-06-12T03:15:59.010Z"
+        }
+      ],
+      "created": "2026-06-12T03:15:59.010Z",
+      "updated": "2026-06-12T03:15:59.010Z"
+    },
+    "bumpy": {
+      "lemma": "bumpy",
+      "title": "bumpy",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "bumpy"
+      ],
+      "translation": "a. 颠簸的, 崎岖不平的",
+      "display": "**词性**  /'bʌmpi/\n\n**英英释义**：s. covered with or full of bumps\n\n**中文释义**：a. 颠簸的, 崎岖不平的",
+      "phonetic": "/'bʌmpi/",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-bumpy",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/34,/1:114,/1:119)",
+          "quote": "bumpy",
+          "created": "2026-06-12T03:16:31.410Z"
+        }
+      ],
+      "created": "2026-06-12T03:16:31.410Z",
+      "updated": "2026-06-12T03:16:31.410Z"
+    },
+    "sidewalk": {
+      "lemma": "sidewalk",
+      "title": "sidewalk",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "sidewalk"
+      ],
+      "translation": "n. 人行道",
+      "display": "**词性** n. /'saidwɒ:k/\n\n**英英释义**：n. walk consisting of a paved area for pedestrians; usually beside a street or roadway\n\n**中文释义**：n. 人行道",
+      "phonetic": "/'saidwɒ:k/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sidewalk",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/34,/1:120,/1:128)",
+          "quote": "sidewalk",
+          "created": "2026-06-12T03:16:46.293Z"
+        }
+      ],
+      "created": "2026-06-12T03:16:46.293Z",
+      "updated": "2026-06-12T03:16:46.293Z"
+    },
+    "sophomore": {
+      "lemma": "sophomore",
+      "title": "sophomore",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "sophomore"
+      ],
+      "translation": "n. (大学)二年级生",
+      "display": "**词性** n. /'sɒfәmɒ:/\n\n**英英释义**：n. a second-year undergraduate\ns. used of the second year in United States high school or college\n\n**中文释义**：n. (大学)二年级生\na. 二年级学生的, 二年级的",
+      "phonetic": "/'sɒfәmɒ:/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sophomore",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/6,/3:10,/3:19)",
+          "quote": "sophomore",
+          "created": "2026-06-12T03:17:19.762Z"
+        }
+      ],
+      "created": "2026-06-12T03:17:19.762Z",
+      "updated": "2026-06-12T03:17:19.762Z"
+    },
+    "choke": {
+      "lemma": "choke",
+      "title": "choke",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "choke",
+        "chok"
+      ],
+      "translation": "忍住，抑制",
+      "display": "**verb** /tʃəʊk/\n\n**英英释义**：to have difficulty breathing because something is blocking your throat; in the phrase 'choke back', it means to suppress or hold back (emotions, tears, etc.).\n\n**中文释义**：文中含义：抑制，忍住（眼泪、情感等）。其他常见含义：窒息；使窒息；阻塞。\n\n---\n\n**例句**：He choked back tears as he explained to my sister that he would miss her eighth-grade graduation ceremony that night.\n他强忍住眼泪，向妹妹解释说他将错过她当晚的八年级毕业典礼。\n\n---\n\n**搭配**：choke back tears, choke on something\n**派生**：choked (adj.), choking (adj./n.)\n**词源**：来自古英语 cēocian，拟声词。\n**同义词**：suppress, hold back, stifle",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-choke",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/36,/1:133,/1:137)",
+          "quote": "chok",
+          "created": "2026-06-12T03:17:58.128Z"
+        }
+      ],
+      "created": "2026-06-12T03:17:58.128Z",
+      "updated": "2026-06-12T03:17:58.128Z"
+    },
+    "sibling": {
+      "lemma": "sibling",
+      "title": "sibling",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "sibling"
+      ],
+      "translation": "n. 兄弟, 同胞",
+      "display": "**词性** n. /'sibliŋ/\n\n**英英释义**：n. a person's brother or sister\n\n**中文释义**：n. 兄弟, 同胞\n[医] 同胞(兄弟姐妹)",
+      "phonetic": "/'sibliŋ/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sibling",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/36,/1:265,/1:272)",
+          "quote": "sibling",
+          "created": "2026-06-12T03:18:14.186Z"
+        }
+      ],
+      "created": "2026-06-12T03:18:14.186Z",
+      "updated": "2026-06-12T03:18:14.186Z"
+    },
+    "trauma": {
+      "lemma": "trauma",
+      "title": "trauma",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "trauma"
+      ],
+      "translation": "n. 外伤, 损伤",
+      "display": "**词性** n. /'trɒ:mә/\n\n**英英释义**：n. an emotional wound or shock often having long-lasting effects\n\n**中文释义**：n. 外伤, 损伤\n[医] 创伤, 外伤",
+      "phonetic": "/'trɒ:mә/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-trauma",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/38,/1:147,/1:153)",
+          "quote": "trauma",
+          "created": "2026-06-12T03:18:34.230Z"
+        }
+      ],
+      "created": "2026-06-12T03:18:34.230Z",
+      "updated": "2026-06-12T03:18:34.230Z"
+    },
+    "medically induced coma": {
+      "lemma": "medically induced coma",
+      "title": "medically induced coma",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "medically induced coma"
+      ],
+      "translation": "医学诱导昏迷",
+      "display": "**短语** /ˈmɛdɪkli ɪnˈdjuːst ˈkoʊmə/\n\n**英英释义**：A temporary coma intentionally caused by administering drugs, often to reduce brain swelling or allow the brain to rest and heal.\n\n**中文释义**：文中含义：为保护大脑或促进恢复而使用药物诱导的昏迷状态。其他常见含义：无。\n\n---\n\n**例句**：After yet another seizure—my third of the day—I was put into a medically induced coma and placed on a ventilator.\n在当天第三次癫痫发作后，我被置于医学诱导昏迷状态并接上呼吸机。\n\n---\n\n**搭配**：place in a medically induced coma, induce a medically induced coma\n**派生**：无\n**词源**：medically（医学上）+ induced（诱导的）+ coma（昏迷）\n**同义词**：induced coma, pharmacologic coma",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-medically-induced-coma",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/38,/1:417,/1:439)",
+          "quote": "medically induced coma",
+          "created": "2026-06-12T03:19:03.647Z"
+        }
+      ],
+      "created": "2026-06-12T03:19:03.647Z",
+      "updated": "2026-06-12T03:19:03.647Z"
+    },
+    "chemotherapy": {
+      "lemma": "chemotherapy",
+      "title": "chemotherapy",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "chemotherapy"
+      ],
+      "translation": "n. 化学疗法",
+      "display": "**词性** n. /.kemәu'θerәpi/\n\n**英英释义**：n. the use of chemical agents to treat or control disease (or mental illness)\n\n**中文释义**：n. 化学疗法\n[化] 化学疗法",
+      "phonetic": "/.kemәu'θerәpi/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-chemotherapy",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/40,/1:269,/1:281)",
+          "quote": "chemotherapy",
+          "created": "2026-06-12T03:19:30.955Z"
+        }
+      ],
+      "created": "2026-06-12T03:19:30.955Z",
+      "updated": "2026-06-12T03:19:30.955Z"
+    },
+    "mattress": {
+      "lemma": "mattress",
+      "title": "mattress",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "mattress"
+      ],
+      "translation": "n. 床垫, 空气垫, 沉床",
+      "display": "**词性** n. /'mætris/\n\n**英英释义**：n. a large thick pad filled with resilient material and often incorporating coiled springs, used as a bed or part of a bed\n\n**中文释义**：n. 床垫, 空气垫, 沉床\n[医] 褥子, 床垫",
+      "phonetic": "/'mætris/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-mattress",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/44,/1:103,/1:111)",
+          "quote": "mattress",
+          "created": "2026-06-12T03:20:18.964Z"
+        }
+      ],
+      "created": "2026-06-12T03:20:18.964Z",
+      "updated": "2026-06-12T03:20:18.964Z"
+    },
+    "fatigue": {
+      "lemma": "fatigue",
+      "title": "fatigue",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "fatigue"
+      ],
+      "translation": "n. 疲乏, 疲劳",
+      "display": "**词性** n. vt. vi. /fә'ti:g/\n\n**英英释义**：n. temporary loss of strength and energy resulting from hard physical or mental work\nn. used of materials (especially metals) in a weakened state caused by long stress\nn. (always used with a modifier) boredom resulting from overexposure to something\n\n**中文释义**：n. 疲乏, 疲劳\nvt. 使疲劳, 使心智衰弱\nvi. 疲劳\na. 疲劳的",
+      "phonetic": "/fә'ti:g/",
+      "partOfSpeech": "n. vt. vi.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-fatigue",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/44,/1:148,/1:155)",
+          "quote": "fatigue",
+          "created": "2026-06-12T03:20:37.694Z"
+        }
+      ],
+      "created": "2026-06-12T03:20:37.694Z",
+      "updated": "2026-06-12T03:20:37.694Z"
+    },
+    "rebound": {
+      "lemma": "rebound",
+      "title": "rebound",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "rebound",
+        "rebounde"
+      ],
+      "translation": "恢复",
+      "display": "**动词** /rɪˈbaʊnd/\n\n**英英释义**：recover in value, strength, or health; bounce back.\n\n**中文释义**：文中含义：恢复（健康、力量等）。其他常见含义：反弹，回升；弹回。\n\n---\n\n**例句**：By the next morning my breathing had rebounded to the point where the doctors felt comfortable releasing me from the coma.\n到第二天早上，我的呼吸已恢复到医生认为可以放心让我脱离昏迷的程度。\n\n---\n\n**搭配**：rebound from, rebound to\n**派生**：rebounder, rebounding\n**词源**：来自中古英语，源自盎格鲁-法语reboundir，意为“弹回”。\n**同义词**：recover, bounce back, rally",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-rebound",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/48,/1:49,/1:57)",
+          "quote": "rebounde",
+          "created": "2026-06-12T03:21:05.227Z"
+        }
+      ],
+      "created": "2026-06-12T03:21:05.227Z",
+      "updated": "2026-06-12T03:21:05.227Z"
+    },
+    "sniff": {
+      "lemma": "sniff",
+      "title": "sniff",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "sniff"
+      ],
+      "translation": "n. 以鼻吸气, 嗅, 气息",
+      "display": "**词性** n. vi. vt. v. /snif/\n\n**英英释义**：n. sensing an odor by inhaling through the nose\nv. perceive by inhaling through the nose\nv. inhale audibly through the nose\n\n**中文释义**：n. 以鼻吸气, 嗅, 气息\nvi. 嗅, 蔑视, 嗤之以鼻\nvt. 闻, 用力吸, 发觉",
+      "phonetic": "/snif/",
+      "partOfSpeech": "n. vi. vt. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sniff",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/48,/1:272,/1:277)",
+          "quote": "sniff",
+          "created": "2026-06-12T03:21:24.590Z"
+        }
+      ],
+      "created": "2026-06-12T03:21:24.590Z",
+      "updated": "2026-06-12T03:21:24.590Z"
+    },
+    "bulge": {
+      "lemma": "bulge",
+      "title": "bulge",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "bulge"
+      ],
+      "translation": "n. 胀, 膨胀",
+      "display": "**词性** n. vi. vt. v. /bʌldʒ/\n\n**英英释义**：n. something that bulges out or is protuberant or projects from its surroundings\nv. swell or protrude outwards\nv. bulge out; form a bulge outward, or be so full as to appear to bulge\nv. cause to bulge or swell outwards\n\n**中文释义**：n. 胀, 膨胀\nvi. 凸出\nvt. 使膨胀",
+      "phonetic": "/bʌldʒ/",
+      "partOfSpeech": "n. vi. vt. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-bulge",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/48,/1:473,/1:478)",
+          "quote": "bulge",
+          "created": "2026-06-12T03:22:00.509Z"
+        }
+      ],
+      "created": "2026-06-12T03:22:00.509Z",
+      "updated": "2026-06-12T03:22:00.509Z"
+    },
+    "precariously": {
+      "lemma": "precariously",
+      "title": "precariously",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "precariously"
+      ],
+      "translation": "adv. 不安全地；不牢靠地",
+      "display": "**词性** adv.\n\n**英英释义**：r. in a precarious manner\n\n**中文释义**：adv. 不安全地；不牢靠地",
+      "phonetic": "",
+      "partOfSpeech": "adv.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-precariously",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/48,/1:504,/1:516)",
+          "quote": "precariously",
+          "created": "2026-06-12T03:22:14.714Z"
+        }
+      ],
+      "created": "2026-06-12T03:22:14.714Z",
+      "updated": "2026-06-12T03:22:14.714Z"
+    },
+    "ophthalmologist": {
+      "lemma": "ophthalmologist",
+      "title": "ophthalmologist",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "ophthalmologist"
+      ],
+      "translation": "n. 眼科医师",
+      "display": "**词性** n. /.ɒfθæl'mɒlәdʒist/\n\n**英英释义**：n. a medical doctor specializing in the diagnosis and treatment of diseases of the eye\n\n**中文释义**：n. 眼科医师\n[医] 眼科学家",
+      "phonetic": "/.ɒfθæl'mɒlәdʒist/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-ophthalmologist",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/50,/1:4,/1:19)",
+          "quote": "ophthalmologist",
+          "created": "2026-06-12T03:22:39.861Z"
+        }
+      ],
+      "created": "2026-06-12T03:22:39.861Z",
+      "updated": "2026-06-12T03:22:39.861Z"
+    },
+    "slide back into": {
+      "lemma": "slide back into",
+      "title": "slide back into",
+      "kind": "phrase",
+      "isWord": true,
+      "surfaceForms": [
+        "slide back into"
+      ],
+      "translation": "滑回原位",
+      "display": "**词性**：动词短语 /slʌɪd bæk ˈɪntuː/\n\n**英英释义**：to move or return gradually to a previous position or state\n\n**中文释义**：文中含义：逐渐滑回原位。其他常见含义：重新陷入（某种不良状态）\n\n---\n\n**例句**：The ophthalmologist said my eye would gradually slide back into place as the air seeped out.\n眼科医生说我眼睛会随着空气渗出逐渐滑回原位。\n\n---\n\n**搭配**：slide back into place\n**派生**：无\n**词源**：无\n**同义词**：slip back into, return to",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-slide-back-into",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/50,/1:48,/1:63)",
+          "quote": "slide back into",
+          "created": "2026-06-12T03:23:02.774Z"
+        }
+      ],
+      "created": "2026-06-12T03:23:02.774Z",
+      "updated": "2026-06-12T03:23:02.774Z"
+    },
+    "rehabilitation": {
+      "lemma": "rehabilitation",
+      "title": "rehabilitation",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "rehabilitation"
+      ],
+      "translation": "n. 复原",
+      "display": "**词性** n. /'ri:(h)ә,bili'teiʃәn/\n\n**英英释义**：n. the restoration of someone to a useful place in society\nn. vindication of a person's character and the re-establishment of that person's reputation\nn. the treatment of physical disabilities by massage and electrotherapy and exercises\n\n**中文释义**：n. 复原\n[医] 复原, 恢复, 康复",
+      "phonetic": "/'ri:(h)ә,bili'teiʃәn/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-rehabilitation",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/54,/3:10,/3:24)",
+          "quote": "rehabilitation",
+          "created": "2026-06-12T03:24:33.281Z"
+        }
+      ],
+      "created": "2026-06-12T03:24:33.281Z",
+      "updated": "2026-06-12T03:24:33.281Z"
+    },
+    "sentence-fcx76x": {
+      "lemma": "sentence-fcx76x",
+      "title": "l did eventually return to its normal location. Between the seizures and my vision problems, it was eight months before I could drive a car again. At physical therapy, I practiced basic motor patterns like walking in a straight line. I was determined not to let my injury get m",
+      "kind": "sentence",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "我最终还是回到了正常的位置。在癫痫发作和视力问题之间，过了八个月我才能再次开车。在物理治疗中，我练习了像走直线这样的基本运动模式。我决心不让我的受伤击倒我。",
+      "display": "我最终还是回到了正常的位置。在癫痫发作和视力问题之间，过了八个月我才能再次开车。在物理治疗中，我练习了像走直线这样的基本运动模式。我决心不让我的受伤击倒我。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-fcx76x",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/52,/1:187,/1:464)",
+          "quote": "l did eventually return to its normal location. Between the seizures and my vision problems, it was eight months before I could drive a car again. At physical therapy, I practiced basic motor patterns like walking in a straight line. I was determined not to let my injury get m",
+          "created": "2026-06-12T13:16:42.175Z"
+        }
+      ],
+      "created": "2026-06-12T13:16:42.175Z",
+      "updated": "2026-06-12T13:16:42.175Z"
+    },
+    "smell": {
+      "lemma": "smell",
+      "title": "smell",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "smell"
+      ],
+      "translation": "n. 味道, 气味, 嗅觉, 嗅, 臭味, 气息",
+      "display": "**词性** n. vt. vi. v. /smel/\n\n**英英释义**：n. the sensation that results when olfactory receptors in the nose are stimulated by particular chemicals in gaseous form\nn. the faculty that enables us to distinguish scents\nn. the act of perceiving the odor of something\nv. inhale the odor of; perceive by the olfactory sense\n\n**中文释义**：n. 味道, 气味, 嗅觉, 嗅, 臭味, 气息\nvt. 闻, 探出, 察觉, 发出...的气味\nvi. 嗅, 散发气味, 发臭",
+      "phonetic": "/smel/",
+      "partOfSpeech": "n. vt. vi. v.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-smell",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/48,/1:217,/1:222)",
+          "quote": "smell",
+          "created": "2026-06-12T13:30:25.546Z"
+        }
+      ],
+      "created": "2026-06-12T13:30:25.546Z",
+      "updated": "2026-06-12T13:30:25.546Z"
+    },
+    "mother": {
+      "lemma": "mother",
+      "title": "mother",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "mother"
+      ],
+      "translation": "母亲",
+      "display": "**n.** /ˈmʌðər/\n\n**英英释义**：a female parent\n\n**中文释义**：文中含义：母亲；其他常见含义：妈妈，母体\n\n---\n\n**例句**：My mother would tell me later, \"It was one of the worst nights I’ve ever had.\"\n我母亲后来告诉我，“那是我经历过的最糟糕的夜晚之一。”\n\n---\n\n**搭配**：mother's love, mother tongue, mother nature\n**派生**：motherly, motherhood, motherland\n**词源**：来自古英语 modor\n**同义词**：mom, mama, parent",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-mother",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/44,/1:206,/1:212)",
+          "quote": "mother",
+          "created": "2026-06-12T13:31:33.423Z"
+        }
+      ],
+      "created": "2026-06-12T13:31:33.423Z",
+      "updated": "2026-06-12T13:31:33.423Z"
+    },
+    "nose": {
+      "lemma": "nose",
+      "title": "nose",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "nose"
+      ],
+      "translation": "n. 鼻子, 突出部分, 嗅觉",
+      "display": "**词性** n. vt. vi. /nәuz/\n\n**英英释义**：n. the organ of smell and entrance to the respiratory tract; the prominent part of the face of man or other mammals\nn. a front that resembles a human nose (especially the front of an aircraft)\nn. the front or forward projection of a tool or weapon\nn. a small distance\n\n**中文释义**：n. 鼻子, 突出部分, 嗅觉\nvt. 嗅到, 探出, 用鼻子触\nvi. 闻, 嗅, 探听, 告密",
+      "phonetic": "/nәuz/",
+      "partOfSpeech": "n. vt. vi.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-nose",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/8,/1:64,/1:68)",
+          "quote": "nose",
+          "created": "2026-06-13T00:47:38.413Z"
+        }
+      ],
+      "created": "2026-06-13T00:47:38.413Z",
+      "updated": "2026-06-13T00:47:38.413Z"
+    },
+    "swelling": {
+      "lemma": "swelling",
+      "title": "swelling",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "swelling"
+      ],
+      "translation": "n. 肿胀, 肿大, 隆起部, 身上的肿胀处, 膨胀, 增大",
+      "display": "**词性** n. /'sweliŋ/\n\n**英英释义**：n. an abnormal protuberance or localized enlargement\n\n**中文释义**：n. 肿胀, 肿大, 隆起部, 身上的肿胀处, 膨胀, 增大\na. 肿大的, 突起的",
+      "phonetic": "/'sweliŋ/",
+      "partOfSpeech": "n.",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-swelling",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/8,/1:203,/1:211)",
+          "quote": "swelling",
+          "created": "2026-06-13T00:48:49.381Z"
+        }
+      ],
+      "created": "2026-06-13T00:48:49.381Z",
+      "updated": "2026-06-13T00:48:49.381Z"
+    },
+    "sentence-j0uruf": {
+      "lemma": "sentence-j0uruf",
+      "title": "I have no memory of the moment of impact.",
+      "kind": "sentence",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "我不记得撞击的那一瞬间。",
+      "display": "我不记得撞击的那一瞬间。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-j0uruf",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/6,/3:224,/3:265)",
+          "quote": "I have no memory of the moment of impact.",
+          "created": "2026-06-13T00:57:22.453Z"
+        }
+      ],
+      "created": "2026-06-13T00:57:22.453Z",
+      "updated": "2026-06-13T00:57:22.453Z"
+    },
+    "face": {
+      "lemma": "face",
+      "title": "face",
+      "kind": "word",
+      "isWord": true,
+      "surfaceForms": [
+        "face"
+      ],
+      "translation": "脸",
+      "display": "**名词** /feɪs/\n\n**英英释义**：the front part of a person's head from the forehead to the chin\n\n**中文释义**：文中含义：脸。其他常见含义：面孔，面容；表面，正面；面子，尊严；面对，面向\n\n---\n\n**例句**：The bat smashed into my face with such force that it crushed my nose into a distorted U-shape.\n蝙蝠猛击在我的脸上，力量之大，将我的鼻子压成了扭曲的U形。\n\n---\n\n**搭配**：face to face, face up to, face value\n**派生**：facial, faceless\n**词源**：源自拉丁语 facies\n**同义词**：countenance, visage",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-face",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "Introduction: My Story",
+          "cfiRange": "epubcfi(/6/12!/4[x9780735211308_EPUB-4]/2/8,/1:24,/1:28)",
+          "quote": "face",
+          "created": "2026-06-13T01:02:31.174Z"
+        }
+      ],
+      "created": "2026-06-13T01:02:31.174Z",
+      "updated": "2026-06-13T01:02:31.174Z"
+    },
+    "sentence-kb3neq": {
+      "lemma": "sentence-kb3neq",
+      "title": "Change out of work clothes.",
+      "kind": "sentence",
+      "isWord": false,
+      "surfaceForms": [],
+      "translation": "换掉工作服。",
+      "display": "换掉工作服。",
+      "phonetic": "",
+      "partOfSpeech": "",
+      "example": "",
+      "notePath": "09 Books/Words/Atomic Habits（James Clear）.md",
+      "blockId": "jr-word-sentence-kb3neq",
+      "mastered": false,
+      "sources": [
+        {
+          "bookPath": "09 Books/Atomic Habits（James Clear）.epub",
+          "bookTitle": "Atomic Habits（James Clear）",
+          "chapterTitle": "5: The Best Way to Start a New Habit",
+          "cfiRange": "epubcfi(/6/26!/4[x9780735211308_EPUB-11]/108/22/2,/1:0,/1:27)",
+          "quote": "Change out of work clothes.",
+          "created": "2026-06-14T05:30:26.513Z"
+        }
+      ],
+      "created": "2026-06-14T05:30:26.513Z",
+      "updated": "2026-06-14T05:30:26.513Z"
+    }
+  }
+}

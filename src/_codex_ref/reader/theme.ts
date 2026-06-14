@@ -5,6 +5,35 @@ function cssVariable(name: string, fallback: string): string {
   return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
 }
 
+export interface ReaderThemeSnapshot {
+  background: string;
+  text: string;
+  muted: string;
+  fontFamily: string;
+}
+
+export function getReaderThemeSnapshot(): ReaderThemeSnapshot {
+  return {
+    background: cssVariable("--background-primary", "#ffffff"),
+    text: cssVariable("--text-normal", "#222222"),
+    muted: cssVariable("--text-muted", "#999999"),
+    fontFamily: cssVariable("--font-text", "system-ui, sans-serif"),
+  };
+}
+
+export function getReaderThemeKey(readerZoom: number, readerLineHeight: number): string {
+  const zoom = clampReaderZoom(readerZoom);
+  const lineHeight = clampReaderLineHeight(readerLineHeight);
+  return [
+    cssVariable("--background-primary", "#ffffff"),
+    cssVariable("--text-normal", "#222222"),
+    cssVariable("--font-text", "system-ui, sans-serif"),
+    cssVariable("--font-text-size", "18"),
+    zoom,
+    lineHeight,
+  ].join("|");
+}
+
 export function applyReaderTheme(
   rendition: Rendition,
   readerZoom: number,
