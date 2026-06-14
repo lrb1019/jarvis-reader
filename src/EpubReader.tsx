@@ -45,6 +45,7 @@ export interface EpubReaderProps {
   autoWordHighlight: boolean;
   autoTranslateSelection: boolean;
   speechLang: string;
+  highlightColors?: Record<string, string>;
   enableWordAudio: boolean;
   wordAudioTemplate: string;
   wordAudioAccent: string;
@@ -148,7 +149,7 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
 
 // src/EpubView.tsx
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -173,6 +174,21 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const wordDisplayCacheRef = useRef<any>( new Map());
   const pendingWordLookupRef = useRef<any>(0);
   const [theme, setTheme] = useState(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
+  const [currentColors, setCurrentColors] = useState<any>(highlightColors);
+
+  useEffect(() => {
+    setCurrentColors(highlightColors);
+  }, [highlightColors]);
+
+  useEffect(() => {
+    const handleColorChange = (e: any) => {
+      if (e.detail) {
+        setCurrentColors(e.detail);
+      }
+    };
+    window.addEventListener("jarvis-reader-colors-changed", handleColorChange);
+    return () => window.removeEventListener("jarvis-reader-colors-changed", handleColorChange);
+  }, []);
 
   useEffect(() => {
     let lastThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
@@ -186,6 +202,31 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     }, 1000);
     return () => clearInterval(intervalId);
   }, [readerZoom, readerLineHeight]);
+
+  useEffect(() => {
+    if (!renditionRef.current || !currentColors) return;
+    try {
+      const rendition = renditionRef.current;
+      if (highlightListRef.current) {
+        for (const highlight of highlightListRef.current) {
+          if (highlight.cfiRange) {
+            rendition.annotations.remove(highlight.cfiRange, "highlight");
+            rendition.annotations.remove(highlight.cfiRange, "underline");
+          }
+        }
+      }
+      if (rendition.__awesomeReaderHighlightIds) {
+        rendition.__awesomeReaderHighlightIds.clear();
+      }
+      
+      clearAutoWordHighlights(rendition);
+      
+      applyHighlights(rendition, highlightListRef.current);
+      syncAutoWordHighlights(rendition);
+    } catch (e) {
+      console.warn("Jarvis Reader: Failed to redraw annotations on color change", e);
+    }
+  }, [currentColors]);
 
   const wordHoverHideTimerRef = useRef<any>(null);
   const pendingHighlightMenuRef = useRef<any>(null);
@@ -421,20 +462,22 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       };
 
       if (highlight.comment) {
+        const commentColor = currentColors?.comment || "#f97316";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
-          fill: "#f97316",
+          fill: commentColor,
           "fill-opacity": "0.15",
           "mix-blend-mode": "multiply"
         });
         rendition.annotations.underline(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment", {
-          stroke: "#f97316",
+          stroke: commentColor,
           "stroke-opacity": "0.98",
           "stroke-width": "2.0",
           "mix-blend-mode": "multiply"
         });
       } else {
+        const normalColor = currentColors?.normal || "#ffeb3b";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
-          fill: "#ffeb3b",
+          fill: normalColor,
           "fill-opacity": "0.45",
           "mix-blend-mode": "multiply"
         });
@@ -986,7 +1029,7 @@ const showWordHoverCard = (asset, element) => {
     rendition.__jarvisReaderWordHighlightIds.add(cfiRange);
     try {
       const kind = getTranslationAssetKind(asset);
-      const strokeColor = kind === "sentence" ? "#40c057" : kind === "phrase" ? "#ae3ec9" : "#4dabf7";
+      const strokeColorVar = kind === "sentence" ? (currentColors?.sentence || "#40c057") : kind === "phrase" ? (currentColors?.phrase || "#ae3ec9") : (currentColors?.word || "#4dabf7");
       const openWordCardFromEvent = (event) => {
         if (event && typeof event.preventDefault === "function")
           event.preventDefault();
@@ -996,12 +1039,12 @@ const showWordHoverCard = (asset, element) => {
         }
       };
       const annotationBg = rendition.annotations.highlight(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight-bg", {
-        fill: strokeColor,
+        fill: strokeColorVar,
         "fill-opacity": "0.15",
         "mix-blend-mode": "multiply"
       });
       const annotationUl = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
-        stroke: strokeColor,
+        stroke: strokeColorVar,
         "stroke-opacity": "0.92",
         "stroke-width": "2.0",
         "mix-blend-mode": "multiply"

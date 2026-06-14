@@ -35,7 +35,14 @@ export const DEFAULT_SETTINGS = {
   bookCoverCache: {},
   sidebarLayoutMode: "single",
   sidebarPaneSplit: 48,
-  bookshelfCoverOnly: false
+  bookshelfCoverOnly: false,
+  highlightColors: {
+    word: "#4dabf7",
+    phrase: "#ae3ec9",
+    sentence: "#40c057",
+    comment: "#f97316",
+    normal: "#ffeb3b"
+  }
 };
 export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
   onChoose: (path: string) => void;
@@ -251,6 +258,34 @@ created: {{created}}
         await this.plugin.saveSettings();
       });
     });
+
+    containerEl.createEl("h3", { text: "高亮颜色设置" });
+
+    const createColorPicker = (name: string, desc: string, key: "word" | "phrase" | "sentence" | "comment" | "normal") => {
+      new Setting(containerEl)
+        .setName(name)
+        .setDesc(desc)
+        .addColorPicker(picker => picker
+          .setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key])
+          .onChange(async (value) => {
+            this.plugin.settings.highlightColors = {
+              ...(this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors),
+              [key]: value
+            };
+            await this.plugin.saveSettings();
+            
+            // Dispatch event to update EpubReader components directly without a full React unmount
+            const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
+            window.dispatchEvent(event);
+          })
+        );
+    };
+
+    createColorPicker("单词颜色", "自动识别的单词高亮底色", "word");
+    createColorPicker("短语颜色", "自动识别的短语高亮底色", "phrase");
+    createColorPicker("句子颜色", "自动识别的句子高亮底色", "sentence");
+    createColorPicker("感想颜色", "带有感想笔记的划线颜色", "comment");
+    createColorPicker("默认高亮颜色", "普通的文本划线颜色", "normal");
   }
 };
 /*

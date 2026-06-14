@@ -54297,7 +54297,7 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
     top: Math.min(boundsHeight - height - 16, Math.max(16, top))
   };
 }
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
@@ -54322,6 +54322,19 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const wordDisplayCacheRef = (0, import_react2.useRef)(/* @__PURE__ */ new Map());
   const pendingWordLookupRef = (0, import_react2.useRef)(0);
   const [theme, setTheme] = (0, import_react2.useState)(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
+  const [currentColors, setCurrentColors] = (0, import_react2.useState)(highlightColors);
+  (0, import_react2.useEffect)(() => {
+    setCurrentColors(highlightColors);
+  }, [highlightColors]);
+  (0, import_react2.useEffect)(() => {
+    const handleColorChange = (e) => {
+      if (e.detail) {
+        setCurrentColors(e.detail);
+      }
+    };
+    window.addEventListener("jarvis-reader-colors-changed", handleColorChange);
+    return () => window.removeEventListener("jarvis-reader-colors-changed", handleColorChange);
+  }, []);
   (0, import_react2.useEffect)(() => {
     let lastThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
     const intervalId = setInterval(() => {
@@ -54334,6 +54347,28 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }, 1e3);
     return () => clearInterval(intervalId);
   }, [readerZoom, readerLineHeight]);
+  (0, import_react2.useEffect)(() => {
+    if (!renditionRef.current || !currentColors) return;
+    try {
+      const rendition = renditionRef.current;
+      if (highlightListRef.current) {
+        for (const highlight of highlightListRef.current) {
+          if (highlight.cfiRange) {
+            rendition.annotations.remove(highlight.cfiRange, "highlight");
+            rendition.annotations.remove(highlight.cfiRange, "underline");
+          }
+        }
+      }
+      if (rendition.__awesomeReaderHighlightIds) {
+        rendition.__awesomeReaderHighlightIds.clear();
+      }
+      clearAutoWordHighlights(rendition);
+      applyHighlights(rendition, highlightListRef.current);
+      syncAutoWordHighlights(rendition);
+    } catch (e) {
+      console.warn("Jarvis Reader: Failed to redraw annotations on color change", e);
+    }
+  }, [currentColors]);
   const wordHoverHideTimerRef = (0, import_react2.useRef)(null);
   const pendingHighlightMenuRef = (0, import_react2.useRef)(null);
   const pendingWordSelectionRef = (0, import_react2.useRef)(null);
@@ -54567,20 +54602,22 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         });
       };
       if (highlight.comment) {
+        const commentColor = currentColors?.comment || "#f97316";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
-          fill: "#f97316",
+          fill: commentColor,
           "fill-opacity": "0.15",
           "mix-blend-mode": "multiply"
         });
         rendition.annotations.underline(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment", {
-          stroke: "#f97316",
+          stroke: commentColor,
           "stroke-opacity": "0.98",
           "stroke-width": "2.0",
           "mix-blend-mode": "multiply"
         });
       } else {
+        const normalColor = currentColors?.normal || "#ffeb3b";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
-          fill: "#ffeb3b",
+          fill: normalColor,
           "fill-opacity": "0.45",
           "mix-blend-mode": "multiply"
         });
@@ -55131,7 +55168,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     rendition.__jarvisReaderWordHighlightIds.add(cfiRange);
     try {
       const kind = getTranslationAssetKind(asset);
-      const strokeColor = kind === "sentence" ? "#40c057" : kind === "phrase" ? "#ae3ec9" : "#4dabf7";
+      const strokeColorVar = kind === "sentence" ? currentColors?.sentence || "#40c057" : kind === "phrase" ? currentColors?.phrase || "#ae3ec9" : currentColors?.word || "#4dabf7";
       const openWordCardFromEvent = (event) => {
         if (event && typeof event.preventDefault === "function")
           event.preventDefault();
@@ -55141,12 +55178,12 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         }
       };
       const annotationBg = rendition.annotations.highlight(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight-bg", {
-        fill: strokeColor,
+        fill: strokeColorVar,
         "fill-opacity": "0.15",
         "mix-blend-mode": "multiply"
       });
       const annotationUl = rendition.annotations.underline(cfiRange, { lemma: asset.lemma }, openWordCardFromEvent, "jarvis-reader-word-highlight", {
-        stroke: strokeColor,
+        stroke: strokeColorVar,
         "stroke-opacity": "0.92",
         "stroke-width": "2.0",
         "mix-blend-mode": "multiply"
@@ -56784,6 +56821,7 @@ var EpubView = class extends import_obsidian5.FileView {
       autoWordHighlight: this.shouldAutoHighlightWords(),
       autoTranslateSelection: !!(this.plugin.settings.experimentalInstantTranslation && this.plugin.settings.experimentalInstantTranslation.enabled),
       speechLang: this.plugin.settings.speechLang,
+      highlightColors: this.plugin.settings.highlightColors,
       enableWordAudio: !!this.plugin.settings.enableWordAudio,
       wordAudioTemplate: this.plugin.settings.wordAudioTemplate,
       wordAudioAccent: this.plugin.settings.wordAudioAccent,
@@ -57818,7 +57856,14 @@ var DEFAULT_SETTINGS = {
   bookCoverCache: {},
   sidebarLayoutMode: "single",
   sidebarPaneSplit: 48,
-  bookshelfCoverOnly: false
+  bookshelfCoverOnly: false,
+  highlightColors: {
+    word: "#4dabf7",
+    phrase: "#ae3ec9",
+    sentence: "#40c057",
+    comment: "#f97316",
+    normal: "#ffeb3b"
+  }
 };
 var JarvisReaderFolderSuggestModal = class extends import_obsidian8.FuzzySuggestModal {
   onChoose;
@@ -58034,6 +58079,25 @@ created: {{created}}
         await this.plugin.saveSettings();
       });
     });
+    containerEl.createEl("h3", { text: "\u9AD8\u4EAE\u989C\u8272\u8BBE\u7F6E" });
+    const createColorPicker = (name, desc, key) => {
+      new import_obsidian8.Setting(containerEl).setName(name).setDesc(desc).addColorPicker(
+        (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+          this.plugin.settings.highlightColors = {
+            ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
+            [key]: value
+          };
+          await this.plugin.saveSettings();
+          const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
+          window.dispatchEvent(event);
+        })
+      );
+    };
+    createColorPicker("\u5355\u8BCD\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u5355\u8BCD\u9AD8\u4EAE\u5E95\u8272", "word");
+    createColorPicker("\u77ED\u8BED\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u77ED\u8BED\u9AD8\u4EAE\u5E95\u8272", "phrase");
+    createColorPicker("\u53E5\u5B50\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u53E5\u5B50\u9AD8\u4EAE\u5E95\u8272", "sentence");
+    createColorPicker("\u611F\u60F3\u989C\u8272", "\u5E26\u6709\u611F\u60F3\u7B14\u8BB0\u7684\u5212\u7EBF\u989C\u8272", "comment");
+    createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
   }
 };
 

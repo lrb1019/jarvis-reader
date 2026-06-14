@@ -161,6 +161,7 @@ export interface JarvisReaderSettings {
   sidebarLayoutMode: SidebarLayoutMode;
   sidebarPaneSplit: number;
   bookshelfCoverOnly: boolean;
+  highlightColors: Record<string, string>;
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &

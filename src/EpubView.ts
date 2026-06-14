@@ -451,6 +451,7 @@ export class EpubView extends FileView {
       autoWordHighlight: this.shouldAutoHighlightWords(),
       autoTranslateSelection: !!(this.plugin.settings.experimentalInstantTranslation && this.plugin.settings.experimentalInstantTranslation.enabled),
       speechLang: this.plugin.settings.speechLang,
+      highlightColors: this.plugin.settings.highlightColors,
       enableWordAudio: !!this.plugin.settings.enableWordAudio,
       wordAudioTemplate: this.plugin.settings.wordAudioTemplate,
       wordAudioAccent: this.plugin.settings.wordAudioAccent,
