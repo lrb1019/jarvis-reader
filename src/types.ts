@@ -146,7 +146,6 @@ export interface JarvisReaderSettings {
   wordNoteFolder: string;
   wordAssets: WordAssetMap;
   translationApi: TranslationApiSettings;
-  experimentalInstantTranslation: InstantTranslationSettings;
   translationPrompt: string;
   autoHighlightFolders: string[];
   enableWordAudio: boolean;

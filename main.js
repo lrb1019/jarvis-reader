@@ -54297,7 +54297,7 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
     top: Math.min(boundsHeight - height - 16, Math.max(16, top))
   };
 }
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
@@ -55533,15 +55533,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     };
     clearWordLookup();
     setPendingSelection(null);
-    if (autoTranslateSelection) {
-      Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
-        if (!opened) {
-          setPendingHighlightMenu(selectionItem);
-        }
-      });
-    } else {
-      setPendingHighlightMenu(selectionItem);
-    }
+    setPendingHighlightMenu(selectionItem);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
@@ -56819,7 +56811,6 @@ var EpubView = class extends import_obsidian5.FileView {
       deleteWordAsset: (asset) => this.deleteWordAsset(asset),
       loadWordDisplay: (asset) => this.loadWordDisplay(asset),
       autoWordHighlight: this.shouldAutoHighlightWords(),
-      autoTranslateSelection: !!(this.plugin.settings.experimentalInstantTranslation && this.plugin.settings.experimentalInstantTranslation.enabled),
       speechLang: this.plugin.settings.speechLang,
       highlightColors: this.plugin.settings.highlightColors,
       enableWordAudio: !!this.plugin.settings.enableWordAudio,
@@ -57840,9 +57831,6 @@ var DEFAULT_SETTINGS = {
     apiKey: "",
     model: ""
   },
-  experimentalInstantTranslation: {
-    enabled: false
-  },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   autoHighlightFolders: ["09 Books"],
   enableWordAudio: true,
@@ -58051,11 +58039,6 @@ created: {{created}}
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
         new import_obsidian8.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
-      }));
-      const experimental = this.plugin.settings.experimentalInstantTranslation || {};
-      new import_obsidian8.Setting(contentDiv).setName("\u5B9E\u9A8C\uFF1A\u9009\u4E2D\u5373\u7FFB\u8BD1").setDesc("\u9ED8\u8BA4\u5173\u95ED\u3002\u5F00\u542F\u540E\u9009\u4E2D\u6587\u672C\u4F1A\u76F4\u63A5\u6253\u5F00\u7FFB\u8BD1\u5F39\u7A97\uFF0C\u4E0D\u518D\u5148\u663E\u793A\u64CD\u4F5C\u83DC\u5355").addToggle((toggle) => toggle.setValue(experimental.enabled === true).onChange(async (value) => {
-        this.plugin.settings.experimentalInstantTranslation.enabled = value;
-        await this.plugin.saveSettings();
       }));
     }
     if (this.activeTab === "words") {
@@ -59133,14 +59116,6 @@ var JarvisReaderPlugin = class extends import_obsidian10.Plugin {
     this.settings.translationApi.baseUrl = String(this.settings.translationApi.baseUrl || "");
     this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
-    if (!this.settings.experimentalInstantTranslation || typeof this.settings.experimentalInstantTranslation !== "object") {
-      this.settings.experimentalInstantTranslation = {
-        enabled: false
-      };
-    }
-    this.settings.experimentalInstantTranslation.enabled = this.settings.experimentalInstantTranslation.enabled === true;
-    delete this.settings.experimentalInstantTranslation.localDictionaryEnabled;
-    delete this.settings.experimentalInstantTranslation.localDictionaryPath;
     delete this.settings.localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");

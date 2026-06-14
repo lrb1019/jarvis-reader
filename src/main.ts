@@ -390,15 +390,7 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.translationApi.baseUrl = String(this.settings.translationApi.baseUrl || "");
     this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
-    if (!this.settings.experimentalInstantTranslation || typeof this.settings.experimentalInstantTranslation !== "object") {
-      this.settings.experimentalInstantTranslation = {
-        enabled: false
-      };
-    }
-    this.settings.experimentalInstantTranslation.enabled = this.settings.experimentalInstantTranslation.enabled === true;
-    delete this.settings.experimentalInstantTranslation.localDictionaryEnabled;
-    delete this.settings.experimentalInstantTranslation.localDictionaryPath;
-    delete this.settings.localDictionary;
+    delete (this.settings as any).localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
     this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];

@@ -19,9 +19,6 @@ export const DEFAULT_SETTINGS = {
     apiKey: "",
     model: ""
   },
-  experimentalInstantTranslation: {
-    enabled: false
-  },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   autoHighlightFolders: ["09 Books"],
   enableWordAudio: true,
@@ -250,12 +247,6 @@ created: {{created}}
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
         new Notice("已恢复默认翻译提示词。");
-      }));
-      
-      const experimental = this.plugin.settings.experimentalInstantTranslation || {};
-      new Setting(contentDiv).setName("实验：选中即翻译").setDesc("默认关闭。开启后选中文本会直接打开翻译弹窗，不再先显示操作菜单").addToggle((toggle) => toggle.setValue(experimental.enabled === true).onChange(async (value) => {
-        this.plugin.settings.experimentalInstantTranslation.enabled = value;
-        await this.plugin.saveSettings();
       }));
     }
 

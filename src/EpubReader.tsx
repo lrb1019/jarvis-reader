@@ -43,7 +43,6 @@ export interface EpubReaderProps {
   deleteWordAsset: (asset: any) => Promise<boolean>;
   loadWordDisplay: (asset: any) => Promise<string>;
   autoWordHighlight: boolean;
-  autoTranslateSelection: boolean;
   speechLang: string;
   highlightColors?: Record<string, string>;
   enableWordAudio: boolean;
@@ -149,7 +148,7 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
 
 // src/EpubView.tsx
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, autoTranslateSelection, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -1394,15 +1393,7 @@ const showWordHoverCard = (asset, element) => {
     };
     clearWordLookup();
     setPendingSelection(null);
-    if (autoTranslateSelection) {
-      Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
-        if (!opened) {
-          setPendingHighlightMenu(selectionItem);
-        }
-      });
-    } else {
-      setPendingHighlightMenu(selectionItem);
-    }
+    setPendingHighlightMenu(selectionItem);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);

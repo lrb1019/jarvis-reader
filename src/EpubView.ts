@@ -449,7 +449,6 @@ export class EpubView extends FileView {
       deleteWordAsset: (asset: any) => this.deleteWordAsset(asset),
       loadWordDisplay: (asset: any) => this.loadWordDisplay(asset),
       autoWordHighlight: this.shouldAutoHighlightWords(),
-      autoTranslateSelection: !!(this.plugin.settings.experimentalInstantTranslation && this.plugin.settings.experimentalInstantTranslation.enabled),
       speechLang: this.plugin.settings.speechLang,
       highlightColors: this.plugin.settings.highlightColors,
       enableWordAudio: !!this.plugin.settings.enableWordAudio,
