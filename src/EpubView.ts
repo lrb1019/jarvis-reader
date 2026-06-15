@@ -82,12 +82,19 @@ export class EpubView extends FileView {
     this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
     await this.plugin.persistWordAssetSidecar("save");
     await this.plugin.saveSettings();
+    if (typeof this.plugin.refreshWordSidebar === "function") {
+      this.plugin.refreshWordSidebar(this);
+    }
     new Notice("已保存到全局字典");
     return asset;
   }
 
   async openWordNote(asset: any): Promise<void> {
-    new Notice("单词卡现已无文件化，请在右侧边栏查阅");
+    if (typeof this.plugin.openWordSidebarPane === "function") {
+      this.plugin.openWordSidebarPane(true);
+    } else {
+      new Notice("单词卡现已无文件化，请在右侧边栏查阅");
+    }
   }
 
   async setWordMastered(asset: any, mastered: boolean): Promise<any> {
@@ -108,6 +115,9 @@ export class EpubView extends FileView {
     // FILELESS: No markdown modification
     await this.plugin.persistWordAssetSidecar("save");
     await this.plugin.saveSettings();
+    if (typeof this.plugin.refreshWordSidebar === "function") {
+      this.plugin.refreshWordSidebar(this);
+    }
     return updated;
   }
 
@@ -123,6 +133,9 @@ export class EpubView extends FileView {
     await this.plugin.saveSettingsData();
     
     // FILELESS: No markdown modification
+    if (typeof this.plugin.refreshWordSidebar === "function") {
+      this.plugin.refreshWordSidebar(this);
+    }
     new Notice("词条已彻底删除。");
     return true;
   }

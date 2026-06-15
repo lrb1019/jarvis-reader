@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS = {
   bookNoteFolder: "",
   bookNoteTemplate: "",
   wordNoteFolder: "09 Books/Words",
+  wordBookExportFolder: "",
   wordAssets: {},
   translationApi: {
     provider: "openai-compatible",
@@ -133,6 +134,29 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
         if (folderText) {
           folderText.setValue("");
+        }
+      }));
+
+      let exportFolderText: any = null;
+      new Setting(contentDiv).setName("阅读积累导出文件夹").setDesc("选择英语词句本导出的 Markdown 笔记存放路径（相对于 Vault 根目录）").addText((text) => {
+        exportFolderText = text;
+        text.setPlaceholder("如: Export/Wordbooks").setValue(this.plugin.settings.wordBookExportFolder || "").onChange(async (value) => {
+          this.plugin.settings.wordBookExportFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("选择").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.wordBookExportFolder = path;
+          await this.plugin.saveSettings();
+          if (exportFolderText) {
+            exportFolderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
+        this.plugin.settings.wordBookExportFolder = "";
+        await this.plugin.saveSettings();
+        if (exportFolderText) {
+          exportFolderText.setValue("");
         }
       }));
 

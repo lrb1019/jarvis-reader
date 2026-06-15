@@ -1805,3 +1805,164 @@ g.jarvis-reader-highlight-with-comment line {
   stroke: inherit !important;
 }
 
+/* Word Sidebar Styles */
+.jarvis-reader-word-sidebar-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.jarvis-reader-word-sidebar-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.jarvis-reader-word-sidebar-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jarvis-reader-word-sidebar-subtitle {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.jarvis-reader-word-sidebar-action {
+  background: transparent;
+  box-shadow: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: var(--radius-s);
+}
+
+.jarvis-reader-word-sidebar-action:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.jarvis-reader-word-list {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.jarvis-reader-word-item {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.jarvis-reader-word-item:hover {
+  border-color: var(--interactive-accent);
+}
+
+.jarvis-reader-word-item.is-mastered {
+  opacity: 0.6;
+}
+
+.jarvis-reader-word-item-header {
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.jarvis-reader-word-lemma-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jarvis-reader-word-lemma {
+  font-weight: 500;
+  font-size: var(--font-ui-medium);
+  color: var(--text-normal);
+}
+
+.jarvis-reader-word-lemma.has-audio {
+  cursor: pointer;
+  transition: color 0.1s ease;
+}
+
+.jarvis-reader-word-lemma.has-audio:hover {
+  color: var(--interactive-accent);
+  text-decoration: underline;
+}
+
+.jarvis-reader-word-item-display {
+  padding: 0 8px 8px 8px;
+  font-size: 0.9em;
+  color: var(--text-normal);
+  border-top: 1px dashed var(--background-modifier-border);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.jarvis-reader-word-item-display p {
+  margin: 0.5em 0;
+}
+/* Global Word Book Styles */
+.jarvis-word-book-container {
+  background-color: var(--background-primary);
+}
+
+.jarvis-word-book-header input[type="text"],
+.jarvis-word-book-header select {
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  padding: 4px 8px;
+  border-radius: var(--radius-s);
+}
+
+.jarvis-word-book-header button {
+  background: var(--interactive-normal);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  padding: 4px 12px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+
+.jarvis-word-book-header button:hover:not(:disabled) {
+  background: var(--interactive-hover);
+}
+
+.jarvis-word-book-header button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+}
+
+.jarvis-word-book-header button.mod-cta:hover:not(:disabled) {
+  background: var(--interactive-accent-hover);
+}
+
+.jarvis-word-book-header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jarvis-word-book-table-wrap {
+  position: relative;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.jarvis-word-book-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.jarvis-word-book-table tbody tr:hover {
+  background-color: var(--background-modifier-hover);
+}

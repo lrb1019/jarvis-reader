@@ -1,9 +1,10 @@
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
 import { Notice, setIcon } from "obsidian";
-import { ReactReader, ReactReaderStyle } from "react-reader";
+import { ReactReader } from "react-reader";
+import * as ReactReaderModule from "react-reader";
 import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, formatLocalDate } from "./utils";
-import { normalizeWordSelection, findWordAssetBySurface, getWordAssetSurfaceForms, getTranslationAssetKind, getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAudioUrl, getWordEntryStart, getWordEntryEnd } from "./word-assets";
+import { normalizeWordSelection, findWordAssetBySurface, getWordAssetSurfaceForms, getTranslationAssetKind, getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAudioUrl } from "./word-assets";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { findChapterTitle, getReaderProgressLabel, ensureReaderLocations, getReaderProgress } from "./progress";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
@@ -54,6 +55,10 @@ export interface EpubReaderProps {
   openWikiLink: (target: string) => void;
 }
 
+const ReactReaderStyle = (ReactReaderModule as typeof ReactReaderModule & {
+  ReactReaderStyle: Record<string, React.CSSProperties>;
+}).ReactReaderStyle;
+
 export function getWordLookupResultFromAsset(asset, selectedText = "") {
   if (!asset)
     return null;
@@ -76,6 +81,7 @@ export function getLightWordAsset(asset) {
   };
 }
 export const WORD_DISPLAY_MAX_CHARS = 8e3;
+export const WORD_DISPLAY_CACHE_LIMIT = 50;
 
 export function truncateWordDisplay(value) {
   const text = normalizeWordDisplayText(value);
@@ -400,7 +406,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp, { once: true });
   };
-  const epubOptions = effectiveScrolled ? {
+  const epubOptions: Record<string, unknown> = effectiveScrolled ? {
     allowPopups: false,
     flow: "scrolled",
     manager: "continuous"
@@ -431,6 +437,30 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       });
     }, 80);
   };
+  const purgeHighlightMarks = (rendition, cfiRange) => {
+    if (!rendition || !cfiRange)
+      return;
+    try {
+      rendition.annotations?.remove(cfiRange, "highlight");
+      rendition.annotations?.remove(cfiRange, "underline");
+      const views = typeof rendition.views === "function" ? rendition.views() || [] : [];
+      for (const view of views) {
+        const pane = view?.pane;
+        if (!pane || !Array.isArray(pane.marks) || typeof pane.removeMark !== "function")
+          continue;
+        const staleMarks = pane.marks.filter((mark) => mark?.data?.epubcfi === cfiRange && String(mark?.className || "").startsWith("jarvis-reader-highlight"));
+        for (const mark of staleMarks) {
+          pane.removeMark(mark);
+        }
+        if (view.highlights)
+          delete view.highlights[cfiRange];
+        if (view.underlines)
+          delete view.underlines[cfiRange];
+      }
+    } catch (error) {
+      console.warn("Jarvis Reader stale highlight cleanup failed.", error);
+    }
+  };
   const applyHighlight = (rendition, highlight) => {
     if (!rendition || !rendition.annotations || !highlight || !highlight.cfiRange)
       return;
@@ -442,6 +472,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       return;
     rendition.__awesomeReaderHighlightIds.add(key);
     try {
+      purgeHighlightMarks(rendition, highlight.cfiRange);
       const eventHandler = (event) => {
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
@@ -477,7 +508,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
         const normalColor = currentColors?.normal || "#ffeb3b";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
           fill: normalColor,
-          "fill-opacity": "0.45",
+          "fill-opacity": "0.24",
           "mix-blend-mode": "multiply"
         });
       }
@@ -487,7 +518,12 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     }
   };
   const applyHighlights = (rendition, list) => {
+    const uniqueHighlights = new Map();
     for (const highlight of list || []) {
+      if (highlight?.cfiRange)
+        uniqueHighlights.set(highlight.cfiRange, highlight);
+    }
+    for (const highlight of uniqueHighlights.values()) {
       applyHighlight(rendition, highlight);
     }
     refreshHighlightPanes(rendition);
@@ -496,10 +532,13 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     if (!rendition || !rendition.annotations || !highlight || !highlight.cfiRange)
       return;
     try {
-      rendition.annotations.remove(highlight.cfiRange, "highlight");
-      rendition.annotations.remove(highlight.cfiRange, "underline");
+      purgeHighlightMarks(rendition, highlight.cfiRange);
       if (rendition.__awesomeReaderHighlightIds) {
-        rendition.__awesomeReaderHighlightIds.delete(highlight.id || highlight.cfiRange);
+        for (const key of [...rendition.__awesomeReaderHighlightIds]) {
+          const sameHighlight = (highlightListRef.current || []).find((item) => (item.id || item.cfiRange) === key);
+          if (key === highlight.id || key === highlight.cfiRange || sameHighlight?.cfiRange === highlight.cfiRange)
+            rendition.__awesomeReaderHighlightIds.delete(key);
+        }
       }
       refreshHighlightPanes(rendition);
     } catch (error) {
@@ -725,15 +764,25 @@ const showWordHoverCard = (asset, element) => {
     setPendingWordSelection(null);
     setWordLookupState({ status: "idle", result: null, error: "", savedLemma: "" });
   };
-  const openWordTranslator = async (item, options = {}) => {
+  const openWordTranslator = async (item, options: { autoLocalOnly?: boolean } = {}) => {
     if (!item || typeof translateSelection !== "function")
       return false;
     const normalized = normalizeWordSelection(item.quote || "");
     if (options.autoLocalOnly) {
       if (!normalized || !normalized.isSingleWord)
         return false;
+      const requestId = pendingWordLookupRef.current + 1;
+      pendingWordLookupRef.current = requestId;
+      setPendingHighlightMenu(null);
+      setPendingWordSelection({
+        ...item,
+        normalized
+      });
+      setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
       try {
         const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
+        if (pendingWordLookupRef.current !== requestId)
+          return true;
         if (!localDictionaryResult)
           return false;
         setPendingSelection(null);
@@ -753,6 +802,8 @@ const showWordHoverCard = (asset, element) => {
         });
         return true;
       } catch (error) {
+        if (pendingWordLookupRef.current !== requestId)
+          return true;
         console.warn("Jarvis Reader automatic local dictionary lookup failed.", error);
         return false;
       }
@@ -1057,8 +1108,8 @@ const showWordHoverCard = (asset, element) => {
           paneElement.style.pointerEvents = "none";
         }
         element.style.pointerEvents = "none";
-        Array.from(element.children || []).forEach((child) => {
-          child.style.pointerEvents = "none";
+        Array.from(element.children || []).forEach((child: Element) => {
+          (child as SVGElement).style.pointerEvents = "none";
         });
       };
       bindWordHighlightElement(annotationBg == null ? void 0 : annotationBg.mark);
@@ -1122,7 +1173,7 @@ const showWordHoverCard = (asset, element) => {
   const collectAutoWordMatches = (contents2, assetsMap) => {
     if (!contents2 || !contents2.document || !contents2.document.body || !assetsMap)
       return [];
-    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma && !asset.mastered && getTranslationAssetKind(asset) !== "sentence").flatMap((asset) => getWordAssetSurfaceForms(asset).map((surface) => ({
+    const assets = (Object.values(assetsMap) as WordAsset[]).filter((asset) => asset && asset.lemma && !asset.mastered && getTranslationAssetKind(asset) !== "sentence").flatMap((asset) => getWordAssetSurfaceForms(asset).map((surface) => ({
       asset,
       surface,
       regex: buildWordMatchRegex(surface)
@@ -1194,7 +1245,7 @@ const showWordHoverCard = (asset, element) => {
     clearAutoWordHighlights(rendition);
     const contentsList = typeof rendition.getContents === "function" ? rendition.getContents() || [] : [];
     const seen =  new Set();
-    for (const asset of Object.values(wordAssetsRef.current || {})) {
+    for (const asset of Object.values(wordAssetsRef.current || {}) as WordAsset[]) {
       if (!asset || asset.mastered || !Array.isArray(asset.sources))
         continue;
       for (const source of asset.sources) {
@@ -1278,7 +1329,7 @@ const showWordHoverCard = (asset, element) => {
       removeHighlightMark(renditionRef.current, highlight);
       setPendingHighlightMenu(null);
       setHighlightList((current) => {
-        const next = current.filter((item) => item.id !== highlight.id);
+        const next = current.filter((item) => item.cfiRange !== highlight.cfiRange);
         highlightListRef.current = next;
         return next;
       });
@@ -1381,7 +1432,8 @@ const showWordHoverCard = (asset, element) => {
   };
   const handleTextSelected = (cfiRange, contents2) => {
     var _a, _b;
-    const selectedText = normalizeHighlightQuote((_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString());
+    const rawSelectedText = (_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString();
+    const selectedText = normalizeHighlightQuote(String(rawSelectedText || "").replace(/[\u00ad\u200b-\u200d\ufeff]/g, ""));
     if (!selectedText)
       return;
     const selectionItem = {
@@ -1391,9 +1443,25 @@ const showWordHoverCard = (asset, element) => {
       chapterTitle: readerTitleRef.current,
       rect: getSelectionHighlightMenuRect(contents2)
     };
+    const existingHighlight = (highlightListRef.current || []).find((highlight) => highlight.cfiRange === cfiRange);
     clearWordLookup();
     setPendingSelection(null);
-    setPendingHighlightMenu(selectionItem);
+    if (existingHighlight) {
+      setPendingHighlightMenu({
+        ...existingHighlight,
+        rect: selectionItem.rect
+      });
+      setHighlightComment("");
+      setWikiSuggest(null);
+      setWikiEditRange(null);
+      return;
+    }
+    Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
+      if (!opened) {
+        clearWordLookup();
+        setPendingHighlightMenu(selectionItem);
+      }
+    });
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
@@ -1611,7 +1679,7 @@ const showWordHoverCard = (asset, element) => {
       comment: ""
     });
     if (created) {
-      setHighlightList((current) => [...current, created]);
+      setHighlightList((current) => [...current.filter((highlight) => highlight.id !== created.id && highlight.cfiRange !== created.cfiRange), created]);
       applyHighlight(renditionRef.current, created);
     }
     clearHighlightUi();
@@ -1622,7 +1690,7 @@ const showWordHoverCard = (asset, element) => {
     const deleted = await deleteHighlight(item);
     if (deleted) {
       removeHighlightMark(renditionRef.current, item);
-      setHighlightList((current) => current.filter((highlight) => highlight.id !== item.id));
+      setHighlightList((current) => current.filter((highlight) => highlight.cfiRange !== item.cfiRange));
     }
     clearHighlightUi();
   };
@@ -1646,7 +1714,7 @@ const showWordHoverCard = (asset, element) => {
         comment: highlightComment.trim()
       });
       if (created) {
-        setHighlightList((current) => [...current, created]);
+        setHighlightList((current) => [...current.filter((item) => item.id !== created.id && item.cfiRange !== created.cfiRange), created]);
         applyHighlight(renditionRef.current, created);
       }
     }
@@ -1766,7 +1834,7 @@ const showWordHoverCard = (asset, element) => {
     swipeable: false,
     url: contents,
     tocChanged: (toc) => {
-      tocRef.current = toc || [];
+      tocRef.current = Array.isArray(toc) ? toc : [];
       tocMemo(toc);
     },
     getRendition: (rendition) => {
@@ -1775,8 +1843,9 @@ const showWordHoverCard = (asset, element) => {
       applyHighlights(rendition, highlightList);
       syncAutoWordHighlights(rendition);
       ensureReaderLocations(rendition, updateReaderTitle);
-      if (rendition && typeof rendition.on === "function" && !rendition.__awesomeReaderTitleBound) {
-        rendition.__awesomeReaderTitleBound = true;
+      const jarvisRendition = rendition as typeof rendition & { __awesomeReaderTitleBound?: boolean };
+      if (rendition && typeof rendition.on === "function" && !jarvisRendition.__awesomeReaderTitleBound) {
+        jarvisRendition.__awesomeReaderTitleBound = true;
         rendition.on("relocated", (relocated) => {
           updateReaderTitle(relocated);
           syncAutoWordHighlights(rendition);
@@ -1969,7 +2038,7 @@ const showWordHoverCard = (asset, element) => {
         width: "54%",
         margin: "-1px -27%"
       }
-    }
+    } as any
   }), pendingHighlightMenu ?  React.createElement("div", {
     className: "jarvis-reader-highlight-menu",
     style: pendingHighlightMenu.rect ? {

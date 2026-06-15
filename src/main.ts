@@ -3,6 +3,8 @@ import { EpubView } from "./EpubView";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE, HIGHLIGHTS_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { JarvisReaderHighlightsView } from "./sidebar/HighlightsView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
+import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarView";
+import { WordBookView, WORD_BOOK_VIEW_TYPE } from "./word-book/WordBookView";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
 import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
@@ -13,10 +15,11 @@ import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-
 import { registerGlobalMarkdownFeatures } from "./global-markdown";
 
 export default class JarvisReaderPlugin extends Plugin {
-  settings: any;
+  declare settings: any;
   bookshelfView: any;
   highlightsView: any;
   activeReaderView: any;
+  wordSidebarView: any;
   lastIndexCounts: any;
 
   async onload() {
@@ -38,6 +41,14 @@ export default class JarvisReaderPlugin extends Plugin {
       this.highlightsView = view;
       return view;
     });
+    this.registerView(WORD_SIDEBAR_VIEW_TYPE, (leaf) => {
+      const view = new WordSidebarView(leaf, this);
+      this.wordSidebarView = view;
+      return view;
+    });
+    this.registerView(WORD_BOOK_VIEW_TYPE, (leaf) => {
+      return new WordBookView(leaf, this);
+    });
     try {
       this.registerExtensions(["epub"], "epub");
     } catch (error) {
@@ -53,8 +64,22 @@ export default class JarvisReaderPlugin extends Plugin {
         this.openBookshelfPane(true);
       }
     });
+    this.addCommand({
+      id: "open-jarvis-reader-word-sidebar",
+      name: "打开 Jarvis Reader 单词侧边栏",
+      callback: () => {
+        this.openWordSidebarPane(true);
+      }
+    });
+    this.addCommand({
+      id: "open-jarvis-reader-word-book",
+      name: "打开英语词句本",
+      callback: () => {
+        this.openWordBook();
+      }
+    });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file.extension.toLowerCase() === "pdf") {
+      if (file instanceof TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521b\u5efa\u6216\u6253\u5f00\u8bfb\u4e66\u7b14\u8bb0").setIcon("document").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -76,6 +101,7 @@ export default class JarvisReaderPlugin extends Plugin {
         leaf.detach();
       }
       this.openBookshelfPane(false);
+      this.openWordSidebarPane(false);
     });
     registerGlobalMarkdownFeatures(this);
     this.addSettingTab(new JarvisReaderSettingTab(this.app, this));
@@ -109,11 +135,56 @@ export default class JarvisReaderPlugin extends Plugin {
       }, 50);
     }
   }
+  async openWordSidebarPane(reveal = true) {
+    let leaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
+    if (!leaves.length) {
+      const leaf = this.app.workspace.getRightLeaf(false);
+      if (!leaf)
+        return;
+      await leaf.setViewState({ type: WORD_SIDEBAR_VIEW_TYPE, active: true });
+      leaves = [leaf];
+    }
+    const leaf = leaves[0];
+    if (reveal && leaf && typeof this.app.workspace.revealLeaf === "function") {
+      this.app.workspace.revealLeaf(leaf);
+    }
+    const view = leaf == null ? void 0 : leaf.view;
+    if (view instanceof WordSidebarView) {
+      this.wordSidebarView = view;
+      view.render();
+    } else if (leaf) {
+      window.setTimeout(() => {
+        const delayedView = leaf.view;
+        if (delayedView instanceof WordSidebarView) {
+          this.wordSidebarView = delayedView;
+          delayedView.render();
+        }
+      }, 50);
+    }
+  }
+
+  async openWordBook() {
+    let leaves = this.app.workspace.getLeavesOfType(WORD_BOOK_VIEW_TYPE);
+    if (!leaves.length) {
+      const leaf = this.app.workspace.getLeaf("split", "vertical");
+      await leaf.setViewState({ type: WORD_BOOK_VIEW_TYPE, active: true });
+      leaves = [leaf];
+    }
+    const leaf = leaves[0];
+    if (leaf && typeof this.app.workspace.revealLeaf === "function") {
+      this.app.workspace.revealLeaf(leaf);
+    }
+  }
+
   async setActiveReader(reader, preferredPanel = "toc") {
     this.activeReaderView = reader;
     await this.openBookshelfPane(false);
     if (this.bookshelfView && typeof this.bookshelfView.setActiveReader === "function") {
       this.bookshelfView.setActiveReader(reader, preferredPanel);
+    }
+    await this.openWordSidebarPane(false);
+    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
+      this.wordSidebarView.setReader(reader);
     }
   }
   refreshReaderSidebar(reader) {
@@ -122,6 +193,11 @@ export default class JarvisReaderPlugin extends Plugin {
     }
     if (this.bookshelfView && typeof this.bookshelfView.render === "function") {
       this.bookshelfView.render();
+    }
+  }
+  refreshWordSidebar(reader) {
+    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
+      this.wordSidebarView.setReader(reader || this.activeReaderView);
     }
   }
   revealHighlightInSidebar(reader, highlightId) {
@@ -148,6 +224,9 @@ export default class JarvisReaderPlugin extends Plugin {
     this.activeReaderView = null;
     if (this.bookshelfView && typeof this.bookshelfView.clearActiveReader === "function") {
       this.bookshelfView.clearActiveReader(reader);
+    }
+    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
+      this.wordSidebarView.setReader(null);
     }
   }
   async restoreValueHighlightsIfNeeded() {
@@ -223,9 +302,10 @@ export default class JarvisReaderPlugin extends Plugin {
       wordAssets
     };
   }
-  getIndexCounts(snapshot = null) {
-    const state = snapshot || this.getIndexSnapshot();
-    const highlightCount = Object.values(state.bookHighlights || {}).reduce((total, list) => total + (Array.isArray(list) ? list.length : 0), 0);
+  getIndexCounts(snapshot: any = null) {
+    const state: any = snapshot || this.getIndexSnapshot();
+    const highlightLists = Object.values(state.bookHighlights || {}) as unknown[];
+    const highlightCount = highlightLists.reduce<number>((total, list) => total + (Array.isArray(list) ? list.length : 0), 0);
     const wordAssetCount = Object.keys(state.wordAssets || {}).length;
     return {
       highlightCount,
@@ -373,7 +453,7 @@ export default class JarvisReaderPlugin extends Plugin {
     if (!this.settings.wordAssets || typeof this.settings.wordAssets !== "object") {
       this.settings.wordAssets = {};
     }
-    for (const [lemma, asset] of Object.entries(this.settings.wordAssets)) {
+    for (const [lemma, asset] of Object.entries(this.settings.wordAssets) as [string, any][]) {
       if (asset && asset.display) {
         this.settings.wordAssets[lemma] = getLightWordAsset(asset);
       }

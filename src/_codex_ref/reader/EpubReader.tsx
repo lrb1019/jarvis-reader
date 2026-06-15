@@ -712,7 +712,14 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
             <div className="jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate" style={editorStyle}>
               <div className="jarvis-reader-word-card-head">
                 <div className="jarvis-reader-word-card-head-row">
-                  <div className="jarvis-reader-highlight-title">翻译</div>
+                  <div className="jarvis-reader-highlight-title">
+                    {(() => {
+                      const count = translationSelection.quote.trim().split(/\s+/).length;
+                      if (count === 1) return "单词卡";
+                      if (count <= 4) return "短语卡";
+                      return "长句卡";
+                    })()}
+                  </div>
                 </div>
               </div>
               {translating ? <div>正在翻译...</div> : null}
@@ -738,7 +745,11 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
                 <button type="button" onClick={clearTransientUi}>取消</button>
                 {translation?.sourceType === "local-dictionary" ? <button type="button" disabled={translating} onClick={() => void runTranslation(true)}>AI 翻译</button> : null}
                 {savedAsset ? <button type="button" disabled={saving} onClick={() => void deleteSavedAsset()}>彻底删除</button> : null}
-                {translation ? <button type="button" disabled={saving || Boolean(savedAsset)} onClick={() => void saveTranslation()}>{savedAsset ? "已保存" : "保存词卡"}</button> : null}
+                {translation ? <button type="button" disabled={saving || Boolean(savedAsset)} onClick={() => void saveTranslation()}>{savedAsset ? "已保存" : (() => {
+                  const count = translationSelection.quote.trim().split(/\s+/).length;
+                  if (count > 4) return "保存长句";
+                  return "加入词句本";
+                })()}</button> : null}
               </div>
             </div>
           ) : null}
@@ -747,14 +758,14 @@ export function JarvisEpubReader(props: JarvisEpubReaderProps) {
               <div className="jarvis-reader-word-card-head">
                 <div className="jarvis-reader-word-card-head-row">
                   {activeWordCard.asset.kind === "sentence" ? (
-                    <div className="jarvis-reader-word-card-sentence-title">原句翻译</div>
+                    <div className="jarvis-reader-word-card-sentence-title">长句翻译</div>
                   ) : (
                     <button className="jarvis-reader-word-card-lemma" type="button" title="点击发音" disabled={!props.wordAudio.enabled} onPointerDown={(event) => event.stopPropagation()} onClick={() => pronounce(activeWordCard.asset.title || activeWordCard.asset.lemma)}>{activeWordCard.asset.title || activeWordCard.asset.lemma}</button>
                   )}
                   <div className="jarvis-reader-word-card-drag-handle" title="拖动卡片" onPointerDown={beginWordCardMove} />
                   <div className="jarvis-reader-word-card-actions" onPointerDown={(event) => event.stopPropagation()}>
                     <button className="jarvis-reader-word-card-action jarvis-reader-word-card-mastered" type="button" title="标记已掌握" disabled={saving} onClick={() => void markActiveWordMastered()}>{renderIcon("check")}</button>
-                    <button className="jarvis-reader-word-card-action jarvis-reader-word-card-delete" type="button" title="删除词条" disabled={saving} onClick={async () => {
+                    <button className="jarvis-reader-word-card-action jarvis-reader-word-card-delete" type="button" title="删除" disabled={saving} onClick={async () => {
                   setSaving(true);
                   try {
                     await props.onDeleteWordAsset(activeWordCard.asset);
