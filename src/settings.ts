@@ -178,6 +178,13 @@ created: {{created}}
         this.plugin.settings.enableGlobalMarkdownTranslation = value;
         await this.plugin.saveSettings();
       }));
+
+      new Setting(contentDiv).setName("自动标记文件夹").setDesc("只在这些文件夹下的 EPUB 中自动标记已保存单词；多个文件夹用英文逗号分隔").addText((text) => {
+        text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
+          this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
+          await this.plugin.saveSettings();
+        });
+      });
     }
     
     if (this.activeTab === "translation") {
@@ -187,7 +194,7 @@ created: {{created}}
 
       new Setting(contentDiv).setName("翻译服务").setDesc("选择 API 请求格式；自定义会继续按 URL 自动识别").addDropdown((dropdown) => {
         dropdown.addOption("openai-compatible", "OpenAI 兼容").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "自定义").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
-          const provider = normalizeTranslationProvider(value, this.plugin.settings.translationApi.baseUrl);
+          const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
           this.plugin.settings.translationApi.provider = provider;
           if (!String(this.plugin.settings.translationApi.baseUrl || "").trim() && defaults.baseUrl) {
@@ -311,12 +318,6 @@ created: {{created}}
     }
 
     if (this.activeTab === "appearance") {
-      new Setting(contentDiv).setName("自动标记文件夹").setDesc("只在这些文件夹下的 EPUB 中自动标记已保存单词；多个文件夹用英文逗号分隔").addText((text) => {
-        text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
-          this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
-          await this.plugin.saveSettings();
-        });
-      });
 
       const createColorPicker = (name: string, desc: string, key: "word" | "phrase" | "sentence" | "comment" | "normal") => {
         new Setting(contentDiv)
@@ -343,76 +344,4 @@ created: {{created}}
       createColorPicker("默认高亮颜色", "普通的文本划线颜色", "normal");
     }
   }
-}
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
-/*!
-
-JSZip v3.10.1 - A JavaScript class for generating and reading zip files
-<http://stuartk.com/jszip>
-
-(c) 2009-2016 Stuart Knightley <stuart [at] stuartk.com>
-Dual licenced under the MIT license or GPLv3. See https://raw.github.com/Stuk/jszip/main/LICENSE.markdown.
-
-JSZip uses the library pako released under the MIT license :
-https://github.com/nodeca/pako/blob/main/LICENSE
-*/
-/*!
-    localForage -- Offline Storage, Improved
-    Version 1.10.0
-    https://localforage.github.io/localForage
-    (c) 2013-2017 Mozilla, Apache License 2.0
-*/
-/**
- * @license React
- * react-dom.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-/**
- * @license React
- * react.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-/**
- * @license React
- * scheduler.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-/**
- * Checks if an event is supported in the current execution environment.
- *
- * NOTE: This will not work correctly for non-generic events such as `change`,
- * `reset`, `load`, `error`, and `select`.
- *
- * Borrows from Modernizr.
- *
- * @param {string} eventNameSuffix Event name, e.g. "click".
- * @return {boolean} True if the event is supported.
- * @internal
- * @license Modernizr 3.0.0pre (Custom Build) | MIT
- */
-/** @license React v16.13.1
- * react-is.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-/* nosourcemap */
+}

@@ -53,7 +53,7 @@ export class WordSidebarView extends ItemView {
     // Filter by current book
     if (currentBookPath) {
       assets = assets.filter((asset: any) => {
-        return asset.sources && asset.sources.length > 0 && asset.sources[0].bookPath === currentBookPath;
+        return asset.sources && asset.sources.some((s: any) => s.bookPath === currentBookPath);
       });
     } else {
       assets = []; // Or show all? Let's show none if no book is active, or empty state.

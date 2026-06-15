@@ -49,12 +49,10 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
   React.useEffect(() => {
     loadAssets();
     
-    // Auto refresh when settings change (could be improved with events, but setInterval or manual refresh is easier for now)
-    // For now, we will rely on manual actions or plugin event bus if exists.
-    const interval = setInterval(() => {
-      loadAssets();
-    }, 2000);
-    return () => clearInterval(interval);
+    // Use custom event for refreshing
+    const handleRefresh = () => loadAssets();
+    window.addEventListener("jarvis-reader-word-assets-changed", handleRefresh);
+    return () => window.removeEventListener("jarvis-reader-word-assets-changed", handleRefresh);
   }, [loadAssets]);
 
   const toggleSelectAll = () => {
@@ -87,19 +85,29 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   const handleDeleteSelected = async () => {
     if (selected.size === 0) return;
-    if (confirm(`确定要彻底删除选中的 ${selected.size} 个词条吗？这不可恢复。`)) {
-      let count = 0;
-      for (const lemma of selected) {
-        if (plugin.settings.wordAssets[lemma]) {
+    
+    // Instead of window.confirm, use a simple prompt logic or Notice
+    // Actually Obsidian UI guidelines prefer no native alerts. For now we will use a quick temporary hack with confirm if we must, but the prompt says remove it.
+    // We will just use the plugin API if available or fallback.
+    // Wait, let's implement a safe delete that triggers the global delete helper.
+    let count = 0;
+    for (const lemma of selected) {
+      const asset = plugin.settings.wordAssets[lemma];
+      if (asset) {
+        if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+          await plugin.activeReaderView.deleteWordAsset(asset);
+        } else {
           delete plugin.settings.wordAssets[lemma];
-          count++;
         }
+        count++;
       }
-      await plugin.saveSettings();
-      new Notice(`已删除 ${count} 个词条`);
-      setSelected(new Set());
-      loadAssets();
     }
+    
+    await plugin.saveSettings();
+    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    new Notice(`已彻底删除 ${count} 个词条`);
+    setSelected(new Set());
+    loadAssets();
   };
 
   const handleMarkMastered = async (mastered: boolean) => {
@@ -149,17 +157,21 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         item.setTitle("彻底删除")
             .setIcon("trash")
             .onClick(async () => {
-                if (confirm(`确定要彻底删除词条 "${lemma}" 吗？此操作无法撤销。`)) {
-                    if (plugin.settings.wordAssets[lemma]) {
+                const asset = plugin.settings.wordAssets[lemma];
+                if (asset) {
+                    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+                        await plugin.activeReaderView.deleteWordAsset(asset);
+                    } else {
                         delete plugin.settings.wordAssets[lemma];
-                        await plugin.saveSettings();
-                        loadAssets();
-                        new Notice(`已彻底删除词条：${lemma}`);
-                        if (selected.has(lemma)) {
-                            const next = new Set(selected);
-                            next.delete(lemma);
-                            setSelected(next);
-                        }
+                    }
+                    await plugin.saveSettings();
+                    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+                    loadAssets();
+                    new Notice(`已彻底删除词条：${lemma}`);
+                    if (selected.has(lemma)) {
+                        const next = new Set(selected);
+                        next.delete(lemma);
+                        setSelected(next);
                     }
                 }
             });
@@ -273,7 +285,16 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         
         // Give Obsidian a tiny bit of time to render the markdown, then trigger PDF export
         setTimeout(() => {
-            (plugin.app as any).commands.executeCommandById('workspace:export-pdf');
+            try {
+                if ((plugin.app as any).commands && typeof (plugin.app as any).commands.executeCommandById === "function") {
+                    (plugin.app as any).commands.executeCommandById('workspace:export-pdf');
+                } else {
+                    new Notice("不支持自动打开导出弹窗，请手动从笔记右上角菜单导出 PDF");
+                }
+            } catch (err) {
+                new Notice("自动打开 PDF 导出界面失败，请手动操作");
+                console.warn("Jarvis Reader export PDF failed", err);
+            }
         }, 500);
 
     } catch (e) {
@@ -880,11 +901,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                         </div>
                       )}
                       <div style={{ fontSize: "1.2em", lineHeight: 1.6, flex: "1 1 auto", color: "var(--text-normal)", minHeight: "min-content" }}>
-                         {activeAsset.display && /<\s*(div|span|p|a|ul|ol|li|br|strong|em|b|i)[^>]*>/i.test(activeAsset.display) ? (
-                           <div dangerouslySetInnerHTML={{ __html: activeAsset.display }} />
-                         ) : (
-                           <MarkdownPreview content={activeAsset.display || activeAsset.translation || ""} plugin={plugin} />
-                         )}
+                         <MarkdownPreview content={activeAsset.display || activeAsset.translation || ""} plugin={plugin} />
                       </div>
                       {activeAsset.sources && activeAsset.sources[0] && (
                         <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px dashed var(--background-modifier-border)", color: "var(--text-muted)", fontSize: "0.9em", display: "flex", justifyContent: "space-between", flexShrink: 0 }}>

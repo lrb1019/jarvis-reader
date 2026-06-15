@@ -61,6 +61,7 @@ export interface WordAsset {
   nextReviewDate?: string;
   interval?: number;
   ease?: number;
+  pos?: string;
 }
 
 export type WordAssetMap = Record<string, WordAsset>;

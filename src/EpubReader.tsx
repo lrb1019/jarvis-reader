@@ -1846,6 +1846,19 @@ const showWordHoverCard = (asset, element) => {
       const jarvisRendition = rendition as typeof rendition & { __awesomeReaderTitleBound?: boolean };
       if (rendition && typeof rendition.on === "function" && !jarvisRendition.__awesomeReaderTitleBound) {
         jarvisRendition.__awesomeReaderTitleBound = true;
+        
+        // Attach wheel event to iframe document to allow zooming when hovering book text
+        rendition.hooks.content.register((contents: any) => {
+          const doc = contents?.document;
+          if (doc) {
+            doc.addEventListener("wheel", (event: WheelEvent) => {
+              if (!event.ctrlKey) return;
+              event.preventDefault();
+              setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
+            }, { passive: false });
+          }
+        });
+
         rendition.on("relocated", (relocated) => {
           updateReaderTitle(relocated);
           syncAutoWordHighlights(rendition);
@@ -1865,8 +1878,47 @@ const showWordHoverCard = (asset, element) => {
           if (selection && selection.toString().trim().length > 0) {
             return;
           }
+          const target = e.target;
+          if (target && target.tagName && target.tagName.toLowerCase() === 'a') {
+            return;
+          }
           clearHighlightUi();
           hideWordHoverCard();
+
+          const isTouch = e.type === "touchend";
+          
+          // Fallback to the iframe's clientX if we can't do better, but we will try to use the container's physical bounds
+          const iframeClientX = isTouch && e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+          const screenX = isTouch && e.changedTouches ? e.changedTouches[0].screenX : e.screenX;
+
+          let clickedLeft = false;
+          let clickedRight = false;
+
+          // Attempt to get the physical container bounds on the screen
+          const container = (rendition as any).manager?.container;
+          if (container && screenX !== undefined) {
+              const rect = container.getBoundingClientRect();
+              // To use screenX, we need to know the window's screenX. 
+              // A safer way is to map the click based on epub.js columnWidth.
+              // epub.js lays out pages horizontally. The visible coordinate is approximately (iframeClientX % columnWidth)
+              const columnWidth = (rendition as any).manager?.layout?.columnWidth || (rendition as any).manager?.layout?.width || window.innerWidth;
+              const visibleX = iframeClientX % columnWidth;
+              
+              clickedLeft = visibleX < columnWidth * 0.3;
+              clickedRight = visibleX > columnWidth * 0.7;
+          } else {
+              // Fallback
+              const columnWidth = window.innerWidth;
+              const visibleX = iframeClientX % columnWidth;
+              clickedLeft = visibleX < columnWidth * 0.3;
+              clickedRight = visibleX > columnWidth * 0.7;
+          }
+
+          if (clickedLeft) {
+              rendition.prev();
+          } else if (clickedRight) {
+              rendition.next();
+          }
         };
 
         rendition.on("click", handleRenditionClick);
