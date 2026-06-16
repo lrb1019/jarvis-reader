@@ -1133,40 +1133,14 @@ const showWordHoverCard = (asset, element) => {
     }
     if (rendition.__jarvisReaderWordHoverCleanup.has(doc))
       return;
-    let lastLemma = "";
-    let lastMoveAt = 0;
-    const onMouseMove = (event) => {
-      const now = Date.now();
-      if (now - lastMoveAt < 60)
-        return;
-      lastMoveAt = now;
-      const hit = getWordAssetAtPoint(contents2, event);
-      if (!hit) {
-        lastLemma = "";
-        scheduleHideWordHoverCard();
-        return;
-      }
-      if (lastLemma === hit.asset.lemma)
-        return;
-      lastLemma = hit.asset.lemma || "";
-      showWordHoverCardAtRect(hit.asset, hit.rect);
-    };
-    const onMouseLeave = () => {
-      lastLemma = "";
-      scheduleHideWordHoverCard();
-    };
     const onMouseDown = () => {
       if (!pendingWordSelectionRef.current)
         return;
       clearHighlightUi();
       hideWordHoverCard();
     };
-    doc.addEventListener("mousemove", onMouseMove);
-    doc.addEventListener("mouseleave", onMouseLeave);
     doc.addEventListener("mousedown", onMouseDown);
     rendition.__jarvisReaderWordHoverCleanup.set(doc, () => {
-      doc.removeEventListener("mousemove", onMouseMove);
-      doc.removeEventListener("mouseleave", onMouseLeave);
       doc.removeEventListener("mousedown", onMouseDown);
     });
   };
@@ -1878,47 +1852,8 @@ const showWordHoverCard = (asset, element) => {
           if (selection && selection.toString().trim().length > 0) {
             return;
           }
-          const target = e.target;
-          if (target && target.tagName && target.tagName.toLowerCase() === 'a') {
-            return;
-          }
           clearHighlightUi();
           hideWordHoverCard();
-
-          const isTouch = e.type === "touchend";
-          
-          // Fallback to the iframe's clientX if we can't do better, but we will try to use the container's physical bounds
-          const iframeClientX = isTouch && e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-          const screenX = isTouch && e.changedTouches ? e.changedTouches[0].screenX : e.screenX;
-
-          let clickedLeft = false;
-          let clickedRight = false;
-
-          // Attempt to get the physical container bounds on the screen
-          const container = (rendition as any).manager?.container;
-          if (container && screenX !== undefined) {
-              const rect = container.getBoundingClientRect();
-              // To use screenX, we need to know the window's screenX. 
-              // A safer way is to map the click based on epub.js columnWidth.
-              // epub.js lays out pages horizontally. The visible coordinate is approximately (iframeClientX % columnWidth)
-              const columnWidth = (rendition as any).manager?.layout?.columnWidth || (rendition as any).manager?.layout?.width || window.innerWidth;
-              const visibleX = iframeClientX % columnWidth;
-              
-              clickedLeft = visibleX < columnWidth * 0.3;
-              clickedRight = visibleX > columnWidth * 0.7;
-          } else {
-              // Fallback
-              const columnWidth = window.innerWidth;
-              const visibleX = iframeClientX % columnWidth;
-              clickedLeft = visibleX < columnWidth * 0.3;
-              clickedRight = visibleX > columnWidth * 0.7;
-          }
-
-          if (clickedLeft) {
-              rendition.prev();
-          } else if (clickedRight) {
-              rendition.next();
-          }
         };
 
         rendition.on("click", handleRenditionClick);

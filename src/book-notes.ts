@@ -7,6 +7,11 @@ import type { JarvisReaderSettings } from "./types";
 export function getDefaultBookNoteContent(file: TFile, toc: string): string {
   return `---
 bookname: "[[${file.basename}.${file.extension}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
 created: ${formatLocalDateTime(new Date())}
 ---
 
@@ -26,7 +31,34 @@ export function getBookNotePath(file: TFile, settings: Partial<JarvisReaderSetti
   return joinVaultPath(noteFolder, `${file.basename}.md`);
 }
 
+export function findBookNote(app: App, file: TFile, settings: Partial<JarvisReaderSettings> = {}): TFile | null {
+  // 1. Check exact expected path first
+  const exactPath = getBookNotePath(file, settings);
+  const exactFile = app.vault.getAbstractFileByPath(exactPath);
+  if (exactFile instanceof TFile) return exactFile;
+
+  // 2. Search entire vault for frontmatter `bookname: "[[basename.epub]]"`
+  const allMarkdownFiles = app.vault.getMarkdownFiles();
+  const targetBookname = `[[${file.basename}.${file.extension}]]`;
+  
+  for (const mdFile of allMarkdownFiles) {
+    const cache = app.metadataCache.getFileCache(mdFile);
+    if (cache?.frontmatter?.bookname === targetBookname) {
+      return mdFile;
+    }
+  }
+
+  // 3. Fallback: Search for any md file with the exact basename
+  const fallbackFile = allMarkdownFiles.find(f => f.basename === file.basename);
+  if (fallbackFile) return fallbackFile;
+
+  return null;
+}
+
 export async function getOrCreateBookNote(app: App, file: TFile, toc: string, settings: Partial<JarvisReaderSettings> = {}): Promise<TFile | null> {
+  let noteFile = findBookNote(app, file, settings);
+  if (noteFile) return noteFile;
+
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
   if (configuredFolder) {
     const folder = app.vault.getAbstractFileByPath(configuredFolder);
@@ -36,10 +68,7 @@ export async function getOrCreateBookNote(app: App, file: TFile, toc: string, se
     }
   }
   const noteFilename = getBookNotePath(file, settings);
-  let noteFile = app.vault.getAbstractFileByPath(noteFilename);
-  if (noteFile == null || !(noteFile instanceof TFile)) {
-    noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
-  }
+  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
   return noteFile as TFile;
 }
 

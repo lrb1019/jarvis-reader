@@ -163,6 +163,11 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
       new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
 created: {{created}}
 ---
 
@@ -170,7 +175,7 @@ created: {{created}}
           this.plugin.settings.bookNoteTemplate = value;
           await this.plugin.saveSettings();
         });
-        text.inputEl.rows = 8;
+        text.inputEl.rows = 13;
         text.inputEl.style.width = "100%";
       });
       

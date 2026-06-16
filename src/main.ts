@@ -1,6 +1,7 @@
 import { Plugin, WorkspaceLeaf, Notice, TFile } from "obsidian";
 import { EpubView } from "./EpubView";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE, HIGHLIGHTS_VIEW_TYPE } from "./sidebar/BookshelfView";
+import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
 import { JarvisReaderHighlightsView } from "./sidebar/HighlightsView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarView";
@@ -49,17 +50,27 @@ export default class JarvisReaderPlugin extends Plugin {
     this.registerView(WORD_BOOK_VIEW_TYPE, (leaf) => {
       return new WordBookView(leaf, this);
     });
+    this.registerView(LIBRARY_VIEW_TYPE, (leaf) => {
+      return new LibraryView(leaf, this);
+    });
     try {
       this.registerExtensions(["epub"], "epub");
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
-    this.addRibbonIcon("library", "\u6253\u5f00 Jarvis Reader \u4e66\u67b6", () => {
-      this.openBookshelfPane(true);
+    this.addRibbonIcon("library", "打开图书库", () => {
+      this.openLibrary();
+    });
+    this.addCommand({
+      id: "open-jarvis-reader-library",
+      name: "打开图书库",
+      callback: () => {
+        this.openLibrary();
+      }
     });
     this.addCommand({
       id: "open-jarvis-reader-bookshelf",
-      name: "\u6253\u5f00 Jarvis Reader \u4e66\u67b6",
+      name: "打开阅读辅助边栏",
       callback: () => {
         this.openBookshelfPane(true);
       }
@@ -100,8 +111,6 @@ export default class JarvisReaderPlugin extends Plugin {
       for (const leaf of this.app.workspace.getLeavesOfType(HIGHLIGHTS_VIEW_TYPE)) {
         leaf.detach();
       }
-      this.openBookshelfPane(false);
-      this.openWordSidebarPane(false);
     });
     registerGlobalMarkdownFeatures(this);
     this.addSettingTab(new JarvisReaderSettingTab(this.app, this));
@@ -176,13 +185,24 @@ export default class JarvisReaderPlugin extends Plugin {
     }
   }
 
+  async openLibrary() {
+    let leaves = this.app.workspace.getLeavesOfType(LIBRARY_VIEW_TYPE);
+    if (!leaves.length) {
+      const leaf = this.app.workspace.getLeaf("tab");
+      await leaf.setViewState({ type: LIBRARY_VIEW_TYPE, active: true });
+      leaves = [leaf];
+    }
+    const leaf = leaves[0];
+    if (leaf && typeof this.app.workspace.revealLeaf === "function") {
+      this.app.workspace.revealLeaf(leaf);
+    }
+  }
+
   async setActiveReader(reader, preferredPanel = "toc") {
     this.activeReaderView = reader;
-    await this.openBookshelfPane(false);
     if (this.bookshelfView && typeof this.bookshelfView.setActiveReader === "function") {
       this.bookshelfView.setActiveReader(reader, preferredPanel);
     }
-    await this.openWordSidebarPane(false);
     if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
       this.wordSidebarView.setReader(reader);
     }

@@ -159,11 +159,6 @@ export class WordSidebarView extends ItemView {
     };
 
     const filterTabsWrap = container.createDiv({ cls: "jarvis-reader-word-sidebar-tabs" });
-    filterTabsWrap.style.display = "flex";
-    filterTabsWrap.style.background = "var(--background-modifier-form-field)";
-    filterTabsWrap.style.borderRadius = "var(--radius-s)";
-    filterTabsWrap.style.padding = "2px";
-    filterTabsWrap.style.margin = "8px 0";
     
     const tabs = [
       { id: "all", label: "全部" },
@@ -173,22 +168,10 @@ export class WordSidebarView extends ItemView {
     ];
     
     tabs.forEach(tab => {
-      const tabEl = filterTabsWrap.createDiv({ text: tab.label });
-      tabEl.style.flex = "1";
-      tabEl.style.textAlign = "center";
-      tabEl.style.padding = "4px 0";
-      tabEl.style.fontSize = "0.85em";
-      tabEl.style.cursor = "pointer";
-      tabEl.style.borderRadius = "var(--radius-s)";
-      tabEl.style.transition = "all 0.2s ease";
-      
-      if (this.filterKind === tab.id) {
-        tabEl.style.background = "var(--background-modifier-active-hover)";
-        tabEl.style.color = "var(--text-normal)";
-        tabEl.style.fontWeight = "bold";
-      } else {
-        tabEl.style.color = "var(--text-muted)";
-      }
+      const tabEl = filterTabsWrap.createDiv({ 
+        text: tab.label, 
+        cls: `jarvis-reader-word-sidebar-tab${this.filterKind === tab.id ? " is-active" : ""}` 
+      });
       
       tabEl.onclick = () => {
         this.filterKind = tab.id as any;

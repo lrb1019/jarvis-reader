@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-当前版本：v0.4.0
+当前版本：v0.7.0
 
 中文说明 | [English](./README.en.md)
 
@@ -9,6 +9,13 @@ Jarvis Reader 是一个面向 Obsidian 的个人化 EPUB 阅读插件。它把�
 插件内置 ECDICT 离线词典，选中英文单词时可直接查询，无需导入词典或配置本地路径。词典数据按首字母分片加载，来源与许可见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 
 ## 版本记录
+
+### v0.7.0
+
+- 重构全景图书库 (Library App)，支持卡片、列表和 3D Coverflow 三种沉浸式展示模式。
+- 废除原侧边栏书架，重构为“阅读辅助边栏”，专注提供纯粹的“目录”与“感想摘抄”功能。
+- 阅读状态（在读、已读、未读）严格对齐 Markdown 笔记 Frontmatter 元数据，不再依赖百分比推算。
+- 实现打开图书时自动无缝唤醒联动“阅读辅助边栏”。
 
 ### v0.4.0
 
