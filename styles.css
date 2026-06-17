@@ -3080,18 +3080,28 @@ g.jarvis-reader-highlight-with-comment line {
 /* Tabs list */
 .jarvis-library-detail-tabs {
   display: flex;
-  border-bottom: 2px solid var(--background-modifier-border);
-  gap: 20px;
   margin-top: 10px;
 }
 
-.detail-tab-btn {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 10px 4px;
-  font-size: 14px;
+/* Tab group container (Segmented Control style) */
+.detail-tab-group {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--background-secondary-alt);
+  border: 1px solid var(--border-color);
+  border-radius: 8px; /* 圆滑外框 */
+  padding: 4px;
+  gap: 8px; /* 间距拉开 */
+}
+
+/* Individual tab button */
+.detail-tab-group button.detail-tab-btn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 6px !important; /* 按钮圆角 */
+  box-shadow: none !important;
+  padding: 6px 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -3099,25 +3109,18 @@ g.jarvis-reader-highlight-with-comment line {
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px; /* 图标与文字间距 */
 }
 
-.detail-tab-btn.is-active {
-  color: var(--interactive-accent);
-}
-
-.detail-tab-btn.is-active::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: var(--interactive-accent);
-}
-
-.detail-tab-btn:hover:not(.is-active) {
+.detail-tab-group button.detail-tab-btn:hover:not(.is-active) {
   color: var(--text-normal);
+  background-color: var(--background-modifier-hover) !important;
+}
+
+.detail-tab-group button.detail-tab-btn.is-active {
+  color: var(--text-normal) !important;
+  background-color: var(--background-primary) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Tab empty state */
