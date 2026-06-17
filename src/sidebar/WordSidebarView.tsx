@@ -30,7 +30,7 @@ export class WordSidebarView extends ItemView {
   }
 
   getDisplayText() {
-    return "英语词句本";
+    return "Jarvis Reader 词条";
   }
 
   getIcon() {
@@ -145,8 +145,8 @@ export class WordSidebarView extends ItemView {
     const wordBookBtn = titleRow.createEl("button", {
       cls: "jarvis-reader-word-sidebar-action",
       attr: {
-        "aria-label": "打开英语词句本",
-        "title": "打开英语词句本"
+        "aria-label": "打开词条",
+        "title": "打开词条"
       }
     });
     setIcon(wordBookBtn, "library");

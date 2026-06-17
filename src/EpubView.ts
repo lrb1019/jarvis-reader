@@ -34,6 +34,10 @@ export class EpubView extends FileView {
   themeSyncViewportHandler: any = null;
   highlightEditor: any = null;
   highlightDeleted: any = null;
+  lastInteractionTime: number = Date.now();
+  pendingStatsSeconds: number = 0;
+  statsSaveTimer: any = null;
+  interactionCleanup: (() => void) | null = null;
 
   constructor(leaf: WorkspaceLeaf, settings: any, plugin: any) {
     super(leaf);
@@ -324,17 +328,32 @@ export class EpubView extends FileView {
       window.clearInterval(this.themeSyncInterval);
       this.themeSyncInterval = null;
     }
+    if (this.statsSaveTimer) {
+      window.clearInterval(this.statsSaveTimer);
+      this.statsSaveTimer = null;
+    }
+    this.saveReadingStats();
     if (this.themeSyncViewportHandler && window.visualViewport) {
       window.visualViewport.removeEventListener("resize", this.themeSyncViewportHandler);
       this.themeSyncViewportHandler = null;
+    }
+    if (this.interactionCleanup) {
+      this.interactionCleanup();
+      this.interactionCleanup = null;
     }
   }
 
   startThemeSync(rendition: any): void {
     this.stopThemeSync();
     this.currentRendition = rendition;
+    this.statsSaveTimer = window.setInterval(() => {
+      this.saveReadingStats();
+    }, 30000);
     let lastThemeKey = "";
     const sync = () => {
+      if (Date.now() - this.lastInteractionTime < 120000) {
+        this.pendingStatsSeconds++;
+      }
       const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
       const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
       const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
@@ -350,6 +369,44 @@ export class EpubView extends FileView {
     if (window.visualViewport) {
       this.themeSyncViewportHandler = sync;
       window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
+    }
+  }
+
+  async saveReadingStats(): Promise<void> {
+    if (this.pendingStatsSeconds <= 0) return;
+    const seconds = this.pendingStatsSeconds;
+    this.pendingStatsSeconds = 0;
+    const today = new Date().toLocaleDateString("en-CA");
+    if (!this.plugin.settings.readingStats) {
+      this.plugin.settings.readingStats = {};
+    }
+    if (!this.plugin.settings.readingStats[today]) {
+      this.plugin.settings.readingStats[today] = {};
+    }
+    const bookPath = this.file!.path;
+    if (!this.plugin.settings.readingStats[today][bookPath]) {
+      this.plugin.settings.readingStats[today][bookPath] = 0;
+    }
+    this.plugin.settings.readingStats[today][bookPath] += seconds;
+    await this.plugin.saveSettings();
+
+    // Sync reading time to frontmatter
+    let totalSecs = 0;
+    Object.values(this.plugin.settings.readingStats).forEach(daily => {
+      if (daily[bookPath]) totalSecs += daily[bookPath];
+    });
+    
+    try {
+      const { getOrCreateBookNote } = await import("./book-notes");
+      const { formatDuration } = await import("./utils");
+      const noteFile = await getOrCreateBookNote(this.plugin.app, this.file!, "", this.plugin.settings);
+      if (noteFile) {
+        await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm: any) => {
+          fm.reading_time = formatDuration(totalSecs);
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to sync reading time to metadata", e);
     }
   }
 
@@ -421,6 +478,21 @@ export class EpubView extends FileView {
     this.stopThemeSync();
     ReactDOM.unmountComponentAtNode(this.contentEl);
     (this.contentEl as any).empty();
+
+    this.lastInteractionTime = Date.now();
+    this.pendingStatsSeconds = 0;
+    
+    const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
+    const interactionHandler = () => { this.lastInteractionTime = Date.now(); };
+    interactionEvents.forEach(evt => {
+      this.contentEl.addEventListener(evt, interactionHandler, { passive: true });
+    });
+    this.interactionCleanup = () => {
+      interactionEvents.forEach(evt => {
+        this.contentEl.removeEventListener(evt, interactionHandler);
+      });
+    };
+
     const style = getComputedStyle(this.containerEl.parentElement!.querySelector("div.view-header")!);
     const width = parseFloat(style.width);
     const height = parseFloat(style.height);
@@ -472,6 +544,7 @@ export class EpubView extends FileView {
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
+      onInteraction: () => { this.lastInteractionTime = Date.now(); }
     }), this.contentEl);
   }
 

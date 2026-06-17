@@ -39,3 +39,22 @@ export function confirmDestructiveAction(app: App, title: string, message: strin
     modal.open();
   });
 }
+
+
+export function formatDuration(secs: number): string {
+  if (secs <= 0) return "0分钟";
+  const h = Math.floor(secs / 3600);
+  const m = Math.round((secs % 3600) / 60);
+  if (h > 0 && m > 0) return `${h}小时${m}分钟`;
+  else if (h > 0) return `${h}小时`;
+  else return `${m}分钟`;
+}
+
+export function getBookTotalSeconds(readingStats: Record<string, Record<string, number>> | undefined, bookPath: string): number {
+  if (!readingStats) return 0;
+  let sum = 0;
+  for (const dateKey in readingStats) {
+    if (readingStats[dateKey][bookPath]) sum += readingStats[dateKey][bookPath];
+  }
+  return sum;
+}

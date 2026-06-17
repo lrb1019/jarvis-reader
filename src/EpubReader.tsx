@@ -55,6 +55,7 @@ export interface EpubReaderProps {
   wikiLinkCandidates: any[];
   getWikiLinkCandidates: () => any[];
   openWikiLink: (target: string) => void;
+  onInteraction?: () => void;
 }
 
 const ReactReaderStyle = (ReactReaderModule as typeof ReactReaderModule & {
@@ -156,7 +157,7 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
 
 // src/EpubView.tsx
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -1834,6 +1835,15 @@ const showWordHoverCard = (asset, element) => {
         rendition.hooks.content.register((contents: any) => {
           const doc = contents?.document;
           if (doc) {
+            const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
+            const interactionHandler = () => {
+              if (typeof onInteraction === "function") {
+                onInteraction();
+              }
+            };
+            interactionEvents.forEach(evt => {
+              doc.addEventListener(evt, interactionHandler, { passive: true });
+            });
             doc.addEventListener("wheel", (event: WheelEvent) => {
               if (!event.ctrlKey) return;
               event.preventDefault();

@@ -1,10 +1,10 @@
 import * as React from "react";
 import type JarvisReaderPlugin from "../main";
-import { TFile, Notice, MarkdownRenderer } from "obsidian";
+import { TFile, Notice, MarkdownRenderer, moment } from "obsidian";
 import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
 import { getHighlightsForBook } from "../highlights";
 import { buildWordAudioUrl, DEFAULT_WORD_AUDIO_TEMPLATE } from "../word-assets";
-import { confirmDestructiveAction } from "../utils";
+import { confirmDestructiveAction, formatDuration, getBookTotalSeconds } from "../utils";
 import type { BookHighlight, WordAsset, BookProgress } from "../types";
 import { WordCard } from "../word-book/WordCard";
 
@@ -80,7 +80,7 @@ function resolveBookStatus(fm: any, percentage: number): "finished" | "reading" 
 }
 
 function formatBookStatus(status: "finished" | "reading" | "unread"): string {
-  return status === "finished" ? "已读完" : status === "reading" ? "在读中" : "未读";
+  return status === "finished" ? "已读完" : status === "reading" ? "在读" : "未读";
 }
 
 // Simple Markdown previewer
@@ -97,7 +97,7 @@ const MarkdownText = ({ content, plugin }: { content: string; plugin: JarvisRead
 
 export function LibraryApp({ plugin }: LibraryAppProps) {
   // Navigation & UI States
-  const [currentView, setCurrentView] = React.useState<"home" | "detail">("home");
+  const [currentView, setCurrentView] = React.useState<"home" | "detail" | "stats">("home");
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
@@ -107,6 +107,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [activeTab, setActiveTab] = React.useState<"highlights" | "words" | "bookmarks">("highlights");
   const [descExpanded, setDescExpanded] = React.useState(false);
   const [showFilters, setShowFilters] = React.useState(false);
+  const [showLayoutMenu, setShowLayoutMenu] = React.useState(false);
 
   // Metadata States
   const [bookMetadata, setBookMetadata] = React.useState<{
@@ -129,7 +130,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [books, setBooks] = React.useState<TFile[]>([]);
   const [coverCache, setCoverCache] = React.useState<Record<string, any>>(plugin.settings.bookCoverCache || {});
   const [noteFallbackCovers, setNoteFallbackCovers] = React.useState<Record<string, string>>({});
-  const [showStatsModal, setShowStatsModal] = React.useState(false);
+  const [statsTab, setStatsTab] = React.useState<"week" | "month" | "year" | "all">("week");
+  const [statsDate, setStatsDate] = React.useState<Date>(() => new Date());
+  const [statsChartType, setStatsChartType] = React.useState<"bar" | "calendar" | "heatmap">("bar");
   const [debugImages, setDebugImages] = React.useState<{href: string, size: number, dataUrl: string}[] | null>(null);
 
   // Scan books from Vault
@@ -470,6 +473,261 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     };
   }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
 
+  // Detailed stats for the Jarvis Reader stats modal
+  const selectedStats = React.useMemo(() => {
+    const today = (moment as any)(statsDate);
+    let startDate: moment.Moment;
+    let endDate: moment.Moment;
+    let prevStartDate: moment.Moment;
+    let prevEndDate: moment.Moment;
+
+    if (statsTab === "week") {
+      startDate = today.clone().startOf("isoWeek");
+      endDate = today.clone().endOf("isoWeek");
+      prevStartDate = startDate.clone().subtract(1, "week");
+      prevEndDate = endDate.clone().subtract(1, "week");
+    } else if (statsTab === "month") {
+      startDate = today.clone().startOf("month");
+      endDate = today.clone().endOf("month");
+      prevStartDate = startDate.clone().subtract(1, "month");
+      prevEndDate = endDate.clone().subtract(1, "month");
+    } else if (statsTab === "year") {
+      startDate = today.clone().startOf("year");
+      endDate = today.clone().endOf("year");
+      prevStartDate = startDate.clone().subtract(1, "year");
+      prevEndDate = endDate.clone().subtract(1, "year");
+    } else {
+      startDate = (moment as any)(0);
+      endDate = (moment as any)().endOf("day");
+      prevStartDate = (moment as any)(0);
+      prevEndDate = (moment as any)().endOf("day");
+    }
+
+    const statsData = plugin.settings.readingStats || {};
+    let totalSeconds = 0;
+    let prevTotalSeconds = 0;
+    const bookSecondsMap: Record<string, number> = {};
+    const dailySecondsMap: Record<string, number> = {};
+    const monthlySecondsMap: Record<string, number> = {};
+    const yearlySecondsMap: Record<string, number> = {};
+    const readDays = new Set<string>();
+
+    Object.entries(statsData).forEach(([dateStr, dailyData]: [string, any]) => {
+      const dateVal = (moment as any)(dateStr, "YYYY-MM-DD");
+      if (!dateVal.isValid()) return;
+
+      const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
+      const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
+
+      if (isCurrentRange) {
+        Object.entries(dailyData).forEach(([bookPath, secs]: [string, number]) => {
+          totalSeconds += secs;
+          bookSecondsMap[bookPath] = (bookSecondsMap[bookPath] || 0) + secs;
+          if (secs > 0) {
+            readDays.add(dateStr);
+            dailySecondsMap[dateStr] = (dailySecondsMap[dateStr] || 0) + secs;
+            
+            const monthStr = dateVal.format("YYYY-MM");
+            monthlySecondsMap[monthStr] = (monthlySecondsMap[monthStr] || 0) + secs;
+
+            const yearStr = dateVal.format("YYYY");
+            yearlySecondsMap[yearStr] = (yearlySecondsMap[yearStr] || 0) + secs;
+          }
+        });
+      } else if (isPrevRange && statsTab !== "all") {
+        Object.values(dailyData).forEach((secs: number) => {
+          prevTotalSeconds += secs;
+        });
+      }
+    });
+
+    // 统计在读中与已读完的书籍
+    const readBookPaths = new Set<string>();
+    const finishedBookPaths = new Set<string>();
+
+    books.forEach((b) => {
+      const prog = getProgress(b);
+      const percentage = prog ? Math.round((prog.percentage || 0) * 100) : 0;
+      
+      const noteFile = bookNotesMap[b.path];
+      let fm: any = {};
+      if (noteFile) {
+        const cache = plugin.app.metadataCache.getFileCache(noteFile);
+        fm = cache?.frontmatter || {};
+      }
+
+      // 使用对齐前边状态的统一 Resolver
+      const actualStatus = resolveBookStatus(fm, percentage);
+
+      if (actualStatus === "finished") {
+        if (statsTab === "all") {
+          finishedBookPaths.add(b.path);
+        } else {
+          const updatedVal = prog ? (moment as any)(prog.updated) : (moment as any)(0);
+          const finishDateVal = fm.finish_date ? (moment as any)(fm.finish_date, "YYYY-MM-DD") : (moment as any)(0);
+          
+          const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
+          const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
+          
+          if (isUpdatedInRange || isFinishDateInRange) {
+            finishedBookPaths.add(b.path);
+          }
+        }
+      } else if (actualStatus === "reading") {
+        if (statsTab === "all") {
+          readBookPaths.add(b.path);
+        } else {
+          const updatedVal = prog ? (moment as any)(prog.updated) : (moment as any)(0);
+          const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
+          const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
+          
+          if (isUpdatedInRange || hasTimeSecs) {
+            readBookPaths.add(b.path);
+          }
+        }
+      }
+    });
+
+    const booksReadCount = readBookPaths.size;
+    const finishedBooksCount = finishedBookPaths.size;
+
+    let newHighlightsCount = 0;
+    Object.values(plugin.settings.bookHighlights || {}).forEach((list: any) => {
+      if (Array.isArray(list)) {
+        list.forEach((hl: any) => {
+          const createdVal = (moment as any)(hl.created);
+          if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+            newHighlightsCount++;
+          }
+        });
+      }
+    });
+
+    let newWordsCount = 0;
+    Object.values(plugin.settings.wordAssets || {}).forEach((asset: any) => {
+      const createdVal = (moment as any)(asset.created);
+      if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+        newWordsCount++;
+      }
+    });
+
+    const categoryCount: Record<string, number> = {};
+    const publisherCount: Record<string, number> = {};
+
+    // 偏好分析书籍集合（包含所有在读中和已读完的书籍）
+    const prefBookPaths = new Set<string>([...readBookPaths, ...finishedBookPaths]);
+
+    prefBookPaths.forEach((bookPath) => {
+      const noteFile = bookNotesMap[bookPath];
+      let fm: any = {};
+      if (noteFile) {
+        const cache = plugin.app.metadataCache.getFileCache(noteFile);
+        fm = cache?.frontmatter || {};
+      }
+
+      const secs = bookSecondsMap[bookPath] || 0;
+      const weight = secs > 0 ? secs : 1;
+
+      // 按照标签分类
+      const tagsList: string[] = [];
+      if (Array.isArray(fm.tags) && fm.tags.length > 0) {
+        fm.tags.forEach((tag: any) => {
+          if (typeof tag === "string" && tag.trim()) {
+            tagsList.push(tag.trim());
+          }
+        });
+      }
+      if (fm.category && typeof fm.category === "string" && fm.category.trim()) {
+        const cat = fm.category.trim();
+        if (!tagsList.includes(cat)) {
+          tagsList.push(cat);
+        }
+      }
+
+      if (tagsList.length > 0) {
+        tagsList.forEach((tag) => {
+          categoryCount[tag] = (categoryCount[tag] || 0) + weight;
+        });
+      } else {
+        categoryCount["未知"] = (categoryCount["未知"] || 0) + weight;
+      }
+
+      const publisher = fm.publisher || "";
+      if (publisher) {
+        publisherCount[publisher] = (publisherCount[publisher] || 0) + weight;
+      }
+    });
+
+    const topPublishers = Object.entries(publisherCount)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0])
+      .slice(0, 2);
+
+    const sortedCategories = Object.entries(categoryCount)
+      .sort((a, b) => b[1] - a[1]);
+    
+    const radarDimensions = ["影视原著", "文学", "个人成长", "社会小说", "男生小说"];
+    const topCategories = sortedCategories.slice(0, 5).map(entry => entry[0]);
+    topCategories.forEach(cat => {
+      if (!radarDimensions.includes(cat) && cat !== "未知") {
+        radarDimensions.push(cat);
+      }
+    });
+    const activeDimensions = radarDimensions.slice(0, 5);
+    const radarData = activeDimensions.map(dim => {
+      return {
+        dimension: dim,
+        value: categoryCount[dim] || 0
+      };
+    });
+
+    let trendPercent = 0;
+    if (prevTotalSeconds > 0) {
+      trendPercent = Math.round(((totalSeconds - prevTotalSeconds) / prevTotalSeconds) * 100);
+    } else if (totalSeconds > 0) {
+      trendPercent = 100;
+    }
+
+    return {
+      startDate,
+      endDate,
+      totalSeconds,
+      prevTotalSeconds,
+      trendPercent,
+      readDaysCount: readDays.size,
+      booksReadCount,
+      finishedBooksCount,
+      newHighlightsCount,
+      newWordsCount,
+      bookSecondsMap,
+      dailySecondsMap,
+      monthlySecondsMap,
+      yearlySecondsMap,
+      radarData,
+      topPublishers
+    };
+  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache]);
+
+  const handlePrevDate = () => {
+    setStatsDate((prev) => {
+      const m = (moment as any)(prev);
+      if (statsTab === "week") return m.subtract(1, "week").toDate();
+      if (statsTab === "month") return m.subtract(1, "month").toDate();
+      if (statsTab === "year") return m.subtract(1, "year").toDate();
+      return prev;
+    });
+  };
+
+  const handleNextDate = () => {
+    setStatsDate((prev) => {
+      const m = (moment as any)(prev);
+      if (statsTab === "week") return m.add(1, "week").toDate();
+      if (statsTab === "month") return m.add(1, "month").toDate();
+      if (statsTab === "year") return m.add(1, "year").toDate();
+      return prev;
+    });
+  };
+
   // Filter & Sort books
   const filteredBooks = React.useMemo(() => {
     return books
@@ -765,57 +1023,776 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     );
   };
 
-  // Stats Modal
-  const renderStatsModal = () => {
-    if (!showStatsModal) return null;
+  // Stats View
+  const renderStatsView = () => {
+    const {
+      startDate,
+      endDate,
+      totalSeconds,
+      prevTotalSeconds,
+      trendPercent,
+      readDaysCount,
+      booksReadCount,
+      finishedBooksCount,
+      newHighlightsCount,
+      newWordsCount,
+      bookSecondsMap,
+      dailySecondsMap,
+      monthlySecondsMap,
+      yearlySecondsMap,
+      radarData,
+      topPublishers
+    } = selectedStats;
+
+    const statsData = plugin.settings.readingStats || {};
+
+    // First reading date for "All" tab subtext
+    const sortedDates = Object.keys(statsData).sort();
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (moment as any)().format("YYYY-MM-DD");
+    const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
+
+    // Format date string for range picker
+    let dateRangeStr = "";
+    if (statsTab === "week") {
+      const start = (moment as any)(startDate);
+      const end = (moment as any)(endDate);
+      dateRangeStr = `${start.format("YYYY · M/D")} - ${end.format("M/D")}`;
+    } else if (statsTab === "month") {
+      dateRangeStr = (moment as any)(startDate).format("YYYY年M月");
+    } else if (statsTab === "year") {
+      dateRangeStr = (moment as any)(startDate).format("YYYY年");
+    }
+
+    // formatDuration is now imported globally
+
+    // Helper: render large duration digits
+    const renderLargeDuration = (secs: number) => {
+      if (secs <= 0) {
+        return (
+          <>
+            0<span>分钟</span>
+          </>
+        );
+      }
+      const h = Math.floor(secs / 3600);
+      const m = Math.round((secs % 3600) / 60);
+      if (h > 0 && m > 0) {
+        return (
+          <>
+            {h}<span>小时</span>{m}<span>分钟</span>
+          </>
+        );
+      } else if (h > 0) {
+        return (
+          <>
+            {h}<span>小时</span>
+          </>
+        );
+      } else {
+        return (
+          <>
+            {m}<span>分钟</span>
+          </>
+        );
+      }
+    };
+
+    // Subtext for summary card
+    let mainCardSub = "";
+    const avgSecs = Math.round(totalSeconds / (readDaysCount || 1));
+    const trendText = trendPercent > 0 ? `↑ ${trendPercent}%` : trendPercent < 0 ? `↓ ${Math.abs(trendPercent)}%` : "--";
+    const trendClass = trendPercent > 0 ? "jarvis-stats-trend-up" : trendPercent < 0 ? "jarvis-stats-trend-down" : "";
+
+    if (statsTab === "week") {
+      mainCardSub = `日均阅读 ${formatDuration(avgSecs)} · 比上周 `;
+    } else if (statsTab === "month") {
+      mainCardSub = `日均阅读 ${formatDuration(avgSecs)} · 比上月 `;
+    } else if (statsTab === "year") {
+      mainCardSub = `日均阅读 ${formatDuration(avgSecs)} · 比去年 `;
+    } else {
+      mainCardSub = `${firstDateStr}至今 · 日均阅读 ${formatDuration(avgSecs)} · 与 Jarvis Reader 相伴 ${readDaysCount} 天`;
+    }
+
+    // Chart toggle logic
+    let activeChart = statsChartType;
+    if (statsTab === "week") {
+      activeChart = "bar";
+    } else if (statsTab === "month" && activeChart === "heatmap") {
+      activeChart = "bar";
+    } else if ((statsTab === "year" || statsTab === "all") && activeChart === "calendar") {
+      activeChart = "heatmap";
+    }
+
+    // Precalculate ranking characteristics
+    let maxSingleDaySecs = 0;
+    let maxSingleDayBook = "";
+    let maxHighlightsCount = 0;
+    let maxHighlightsBook = "";
+
+    const bookDailyMaxSecs: Record<string, number> = {};
+    const bookRangeHighlightsCount: Record<string, number> = {};
+
+    Object.entries(statsData).forEach(([dateStr, dailyData]: [string, any]) => {
+      const dateVal = (moment as any)(dateStr, "YYYY-MM-DD");
+      if (!dateVal.isValid()) return;
+      
+      const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
+      if (isCurrentRange) {
+        Object.entries(dailyData).forEach(([bookPath, secs]: [string, number]) => {
+          if (secs > 0) {
+            bookDailyMaxSecs[bookPath] = Math.max(bookDailyMaxSecs[bookPath] || 0, secs);
+          }
+        });
+      }
+    });
+
+    Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]: [string, any]) => {
+      if (Array.isArray(list)) {
+        list.forEach((hl: any) => {
+          const createdVal = (moment as any)(hl.created);
+          if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+            bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    Object.entries(bookDailyMaxSecs).forEach(([bookPath, secs]) => {
+      if (secs > maxSingleDaySecs) {
+        maxSingleDaySecs = secs;
+        maxSingleDayBook = bookPath;
+      }
+    });
+
+    Object.entries(bookRangeHighlightsCount).forEach(([bookPath, count]) => {
+      if (count > maxHighlightsCount) {
+        maxHighlightsCount = count;
+        maxHighlightsBook = bookPath;
+      }
+    });
+
+    let sortedRankBooks: [string, number][] = [];
+    let isTimeRank = true;
+    if (Object.keys(bookSecondsMap).length > 0) {
+      sortedRankBooks = Object.entries(bookSecondsMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+      isTimeRank = true;
+    } else {
+      const progRankList: [string, number][] = [];
+      Object.entries(plugin.settings.bookProgress || {}).forEach(([bookPath, prog]: [string, any]) => {
+        if (prog && prog.percentage > 0) {
+          if (statsTab === "all") {
+            progRankList.push([bookPath, prog.percentage]);
+          } else {
+            const updatedVal = (moment as any)(prog.updated);
+            if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
+              progRankList.push([bookPath, prog.percentage]);
+            }
+          }
+        }
+      });
+      sortedRankBooks = progRankList
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+      isTimeRank = false;
+    }
+
+    const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
+
     return (
-      <div className="jarvis-library-stats-modal-overlay" onClick={() => setShowStatsModal(false)}>
-        <div className="jarvis-library-stats-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="jarvis-library-stats-modal-header">
-            <h3>📊 阅读统计</h3>
-            <button className="jarvis-library-stats-close-btn" onClick={() => setShowStatsModal(false)}>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div className="jarvis-library-stats-grid">
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">全部书籍</span>
-              <span className="jarvis-library-stats-number">{stats.total}</span>
-            </div>
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">在读中</span>
-              <span className="jarvis-library-stats-number status-reading">{stats.reading}</span>
-            </div>
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">已读完</span>
-              <span className="jarvis-library-stats-number status-finished">{stats.finished}</span>
-            </div>
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">未开始</span>
-              <span className="jarvis-library-stats-number status-unread">{stats.unread}</span>
-            </div>
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">划线摘抄</span>
-              <span className="jarvis-library-stats-number">{stats.highlights}</span>
-            </div>
-            <div className="jarvis-library-stats-card">
-              <span className="jarvis-library-stats-label">收集词卡</span>
-              <span className="jarvis-library-stats-number">{stats.words}</span>
+      <div className="jarvis-library-stats-view">
+        <div className="jarvis-library-stats-view-container">
+          <div className="jarvis-library-stats-view-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button className="jarvis-library-back-btn" onClick={() => setCurrentView("home")}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                返回书架
+              </button>
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>阅读统计</h2>
             </div>
           </div>
-          <div className="jarvis-library-stats-visuals">
-            <span className="jarvis-library-stats-subheader">阅读进度比例</span>
-            <div className="jarvis-library-progress-track">
-              <div className="jarvis-library-progress-bar status-finished" style={{ width: `${stats.total ? (stats.finished / stats.total) * 100 : 0}%` }} title={`已读完: ${stats.finished}`} />
-              <div className="jarvis-library-progress-bar status-reading" style={{ width: `${stats.total ? (stats.reading / stats.total) * 100 : 0}%` }} title={`在读中: ${stats.reading}`} />
-              <div className="jarvis-library-progress-bar status-unread" style={{ width: `${stats.total ? (stats.unread / stats.total) * 100 : 0}%` }} title={`未开始: ${stats.unread}`} />
+
+          {/* Navigation and tab bar */}
+          <div className="jarvis-stats-header-wrap">
+            <div className="jarvis-stats-nav-tabs">
+              <button className={`jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`} onClick={() => setStatsTab("week")}>周</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`} onClick={() => setStatsTab("month")}>月</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`} onClick={() => setStatsTab("year")}>年</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`} onClick={() => setStatsTab("all")}>全部</button>
             </div>
-            <div className="jarvis-library-progress-legend">
-              <span><span className="legend-dot status-finished"/>已读完 {stats.total ? Math.round((stats.finished / stats.total) * 100) : 0}%</span>
-              <span><span className="legend-dot status-reading"/>在读中 {stats.total ? Math.round((stats.reading / stats.total) * 100) : 0}%</span>
-              <span><span className="legend-dot status-unread"/>未开始 {stats.total ? Math.round((stats.unread / stats.total) * 100) : 0}%</span>
+            {statsTab !== "all" && (
+              <div className="jarvis-stats-date-picker">
+                <button className="jarvis-stats-date-btn" onClick={handlePrevDate}>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <span className="jarvis-stats-date-text">{dateRangeStr}</span>
+                <button className="jarvis-stats-date-btn" onClick={handleNextDate}>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Main Card */}
+          <div className="jarvis-stats-main-card">
+            <div className="jarvis-stats-main-time">
+              {renderLargeDuration(totalSeconds)}
+            </div>
+            <div className="jarvis-stats-main-sub">
+              {mainCardSub}
+              {statsTab !== "all" && (
+                <span className={trendClass}>{trendText}</span>
+              )}
             </div>
           </div>
+
+          {/* Mini Cards Grid */}
+          <div className="jarvis-stats-mini-grid">
+            <div className="jarvis-stats-mini-card">
+              <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                {readDaysCount}天
+              </span>
+              <span className="jarvis-stats-mini-label">阅读天数</span>
+            </div>
+            {statsTab !== "all" && (
+              <div className="jarvis-stats-mini-card">
+                <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                  {formatDuration(avgSecs)}
+                  <span className={trendClass} style={{ fontSize: '9px', padding: '1px 3px', borderRadius: '4px', background: trendPercent > 0 ? '#E5F5F1' : trendPercent < 0 ? '#FCE8E6' : 'var(--background-modifier-border)' }}>
+                    {trendText}
+                  </span>
+                </span>
+                <span className="jarvis-stats-mini-label">日均时长</span>
+              </div>
+            )}
+            {statsTab !== "week" && (
+              <>
+                <div className="jarvis-stats-mini-card">
+                  <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    {booksReadCount}本
+                  </span>
+                  <span className="jarvis-stats-mini-label">在读</span>
+                </div>
+                <div className="jarvis-stats-mini-card">
+                  <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    {finishedBooksCount}本
+                  </span>
+                  <span className="jarvis-stats-mini-label">已读完</span>
+                </div>
+                <div className="jarvis-stats-mini-card">
+                  <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    {newHighlightsCount}条
+                  </span>
+                  <span className="jarvis-stats-mini-label">笔记</span>
+                </div>
+                <div className="jarvis-stats-mini-card">
+                  <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    {newWordsCount}条
+                  </span>
+                  <span className="jarvis-stats-mini-label">词条</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Visual Chart Section */}
+          <div className="jarvis-stats-chart-section">
+            <div className="jarvis-stats-chart-header">
+              <span className="jarvis-stats-chart-title">
+                {activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "每日阅读时长" : statsTab === "year" ? "每月阅读时长" : "每年阅读时长")}
+                {activeChart === "calendar" && "每日阅读时长"}
+                {activeChart === "heatmap" && "每日阅读时长"}
+              </span>
+              <div className="jarvis-stats-chart-toggles">
+                {statsTab === "month" && (
+                  <>
+                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`} onClick={() => setStatsChartType("bar")}>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    </button>
+                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`} onClick={() => setStatsChartType("calendar")}>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </button>
+                  </>
+                )}
+                {(statsTab === "year" || statsTab === "all") && (
+                  <>
+                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`} onClick={() => setStatsChartType("heatmap")}>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </button>
+                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`} onClick={() => setStatsChartType("bar")}>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Render selected chart */}
+            {activeChart === "bar" && (() => {
+              // Construct data based on current tab
+              let data: { label: string; secs: number; tooltip: string }[] = [];
+              if (statsTab === "week") {
+                const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+                data = Array.from({ length: 7 }).map((_, i) => {
+                  const day = (moment as any)(startDate).add(i, "days");
+                  const dateStr = day.format("YYYY-MM-DD");
+                  const secs = dailySecondsMap[dateStr] || 0;
+                  return { label: weekdays[i], secs, tooltip: `${day.format("M月D日")} 阅读 ${formatDuration(secs)}` };
+                });
+              } else if (statsTab === "month") {
+                const daysInMonth = (moment as any)(startDate).daysInMonth();
+                data = Array.from({ length: daysInMonth }).map((_, i) => {
+                  const day = (moment as any)(startDate).add(i, "days");
+                  const dateStr = day.format("YYYY-MM-DD");
+                  const secs = dailySecondsMap[dateStr] || 0;
+                  return { label: String(i + 1), secs, tooltip: `${day.format("M月D日")} 阅读 ${formatDuration(secs)}` };
+                });
+              } else if (statsTab === "year") {
+                data = Array.from({ length: 12 }).map((_, i) => {
+                  const month = (moment as any)(startDate).add(i, "months");
+                  const monthStr = month.format("YYYY-MM");
+                  const secs = monthlySecondsMap[monthStr] || 0;
+                  return { label: `${i + 1}月`, secs, tooltip: `${month.format("YYYY年M月")} 阅读 ${formatDuration(secs)}` };
+                });
+              } else {
+                const currentYear = (moment as any)().year();
+                const startYear = earliestYearStr ? (moment as any)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+                const yearsCount = Math.max(currentYear - startYear + 1, 1);
+                data = Array.from({ length: yearsCount }).map((_, i) => {
+                  const year = String(startYear + i);
+                  const secs = yearlySecondsMap[year] || 0;
+                  return { label: year, secs, tooltip: `${year}年 阅读 ${formatDuration(secs)}` };
+                });
+              }
+
+              const maxVal = Math.max(...data.map(d => d.secs), 60);
+
+              return (
+                <div style={{ position: 'relative' }}>
+                  {/* Grid Lines */}
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '20px', bottom: '38px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', pointerEvents: 'none', zIndex: 1 }}>
+                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>{formatDuration(maxVal)}</span>
+                    </div>
+                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>{formatDuration(Math.round(maxVal / 2))}</span>
+                    </div>
+                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>0</span>
+                    </div>
+                  </div>
+
+                  <div className="jarvis-stats-bar-chart-container" style={{ position: 'relative', zIndex: 2 }}>
+                    {data.map((item, idx) => {
+                      const heightPct = (item.secs / maxVal) * 85;
+                      return (
+                        <div key={idx} className="jarvis-stats-bar-column">
+                          <div className="jarvis-stats-bar-tooltip">{item.tooltip}</div>
+                          <div className="jarvis-stats-bar" style={{ height: `${heightPct || 2}%` }} />
+                          <span className="jarvis-stats-bar-label">{item.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {activeChart === "calendar" && (() => {
+              const daysInMonth = (moment as any)(startDate).daysInMonth();
+              const firstDayOffset = (((moment as any)(startDate).clone().startOf("month").day() + 6) % 7);
+              const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+              
+              const cells: any[] = [];
+              // Fill blanks before start of month
+              for (let i = 0; i < firstDayOffset; i++) {
+                cells.push(<div key={`empty-start-${i}`} className="jarvis-stats-calendar-cell is-empty" />);
+              }
+              
+              // Fill days of month
+              for (let d = 1; d <= daysInMonth; d++) {
+                const day = (moment as any)(startDate).clone().date(d);
+                const dateStr = day.format("YYYY-MM-DD");
+                const secs = dailySecondsMap[dateStr] || 0;
+                
+                cells.push(
+                  <div key={`day-${d}`} className={`jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`}>
+                    <span style={{ fontWeight: secs > 0 ? 700 : 500 }}>{d}</span>
+                    {secs > 0 && (
+                      <span className="jarvis-stats-calendar-cell-time">{formatDuration(secs)}</span>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div>
+                  <div className="jarvis-stats-calendar-grid" style={{ marginBottom: '8px' }}>
+                    {weekdays.map(wd => (
+                      <div key={wd} className="jarvis-stats-calendar-weekday">{wd}</div>
+                    ))}
+                  </div>
+                  <div className="jarvis-stats-calendar-grid">
+                    {cells}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {activeChart === "heatmap" && (() => {
+              const renderHeatmapWall = (yearStr: string) => {
+                const startOfYear = (moment as any)(`${yearStr}-01-01`);
+                const gridStart = startOfYear.clone().startOf("isoWeek");
+
+                const weeksCount = 53;
+                const columns: any[] = [];
+
+                // Precalculate month headers positioning
+                const monthLabels: { label: string; colIndex: number }[] = [];
+                let lastMonth = -1;
+
+                for (let w = 0; w < weeksCount; w++) {
+                  const colCells: any[] = [];
+                  const colMonday = gridStart.clone().add(w * 7, "days");
+                  
+                  // Record month label if it changes
+                  const m = colMonday.month();
+                  if (m !== lastMonth) {
+                    monthLabels.push({ label: `${m + 1}月`, colIndex: w });
+                    lastMonth = m;
+                  }
+
+                  for (let d = 0; d < 7; d++) {
+                    const cellDate = gridStart.clone().add(w * 7 + d, "days");
+                    const isTargetYear = cellDate.year() === Number(yearStr);
+                    const dateStr = cellDate.format("YYYY-MM-DD");
+                    const secs = isTargetYear ? (dailySecondsMap[dateStr] || 0) : 0;
+                    
+                    const mins = secs / 60;
+                    let level = 0;
+                    if (mins > 0 && mins <= 5) level = 1;
+                    else if (mins > 5 && mins <= 15) level = 2;
+                    else if (mins > 15 && mins <= 45) level = 3;
+                    else if (mins > 45) level = 4;
+
+                    const tooltipText = isTargetYear 
+                      ? `${cellDate.format("YYYY年M月D日")} 阅读 ${formatDuration(secs)}`
+                      : "";
+
+                    colCells.push(
+                      <div key={`d-${d}`} className={`jarvis-stats-heatmap-cell level-${level}`}>
+                        {tooltipText && (
+                          <div className="jarvis-stats-heatmap-cell-tooltip">{tooltipText}</div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  columns.push(
+                    <div key={`w-${w}`} className="jarvis-stats-heatmap-col">
+                      {colCells}
+                    </div>
+                  );
+                }
+
+                const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
+                  return dateStr.startsWith(yearStr) && secs > 0;
+                }).length;
+
+                const yearsTotalSecs = Object.entries(dailySecondsMap)
+                  .filter(([dateStr]) => dateStr.startsWith(yearStr))
+                  .reduce((acc, entry) => acc + entry[1], 0);
+
+                return (
+                  <div key={yearStr} style={{ marginBottom: '24px' }}>
+                    {statsTab === "all" && (
+                      <h4 style={{ fontSize: '13px', margin: '0 0 10px 0', fontWeight: '700' }}>{yearStr}</h4>
+                    )}
+                    <div className="jarvis-stats-heatmap-wrapper">
+                      {/* Months Row Header */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(53, 1fr)', gap: '3px', fontSize: '9px', color: 'var(--text-muted)', marginBottom: '4px', paddingLeft: '15px' }}>
+                        {monthLabels.map(ml => (
+                          <span key={ml.label} style={{ gridColumnStart: ml.colIndex + 1, whiteSpace: 'nowrap' }}>{ml.label}</span>
+                        ))}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {/* Weekday labels */}
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '9px', color: 'var(--text-muted)', height: '88px', padding: '2px 0' }}>
+                          <span>一</span>
+                          <span>三</span>
+                          <span>五</span>
+                        </div>
+                        
+                        {/* Heatmap Grid Container */}
+                        <div style={{ display: 'flex', gap: '3px' }}>
+                          {columns}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="jarvis-stats-heatmap-footer">
+                      <span>{yearStr}年共阅读 {yearsTotalDays}天，累计 {formatDuration(yearsTotalSecs)}</span>
+                      <div className="jarvis-stats-heatmap-legend">
+                        <span>少</span>
+                        <div className="jarvis-stats-heatmap-legend-box level-0" />
+                        <div className="jarvis-stats-heatmap-legend-box level-1" />
+                        <div className="jarvis-stats-heatmap-legend-box level-2" />
+                        <div className="jarvis-stats-heatmap-legend-box level-3" />
+                        <div className="jarvis-stats-heatmap-legend-box level-4" />
+                        <span>多</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              };
+
+              if (statsTab === "year") {
+                const yearStr = (moment as any)(startDate).format("YYYY");
+                return renderHeatmapWall(yearStr);
+              } else {
+                // Stacked heatmaps for All years in descending order
+                const currentYear = (moment as any)().year();
+                const startYear = earliestYearStr ? (moment as any)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+                const yearsList = [];
+                for (let y = currentYear; y >= startYear; y--) {
+                  yearsList.push(String(y));
+                }
+                return (
+                  <div>
+                    {yearsList.map(y => renderHeatmapWall(y))}
+                  </div>
+                );
+              }
+            })()}
+          </div>
+
+          {/* Book Rankings TOP 10 (Not shown for Week view) */}
+          {statsTab !== "week" && (
+            <div className="jarvis-stats-top-section">
+              <div className="jarvis-stats-top-title">
+                {isTimeRank ? "阅读时长" : "阅读进度"} TOP {sortedRankBooks.length}
+              </div>
+              {sortedRankBooks.length > 0 ? (
+                <div className="jarvis-stats-top-list">
+                  {sortedRankBooks.map(([bookPath, val], idx) => {
+                    const book = books.find(b => b.path === bookPath);
+                    const cover = book ? getCover(book) : null;
+                    const { title, author } = book ? parseBookInfo(book) : { title: bookPath.split("/").pop() || "未知", author: "未知" };
+                    
+                    const noteFile = book ? bookNotesMap[book.path] : null;
+                    let fm: any = {};
+                    if (noteFile) {
+                      const cache = plugin.app.metadataCache.getFileCache(noteFile);
+                      fm = cache?.frontmatter || {};
+                    }
+                    const displayAuthor = fm.author || fm.creator || cover?.creator || author;
+
+                    const progressPct = isTimeRank ? (maxRankSecs > 0 ? (val / maxRankSecs) * 100 : 0) : val * 100;
+                    
+                    const isSingleDayMax = bookPath === maxSingleDayBook && maxSingleDaySecs > 0;
+                    const isMostNotes = bookPath === maxHighlightsBook && maxHighlightsCount > 0;
+
+                    return (
+                      <div key={bookPath} className="jarvis-stats-top-item">
+                        <div className="jarvis-stats-top-rank">{idx + 1}</div>
+                        {cover?.dataUrl ? (
+                          <div className="jarvis-stats-top-cover" style={{ backgroundImage: `url(${cover.dataUrl})` }} />
+                        ) : (
+                          <div className="jarvis-stats-top-cover" style={{ background: '#E6E6E6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', textAlign: 'center', padding: '2px', color: 'var(--text-muted)' }}>
+                            {title.slice(0, 4)}
+                          </div>
+                        )}
+                        <div className="jarvis-stats-top-info">
+                          <span className="jarvis-stats-top-bookname">{title}</span>
+                          <div className="jarvis-stats-top-author-row">
+                            <span className="jarvis-stats-top-author">{displayAuthor}</span>
+                            {isSingleDayMax && (
+                              <span className="jarvis-stats-top-badge">单日阅读最久</span>
+                            )}
+                            {isMostNotes && (
+                              <span className="jarvis-stats-top-badge" style={{ background: 'rgba(45, 140, 240, 0.08)', color: 'var(--text-accent)', border: '1px solid rgba(45, 140, 240, 0.2)' }}>笔记最多</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="jarvis-stats-top-time-col">
+                          <span className="jarvis-stats-top-time">
+                            {isTimeRank ? formatDuration(val) : `已读 ${Math.round(val * 100)}%`}
+                          </span>
+                          <div className="jarvis-stats-top-progress-bg">
+                            <div className="jarvis-stats-top-progress-bar" style={{ width: `${progressPct}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '12px' }}>暂无书籍阅读记录</div>
+              )}
+            </div>
+          )}
+
+          {/* Preference Analysis (Shown for Year and All views) */}
+          {(statsTab === "year" || statsTab === "all") && (
+            <div>
+              <div className="jarvis-stats-top-title" style={{ marginTop: '24px', marginBottom: '12px' }}>偏好分析</div>
+              <div className="jarvis-stats-pref-section">
+                {/* Category preference radar */}
+                <div className="jarvis-stats-pref-card">
+                  <span className="jarvis-stats-pref-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    分类偏好
+                  </span>
+                  <span className="jarvis-stats-pref-sub">
+                    {radarData.length > 0 ? `偏好阅读 ${radarData[0].dimension}` : "暂无分类偏好记录"}
+                  </span>
+                  <div className="jarvis-stats-radar-container">
+                    {radarData.length > 0 ? (() => {
+                      const CX = 75;
+                      const CY = 75;
+                      const R = 45;
+                      const numPoints = 5;
+                      const maxRadarVal = Math.max(...radarData.map(d => d.value), 60);
+
+                      const angles = Array.from({ length: numPoints }).map((_, i) => -Math.PI / 2 + i * (2 * Math.PI / numPoints));
+
+                      // Draw concentric pentagons (5 layers)
+                      const pentagons = Array.from({ length: 5 }).map((_, layerIdx) => {
+                        const r = R * ((layerIdx + 1) / 5);
+                        return angles.map(angle => ({
+                          x: CX + r * Math.cos(angle),
+                          y: CY + r * Math.sin(angle)
+                        }));
+                      });
+
+                      // Axis lines from center to outer vertices
+                      const axes = angles.map(angle => ({
+                        x1: CX,
+                        y1: CY,
+                        x2: CX + R * Math.cos(angle),
+                        y2: CY + R * Math.sin(angle)
+                      }));
+
+                      // Data polygon
+                      const dataPoints = radarData.map((d, i) => {
+                        const angle = angles[i] || 0;
+                        const r = R * (d.value / maxRadarVal);
+                        return {
+                          x: CX + r * Math.cos(angle),
+                          y: CY + r * Math.sin(angle),
+                          value: d.value
+                        };
+                      });
+
+                      const polygonPointsStr = dataPoints.map(p => `${p.x},${p.y}`).join(" ");
+
+                      return (
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                          {pentagons.map((points, idx) => (
+                            <polygon
+                              key={`p-${idx}`}
+                              points={points.map(p => `${p.x},${p.y}`).join(" ")}
+                              fill="none"
+                              stroke="var(--background-modifier-border)"
+                              strokeWidth="0.8"
+                            />
+                          ))}
+                          {axes.map((axis, idx) => (
+                            <line
+                              key={`line-${idx}`}
+                              x1={axis.x1}
+                              y1={axis.y1}
+                              x2={axis.x2}
+                              y2={axis.y2}
+                              stroke="var(--background-modifier-border)"
+                              strokeWidth="0.8"
+                            />
+                          ))}
+                          {dataPoints.length > 0 && (
+                            <polygon
+                              points={polygonPointsStr}
+                              fill="rgba(140, 26, 26, 0.08)"
+                              stroke="#8C1A1A"
+                              strokeWidth="1.5"
+                            />
+                          )}
+                          {dataPoints.map((p, idx) => p.value > 0 && (
+                            <circle
+                              key={`circle-${idx}`}
+                              cx={p.x}
+                              cy={p.y}
+                              r="2.5"
+                              fill="#ffffff"
+                              stroke="#8C1A1A"
+                              strokeWidth="1.5"
+                            />
+                          ))}
+                          {radarData.map((d, i) => {
+                            const angle = angles[i] || 0;
+                            const textR = R + 10;
+                            const tx = CX + textR * Math.cos(angle);
+                            const ty = CY + textR * Math.sin(angle);
+                            let textAnchor = "middle";
+                            let dy = "3px";
+                            if (Math.abs(Math.cos(angle)) > 0.1) {
+                              textAnchor = Math.cos(angle) > 0 ? "start" : "end";
+                            }
+                            if (angle === -Math.PI / 2) {
+                              dy = "-4px";
+                            } else if (angle > 0 && angle < Math.PI) {
+                              dy = "7px";
+                            }
+                            return (
+                              <text
+                                key={`txt-${i}`}
+                                x={tx}
+                                y={ty}
+                                textAnchor={textAnchor}
+                                dy={dy}
+                                fontSize="8px"
+                                fill="var(--text-muted)"
+                              >
+                                {d.dimension}
+                              </text>
+                            );
+                          })}
+                        </svg>
+                      );
+                    })() : (
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>暂无分析数据</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Publisher preference list */}
+                <div className="jarvis-stats-pref-card">
+                  <span className="jarvis-stats-pref-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="16"></line><line x1="15" y1="22" x2="15" y2="16"></line><line x1="9" y1="16" x2="15" y2="16"></line><path d="M8 6h8M8 10h8M8 14h8"></path></svg>
+                    偏好出版方
+                  </span>
+                  <span className="jarvis-stats-pref-sub">偏好出版方排行</span>
+                  <div className="jarvis-stats-publishers-list">
+                    {topPublishers.length > 0 ? (
+                      topPublishers.map((pub, idx) => (
+                        <div key={pub} className="jarvis-stats-publisher-item">
+                          {pub}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '11px' }}>暂无出版方信息</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -823,6 +1800,15 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   // Render Home
   const renderHome = () => {
+    let totalAppReadingTime = 0;
+    if (plugin.settings.readingStats) {
+      for (const daily of Object.values(plugin.settings.readingStats)) {
+        for (const secs of Object.values(daily)) {
+          totalAppReadingTime += secs as number;
+        }
+      }
+    }
+
     return (
       <div className="jarvis-library-home" ref={homeRef}>
         {/* Header toolbar */}
@@ -890,10 +1876,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             </div>
 
             <div className="jarvis-library-header-actions">
-              <button className="jarvis-library-action-icon-btn" title="阅读统计" onClick={() => setShowStatsModal(true)}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              </button>
-              <button className="jarvis-library-action-icon-btn" title="插件设置" onClick={() => (plugin as any).app.setting.openTabById(plugin.manifest.id)}>
+              <button className="jarvis-library-action-icon-btn" title="插件设置" onClick={() => {
+                const setting = (plugin as any).app.setting;
+                setting.open();
+                setting.openTabById(plugin.manifest.id);
+              }}>
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
               </button>
             </div>
@@ -901,7 +1888,10 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         </div>
 
         {/* Stats Quick Strip */}
-        <div className="jarvis-library-stats-strip minimalist" onClick={() => setShowStatsModal(true)}>
+        <div className="jarvis-library-stats-strip minimalist" onClick={() => setCurrentView("stats")} title="查看数据统计" style={{ cursor: 'pointer' }}>
+          <div style={{ display: 'flex', alignItems: 'center', opacity: 0.6, marginRight: '4px' }}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          </div>
           <div className="stats-strip-item">
             <span>总书籍 <b>{stats.total}</b></span>
           </div>
@@ -912,10 +1902,13 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             <span>已读完 <b>{stats.finished}</b></span>
           </div>
           <div className="stats-strip-item">
-            <span>划线摘抄 <b>{stats.highlights}</b></span>
+            <span>笔记 <b>{stats.highlights}</b></span>
           </div>
           <div className="stats-strip-item">
-            <span>词句卡片 <b>{stats.words}</b></span>
+            <span>词条 <b>{stats.words}</b></span>
+          </div>
+          <div className="stats-strip-item">
+            <span>总阅读时长 <b>{formatDuration(totalAppReadingTime)}</b></span>
           </div>
         </div>
 
@@ -1041,11 +2034,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                       </div>
                       <div className="cf-stat">
                         <span className="cf-stat-val">{highlightsCount}</span>
-                        <span className="cf-stat-lbl">划线</span>
+                        <span className="cf-stat-lbl">笔记</span>
                       </div>
                       <div className="cf-stat">
                         <span className="cf-stat-val">{wordsCount}</span>
-                        <span className="cf-stat-lbl">词卡</span>
+                        <span className="cf-stat-lbl">词条</span>
                       </div>
                     </div>
 
@@ -1053,6 +2046,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                       <div>状态：{bookStatus}</div>
                       <div>评分：{rating}</div>
                       <div className="text-ellipsis" style={{ minHeight: '19px' }}>标签：{tags.length > 0 ? tags.map((t: string) => `#${t}`).join(' ') : '无'}</div>
+                      <div>时长：{formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeB.path))}</div>
                       <div>时间：{displayDate}</div>
                     </div>
 
@@ -1148,7 +2142,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                         <div>状态：{bookStatus}</div>
                         <div>评分：{rating}</div>
                         {tags.length > 0 && <div>标签：{tags.map((t: string) => `#${t}`).join(' ')}</div>}
-                        <div>数据：划线 {highlightsCount} · 词卡 {wordsCount}</div>
+                        <div>数据：笔记 {highlightsCount} · 词条 {wordsCount} · 时长 {formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))}</div>
                         <div>时间：{displayDate}</div>
                       </div>
 
@@ -1190,7 +2184,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>进度</th>
                   <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>评分</th>
                   <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>标签</th>
-                  <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>数据 (划线/词卡)</th>
+                  <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>数据 (笔记/词条/时长)</th>
                   <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>开始时间</th>
                   <th style={{ padding: '12px 8px', fontWeight: 'normal' }}>读完时间</th>
                 </tr>
@@ -1260,7 +2254,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                           {tags.length > 0 ? tags.map((t: string) => `#${t}`).join(' ') : '-'}
                         </div>
                       </td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{highlightsCount} / {wordsCount}</td>
+                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>
+                        {highlightsCount} / {wordsCount} / {formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))}
+                      </td>
                       <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{startDate}</td>
                       <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{finishDate}</td>
                     </tr>
@@ -1354,12 +2350,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               <div className="detail-progress-divider" />
               <div className="detail-progress-stat">
                 <span className="progress-stat-value">{highlights.length}</span>
-                <span className="progress-stat-label">划线摘抄</span>
+                <span className="progress-stat-label">笔记</span>
               </div>
               <div className="detail-progress-divider" />
               <div className="detail-progress-stat">
                 <span className="progress-stat-value">{wordAssets.length}</span>
-                <span className="progress-stat-label">关联词卡</span>
+                <span className="progress-stat-label">词条</span>
               </div>
             </div>
 
@@ -1421,6 +2417,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   onChange={(e) => handleUpdateMetadata("finishDate", e.target.value)}
                 />
               </div>
+              <div className="metadata-row">
+                <span className="metadata-label">时长</span>
+                <span className="metadata-value" style={{ fontSize: '13px', display: 'inline-flex', alignItems: 'center', height: '30px', color: 'var(--text-muted)' }}>
+                  {formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path))}
+                </span>
+              </div>
               <div className="metadata-row full-width">
                 <span className="metadata-label">标签</span>
                 <input 
@@ -1476,13 +2478,16 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         <div className="jarvis-library-detail-tabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <button className={`detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`} onClick={() => setActiveTab("highlights")}>
-              ✏️ 我的划线与感想 ({highlights.length})
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              笔记 ({highlights.length})
             </button>
             <button className={`detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`} onClick={() => setActiveTab("words")}>
-              📇 关联词句卡片 ({wordAssets.length})
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              词条 ({wordAssets.length})
             </button>
             <button className={`detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`} onClick={() => setActiveTab("bookmarks")}>
-              🔖 书签 ({bookmarks.length})
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+              书签 ({bookmarks.length})
             </button>
           </div>
         </div>
@@ -1632,8 +2637,13 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   return (
     <div className="jarvis-library-app">
-      {currentView === "home" ? renderHome() : renderDetail()}
-      {renderStatsModal()}
+      {currentView === "home" ? (
+        renderHome()
+      ) : currentView === "detail" ? (
+        renderDetail()
+      ) : (
+        renderStatsView()
+      )}
       {renderDebugModal()}
     </div>
   );

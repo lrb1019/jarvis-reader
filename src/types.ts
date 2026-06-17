@@ -94,6 +94,11 @@ export type BookLocations = Record<string, string | number>;
 export type BookProgressMap = Record<string, BookProgress>;
 export type BookCoverCache = Record<string, BookCoverCacheEntry>;
 
+export interface DailyReadingStat {
+  [bookPath: string]: number;
+}
+export type ReadingStatsMap = Record<string, DailyReadingStat>;
+
 export interface BookBookmark {
   cfi: string;
   title: string;
@@ -171,6 +176,7 @@ export interface JarvisReaderSettings {
   bookshelfCoverOnly: boolean;
   highlightColors: Record<string, string>;
   enableGlobalMarkdownTranslation: boolean;
+  readingStats?: ReadingStatsMap;
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &

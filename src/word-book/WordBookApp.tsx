@@ -75,7 +75,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   const handleDeleteSelected = async () => {
     if (selected.size === 0) return;
-    const confirmed = await confirmDestructiveAction(plugin.app, "删除词卡", `确定要彻底删除选中的 ${selected.size} 个词卡吗？此操作不可恢复。`);
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除词条", `确定要彻底删除选中的 ${selected.size} 个词条吗？此操作不可恢复。`);
     if (!confirmed)
       return;
 
@@ -102,7 +102,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
   const handleDeleteFilteredBookWords = async () => {
     if (filterBook === "all" || filteredAssets.length === 0) return;
 
-    const confirmed = await confirmDestructiveAction(plugin.app, "删除本书词卡", `确定要彻底删除正在显示的这本书的 ${filteredAssets.length} 个词卡吗？此操作不可恢复。`);
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除本书词条", `确定要彻底删除正在显示的这本书的 ${filteredAssets.length} 个词条吗？此操作不可恢复。`);
     if (!confirmed)
       return;
 
@@ -224,7 +224,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     markdown += `
 <div style="${baseStyle} font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333; line-height: 1.5; padding: 0;">
   <div style="${baseStyle} padding-bottom: 12px; margin-bottom: 16px; border-bottom: 2px solid #cbd5e1; display: flex; justify-content: space-between; align-items: baseline;">
-    <h1 style="${baseStyle} margin: 0 !important; font-size: 1.5em !important; font-weight: 700 !important; color: #0f172a !important; padding: 0 !important;">英语词句本</h1>
+    <h1 style="${baseStyle} margin: 0 !important; font-size: 1.5em !important; font-weight: 700 !important; color: #0f172a !important; padding: 0 !important;">英语词条</h1>
     <div style="${baseStyle} text-align: right; font-size: 0.85em; color: #64748b;">
       ${dateStrDisp} · 总计 ${selectedList.length} 个词条
     </div>
@@ -295,7 +295,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
         const dateStr = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
         const suffix = templateType === "full" ? "完整对照" : templateType === "hide_zh" ? "默写中文" : "默写英文";
-        const fileName = `${folderPath ? folderPath + "/" : ""}英语词句本_${suffix}_${dateStr}.md`;
+        const fileName = `${folderPath ? folderPath + "/" : ""}英语词条_${suffix}_${dateStr}.md`;
         
         const file = await plugin.app.vault.create(fileName, markdown);
         const leaf = plugin.app.workspace.getLeaf("split", "vertical");
@@ -613,7 +613,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
       {/* Header & Controls */}
       <div className="jarvis-word-book-header" style={{ padding: "16px", borderBottom: "1px solid var(--background-modifier-border)", flexShrink: 0 }}>
-        <h2>英语词句本</h2>
+        <h2>英语词条</h2>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px", alignItems: "center" }}>
           <input 
             type="text" 

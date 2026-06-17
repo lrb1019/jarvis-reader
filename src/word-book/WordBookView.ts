@@ -20,7 +20,7 @@ export class WordBookView extends ItemView {
   }
 
   getDisplayText() {
-    return "英语词句本";
+    return "英语词条";
   }
 
   getIcon() {

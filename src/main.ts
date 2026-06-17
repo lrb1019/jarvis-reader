@@ -77,14 +77,14 @@ export default class JarvisReaderPlugin extends Plugin {
     });
     this.addCommand({
       id: "open-jarvis-reader-word-sidebar",
-      name: "打开词句本侧边栏",
+      name: "打开词条侧边栏",
       callback: () => {
         this.openWordSidebarPane(true);
       }
     });
     this.addCommand({
       id: "open-jarvis-reader-word-book",
-      name: "打开英语词句本",
+      name: "打开词条",
       callback: () => {
         this.openWordBook();
       }

@@ -31,7 +31,7 @@ export class JarvisReaderHighlightsView extends ItemView {
     return HIGHLIGHTS_VIEW_TYPE;
   }
   getDisplayText() {
-    return "Jarvis Reader \u6807\u6ce8";
+    return "Jarvis Reader 笔记";
   }
   getIcon() {
     return "highlighter";
@@ -285,11 +285,11 @@ export class JarvisReaderHighlightsView extends ItemView {
     container.empty();
     container.addClass("jarvis-reader-highlights-view");
     if (!this.reader) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5f00\u4e00\u672c EPUB \u540e\u663e\u793a\u6807\u6ce8" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "打开一本 EPUB 后显示笔记" });
       return;
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u6807\u6ce8" });
+    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "笔记" });
     header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
     const list = this.reader.getBookHighlights();
     if (!list.length) {
@@ -299,7 +299,7 @@ export class JarvisReaderHighlightsView extends ItemView {
     this.renderControls(container);
     const visibleList = this.getFilteredHighlights(list);
     if (!visibleList.length) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6ca1\u6709\u5339\u914d\u7684\u6807\u6ce8" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "没有匹配的笔记" });
       return;
     }
     const body = container.createDiv({ cls: "jarvis-reader-highlights-list" });
@@ -340,7 +340,7 @@ export class JarvisReaderHighlightsView extends ItemView {
         event.preventDefault();
         const menu = new Menu();
         menu.addItem((item) => {
-          item.setTitle("\u5220\u9664\u6807\u6ce8").setIcon("trash").onClick(async () => {
+          item.setTitle("删除笔记").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
           });
         });

@@ -5,6 +5,9 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -2438,7 +2441,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment4 = 7;
+        var Fragment5 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3595,7 +3598,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment4:
+            case Fragment5:
               return "Fragment";
             case HostComponent:
               return type;
@@ -13293,7 +13296,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment4) {
+            if (current2 === null || current2.tag !== Fragment5) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -13696,7 +13699,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment4) {
+                  if (child.tag === Fragment5) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17871,7 +17874,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment4:
+            case Fragment5:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18143,7 +18146,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment4:
+            case Fragment5:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22404,7 +22407,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment4, elements, key, mode);
+          var fiber = createFiber(Fragment5, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -23510,6 +23513,209 @@ var require_react_dom = __commonJS({
   }
 });
 
+// src/utils-core.ts
+function normalizeVaultPath(path) {
+  return (path || "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+}
+function joinVaultPath(folder, filename) {
+  const cleanFolder = normalizeVaultPath(folder);
+  return cleanFolder ? `${cleanFolder}/${filename}` : filename;
+}
+function formatLocalDate(value) {
+  if (!value)
+    return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return "";
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+function formatLocalDateTime(value) {
+  if (!value)
+    return "";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return value;
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+function sanitizeWordAssetFilename(value) {
+  const cleaned = (value || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim();
+  return cleaned || "word";
+}
+function escapeRegExp(value) {
+  return (value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function escapeYamlString(value) {
+  return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+function normalizeHighlightQuote(quote) {
+  return (quote || "").replace(/\s+/g, " ").trim();
+}
+function normalizeWordDisplayText(value) {
+  return String(value || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
+}
+async function ensureVaultFolder(app, folderPath) {
+  const cleanPath = normalizeVaultPath(folderPath);
+  if (!cleanPath)
+    return;
+  const segments = cleanPath.split("/").filter(Boolean);
+  let currentPath = "";
+  for (const segment of segments) {
+    currentPath = currentPath ? `${currentPath}/${segment}` : segment;
+    const existing = app.vault.getAbstractFileByPath(currentPath);
+    if (!existing) {
+      await app.vault.createFolder(currentPath);
+    }
+  }
+}
+var init_utils_core = __esm({
+  "src/utils-core.ts"() {
+  }
+});
+
+// src/utils.ts
+var utils_exports = {};
+__export(utils_exports, {
+  confirmDestructiveAction: () => confirmDestructiveAction,
+  ensureVaultFolder: () => ensureVaultFolder,
+  escapeRegExp: () => escapeRegExp,
+  escapeYamlString: () => escapeYamlString,
+  formatDuration: () => formatDuration,
+  formatLocalDate: () => formatLocalDate,
+  formatLocalDateTime: () => formatLocalDateTime,
+  getBookTotalSeconds: () => getBookTotalSeconds,
+  joinVaultPath: () => joinVaultPath,
+  normalizeHighlightQuote: () => normalizeHighlightQuote,
+  normalizeVaultPath: () => normalizeVaultPath,
+  normalizeWordDisplayText: () => normalizeWordDisplayText,
+  sanitizeWordAssetFilename: () => sanitizeWordAssetFilename
+});
+function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8BA4\u5220\u9664") {
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (value) => {
+      if (resolved)
+        return;
+      resolved = true;
+      modal.close();
+      resolve(value);
+    };
+    const modal = new import_obsidian.Modal(app);
+    modal.titleEl.setText(title);
+    modal.contentEl.createEl("p", { text: message });
+    new import_obsidian.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u53D6\u6D88").onClick(() => finish(false))).addButton((button) => button.setButtonText(confirmText).setWarning().onClick(() => finish(true)));
+    modal.onClose = () => finish(false);
+    modal.open();
+  });
+}
+function formatDuration(secs) {
+  if (secs <= 0) return "0\u5206\u949F";
+  const h = Math.floor(secs / 3600);
+  const m = Math.round(secs % 3600 / 60);
+  if (h > 0 && m > 0) return `${h}\u5C0F\u65F6${m}\u5206\u949F`;
+  else if (h > 0) return `${h}\u5C0F\u65F6`;
+  else return `${m}\u5206\u949F`;
+}
+function getBookTotalSeconds(readingStats, bookPath) {
+  if (!readingStats) return 0;
+  let sum = 0;
+  for (const dateKey in readingStats) {
+    if (readingStats[dateKey][bookPath]) sum += readingStats[dateKey][bookPath];
+  }
+  return sum;
+}
+var import_obsidian;
+var init_utils = __esm({
+  "src/utils.ts"() {
+    import_obsidian = require("obsidian");
+    init_utils_core();
+  }
+});
+
+// src/book-notes.ts
+var book_notes_exports = {};
+__export(book_notes_exports, {
+  findBookNote: () => findBookNote,
+  getBookNotePath: () => getBookNotePath,
+  getDefaultBookNoteContent: () => getDefaultBookNoteContent,
+  getOrCreateBookNote: () => getOrCreateBookNote,
+  openOrCreateNote: () => openOrCreateNote,
+  renderBookNoteTemplate: () => renderBookNoteTemplate
+});
+function getDefaultBookNoteContent(file, toc) {
+  return `---
+bookname: "[[${file.basename}.${file.extension}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
+created: ${formatLocalDateTime(/* @__PURE__ */ new Date())}
+---
+
+` + toc;
+}
+function renderBookNoteTemplate(template, file, toc) {
+  if (!template || !template.trim()) {
+    return getDefaultBookNoteContent(file, toc);
+  }
+  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, formatLocalDateTime(/* @__PURE__ */ new Date())).replace(/\{\{toc\}\}/g, toc || "");
+}
+function getBookNotePath(file, settings = {}) {
+  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
+  const noteFolder = configuredFolder || normalizeVaultPath(file.parent?.path);
+  return joinVaultPath(noteFolder, `${file.basename}.md`);
+}
+function findBookNote(app, file, settings = {}) {
+  const exactPath = getBookNotePath(file, settings);
+  const exactFile = app.vault.getAbstractFileByPath(exactPath);
+  if (exactFile instanceof import_obsidian2.TFile) return exactFile;
+  const allMarkdownFiles = app.vault.getMarkdownFiles();
+  const targetBookname = `[[${file.basename}.${file.extension}]]`;
+  for (const mdFile of allMarkdownFiles) {
+    const cache = app.metadataCache.getFileCache(mdFile);
+    if (cache?.frontmatter?.bookname === targetBookname) {
+      return mdFile;
+    }
+  }
+  const fallbackFile = allMarkdownFiles.find((f) => f.basename === file.basename);
+  if (fallbackFile) return fallbackFile;
+  return null;
+}
+async function getOrCreateBookNote(app, file, toc, settings = {}) {
+  let noteFile = findBookNote(app, file, settings);
+  if (noteFile) return noteFile;
+  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
+  if (configuredFolder) {
+    const folder = app.vault.getAbstractFileByPath(configuredFolder);
+    if (folder == null || !(folder instanceof import_obsidian2.TFolder)) {
+      new import_obsidian2.Notice(`Jarvis Reader note folder does not exist: ${configuredFolder}`);
+      return null;
+    }
+  }
+  const noteFilename = getBookNotePath(file, settings);
+  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
+  return noteFile;
+}
+async function openOrCreateNote(app, file, toc, settings = {}) {
+  const noteFile = await getOrCreateBookNote(app, file, toc, settings);
+  if (!noteFile)
+    return;
+  const leaf = app.workspace.getMostRecentLeaf();
+  if (leaf instanceof import_obsidian2.WorkspaceLeaf) {
+    const fileLeaf = app.workspace.createLeafBySplit(leaf);
+    await fileLeaf.openFile(noteFile, { active: true });
+  }
+}
+var import_obsidian2;
+var init_book_notes = __esm({
+  "src/book-notes.ts"() {
+    import_obsidian2 = require("obsidian");
+    init_utils();
+  }
+});
+
 // node_modules/react-is/cjs/react-is.development.js
 var require_react_is_development = __commonJS({
   "node_modules/react-is/cjs/react-is.development.js"(exports) {
@@ -23579,7 +23785,7 @@ var require_react_is_development = __commonJS({
         var ContextProvider = REACT_PROVIDER_TYPE;
         var Element2 = REACT_ELEMENT_TYPE;
         var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment4 = REACT_FRAGMENT_TYPE;
+        var Fragment5 = REACT_FRAGMENT_TYPE;
         var Lazy = REACT_LAZY_TYPE;
         var Memo = REACT_MEMO_TYPE;
         var Portal = REACT_PORTAL_TYPE;
@@ -23638,7 +23844,7 @@ var require_react_is_development = __commonJS({
         exports.ContextProvider = ContextProvider;
         exports.Element = Element2;
         exports.ForwardRef = ForwardRef;
-        exports.Fragment = Fragment4;
+        exports.Fragment = Fragment5;
         exports.Lazy = Lazy;
         exports.Memo = Memo;
         exports.Portal = Portal;
@@ -53364,138 +53570,14 @@ var import_obsidian17 = require("obsidian");
 var import_react3 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
 var import_obsidian6 = require("obsidian");
-
-// src/utils.ts
-var import_obsidian = require("obsidian");
-
-// src/utils-core.ts
-function normalizeVaultPath(path) {
-  return (path || "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
-}
-function joinVaultPath(folder, filename) {
-  const cleanFolder = normalizeVaultPath(folder);
-  return cleanFolder ? `${cleanFolder}/${filename}` : filename;
-}
-function formatLocalDate(value) {
-  if (!value)
-    return "";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime()))
-    return "";
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-function formatLocalDateTime(value) {
-  if (!value)
-    return "";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime()))
-    return value;
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-}
-function escapeRegExp(value) {
-  return (value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-function normalizeHighlightQuote(quote) {
-  return (quote || "").replace(/\s+/g, " ").trim();
-}
-function normalizeWordDisplayText(value) {
-  return String(value || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
-}
-
-// src/utils.ts
-function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8BA4\u5220\u9664") {
-  return new Promise((resolve) => {
-    let resolved = false;
-    const finish = (value) => {
-      if (resolved)
-        return;
-      resolved = true;
-      modal.close();
-      resolve(value);
-    };
-    const modal = new import_obsidian.Modal(app);
-    modal.titleEl.setText(title);
-    modal.contentEl.createEl("p", { text: message });
-    new import_obsidian.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u53D6\u6D88").onClick(() => finish(false))).addButton((button) => button.setButtonText(confirmText).setWarning().onClick(() => finish(true)));
-    modal.onClose = () => finish(false);
-    modal.open();
-  });
-}
-
-// src/book-notes.ts
-var import_obsidian2 = require("obsidian");
-function getDefaultBookNoteContent(file, toc) {
-  return `---
-bookname: "[[${file.basename}.${file.extension}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: ${formatLocalDateTime(/* @__PURE__ */ new Date())}
----
-
-` + toc;
-}
-function renderBookNoteTemplate(template, file, toc) {
-  if (!template || !template.trim()) {
-    return getDefaultBookNoteContent(file, toc);
-  }
-  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, formatLocalDateTime(/* @__PURE__ */ new Date())).replace(/\{\{toc\}\}/g, toc || "");
-}
-function getBookNotePath(file, settings = {}) {
-  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
-  const noteFolder = configuredFolder || normalizeVaultPath(file.parent?.path);
-  return joinVaultPath(noteFolder, `${file.basename}.md`);
-}
-function findBookNote(app, file, settings = {}) {
-  const exactPath = getBookNotePath(file, settings);
-  const exactFile = app.vault.getAbstractFileByPath(exactPath);
-  if (exactFile instanceof import_obsidian2.TFile) return exactFile;
-  const allMarkdownFiles = app.vault.getMarkdownFiles();
-  const targetBookname = `[[${file.basename}.${file.extension}]]`;
-  for (const mdFile of allMarkdownFiles) {
-    const cache = app.metadataCache.getFileCache(mdFile);
-    if (cache?.frontmatter?.bookname === targetBookname) {
-      return mdFile;
-    }
-  }
-  const fallbackFile = allMarkdownFiles.find((f) => f.basename === file.basename);
-  if (fallbackFile) return fallbackFile;
-  return null;
-}
-async function getOrCreateBookNote(app, file, toc, settings = {}) {
-  let noteFile = findBookNote(app, file, settings);
-  if (noteFile) return noteFile;
-  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
-  if (configuredFolder) {
-    const folder = app.vault.getAbstractFileByPath(configuredFolder);
-    if (folder == null || !(folder instanceof import_obsidian2.TFolder)) {
-      new import_obsidian2.Notice(`Jarvis Reader note folder does not exist: ${configuredFolder}`);
-      return null;
-    }
-  }
-  const noteFilename = getBookNotePath(file, settings);
-  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
-  return noteFile;
-}
-async function openOrCreateNote(app, file, toc, settings = {}) {
-  const noteFile = await getOrCreateBookNote(app, file, toc, settings);
-  if (!noteFile)
-    return;
-  const leaf = app.workspace.getMostRecentLeaf();
-  if (leaf instanceof import_obsidian2.WorkspaceLeaf) {
-    const fileLeaf = app.workspace.createLeafBySplit(leaf);
-    await fileLeaf.openFile(noteFile, { active: true });
-  }
-}
+init_utils();
+init_book_notes();
 
 // src/highlights.ts
 var import_obsidian3 = require("obsidian");
 
 // src/highlight-core.ts
+init_utils_core();
 function formatBlockquote(text) {
   return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
 }
@@ -53694,6 +53776,8 @@ async function getPdfTocMd(file) {
 }
 
 // src/word-assets.ts
+init_utils_core();
+init_utils_core();
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
 var BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 var DEFAULT_TRANSLATION_PROMPT = `\u4F60\u662F Obsidian \u82F1\u8BED\u7FFB\u8BD1\u4E0E\u8BCD\u53E5\u5361\u7247\u751F\u6210\u5668\u3002
@@ -54038,6 +54122,7 @@ function buildWordAssetFromSelection(file, selection, translation, existingAsset
 
 // src/translation.ts
 var import_obsidian4 = require("obsidian");
+init_utils();
 function extractOpenAIMessageText(payload) {
   var _a, _b, _c;
   const message = (_c = (_b = (_a = payload == null ? void 0 : payload.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.content;
@@ -55215,6 +55300,7 @@ var import_react2 = __toESM(require_react(), 1);
 var import_obsidian5 = require("obsidian");
 var import_react_reader = __toESM(require_lib3(), 1);
 var ReactReaderModule = __toESM(require_lib3(), 1);
+init_utils();
 var ReactReaderStyle2 = ReactReaderModule.ReactReaderStyle;
 function getWordLookupResultFromAsset(asset, selectedText = "") {
   if (!asset)
@@ -55309,7 +55395,7 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
     top: Math.min(boundsHeight - height - 16, Math.max(16, top))
   };
 }
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
@@ -56976,6 +57062,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         rendition.hooks.content.register((contents2) => {
           const doc = contents2?.document;
           if (doc) {
+            const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
+            const interactionHandler = () => {
+              if (typeof onInteraction === "function") {
+                onInteraction();
+              }
+            };
+            interactionEvents.forEach((evt) => {
+              doc.addEventListener(evt, interactionHandler, { passive: true });
+            });
             doc.addEventListener("wheel", (event) => {
               if (!event.ctrlKey) return;
               event.preventDefault();
@@ -57483,6 +57578,10 @@ var EpubView = class extends import_obsidian6.FileView {
   themeSyncViewportHandler = null;
   highlightEditor = null;
   highlightDeleted = null;
+  lastInteractionTime = Date.now();
+  pendingStatsSeconds = 0;
+  statsSaveTimer = null;
+  interactionCleanup = null;
   constructor(leaf, settings, plugin) {
     super(leaf);
     this.settings = settings;
@@ -57741,16 +57840,31 @@ var EpubView = class extends import_obsidian6.FileView {
       window.clearInterval(this.themeSyncInterval);
       this.themeSyncInterval = null;
     }
+    if (this.statsSaveTimer) {
+      window.clearInterval(this.statsSaveTimer);
+      this.statsSaveTimer = null;
+    }
+    this.saveReadingStats();
     if (this.themeSyncViewportHandler && window.visualViewport) {
       window.visualViewport.removeEventListener("resize", this.themeSyncViewportHandler);
       this.themeSyncViewportHandler = null;
+    }
+    if (this.interactionCleanup) {
+      this.interactionCleanup();
+      this.interactionCleanup = null;
     }
   }
   startThemeSync(rendition) {
     this.stopThemeSync();
     this.currentRendition = rendition;
+    this.statsSaveTimer = window.setInterval(() => {
+      this.saveReadingStats();
+    }, 3e4);
     let lastThemeKey = "";
     const sync = () => {
+      if (Date.now() - this.lastInteractionTime < 12e4) {
+        this.pendingStatsSeconds++;
+      }
       const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
       const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
       const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
@@ -57766,6 +57880,40 @@ var EpubView = class extends import_obsidian6.FileView {
     if (window.visualViewport) {
       this.themeSyncViewportHandler = sync;
       window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
+    }
+  }
+  async saveReadingStats() {
+    if (this.pendingStatsSeconds <= 0) return;
+    const seconds = this.pendingStatsSeconds;
+    this.pendingStatsSeconds = 0;
+    const today = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
+    if (!this.plugin.settings.readingStats) {
+      this.plugin.settings.readingStats = {};
+    }
+    if (!this.plugin.settings.readingStats[today]) {
+      this.plugin.settings.readingStats[today] = {};
+    }
+    const bookPath = this.file.path;
+    if (!this.plugin.settings.readingStats[today][bookPath]) {
+      this.plugin.settings.readingStats[today][bookPath] = 0;
+    }
+    this.plugin.settings.readingStats[today][bookPath] += seconds;
+    await this.plugin.saveSettings();
+    let totalSecs = 0;
+    Object.values(this.plugin.settings.readingStats).forEach((daily) => {
+      if (daily[bookPath]) totalSecs += daily[bookPath];
+    });
+    try {
+      const { getOrCreateBookNote: getOrCreateBookNote2 } = await Promise.resolve().then(() => (init_book_notes(), book_notes_exports));
+      const { formatDuration: formatDuration2 } = await Promise.resolve().then(() => (init_utils(), utils_exports));
+      const noteFile = await getOrCreateBookNote2(this.plugin.app, this.file, "", this.plugin.settings);
+      if (noteFile) {
+        await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm) => {
+          fm.reading_time = formatDuration2(totalSecs);
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to sync reading time to metadata", e);
     }
   }
   async setReaderZoom(delta) {
@@ -57829,6 +57977,20 @@ var EpubView = class extends import_obsidian6.FileView {
     this.stopThemeSync();
     import_react_dom.default.unmountComponentAtNode(this.contentEl);
     this.contentEl.empty();
+    this.lastInteractionTime = Date.now();
+    this.pendingStatsSeconds = 0;
+    const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
+    const interactionHandler = () => {
+      this.lastInteractionTime = Date.now();
+    };
+    interactionEvents.forEach((evt) => {
+      this.contentEl.addEventListener(evt, interactionHandler, { passive: true });
+    });
+    this.interactionCleanup = () => {
+      interactionEvents.forEach((evt) => {
+        this.contentEl.removeEventListener(evt, interactionHandler);
+      });
+    };
     const style = getComputedStyle(this.containerEl.parentElement.querySelector("div.view-header"));
     const width = parseFloat(style.width);
     const height = parseFloat(style.height);
@@ -57910,6 +58072,9 @@ var EpubView = class extends import_obsidian6.FileView {
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText) => {
         this.openWikiLink(linkText);
+      },
+      onInteraction: () => {
+        this.lastInteractionTime = Date.now();
       }
     }), this.contentEl);
   }
@@ -57999,7 +58164,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
     return HIGHLIGHTS_VIEW_TYPE;
   }
   getDisplayText() {
-    return "Jarvis Reader \u6807\u6CE8";
+    return "Jarvis Reader \u7B14\u8BB0";
   }
   getIcon() {
     return "highlighter";
@@ -58253,11 +58418,11 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
     container.empty();
     container.addClass("jarvis-reader-highlights-view");
     if (!this.reader) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5F00\u4E00\u672C EPUB \u540E\u663E\u793A\u6807\u6CE8" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5F00\u4E00\u672C EPUB \u540E\u663E\u793A\u7B14\u8BB0" });
       return;
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u6807\u6CE8" });
+    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u7B14\u8BB0" });
     header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
     const list = this.reader.getBookHighlights();
     if (!list.length) {
@@ -58267,7 +58432,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
     this.renderControls(container);
     const visibleList = this.getFilteredHighlights(list);
     if (!visibleList.length) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6CA1\u6709\u5339\u914D\u7684\u6807\u6CE8" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6CA1\u6709\u5339\u914D\u7684\u7B14\u8BB0" });
       return;
     }
     const body = container.createDiv({ cls: "jarvis-reader-highlights-list" });
@@ -58308,7 +58473,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
         event.preventDefault();
         const menu = new import_obsidian7.Menu();
         menu.addItem((item) => {
-          item.setTitle("\u5220\u9664\u6807\u6CE8").setIcon("trash").onClick(async () => {
+          item.setTitle("\u5220\u9664\u7B14\u8BB0").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
           });
         });
@@ -58748,6 +58913,8 @@ var ReactDOM2 = __toESM(require_client(), 1);
 // src/library/LibraryApp.tsx
 var React5 = __toESM(require_react(), 1);
 var import_obsidian10 = require("obsidian");
+init_book_notes();
+init_utils();
 
 // src/word-book/WordCard.tsx
 var React4 = __toESM(require_react(), 1);
@@ -58940,7 +59107,7 @@ function resolveBookStatus(fm, percentage) {
   return "unread";
 }
 function formatBookStatus(status) {
-  return status === "finished" ? "\u5DF2\u8BFB\u5B8C" : status === "reading" ? "\u5728\u8BFB\u4E2D" : "\u672A\u8BFB";
+  return status === "finished" ? "\u5DF2\u8BFB\u5B8C" : status === "reading" ? "\u5728\u8BFB" : "\u672A\u8BFB";
 }
 var MarkdownText = ({ content, plugin }) => {
   const ref = React5.useRef(null);
@@ -58963,6 +59130,7 @@ function LibraryApp({ plugin }) {
   const [activeTab, setActiveTab] = React5.useState("highlights");
   const [descExpanded, setDescExpanded] = React5.useState(false);
   const [showFilters, setShowFilters] = React5.useState(false);
+  const [showLayoutMenu, setShowLayoutMenu] = React5.useState(false);
   const [bookMetadata, setBookMetadata] = React5.useState({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
   const [tagInput, setTagInput] = React5.useState("");
   const [isEditingIntro, setIsEditingIntro] = React5.useState(false);
@@ -58975,7 +59143,9 @@ function LibraryApp({ plugin }) {
   const [books, setBooks] = React5.useState([]);
   const [coverCache, setCoverCache] = React5.useState(plugin.settings.bookCoverCache || {});
   const [noteFallbackCovers, setNoteFallbackCovers] = React5.useState({});
-  const [showStatsModal, setShowStatsModal] = React5.useState(false);
+  const [statsTab, setStatsTab] = React5.useState("week");
+  const [statsDate, setStatsDate] = React5.useState(() => /* @__PURE__ */ new Date());
+  const [statsChartType, setStatsChartType] = React5.useState("bar");
   const [debugImages, setDebugImages] = React5.useState(null);
   const loadBooks = React5.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
@@ -59264,6 +59434,219 @@ function LibraryApp({ plugin }) {
       words: totalWords
     };
   }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
+  const selectedStats = React5.useMemo(() => {
+    const today = (0, import_obsidian10.moment)(statsDate);
+    let startDate;
+    let endDate;
+    let prevStartDate;
+    let prevEndDate;
+    if (statsTab === "week") {
+      startDate = today.clone().startOf("isoWeek");
+      endDate = today.clone().endOf("isoWeek");
+      prevStartDate = startDate.clone().subtract(1, "week");
+      prevEndDate = endDate.clone().subtract(1, "week");
+    } else if (statsTab === "month") {
+      startDate = today.clone().startOf("month");
+      endDate = today.clone().endOf("month");
+      prevStartDate = startDate.clone().subtract(1, "month");
+      prevEndDate = endDate.clone().subtract(1, "month");
+    } else if (statsTab === "year") {
+      startDate = today.clone().startOf("year");
+      endDate = today.clone().endOf("year");
+      prevStartDate = startDate.clone().subtract(1, "year");
+      prevEndDate = endDate.clone().subtract(1, "year");
+    } else {
+      startDate = (0, import_obsidian10.moment)(0);
+      endDate = (0, import_obsidian10.moment)().endOf("day");
+      prevStartDate = (0, import_obsidian10.moment)(0);
+      prevEndDate = (0, import_obsidian10.moment)().endOf("day");
+    }
+    const statsData = plugin.settings.readingStats || {};
+    let totalSeconds = 0;
+    let prevTotalSeconds = 0;
+    const bookSecondsMap = {};
+    const dailySecondsMap = {};
+    const monthlySecondsMap = {};
+    const yearlySecondsMap = {};
+    const readDays = /* @__PURE__ */ new Set();
+    Object.entries(statsData).forEach(([dateStr, dailyData]) => {
+      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
+      if (!dateVal.isValid()) return;
+      const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
+      const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
+      if (isCurrentRange) {
+        Object.entries(dailyData).forEach(([bookPath, secs]) => {
+          totalSeconds += secs;
+          bookSecondsMap[bookPath] = (bookSecondsMap[bookPath] || 0) + secs;
+          if (secs > 0) {
+            readDays.add(dateStr);
+            dailySecondsMap[dateStr] = (dailySecondsMap[dateStr] || 0) + secs;
+            const monthStr = dateVal.format("YYYY-MM");
+            monthlySecondsMap[monthStr] = (monthlySecondsMap[monthStr] || 0) + secs;
+            const yearStr = dateVal.format("YYYY");
+            yearlySecondsMap[yearStr] = (yearlySecondsMap[yearStr] || 0) + secs;
+          }
+        });
+      } else if (isPrevRange && statsTab !== "all") {
+        Object.values(dailyData).forEach((secs) => {
+          prevTotalSeconds += secs;
+        });
+      }
+    });
+    const readBookPaths = /* @__PURE__ */ new Set();
+    const finishedBookPaths = /* @__PURE__ */ new Set();
+    books.forEach((b) => {
+      const prog = getProgress(b);
+      const percentage = prog ? Math.round((prog.percentage || 0) * 100) : 0;
+      const noteFile = bookNotesMap[b.path];
+      let fm = {};
+      if (noteFile) {
+        const cache = plugin.app.metadataCache.getFileCache(noteFile);
+        fm = cache?.frontmatter || {};
+      }
+      const actualStatus = resolveBookStatus(fm, percentage);
+      if (actualStatus === "finished") {
+        if (statsTab === "all") {
+          finishedBookPaths.add(b.path);
+        } else {
+          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
+          const finishDateVal = fm.finish_date ? (0, import_obsidian10.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian10.moment)(0);
+          const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
+          const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
+          if (isUpdatedInRange || isFinishDateInRange) {
+            finishedBookPaths.add(b.path);
+          }
+        }
+      } else if (actualStatus === "reading") {
+        if (statsTab === "all") {
+          readBookPaths.add(b.path);
+        } else {
+          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
+          const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
+          const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
+          if (isUpdatedInRange || hasTimeSecs) {
+            readBookPaths.add(b.path);
+          }
+        }
+      }
+    });
+    const booksReadCount = readBookPaths.size;
+    const finishedBooksCount = finishedBookPaths.size;
+    let newHighlightsCount = 0;
+    Object.values(plugin.settings.bookHighlights || {}).forEach((list) => {
+      if (Array.isArray(list)) {
+        list.forEach((hl) => {
+          const createdVal = (0, import_obsidian10.moment)(hl.created);
+          if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+            newHighlightsCount++;
+          }
+        });
+      }
+    });
+    let newWordsCount = 0;
+    Object.values(plugin.settings.wordAssets || {}).forEach((asset) => {
+      const createdVal = (0, import_obsidian10.moment)(asset.created);
+      if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+        newWordsCount++;
+      }
+    });
+    const categoryCount = {};
+    const publisherCount = {};
+    const prefBookPaths = /* @__PURE__ */ new Set([...readBookPaths, ...finishedBookPaths]);
+    prefBookPaths.forEach((bookPath) => {
+      const noteFile = bookNotesMap[bookPath];
+      let fm = {};
+      if (noteFile) {
+        const cache = plugin.app.metadataCache.getFileCache(noteFile);
+        fm = cache?.frontmatter || {};
+      }
+      const secs = bookSecondsMap[bookPath] || 0;
+      const weight = secs > 0 ? secs : 1;
+      const tagsList = [];
+      if (Array.isArray(fm.tags) && fm.tags.length > 0) {
+        fm.tags.forEach((tag) => {
+          if (typeof tag === "string" && tag.trim()) {
+            tagsList.push(tag.trim());
+          }
+        });
+      }
+      if (fm.category && typeof fm.category === "string" && fm.category.trim()) {
+        const cat = fm.category.trim();
+        if (!tagsList.includes(cat)) {
+          tagsList.push(cat);
+        }
+      }
+      if (tagsList.length > 0) {
+        tagsList.forEach((tag) => {
+          categoryCount[tag] = (categoryCount[tag] || 0) + weight;
+        });
+      } else {
+        categoryCount["\u672A\u77E5"] = (categoryCount["\u672A\u77E5"] || 0) + weight;
+      }
+      const publisher = fm.publisher || "";
+      if (publisher) {
+        publisherCount[publisher] = (publisherCount[publisher] || 0) + weight;
+      }
+    });
+    const topPublishers = Object.entries(publisherCount).sort((a, b) => b[1] - a[1]).map((entry) => entry[0]).slice(0, 2);
+    const sortedCategories = Object.entries(categoryCount).sort((a, b) => b[1] - a[1]);
+    const radarDimensions = ["\u5F71\u89C6\u539F\u8457", "\u6587\u5B66", "\u4E2A\u4EBA\u6210\u957F", "\u793E\u4F1A\u5C0F\u8BF4", "\u7537\u751F\u5C0F\u8BF4"];
+    const topCategories = sortedCategories.slice(0, 5).map((entry) => entry[0]);
+    topCategories.forEach((cat) => {
+      if (!radarDimensions.includes(cat) && cat !== "\u672A\u77E5") {
+        radarDimensions.push(cat);
+      }
+    });
+    const activeDimensions = radarDimensions.slice(0, 5);
+    const radarData = activeDimensions.map((dim) => {
+      return {
+        dimension: dim,
+        value: categoryCount[dim] || 0
+      };
+    });
+    let trendPercent = 0;
+    if (prevTotalSeconds > 0) {
+      trendPercent = Math.round((totalSeconds - prevTotalSeconds) / prevTotalSeconds * 100);
+    } else if (totalSeconds > 0) {
+      trendPercent = 100;
+    }
+    return {
+      startDate,
+      endDate,
+      totalSeconds,
+      prevTotalSeconds,
+      trendPercent,
+      readDaysCount: readDays.size,
+      booksReadCount,
+      finishedBooksCount,
+      newHighlightsCount,
+      newWordsCount,
+      bookSecondsMap,
+      dailySecondsMap,
+      monthlySecondsMap,
+      yearlySecondsMap,
+      radarData,
+      topPublishers
+    };
+  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache]);
+  const handlePrevDate = () => {
+    setStatsDate((prev) => {
+      const m = (0, import_obsidian10.moment)(prev);
+      if (statsTab === "week") return m.subtract(1, "week").toDate();
+      if (statsTab === "month") return m.subtract(1, "month").toDate();
+      if (statsTab === "year") return m.subtract(1, "year").toDate();
+      return prev;
+    });
+  };
+  const handleNextDate = () => {
+    setStatsDate((prev) => {
+      const m = (0, import_obsidian10.moment)(prev);
+      if (statsTab === "week") return m.add(1, "week").toDate();
+      if (statsTab === "month") return m.add(1, "month").toDate();
+      if (statsTab === "year") return m.add(1, "year").toDate();
+      return prev;
+    });
+  };
   const filteredBooks = React5.useMemo(() => {
     return books.filter((b) => {
       const { title, author } = parseBookInfo(b);
@@ -59511,70 +59894,629 @@ function LibraryApp({ plugin }) {
       ] }, img.href)) })
     ] }) });
   };
-  const renderStatsModal = () => {
-    if (!showStatsModal) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-modal-overlay", onClick: () => setShowStatsModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-modal", onClick: (e) => e.stopPropagation(), children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-modal-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { children: "\u{1F4CA} \u9605\u8BFB\u7EDF\u8BA1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-stats-close-btn", onClick: () => setShowStatsModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 6 6 18M6 6l12 12" }) }) })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u5168\u90E8\u4E66\u7C4D" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number", children: stats.total })
+  const renderStatsView = () => {
+    const {
+      startDate,
+      endDate,
+      totalSeconds,
+      prevTotalSeconds,
+      trendPercent,
+      readDaysCount,
+      booksReadCount,
+      finishedBooksCount,
+      newHighlightsCount,
+      newWordsCount,
+      bookSecondsMap,
+      dailySecondsMap,
+      monthlySecondsMap,
+      yearlySecondsMap,
+      radarData,
+      topPublishers
+    } = selectedStats;
+    const statsData = plugin.settings.readingStats || {};
+    const sortedDates = Object.keys(statsData).sort();
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian10.moment)().format("YYYY-MM-DD");
+    const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
+    let dateRangeStr = "";
+    if (statsTab === "week") {
+      const start = (0, import_obsidian10.moment)(startDate);
+      const end = (0, import_obsidian10.moment)(endDate);
+      dateRangeStr = `${start.format("YYYY \xB7 M/D")} - ${end.format("M/D")}`;
+    } else if (statsTab === "month") {
+      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74M\u6708");
+    } else if (statsTab === "year") {
+      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74");
+    }
+    const renderLargeDuration = (secs) => {
+      if (secs <= 0) {
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+          "0",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+        ] });
+      }
+      const h = Math.floor(secs / 3600);
+      const m = Math.round(secs % 3600 / 60);
+      if (h > 0 && m > 0) {
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+          h,
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C0F\u65F6" }),
+          m,
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+        ] });
+      } else if (h > 0) {
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+          h,
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C0F\u65F6" })
+        ] });
+      } else {
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+          m,
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+        ] });
+      }
+    };
+    let mainCardSub = "";
+    const avgSecs = Math.round(totalSeconds / (readDaysCount || 1));
+    const trendText = trendPercent > 0 ? `\u2191 ${trendPercent}%` : trendPercent < 0 ? `\u2193 ${Math.abs(trendPercent)}%` : "--";
+    const trendClass = trendPercent > 0 ? "jarvis-stats-trend-up" : trendPercent < 0 ? "jarvis-stats-trend-down" : "";
+    if (statsTab === "week") {
+      mainCardSub = `\u65E5\u5747\u9605\u8BFB ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u5468 `;
+    } else if (statsTab === "month") {
+      mainCardSub = `\u65E5\u5747\u9605\u8BFB ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u6708 `;
+    } else if (statsTab === "year") {
+      mainCardSub = `\u65E5\u5747\u9605\u8BFB ${formatDuration(avgSecs)} \xB7 \u6BD4\u53BB\u5E74 `;
+    } else {
+      mainCardSub = `${firstDateStr}\u81F3\u4ECA \xB7 \u65E5\u5747\u9605\u8BFB ${formatDuration(avgSecs)} \xB7 \u4E0E Jarvis Reader \u76F8\u4F34 ${readDaysCount} \u5929`;
+    }
+    let activeChart = statsChartType;
+    if (statsTab === "week") {
+      activeChart = "bar";
+    } else if (statsTab === "month" && activeChart === "heatmap") {
+      activeChart = "bar";
+    } else if ((statsTab === "year" || statsTab === "all") && activeChart === "calendar") {
+      activeChart = "heatmap";
+    }
+    let maxSingleDaySecs = 0;
+    let maxSingleDayBook = "";
+    let maxHighlightsCount = 0;
+    let maxHighlightsBook = "";
+    const bookDailyMaxSecs = {};
+    const bookRangeHighlightsCount = {};
+    Object.entries(statsData).forEach(([dateStr, dailyData]) => {
+      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
+      if (!dateVal.isValid()) return;
+      const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
+      if (isCurrentRange) {
+        Object.entries(dailyData).forEach(([bookPath, secs]) => {
+          if (secs > 0) {
+            bookDailyMaxSecs[bookPath] = Math.max(bookDailyMaxSecs[bookPath] || 0, secs);
+          }
+        });
+      }
+    });
+    Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]) => {
+      if (Array.isArray(list)) {
+        list.forEach((hl) => {
+          const createdVal = (0, import_obsidian10.moment)(hl.created);
+          if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
+            bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
+          }
+        });
+      }
+    });
+    Object.entries(bookDailyMaxSecs).forEach(([bookPath, secs]) => {
+      if (secs > maxSingleDaySecs) {
+        maxSingleDaySecs = secs;
+        maxSingleDayBook = bookPath;
+      }
+    });
+    Object.entries(bookRangeHighlightsCount).forEach(([bookPath, count]) => {
+      if (count > maxHighlightsCount) {
+        maxHighlightsCount = count;
+        maxHighlightsBook = bookPath;
+      }
+    });
+    let sortedRankBooks = [];
+    let isTimeRank = true;
+    if (Object.keys(bookSecondsMap).length > 0) {
+      sortedRankBooks = Object.entries(bookSecondsMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      isTimeRank = true;
+    } else {
+      const progRankList = [];
+      Object.entries(plugin.settings.bookProgress || {}).forEach(([bookPath, prog]) => {
+        if (prog && prog.percentage > 0) {
+          if (statsTab === "all") {
+            progRankList.push([bookPath, prog.percentage]);
+          } else {
+            const updatedVal = (0, import_obsidian10.moment)(prog.updated);
+            if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
+              progRankList.push([bookPath, prog.percentage]);
+            }
+          }
+        }
+      });
+      sortedRankBooks = progRankList.sort((a, b) => b[1] - a[1]).slice(0, 10);
+      isTimeRank = false;
+    }
+    const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-view-container", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "12 19 5 12 12 5" })
+          ] }),
+          "\u8FD4\u56DE\u4E66\u67B6"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u5728\u8BFB\u4E2D" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number status-reading", children: stats.reading })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u9605\u8BFB\u7EDF\u8BA1" })
+      ] }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u5DF2\u8BFB\u5B8C" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number status-finished", children: stats.finished })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u672A\u5F00\u59CB" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number status-unread", children: stats.unread })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u5212\u7EBF\u6458\u6284" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number", children: stats.highlights })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-label", children: "\u6536\u96C6\u8BCD\u5361" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-number", children: stats.words })
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-visuals", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-library-stats-subheader", children: "\u9605\u8BFB\u8FDB\u5EA6\u6BD4\u4F8B" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-progress-track", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-progress-bar status-finished", style: { width: `${stats.total ? stats.finished / stats.total * 100 : 0}%` }, title: `\u5DF2\u8BFB\u5B8C: ${stats.finished}` }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-progress-bar status-reading", style: { width: `${stats.total ? stats.reading / stats.total * 100 : 0}%` }, title: `\u5728\u8BFB\u4E2D: ${stats.reading}` }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-progress-bar status-unread", style: { width: `${stats.total ? stats.unread / stats.total * 100 : 0}%` }, title: `\u672A\u5F00\u59CB: ${stats.unread}` })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-main-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
+          mainCardSub,
+          statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: trendClass, children: trendText })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+            ] }),
+            readDaysCount,
+            "\u5929"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u9605\u8BFB\u5929\u6570" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-progress-legend", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "legend-dot status-finished" }),
-            "\u5DF2\u8BFB\u5B8C ",
-            stats.total ? Math.round(stats.finished / stats.total * 100) : 0,
-            "%"
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "17 6 23 6 23 12" })
+            ] }),
+            formatDuration(avgSecs),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "legend-dot status-reading" }),
-            "\u5728\u8BFB\u4E2D ",
-            stats.total ? Math.round(stats.reading / stats.total * 100) : 0,
-            "%"
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
+        ] }),
+        statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+              ] }),
+              booksReadCount,
+              "\u672C"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5728\u8BFB" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "legend-dot status-unread" }),
-            "\u672A\u5F00\u59CB ",
-            stats.total ? Math.round(stats.unread / stats.total * 100) : 0,
-            "%"
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "2" })
+              ] }),
+              finishedBooksCount,
+              "\u672C"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u8BFB\u5B8C" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 20h9" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+              ] }),
+              newHighlightsCount,
+              "\u6761"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+              ] }),
+              newWordsCount,
+              "\u6761"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u6761" })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
+            activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F" : statsTab === "year" ? "\u6BCF\u6708\u9605\u8BFB\u65F6\u957F" : "\u6BCF\u5E74\u9605\u8BFB\u65F6\u957F"),
+            activeChart === "calendar" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F",
+            activeChart === "heatmap" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
+            statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+              ] }) })
+            ] }),
+            (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
+            ] })
+          ] })
+        ] }),
+        activeChart === "bar" && (() => {
+          let data = [];
+          if (statsTab === "week") {
+            const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
+            data = Array.from({ length: 7 }).map((_, i) => {
+              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
+              const dateStr = day.format("YYYY-MM-DD");
+              const secs = dailySecondsMap[dateStr] || 0;
+              return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
+            });
+          } else if (statsTab === "month") {
+            const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
+            data = Array.from({ length: daysInMonth }).map((_, i) => {
+              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
+              const dateStr = day.format("YYYY-MM-DD");
+              const secs = dailySecondsMap[dateStr] || 0;
+              return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
+            });
+          } else if (statsTab === "year") {
+            data = Array.from({ length: 12 }).map((_, i) => {
+              const month = (0, import_obsidian10.moment)(startDate).add(i, "months");
+              const monthStr = month.format("YYYY-MM");
+              const secs = monthlySecondsMap[monthStr] || 0;
+              return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u9605\u8BFB ${formatDuration(secs)}` };
+            });
+          } else {
+            const currentYear = (0, import_obsidian10.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+            const yearsCount = Math.max(currentYear - startYear + 1, 1);
+            data = Array.from({ length: yearsCount }).map((_, i) => {
+              const year = String(startYear + i);
+              const secs = yearlySecondsMap[year] || 0;
+              return { label: year, secs, tooltip: `${year}\u5E74 \u9605\u8BFB ${formatDuration(secs)}` };
+            });
+          }
+          const maxVal = Math.max(...data.map((d) => d.secs), 60);
+          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "relative" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
+              const heightPct = item.secs / maxVal * 85;
+              return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
+              ] }, idx);
+            }) })
+          ] });
+        })(),
+        activeChart === "calendar" && (() => {
+          const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
+          const firstDayOffset = ((0, import_obsidian10.moment)(startDate).clone().startOf("month").day() + 6) % 7;
+          const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
+          const cells = [];
+          for (let i = 0; i < firstDayOffset; i++) {
+            cells.push(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
+          }
+          for (let d = 1; d <= daysInMonth; d++) {
+            const day = (0, import_obsidian10.moment)(startDate).clone().date(d);
+            const dateStr = day.format("YYYY-MM-DD");
+            const secs = dailySecondsMap[dateStr] || 0;
+            cells.push(
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
+                secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
+              ] }, `day-${d}`)
+            );
+          }
+          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
+          ] });
+        })(),
+        activeChart === "heatmap" && (() => {
+          const renderHeatmapWall = (yearStr) => {
+            const startOfYear = (0, import_obsidian10.moment)(`${yearStr}-01-01`);
+            const gridStart = startOfYear.clone().startOf("isoWeek");
+            const weeksCount = 53;
+            const columns = [];
+            const monthLabels = [];
+            let lastMonth = -1;
+            for (let w = 0; w < weeksCount; w++) {
+              const colCells = [];
+              const colMonday = gridStart.clone().add(w * 7, "days");
+              const m = colMonday.month();
+              if (m !== lastMonth) {
+                monthLabels.push({ label: `${m + 1}\u6708`, colIndex: w });
+                lastMonth = m;
+              }
+              for (let d = 0; d < 7; d++) {
+                const cellDate = gridStart.clone().add(w * 7 + d, "days");
+                const isTargetYear = cellDate.year() === Number(yearStr);
+                const dateStr = cellDate.format("YYYY-MM-DD");
+                const secs = isTargetYear ? dailySecondsMap[dateStr] || 0 : 0;
+                const mins = secs / 60;
+                let level = 0;
+                if (mins > 0 && mins <= 5) level = 1;
+                else if (mins > 5 && mins <= 15) level = 2;
+                else if (mins > 15 && mins <= 45) level = 3;
+                else if (mins > 45) level = 4;
+                const tooltipText = isTargetYear ? `${cellDate.format("YYYY\u5E74M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` : "";
+                colCells.push(
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
+                );
+              }
+              columns.push(
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
+              );
+            }
+            const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
+              return dateStr.startsWith(yearStr) && secs > 0;
+            }).length;
+            const yearsTotalSecs = Object.entries(dailySecondsMap).filter(([dateStr]) => dateStr.startsWith(yearStr)).reduce((acc, entry) => acc + entry[1], 0);
+            return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { marginBottom: "24px" }, children: [
+              statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E00" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E09" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E94" })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
+                  yearStr,
+                  "\u5E74\u5171\u9605\u8BFB ",
+                  yearsTotalDays,
+                  "\u5929\uFF0C\u7D2F\u8BA1 ",
+                  formatDuration(yearsTotalSecs)
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C11" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u591A" })
+                ] })
+              ] })
+            ] }, yearStr);
+          };
+          if (statsTab === "year") {
+            const yearStr = (0, import_obsidian10.moment)(startDate).format("YYYY");
+            return renderHeatmapWall(yearStr);
+          } else {
+            const currentYear = (0, import_obsidian10.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+            const yearsList = [];
+            for (let y = currentYear; y >= startYear; y--) {
+              yearsList.push(String(y));
+            }
+            return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
+          }
+        })()
+      ] }),
+      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-title", children: [
+          isTimeRank ? "\u9605\u8BFB\u65F6\u957F" : "\u9605\u8BFB\u8FDB\u5EA6",
+          " TOP ",
+          sortedRankBooks.length
+        ] }),
+        sortedRankBooks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-list", children: sortedRankBooks.map(([bookPath, val], idx) => {
+          const book = books.find((b) => b.path === bookPath);
+          const cover = book ? getCover(book) : null;
+          const { title, author } = book ? parseBookInfo(book) : { title: bookPath.split("/").pop() || "\u672A\u77E5", author: "\u672A\u77E5" };
+          const noteFile = book ? bookNotesMap[book.path] : null;
+          let fm = {};
+          if (noteFile) {
+            const cache = plugin.app.metadataCache.getFileCache(noteFile);
+            fm = cache?.frontmatter || {};
+          }
+          const displayAuthor = fm.author || fm.creator || cover?.creator || author;
+          const progressPct = isTimeRank ? maxRankSecs > 0 ? val / maxRankSecs * 100 : 0 : val * 100;
+          const isSingleDayMax = bookPath === maxSingleDayBook && maxSingleDaySecs > 0;
+          const isMostNotes = bookPath === maxHighlightsBook && maxHighlightsCount > 0;
+          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-item", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
+            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url(${cover.dataUrl})` } }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-info", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-author", children: displayAuthor }),
+                isSingleDayMax && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-badge", children: "\u5355\u65E5\u9605\u8BFB\u6700\u4E45" }),
+                isMostNotes && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-badge", style: { background: "rgba(45, 140, 240, 0.08)", color: "var(--text-accent)", border: "1px solid rgba(45, 140, 240, 0.2)" }, children: "\u7B14\u8BB0\u6700\u591A" })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-time-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-time", children: isTimeRank ? formatDuration(val) : `\u5DF2\u8BFB ${Math.round(val * 100)}%` }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-progress-bg", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-progress-bar", style: { width: `${progressPct}%` } }) })
+            ] })
+          ] }, bookPath);
+        }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "12px" }, children: "\u6682\u65E0\u4E66\u7C4D\u9605\u8BFB\u8BB0\u5F55" })
+      ] }),
+      (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-title", style: { marginTop: "24px", marginBottom: "12px" }, children: "\u504F\u597D\u5206\u6790" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-section", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" })
+              ] }),
+              "\u5206\u7C7B\u504F\u597D"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-pref-sub", children: radarData.length > 0 ? `\u504F\u597D\u9605\u8BFB ${radarData[0].dimension}` : "\u6682\u65E0\u5206\u7C7B\u504F\u597D\u8BB0\u5F55" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-radar-container", children: radarData.length > 0 ? (() => {
+              const CX = 75;
+              const CY = 75;
+              const R = 45;
+              const numPoints = 5;
+              const maxRadarVal = Math.max(...radarData.map((d) => d.value), 60);
+              const angles = Array.from({ length: numPoints }).map((_, i) => -Math.PI / 2 + i * (2 * Math.PI / numPoints));
+              const pentagons = Array.from({ length: 5 }).map((_, layerIdx) => {
+                const r = R * ((layerIdx + 1) / 5);
+                return angles.map((angle) => ({
+                  x: CX + r * Math.cos(angle),
+                  y: CY + r * Math.sin(angle)
+                }));
+              });
+              const axes = angles.map((angle) => ({
+                x1: CX,
+                y1: CY,
+                x2: CX + R * Math.cos(angle),
+                y2: CY + R * Math.sin(angle)
+              }));
+              const dataPoints = radarData.map((d, i) => {
+                const angle = angles[i] || 0;
+                const r = R * (d.value / maxRadarVal);
+                return {
+                  x: CX + r * Math.cos(angle),
+                  y: CY + r * Math.sin(angle),
+                  value: d.value
+                };
+              });
+              const polygonPointsStr = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
+              return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { width: "150", height: "150", viewBox: "0 0 150 150", children: [
+                pentagons.map((points, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  "polygon",
+                  {
+                    points: points.map((p) => `${p.x},${p.y}`).join(" "),
+                    fill: "none",
+                    stroke: "var(--background-modifier-border)",
+                    strokeWidth: "0.8"
+                  },
+                  `p-${idx}`
+                )),
+                axes.map((axis, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  "line",
+                  {
+                    x1: axis.x1,
+                    y1: axis.y1,
+                    x2: axis.x2,
+                    y2: axis.y2,
+                    stroke: "var(--background-modifier-border)",
+                    strokeWidth: "0.8"
+                  },
+                  `line-${idx}`
+                )),
+                dataPoints.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  "polygon",
+                  {
+                    points: polygonPointsStr,
+                    fill: "rgba(140, 26, 26, 0.08)",
+                    stroke: "#8C1A1A",
+                    strokeWidth: "1.5"
+                  }
+                ),
+                dataPoints.map((p, idx) => p.value > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  "circle",
+                  {
+                    cx: p.x,
+                    cy: p.y,
+                    r: "2.5",
+                    fill: "#ffffff",
+                    stroke: "#8C1A1A",
+                    strokeWidth: "1.5"
+                  },
+                  `circle-${idx}`
+                )),
+                radarData.map((d, i) => {
+                  const angle = angles[i] || 0;
+                  const textR = R + 10;
+                  const tx = CX + textR * Math.cos(angle);
+                  const ty = CY + textR * Math.sin(angle);
+                  let textAnchor = "middle";
+                  let dy = "3px";
+                  if (Math.abs(Math.cos(angle)) > 0.1) {
+                    textAnchor = Math.cos(angle) > 0 ? "start" : "end";
+                  }
+                  if (angle === -Math.PI / 2) {
+                    dy = "-4px";
+                  } else if (angle > 0 && angle < Math.PI) {
+                    dy = "7px";
+                  }
+                  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                    "text",
+                    {
+                      x: tx,
+                      y: ty,
+                      textAnchor,
+                      dy,
+                      fontSize: "8px",
+                      fill: "var(--text-muted)",
+                      children: d.dimension
+                    },
+                    `txt-${i}`
+                  );
+                })
+              ] });
+            })() : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontSize: "11px", color: "var(--text-muted)" }, children: "\u6682\u65E0\u5206\u6790\u6570\u636E" }) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "4", y: "2", width: "16", height: "20", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "9", y1: "22", x2: "9", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "15", y1: "22", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "9", y1: "16", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M8 6h8M8 10h8M8 14h8" })
+              ] }),
+              "\u504F\u597D\u51FA\u7248\u65B9"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-pref-sub", children: "\u504F\u597D\u51FA\u7248\u65B9\u6392\u884C" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-publishers-list", children: topPublishers.length > 0 ? topPublishers.map((pub, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-publisher-item", children: pub }, pub)) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "11px" }, children: "\u6682\u65E0\u51FA\u7248\u65B9\u4FE1\u606F" }) })
           ] })
         ] })
       ] })
     ] }) });
   };
   const renderHome = () => {
+    let totalAppReadingTime = 0;
+    if (plugin.settings.readingStats) {
+      for (const daily of Object.values(plugin.settings.readingStats)) {
+        for (const secs of Object.values(daily)) {
+          totalAppReadingTime += secs;
+        }
+      }
+    }
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { flex: 1 } }),
@@ -59641,20 +60583,22 @@ function LibraryApp({ plugin }) {
               /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "12", y1: "7", x2: "12", y2: "17" })
             ] }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-header-actions", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u9605\u8BFB\u7EDF\u8BA1", onClick: () => setShowStatsModal(true), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => plugin.app.setting.openTabById(plugin.manifest.id), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
-            ] }) })
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
+            const setting = plugin.app.setting;
+            setting.open();
+            setting.openTabById(plugin.manifest.id);
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
+          ] }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-strip minimalist", onClick: () => setShowStatsModal(true), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-strip minimalist", onClick: () => setCurrentView("stats"), title: "\u67E5\u770B\u6570\u636E\u7EDF\u8BA1", style: { cursor: "pointer" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", alignItems: "center", opacity: 0.6, marginRight: "4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+        ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
           "\u603B\u4E66\u7C4D ",
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.total })
@@ -59668,12 +60612,16 @@ function LibraryApp({ plugin }) {
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.finished })
         ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u5212\u7EBF\u6458\u6284 ",
+          "\u7B14\u8BB0 ",
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.highlights })
         ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u8BCD\u53E5\u5361\u7247 ",
+          "\u8BCD\u6761 ",
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.words })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
+          "\u603B\u9605\u8BFB\u65F6\u957F ",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: formatDuration(totalAppReadingTime) })
         ] }) })
       ] }),
       filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "coverflow" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-coverflow-wrapper", children: [
@@ -59765,11 +60713,11 @@ function LibraryApp({ plugin }) {
               ] }),
               /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-stat", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-val", children: highlightsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u5212\u7EBF" })
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u7B14\u8BB0" })
               ] }),
               /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-stat", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-val", children: wordsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u8BCD\u5361" })
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u8BCD\u6761" })
               ] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
@@ -59784,6 +60732,10 @@ function LibraryApp({ plugin }) {
               /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "text-ellipsis", style: { minHeight: "19px" }, children: [
                 "\u6807\u7B7E\uFF1A",
                 tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "\u65E0"
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                "\u65F6\u957F\uFF1A",
+                formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeB.path))
               ] }),
               /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
                 "\u65F6\u95F4\uFF1A",
@@ -59866,10 +60818,12 @@ function LibraryApp({ plugin }) {
                       tags.map((t) => `#${t}`).join(" ")
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-                      "\u6570\u636E\uFF1A\u5212\u7EBF ",
+                      "\u6570\u636E\uFF1A\u7B14\u8BB0 ",
                       highlightsCount,
-                      " \xB7 \u8BCD\u5361 ",
-                      wordsCount
+                      " \xB7 \u8BCD\u6761 ",
+                      wordsCount,
+                      " \xB7 \u65F6\u957F ",
+                      formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
                       "\u65F6\u95F4\uFF1A",
@@ -59913,7 +60867,7 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u5212\u7EBF/\u8BCD\u5361)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u8BCD\u6761/\u65F6\u957F)" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
           ] }) }),
@@ -59970,7 +60924,9 @@ function LibraryApp({ plugin }) {
                   /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
                     highlightsCount,
                     " / ",
-                    wordsCount
+                    wordsCount,
+                    " / ",
+                    formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                   ] }),
                   /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: startDate }),
                   /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: finishDate })
@@ -60053,12 +61009,12 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-progress-divider" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-stat", children: [
               /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u5212\u7EBF\u6458\u6284" })
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-progress-divider" }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-stat", children: [
               /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-value", children: wordAssets.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u5173\u8054\u8BCD\u5361" })
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u8BCD\u6761" })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%" }, children: [
@@ -60130,6 +61086,10 @@ function LibraryApp({ plugin }) {
                 }
               )
             ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u65F6\u957F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-value", style: { fontSize: "13px", display: "inline-flex", alignItems: "center", height: "30px", color: "var(--text-muted)" }, children: formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path)) })
+            ] }),
             /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row full-width", children: [
               /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u6807\u7B7E" }),
               /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
@@ -60173,17 +61133,26 @@ function LibraryApp({ plugin }) {
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-detail-tabs", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`, onClick: () => setActiveTab("highlights"), children: [
-          "\u270F\uFE0F \u6211\u7684\u5212\u7EBF\u4E0E\u611F\u60F3 (",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 20h9" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+          ] }),
+          "\u7B14\u8BB0 (",
           highlights.length,
           ")"
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`, onClick: () => setActiveTab("words"), children: [
-          "\u{1F4C7} \u5173\u8054\u8BCD\u53E5\u5361\u7247 (",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+          ] }),
+          "\u8BCD\u6761 (",
           wordAssets.length,
           ")"
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
-          "\u{1F516} \u4E66\u7B7E (",
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
+          "\u4E66\u7B7E (",
           bookmarks.length,
           ")"
         ] })
@@ -60284,8 +61253,7 @@ function LibraryApp({ plugin }) {
     ] });
   };
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-app", children: [
-    currentView === "home" ? renderHome() : renderDetail(),
-    renderStatsModal(),
+    currentView === "home" ? renderHome() : currentView === "detail" ? renderDetail() : renderStatsView(),
     renderDebugModal()
   ] });
 }
@@ -60326,6 +61294,7 @@ var LibraryView = class extends import_obsidian11.ItemView {
 
 // src/settings.ts
 var import_obsidian12 = require("obsidian");
+init_utils();
 var DEFAULT_SETTINGS = {
   scrolledView: false,
   singlePageView: false,
@@ -60363,7 +61332,8 @@ var DEFAULT_SETTINGS = {
     sentence: "#40c057",
     comment: "#f97316",
     normal: "#ffeb3b"
-  }
+  },
+  readingStats: {}
 };
 var JarvisReaderFolderSuggestModal = class extends import_obsidian12.FuzzySuggestModal {
   onChoose;
@@ -60664,7 +61634,7 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
     return WORD_SIDEBAR_VIEW_TYPE;
   }
   getDisplayText() {
-    return "\u82F1\u8BED\u8BCD\u53E5\u672C";
+    return "Jarvis Reader \u8BCD\u6761";
   }
   getIcon() {
     return "book-a";
@@ -60756,8 +61726,8 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
     const wordBookBtn = titleRow.createEl("button", {
       cls: "jarvis-reader-word-sidebar-action",
       attr: {
-        "aria-label": "\u6253\u5F00\u82F1\u8BED\u8BCD\u53E5\u672C",
-        "title": "\u6253\u5F00\u82F1\u8BED\u8BCD\u53E5\u672C"
+        "aria-label": "\u6253\u5F00\u8BCD\u6761",
+        "title": "\u6253\u5F00\u8BCD\u6761"
       }
     });
     (0, import_obsidian13.setIcon)(wordBookBtn, "library");
@@ -60947,6 +61917,7 @@ var ReactDOM3 = __toESM(require_client(), 1);
 // src/word-book/WordBookApp.tsx
 var React8 = __toESM(require_react(), 1);
 var import_obsidian14 = require("obsidian");
+init_utils();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 function WordBookApp({ plugin }) {
   const [assets, setAssets] = React8.useState([]);
@@ -61003,7 +61974,7 @@ function WordBookApp({ plugin }) {
   };
   const handleDeleteSelected = async () => {
     if (selected.size === 0) return;
-    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u5361", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u9009\u4E2D\u7684 ${selected.size} \u4E2A\u8BCD\u5361\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
+    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u9009\u4E2D\u7684 ${selected.size} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
     if (!confirmed)
       return;
     let count = 0;
@@ -61027,7 +61998,7 @@ function WordBookApp({ plugin }) {
   };
   const handleDeleteFilteredBookWords = async () => {
     if (filterBook === "all" || filteredAssets.length === 0) return;
-    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u672C\u4E66\u8BCD\u5361", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u6B63\u5728\u663E\u793A\u7684\u8FD9\u672C\u4E66\u7684 ${filteredAssets.length} \u4E2A\u8BCD\u5361\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
+    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u672C\u4E66\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u6B63\u5728\u663E\u793A\u7684\u8FD9\u672C\u4E66\u7684 ${filteredAssets.length} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
     if (!confirmed)
       return;
     let count = 0;
@@ -61132,7 +62103,7 @@ function WordBookApp({ plugin }) {
     markdown += `
 <div style="${baseStyle} font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333; line-height: 1.5; padding: 0;">
   <div style="${baseStyle} padding-bottom: 12px; margin-bottom: 16px; border-bottom: 2px solid #cbd5e1; display: flex; justify-content: space-between; align-items: baseline;">
-    <h1 style="${baseStyle} margin: 0 !important; font-size: 1.5em !important; font-weight: 700 !important; color: #0f172a !important; padding: 0 !important;">\u82F1\u8BED\u8BCD\u53E5\u672C</h1>
+    <h1 style="${baseStyle} margin: 0 !important; font-size: 1.5em !important; font-weight: 700 !important; color: #0f172a !important; padding: 0 !important;">\u82F1\u8BED\u8BCD\u6761</h1>
     <div style="${baseStyle} text-align: right; font-size: 0.85em; color: #64748b;">
       ${dateStrDisp} \xB7 \u603B\u8BA1 ${selectedList.length} \u4E2A\u8BCD\u6761
     </div>
@@ -61189,7 +62160,7 @@ function WordBookApp({ plugin }) {
       }
       const dateStr = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19);
       const suffix = templateType === "full" ? "\u5B8C\u6574\u5BF9\u7167" : templateType === "hide_zh" ? "\u9ED8\u5199\u4E2D\u6587" : "\u9ED8\u5199\u82F1\u6587";
-      const fileName = `${folderPath ? folderPath + "/" : ""}\u82F1\u8BED\u8BCD\u53E5\u672C_${suffix}_${dateStr}.md`;
+      const fileName = `${folderPath ? folderPath + "/" : ""}\u82F1\u8BED\u8BCD\u6761_${suffix}_${dateStr}.md`;
       const file = await plugin.app.vault.create(fileName, markdown);
       const leaf = plugin.app.workspace.getLeaf("split", "vertical");
       await leaf.openFile(file);
@@ -61461,7 +62432,7 @@ function WordBookApp({ plugin }) {
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { display: "flex", justifyContent: "flex-end" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setExportState("none"), children: "\u53D6\u6D88" }) })
     ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-word-book-header", style: { padding: "16px", borderBottom: "1px solid var(--background-modifier-border)", flexShrink: 0 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "\u82F1\u8BED\u8BCD\u53E5\u672C" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "\u82F1\u8BED\u8BCD\u6761" }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px", alignItems: "center" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "input",
@@ -61721,7 +62692,7 @@ var WordBookView = class extends import_obsidian15.ItemView {
     return WORD_BOOK_VIEW_TYPE;
   }
   getDisplayText() {
-    return "\u82F1\u8BED\u8BCD\u53E5\u672C";
+    return "\u82F1\u8BED\u8BCD\u6761";
   }
   getIcon() {
     return "library";
@@ -61741,6 +62712,10 @@ var WordBookView = class extends import_obsidian15.ItemView {
     this.contentEl.empty();
   }
 };
+
+// src/main.ts
+init_book_notes();
+init_utils();
 
 // src/global-markdown.ts
 var import_react4 = __toESM(require_react(), 1);
@@ -62441,14 +63416,14 @@ var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
     });
     this.addCommand({
       id: "open-jarvis-reader-word-sidebar",
-      name: "\u6253\u5F00\u8BCD\u53E5\u672C\u4FA7\u8FB9\u680F",
+      name: "\u6253\u5F00\u8BCD\u6761\u4FA7\u8FB9\u680F",
       callback: () => {
         this.openWordSidebarPane(true);
       }
     });
     this.addCommand({
       id: "open-jarvis-reader-word-book",
-      name: "\u6253\u5F00\u82F1\u8BED\u8BCD\u53E5\u672C",
+      name: "\u6253\u5F00\u8BCD\u6761",
       callback: () => {
         this.openWordBook();
       }

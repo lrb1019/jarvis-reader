@@ -41,7 +41,8 @@ export const DEFAULT_SETTINGS = {
     sentence: "#40c057",
     comment: "#f97316",
     normal: "#ffeb3b"
-  }
+  },
+  readingStats: {}
 };
 export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
   onChoose: (path: string) => void;
