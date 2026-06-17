@@ -28,7 +28,7 @@ export const JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
 export const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
-export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与单词卡生成器。
+export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词句卡片生成器。
 你必须只返回单行合法 JSON。
 整个响应不能包含任何真实换行符。
 不要 markdown 代码块。
@@ -39,7 +39,7 @@ Return ONLY valid JSON on a single line:
 规则：
 1. 只返回单行 JSON，整个响应不能换行。
 2. 必须包含且只需要包含：lemma、translation、display、isWord。
-3. selectionType 为 word 或 phrase 时，按单词卡结构输出：display 是唯一正文显示源，必须包含音标、词性、英英释义、中文释义、例句、搭配、派生、词源、同义词；isWord 必须是 true。
+3. selectionType 为 word 或 phrase 时，按词句卡片结构输出：display 是唯一正文显示源，必须包含音标、词性、英英释义、中文释义、例句、搭配、派生、词源、同义词；isWord 必须是 true。
 4. selectionType 为 sentence 时，只翻译整句：translation 写自然中文译文，display 也只写同一段中文译文；lemma 写空字符串；isWord 必须是 false；禁止输出词性、音标、例句、搭配、派生、词源、同义词。
 5. 优先根据上下文判断输入词或短语在原句中的具体含义。word 或 phrase 的 display 必须先展示文中含义，再补充其他常见含义；translation 也优先写文中含义。
 6. display 内换行只能写成 \\n，不能直接换行。
@@ -53,7 +53,7 @@ Return ONLY valid JSON on a single line:
 选择类型：{{selectionType}}
 上下文：{{sentence}}`;
 
-export const TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。word/phrase 输出单词卡；sentence 只输出译文且 isWord=false。display 换行请写成 \\n。测试会先校验 JSON 示例。";
+export const TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。word/phrase 输出词句卡片；sentence 只输出译文且 isWord=false。display 换行请写成 \\n。测试会先校验 JSON 示例。";
 
 export const DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
 

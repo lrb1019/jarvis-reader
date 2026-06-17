@@ -94,6 +94,13 @@ export type BookLocations = Record<string, string | number>;
 export type BookProgressMap = Record<string, BookProgress>;
 export type BookCoverCache = Record<string, BookCoverCacheEntry>;
 
+export interface BookBookmark {
+  cfi: string;
+  title: string;
+  created: number;
+}
+export type BookBookmarksMap = Record<string, BookBookmark[]>;
+
 // --- Sidecar types ---
 
 export interface HighlightSidecar {
@@ -157,6 +164,7 @@ export interface JarvisReaderSettings {
   bookInitLocations: BookLocations;
   bookHighlights: BookHighlightsMap;
   bookProgress: BookProgressMap;
+  bookBookmarks: BookBookmarksMap;
   bookCoverCache: BookCoverCache;
   sidebarLayoutMode: SidebarLayoutMode;
   sidebarPaneSplit: number;

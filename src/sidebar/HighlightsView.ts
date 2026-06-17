@@ -293,7 +293,7 @@ export class JarvisReaderHighlightsView extends ItemView {
     header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
     const list = this.reader.getBookHighlights();
     if (!list.length) {
-      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6682\u65e0\u6807\u6ce8\u3002\u9009\u4e2d\u6b63\u6587\u540e\u9ad8\u4eae\u6216\u5199\u60f3\u6cd5\u5373\u53ef\u751f\u6210\u3002" });
+      container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "暂无笔记。选中正文后高亮或写笔记即可生成。" });
       return;
     }
     this.renderControls(container);

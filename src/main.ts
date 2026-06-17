@@ -77,7 +77,7 @@ export default class JarvisReaderPlugin extends Plugin {
     });
     this.addCommand({
       id: "open-jarvis-reader-word-sidebar",
-      name: "打开 Jarvis Reader 单词侧边栏",
+      name: "打开词句本侧边栏",
       callback: () => {
         this.openWordSidebarPane(true);
       }
@@ -100,12 +100,40 @@ export default class JarvisReaderPlugin extends Plugin {
     }));
     this.registerEvent(this.app.workspace.on("active-leaf-change", (leaf) => {
       const view = leaf == null ? void 0 : leaf.view;
-      if (view instanceof EpubView) {
+      if (view && view.getViewType() === "epub") {
         this.activeReaderView = view;
+        
+        // Auto-switch sidebars to this book
+        const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
+        bookshelfLeaves.forEach(l => {
+          if (l.view && typeof (l.view as any).setActiveReader === "function") {
+             (l.view as any).setActiveReader(view);
+          }
+        });
+        const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
+        wordSidebarLeaves.forEach(l => {
+          if (l.view && typeof (l.view as any).setReader === "function") {
+             (l.view as any).setReader(view);
+          }
+        });
       } else if (view instanceof JarvisReaderBookshelfView) {
         this.bookshelfView = view;
         view.render();
       }
+    }));
+    this.registerEvent(this.app.workspace.on("layout-change", () => {
+      setTimeout(() => {
+        const epubLeaves = this.app.workspace.getLeavesOfType("epub");
+        if (epubLeaves.length === 0) {
+          const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
+          bookshelfLeaves.forEach(leaf => leaf.detach());
+          
+          const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
+          wordSidebarLeaves.forEach(leaf => leaf.detach());
+          
+          this.activeReaderView = null;
+        }
+      }, 50);
     }));
     this.app.workspace.onLayoutReady(() => {
       for (const leaf of this.app.workspace.getLeavesOfType(HIGHLIGHTS_VIEW_TYPE)) {
@@ -144,7 +172,7 @@ export default class JarvisReaderPlugin extends Plugin {
       }, 50);
     }
   }
-  async openWordSidebarPane(reveal = true) {
+  async openWordSidebarPane(reveal = true, targetAsset: any = null) {
     let leaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
     if (!leaves.length) {
       const leaf = this.app.workspace.getRightLeaf(false);
@@ -160,12 +188,16 @@ export default class JarvisReaderPlugin extends Plugin {
     const view = leaf == null ? void 0 : leaf.view;
     if (view instanceof WordSidebarView) {
       this.wordSidebarView = view;
+      if (this.activeReaderView) view.setReader(this.activeReaderView);
+      if (targetAsset && typeof (view as any).focusAsset === "function") (view as any).focusAsset(targetAsset);
       view.render();
     } else if (leaf) {
       window.setTimeout(() => {
         const delayedView = leaf.view;
         if (delayedView instanceof WordSidebarView) {
           this.wordSidebarView = delayedView;
+          if (this.activeReaderView) delayedView.setReader(this.activeReaderView);
+          if (targetAsset && typeof (delayedView as any).focusAsset === "function") (delayedView as any).focusAsset(targetAsset);
           delayedView.render();
         }
       }, 50);
@@ -248,6 +280,16 @@ export default class JarvisReaderPlugin extends Plugin {
     if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
       this.wordSidebarView.setReader(null);
     }
+    setTimeout(() => {
+        const epubLeaves = this.app.workspace.getLeavesOfType("epub");
+        if (epubLeaves.length === 0) {
+            const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
+            bookshelfLeaves.forEach(leaf => leaf.detach());
+            
+            const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
+            wordSidebarLeaves.forEach(leaf => leaf.detach());
+        }
+    }, 50);
   }
   async restoreValueHighlightsIfNeeded() {
     const bookPath = "09 Books/\u4ef7\u503c\u5fc3\u6cd5 (\u59dc\u80e1\u8bf4).epub";

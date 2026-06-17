@@ -66,11 +66,13 @@ export class WordSidebarView extends ItemView {
     
     // Filter by current book
     if (currentBookPath) {
-      assets = assets.filter((asset: any) => {
+      const filteredForBook = assets.filter((asset: any) => {
         return asset.sources && asset.sources.some((s: any) => s.bookPath === currentBookPath);
       });
-    } else {
-      assets = []; // Or show all? Let's show none if no book is active, or empty state.
+      // Fallback to all if empty for this book
+      if (filteredForBook.length > 0) {
+          assets = filteredForBook;
+      }
     }
 
     // Filter by kind
@@ -309,6 +311,11 @@ export class WordSidebarView extends ItemView {
   render() {
     const container = this.contentEl;
     if (!container) return;
+
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
 
     container.empty();
     container.className = "view-content jarvis-reader-sidebar-view jarvis-reader-word-sidebar";

@@ -43,6 +43,7 @@ export interface EpubReaderProps {
   setWordMastered: (asset: any, mastered: boolean) => Promise<any>;
   deleteWordAsset: (asset: any) => Promise<boolean>;
   loadWordDisplay: (asset: any) => Promise<string>;
+  addBookmark?: (cfi: string, title: string) => void;
   autoWordHighlight: boolean;
   speechLang: string;
   highlightColors?: Record<string, string>;
@@ -154,7 +155,7 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
 
 // src/EpubView.tsx
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -174,6 +175,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const highlightInputRef = useRef<any>(null);
   const highlightPopoverRectRef = useRef<any>(null);
   const renditionRef = useRef<any>(null);
+  const currentLocationRef = useRef<string | null>(initLocation);
   const highlightListRef = useRef<any[]>(highlights || []);
   const wordAssetsRef = useRef<any>(wordAssets || {});
   const wordDisplayCacheRef = useRef<any>( new Map());
@@ -418,6 +420,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   }
   const locationChanged = (epubcifi) => {
     setLocation(epubcifi);
+    currentLocationRef.current = epubcifi;
     saveLocation(epubcifi);
   };
   const refreshHighlightPanes = (rendition) => {
@@ -1606,7 +1609,7 @@ const showWordHoverCard = (asset, element) => {
     if (lastIndex < text.length) {
       nodes.push(React.createElement("span", { key: `t-${lastIndex}` }, text.slice(lastIndex)));
     }
-    return nodes.length ? nodes : React.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7");
+    return nodes.length ? nodes : React.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "写下你的笔记与思考");
   };
   const clearHighlightUi = () => {
     pendingWordLookupRef.current += 1;
@@ -1759,6 +1762,16 @@ const showWordHoverCard = (asset, element) => {
   },  React.createElement("div", {
     className: "jarvis-reader-side-controls"
   },  React.createElement("button", {
+    className: "jarvis-reader-side-button",
+    title: "添加书签",
+    "aria-label": "添加书签",
+    onClick: () => {
+      if (typeof addBookmark === "function" && currentLocationRef.current && readerTitleRef.current) {
+        addBookmark(currentLocationRef.current, readerTitleRef.current);
+      }
+    },
+    dangerouslySetInnerHTML: { __html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>' }
+  }),  React.createElement("button", {
     className: "jarvis-reader-side-button",
     title: "\u521b\u5efa\u6216\u6253\u5f00\u8bfb\u4e66\u7b14\u8bb0",
     "aria-label": "\u521b\u5efa\u6216\u6253\u5f00\u8bfb\u4e66\u7b14\u8bb0",
@@ -2050,7 +2063,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-primary",
     type: "button",
     onClick: () => openHighlightCommentEditor(pendingHighlightMenu)
-  }, "\u5199\u60f3\u6cd5"), pendingHighlightMenu.id ?  React.createElement("button", {
+  }, "写笔记"), pendingHighlightMenu.id ?  React.createElement("button", {
     className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-danger",
     type: "button",
     onClick: () => deleteExistingHighlight(pendingHighlightMenu)
@@ -2119,14 +2132,14 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-title",
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
-  }, "\u5199\u60f3\u6cd5"),  React.createElement("div", {
+  }, "写笔记"),  React.createElement("div", {
     className: "jarvis-reader-highlight-quote"
   }, pendingSelection.quote),  React.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
     onChange: (value) => setHighlightComment(value),
     candidates: currentWikiLinkCandidates,
     onOpenLink: openWikiLink,
-    placeholder: "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7"
+    placeholder: "写下你的笔记与思考"
   }),  React.createElement("div", {
     className: "jarvis-reader-highlight-input-shell"
   },  React.createElement("div", {
@@ -2135,7 +2148,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-input",
     ref: highlightInputRef,
     value: highlightComment,
-    placeholder: "\u5199\u611f\u60f3\u4e0e\u8bc4\u4ef7",
+    placeholder: "写下你的笔记与思考",
     autoFocus: true,
     onChange: (event) => {
       const value = event.currentTarget.value;
@@ -2266,6 +2279,13 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-actions",
     onPointerDown: (e) => e.stopPropagation()
   },  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
+    title: "打开词句本",
+    onClick: () => {
+      hideWordHoverCard();
+      openWordNote(activeWordHover.asset);
+    }
+  }, renderObsidianIcon("file-text")), React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
     title: "\u6807\u8bb0\u5df2\u638c\u63e1",
     onClick: markActiveWordMastered

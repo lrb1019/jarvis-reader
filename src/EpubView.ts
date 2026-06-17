@@ -91,9 +91,9 @@ export class EpubView extends FileView {
 
   async openWordNote(asset: any): Promise<void> {
     if (typeof this.plugin.openWordSidebarPane === "function") {
-      this.plugin.openWordSidebarPane(true);
+      this.plugin.openWordSidebarPane(true, asset);
     } else {
-      new Notice("单词卡现已无文件化，请在右侧边栏查阅");
+      new Notice("词句卡片现已无文件化，请在右侧边栏查阅");
     }
   }
 
@@ -201,7 +201,7 @@ export class EpubView extends FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id!);
-    new Notice(highlight.comment ? "\u60f3\u6cd5\u5df2\u4fdd\u5b58" : "\u9ad8\u4eae\u5df2\u4fdd\u5b58");
+    new Notice(highlight.comment ? "笔记已保存" : "高亮已保存");
     return highlight;
   }
 
@@ -226,7 +226,7 @@ export class EpubView extends FileView {
     this.selectedHighlightId = updated.id!;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id!);
-    new Notice(updated.comment ? "\u60f3\u6cd5\u5df2\u66f4\u65b0" : "\u9ad8\u4eae\u5df2\u66f4\u65b0");
+    new Notice(updated.comment ? "笔记已更新" : "高亮已更新");
     return updated;
   }
 
@@ -458,6 +458,7 @@ export class EpubView extends FileView {
       translateSelection: (text: string, sentence: string = "", options: any = {}) => this.translateSelection(text, sentence, options),
       saveWordAsset: (selection: any, translation: any) => this.saveWordAsset(selection, translation),
       openWordNote: (asset: any) => { this.openWordNote(asset); },
+      addBookmark: (cfi: string, title: string) => { this.addBookmark(cfi, title); },
       setWordMastered: (asset: any, mastered: boolean) => this.setWordMastered(asset, mastered),
       deleteWordAsset: (asset: any) => this.deleteWordAsset(asset),
       loadWordDisplay: (asset: any) => this.loadWordDisplay(asset),
@@ -479,6 +480,52 @@ export class EpubView extends FileView {
     this.stopThemeSync();
     this.plugin.clearActiveReader(this);
     ReactDOM.unmountComponentAtNode(this.contentEl);
+  }
+
+  async setEphemeralState(state: any): Promise<void> {
+    if (state && state.epubcifi) {
+      if (this.currentRendition) {
+        this.currentRendition.display(state.epubcifi);
+      } else {
+        this.plugin.settings.bookInitLocations[this.file!.path] = state.epubcifi;
+      }
+    }
+    super.setEphemeralState(state);
+  }
+
+  jumpToCfi(cfi: string): void {
+    if (this.currentRendition) {
+      this.currentRendition.display(cfi);
+    }
+  }
+
+  async addBookmark(cfi: string, title: string) {
+    if (!cfi) return;
+    const path = this.file.path;
+    if (!this.plugin.settings.bookBookmarks) {
+      this.plugin.settings.bookBookmarks = {};
+    }
+    if (!this.plugin.settings.bookBookmarks[path]) {
+      this.plugin.settings.bookBookmarks[path] = [];
+    }
+    
+    // Check if already exists
+    const exists = this.plugin.settings.bookBookmarks[path].find((b: any) => b.cfi === cfi);
+    if (!exists) {
+      this.plugin.settings.bookBookmarks[path].push({
+        cfi,
+        title: title || "未知章节",
+        created: Date.now()
+      });
+      await this.plugin.saveSettings();
+      new Notice("🔖 书签已添加");
+      
+      // Fire event to refresh LibraryApp
+      const event = new CustomEvent("jarvis-reader-bookmarks-updated", { detail: path });
+      window.dispatchEvent(event);
+    } else {
+      new Notice("🔖 该位置已存在书签");
+    }
   }
 
   canAcceptExtension(extension: string): boolean {

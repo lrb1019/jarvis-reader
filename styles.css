@@ -1883,24 +1883,27 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-reader-word-list {
-  padding: 8px 12px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   overflow-y: auto;
   flex: 1 1 auto;
 }
 
 .jarvis-reader-word-item {
-  background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
+  background: transparent;
   border-radius: var(--radius-s);
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .jarvis-reader-word-item:hover {
-  border-color: var(--interactive-accent);
+  background-color: var(--background-modifier-hover);
+}
+
+.jarvis-reader-word-item.is-expanded {
+  background-color: var(--background-secondary);
 }
 
 .jarvis-reader-word-item.is-mastered {
@@ -2311,6 +2314,31 @@ g.jarvis-reader-highlight-with-comment line {
   font-size: 16px;
 }
 
+.jarvis-reader-word-item {
+  background-color: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jarvis-reader-word-item:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.jarvis-reader-word-item.is-mastered .jarvis-reader-word-lemma {
+  opacity: 0.8;
+}
+
+.jarvis-reader-word-item-display {
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: var(--text-normal);
+}
+
 /* Book Grid Layout */
 .jarvis-library-grid {
   display: grid;
@@ -2343,13 +2371,13 @@ g.jarvis-reader-highlight-with-comment line {
 
 .jarvis-library-book-card.is-selected {
   flex-direction: row;
-  grid-column: span 2;
+  z-index: 50;
   background-color: var(--background-secondary);
   border: 1px solid var(--interactive-accent);
   border-radius: 12px;
   padding: 14px;
   gap: 16px;
-  transform: none; /* Reset hover transform */
+  transform: none !important; /* Reset hover transform */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
@@ -3576,7 +3604,7 @@ g.jarvis-reader-highlight-with-comment line {
 
 .jarvis-library-cf-stage {
   position: relative;
-  height: 70%; /* Grow to fill the red box */
+  height: 60%; /* Slightly shrink the 3D display */
   min-height: 200px;
   aspect-ratio: 2 / 3; /* Automatically calculates width based on height */
   margin: 0 auto;
@@ -3644,7 +3672,7 @@ g.jarvis-reader-highlight-with-comment line {
   border-left: none;
   overflow-y: auto;
   z-index: 10;
-  margin-left: -100px; /* Pull it to the left to overlap side cards */
+  margin-left: 0px; /* Remove negative margin to leave space with the 3D display */
 }
 
 .cf-info-content {
@@ -3659,12 +3687,23 @@ g.jarvis-reader-highlight-with-comment line {
   font-size: 1.5rem;
   line-height: 1.3;
   color: var(--text-normal);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: calc(1.5rem * 1.3 * 3);
 }
 
 .cf-info-author {
   margin: 0;
   font-size: 1.1rem;
+  line-height: 1.4;
   color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: calc(1.1rem * 1.4 * 2);
 }
 
 .cf-info-stats {
@@ -3693,7 +3732,7 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .cf-info-desc {
-  max-height: 200px;
+  height: 220px;
   overflow-y: auto;
   color: var(--text-normal);
   font-size: 0.95rem;

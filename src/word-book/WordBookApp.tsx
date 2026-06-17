@@ -8,18 +8,7 @@ export interface WordBookAppProps {
   plugin: JarvisReaderPlugin;
 }
 
-const MarkdownPreview = ({ content, plugin }: { content: string, plugin: JarvisReaderPlugin }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (ref.current) {
-      ref.current.empty();
-      MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin as any).catch(console.error);
-    }
-  }, [content, plugin]);
-
-  return <div ref={ref} className="jarvis-reader-markdown" />;
-};
+import { WordCard, MarkdownPreview } from "./WordCard";
 
 export function WordBookApp({ plugin }: WordBookAppProps) {
   const [assets, setAssets] = React.useState<WordAsset[]>([]);
@@ -108,6 +97,33 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     new Notice(`已彻底删除 ${count} 个词条`);
     setSelected(new Set());
     loadAssets();
+  };
+
+  const handleDeleteFilteredBookWords = async () => {
+    if (filterBook === "all" || filteredAssets.length === 0) return;
+    
+    if (window.confirm(`确定要彻底删除正在显示的这本书的 ${filteredAssets.length} 个词卡吗？此操作不可恢复！`)) {
+      let count = 0;
+      for (const asset of filteredAssets) {
+        if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+          await plugin.activeReaderView.deleteWordAsset(asset);
+        } else {
+          delete plugin.settings.wordAssets[asset.lemma];
+        }
+        count++;
+      }
+      await plugin.saveSettings();
+      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+      new Notice(`已彻底删除此书的 ${count} 个词条`);
+      
+      const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
+      leaves.forEach((leaf: any) => {
+          if (leaf.view && typeof leaf.view.render === "function") {
+              leaf.view.render();
+          }
+      });
+      loadAssets();
+    }
   };
 
   const handleMarkMastered = async (mastered: boolean) => {
@@ -398,87 +414,37 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     };
 
     return (
-      <div 
-        key={asset.lemma} 
-        style={{ 
-          border: `1px solid ${isSelected ? "var(--interactive-accent)" : "var(--background-modifier-border)"}`,
-          borderRadius: "var(--radius-m)",
-          background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 10%, transparent)" : "var(--background-secondary)",
-          padding: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-          cursor: "pointer",
-          position: "relative",
-          transition: "all 0.15s ease"
-        }}
-        onClick={handleCardClick}
-        onContextMenu={(e) => handleContextMenu(e, asset.lemma)}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div className={blurMode === "word" ? "jarvis-blur-test" : ""}>
-            <div style={{ fontWeight: "bold", fontSize: "1.2em" }}>
-              <span 
-                style={{ 
-                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
-                  ...(isSentence ? { display: "block", fontSize: "0.85em", lineHeight: "1.4", fontWeight: "normal", marginBottom: "8px" } : {})
-                }}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = "underline"}
-                onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = "none"}
-                onClick={(e) => { e.stopPropagation(); playAudio(displayWord); }}
-                title="点击发音"
-              >
-                {displayWord}
-              </span>
-            </div>
-            {!isSentence && asset.phonetic && <div style={{ fontSize: "0.85em", color: "var(--text-muted)", marginTop: "2px" }}>{asset.phonetic}</div>}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
-            <span 
-              style={{ 
-                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)", 
-                cursor: "pointer",
-                display: "inline-flex"
-              }}
-              onClick={(e) => { e.stopPropagation(); handleToggleSingleMastery(e, asset.lemma); }}
-              title={asset.mastered ? "已掌握 (点击标记为未掌握)" : "未掌握 (点击标记为已掌握)"}
-            >
-              {asset.mastered ? (
-                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              ) : (
-                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
-              )}
-            </span>
-            {isSelectionMode && (
-              <input type="checkbox" checked={isSelected} onChange={() => {}} style={{ pointerEvents: "none" }} />
-            )}
-          </div>
-        </div>
-        
-        {asset.translation && (
-          <div 
-            className={blurMode === "translation" ? "jarvis-blur-test" : ""}
-            style={{ 
-                fontSize: "0.95em", 
-                color: "var(--text-normal)", 
-                whiteSpace: isExpanded ? "normal" : "pre-wrap", 
-                marginTop: "4px"
+        <WordCard 
+            plugin={plugin}
+            asset={asset}
+            bookTitle={bookTitle}
+            isExpanded={isExpanded}
+            isSelected={isSelected}
+            isSelectionMode={isSelectionMode}
+            blurMode={blurMode}
+            onToggleExpand={(lemma) => {
+                const newExpanded = new Set(expandedItems);
+                if (newExpanded.has(lemma)) {
+                    newExpanded.delete(lemma);
+                } else {
+                    newExpanded.add(lemma);
+                }
+                setExpandedItems(newExpanded);
             }}
-          >
-            {isExpanded && asset.display ? (
-                <div>
-                    <MarkdownPreview content={asset.display} plugin={plugin} />
-                </div>
-            ) : (
-                asset.translation
-            )}
-          </div>
-        )}
-        
-        <div style={{ marginTop: "auto", paddingTop: "8px", borderTop: "1px dashed var(--background-modifier-border)", fontSize: "0.8em", color: "var(--text-faint)" }}>
-          {bookTitle}
-        </div>
-      </div>
+            onToggleSelect={toggleSelect}
+            onToggleMastery={(lemma, mastered) => {
+                if (plugin.settings.wordAssets[lemma]) {
+                    plugin.settings.wordAssets[lemma].mastered = mastered;
+                    plugin.saveSettings().then(() => loadAssets());
+                }
+            }}
+            onDoubleClick={() => {}}
+            contextMenuAdditionalItems={(menu) => {
+                // Not strictly needed here as the base WordCard context menu handles mastery and deletion natively if we passed onDelete.
+                // Wait, WordBookApp has its own handleDeleteSelected logic. We can just skip passing onDelete and pass contextMenuAdditionalItems if we want.
+                // Actually WordBookApp deletes via handleDeleteSelected for bulk, but we can just let it have the default WordCard context menu.
+            }}
+        />
     );
   };
 
@@ -699,7 +665,17 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         {/* Bulk Actions */}
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {!isSelectionMode ? (
-            <button onClick={() => setIsSelectionMode(true)} className="mod-cta">批量管理 / 导出</button>
+            <React.Fragment>
+              <button onClick={() => setIsSelectionMode(true)} className="mod-cta">批量管理 / 导出</button>
+              {filterBook !== "all" && filteredAssets.length > 0 && (
+                <button 
+                  onClick={handleDeleteFilteredBookWords} 
+                  style={{ backgroundColor: 'var(--color-red)', color: 'white', border: 'none' }}
+                >
+                  🗑️ 一键删除此书词条
+                </button>
+              )}
+            </React.Fragment>
           ) : (
             <>
               <span style={{ fontSize: "0.9em", color: "var(--text-muted)", marginRight: "8px" }}>

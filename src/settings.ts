@@ -30,6 +30,7 @@ export const DEFAULT_SETTINGS = {
   bookInitLocations: {},
   bookHighlights: {},
   bookProgress: {},
+  bookBookmarks: {},
   bookCoverCache: {},
   sidebarLayoutMode: "single",
   sidebarPaneSplit: 48,
@@ -90,7 +91,7 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     const tabs = [
       { id: "general", label: "通用" },
       { id: "translation", label: "AI 与翻译" },
-      { id: "words", label: "单词卡" },
+      { id: "words", label: "词句卡片" },
       { id: "appearance", label: "外观" }
     ];
 
@@ -288,7 +289,7 @@ created: {{created}}
 
     if (this.activeTab === "words") {
 
-      new Setting(contentDiv).setName("模糊单词卡正文").setDesc("只模糊可滚动的单词卡正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new Setting(contentDiv).setName("模糊词句卡片正文").setDesc("只模糊可滚动的词句卡片正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
@@ -345,7 +346,7 @@ created: {{created}}
       createColorPicker("单词颜色", "自动识别的单词高亮底色", "word");
       createColorPicker("短语颜色", "自动识别的短语高亮底色", "phrase");
       createColorPicker("句子颜色", "自动识别的句子高亮底色", "sentence");
-      createColorPicker("感想颜色", "带有感想笔记的划线颜色", "comment");
+      createColorPicker("笔记颜色", "带有笔记的划线颜色", "comment");
       createColorPicker("默认高亮颜色", "普通的文本划线颜色", "normal");
     }
   }

@@ -187,7 +187,7 @@ export class JarvisReaderBookshelfView extends ItemView {
         this.activePanel = "toc";
         this.render();
       });
-      this.makePanelButton(panelActions, "感想摘抄", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4"></path><path d="m14.5 4.5 5 5"></path><path d="M13 6 5 14l-1 5 5-1 8-8"></path></svg>', this.activePanel === "highlights", !hasReader, () => {
+      this.makePanelButton(panelActions, "读书笔记", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4"></path><path d="m14.5 4.5 5 5"></path><path d="M13 6 5 14l-1 5 5-1 8-8"></path></svg>', this.activePanel === "highlights", !hasReader, () => {
         this.activePanel = "highlights";
         this.render();
       });
@@ -393,7 +393,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (!activeEpub) {
       const pane = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
       this.renderPaneHeader(pane, "辅助边栏", "");
-      pane.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "请打开一本图书以查看目录和感想" });
+      pane.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "请打开一本图书以查看目录和笔记" });
       return;
     }
 
