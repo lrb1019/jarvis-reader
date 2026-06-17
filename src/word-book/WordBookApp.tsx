@@ -1,8 +1,9 @@
 import * as React from "react";
 import type JarvisReaderPlugin from "../main";
-import { buildWordAudioUrl } from "../word-assets";
+import { buildWordAudioUrl, getTranslationAssetStorageKey } from "../word-assets";
 import { Notice, MarkdownRenderer, Menu } from "obsidian";
 import type { WordAsset } from "../types";
+import { confirmDestructiveAction } from "../utils";
 
 export interface WordBookAppProps {
   plugin: JarvisReaderPlugin;
@@ -37,7 +38,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   React.useEffect(() => {
     loadAssets();
-    
+
     // Use custom event for refreshing
     const handleRefresh = () => loadAssets();
     window.addEventListener("jarvis-reader-word-assets-changed", handleRefresh);
@@ -74,11 +75,10 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   const handleDeleteSelected = async () => {
     if (selected.size === 0) return;
-    
-    // Instead of window.confirm, use a simple prompt logic or Notice
-    // Actually Obsidian UI guidelines prefer no native alerts. For now we will use a quick temporary hack with confirm if we must, but the prompt says remove it.
-    // We will just use the plugin API if available or fallback.
-    // Wait, let's implement a safe delete that triggers the global delete helper.
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除词卡", `确定要彻底删除选中的 ${selected.size} 个词卡吗？此操作不可恢复。`);
+    if (!confirmed)
+      return;
+
     let count = 0;
     for (const lemma of selected) {
       const asset = plugin.settings.wordAssets[lemma];
@@ -91,7 +91,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         count++;
       }
     }
-    
+    await plugin.persistWordAssetSidecar("delete");
     await plugin.saveSettings();
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     new Notice(`已彻底删除 ${count} 个词条`);
@@ -101,29 +101,32 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   const handleDeleteFilteredBookWords = async () => {
     if (filterBook === "all" || filteredAssets.length === 0) return;
-    
-    if (window.confirm(`确定要彻底删除正在显示的这本书的 ${filteredAssets.length} 个词卡吗？此操作不可恢复！`)) {
-      let count = 0;
-      for (const asset of filteredAssets) {
-        if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-          await plugin.activeReaderView.deleteWordAsset(asset);
-        } else {
-          delete plugin.settings.wordAssets[asset.lemma];
-        }
-        count++;
+
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除本书词卡", `确定要彻底删除正在显示的这本书的 ${filteredAssets.length} 个词卡吗？此操作不可恢复。`);
+    if (!confirmed)
+      return;
+
+    let count = 0;
+    for (const asset of filteredAssets) {
+      const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+      if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+        await plugin.activeReaderView.deleteWordAsset(asset);
+      } else {
+        delete plugin.settings.wordAssets[assetKey];
       }
-      await plugin.saveSettings();
-      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-      new Notice(`已彻底删除此书的 ${count} 个词条`);
-      
-      const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
-      leaves.forEach((leaf: any) => {
-          if (leaf.view && typeof leaf.view.render === "function") {
-              leaf.view.render();
-          }
-      });
-      loadAssets();
+      count++;
     }
+    await plugin.persistWordAssetSidecar("delete");
+    await plugin.saveSettings();
+    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    new Notice(`已彻底删除此书的 ${count} 个词条`);
+    const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
+    leaves.forEach((leaf: any) => {
+        if (leaf.view && typeof leaf.view.render === "function") {
+            leaf.view.render();
+        }
+    });
+    loadAssets();
   };
 
   const handleMarkMastered = async (mastered: boolean) => {
@@ -394,20 +397,21 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence && quote ? quote : asset.lemma;
+    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
     const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "未知";
-    const isSelected = isSelectionMode && selected.has(asset.lemma);
-    const isExpanded = expandedItems.has(asset.lemma);
+    const isSelected = isSelectionMode && selected.has(assetKey);
+    const isExpanded = expandedItems.has(assetKey);
 
     const handleCardClick = (e: React.MouseEvent) => {
         if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).closest('svg')) {
             return;
         }
         if (isSelectionMode) {
-            toggleSelect(asset.lemma);
+            toggleSelect(assetKey);
         } else {
             const newExpanded = new Set<string>();
-            if (!expandedItems.has(asset.lemma)) {
-                newExpanded.add(asset.lemma);
+            if (!expandedItems.has(assetKey)) {
+                newExpanded.add(assetKey);
             }
             setExpandedItems(newExpanded);
         }
@@ -449,12 +453,13 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
   };
 
   const renderTableRow = (asset: any) => {
+    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence && quote ? quote : asset.lemma;
-    const isSelected = isSelectionMode && selected.has(asset.lemma);
+    const isSelected = isSelectionMode && selected.has(assetKey);
     const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "未知";
-    const isExpanded = expandedItems.has(asset.lemma);
+    const isExpanded = expandedItems.has(assetKey);
     
     const handleRowClick = (e: React.MouseEvent) => {
         // Prevent toggle if clicking on an input or specific action button
@@ -463,11 +468,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         }
         
         if (isSelectionMode) {
-            toggleSelect(asset.lemma);
+            toggleSelect(assetKey);
         } else {
             const newExpanded = new Set<string>();
-            if (!expandedItems.has(asset.lemma)) {
-                newExpanded.add(asset.lemma);
+            if (!expandedItems.has(assetKey)) {
+                newExpanded.add(assetKey);
             }
             setExpandedItems(newExpanded);
         }
@@ -475,9 +480,9 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
     return (
       <tr 
-        key={asset.lemma} 
+        key={assetKey} 
         style={{ borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "var(--background-modifier-hover)" : "transparent", cursor: "pointer" }}
-        onContextMenu={(e) => handleContextMenu(e, asset.lemma)}
+        onContextMenu={(e) => handleContextMenu(e, assetKey)}
         onClick={handleRowClick}
       >
         {isSelectionMode && (
@@ -522,7 +527,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             </div>
           )}
         </td>
-        <td style={{ padding: "8px", fontSize: "0.9em", cursor: isSelectionMode ? "pointer" : "default" }} onClick={() => isSelectionMode && toggleSelect(asset.lemma)}>{bookTitle}</td>
+        <td style={{ padding: "8px", fontSize: "0.9em", cursor: isSelectionMode ? "pointer" : "default" }} onClick={() => isSelectionMode && toggleSelect(assetKey)}>{bookTitle}</td>
         <td style={{ padding: "8px", cursor: isSelectionMode ? "pointer" : "default" }}>
           <span 
               style={{ 
@@ -532,7 +537,8 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                 cursor: "pointer",
                 width: "fit-content"
               }}
-              onClick={(e) => { e.stopPropagation(); handleToggleSingleMastery(e, asset.lemma); }}
+              className="clickable-icon" 
+              onClick={(e) => { e.stopPropagation(); handleToggleSingleMastery(e, assetKey); }}
               title={asset.mastered ? "已掌握 (点击标记为未掌握)" : "未掌握 (点击标记为已掌握)"}
           >
             {asset.mastered ? (
@@ -775,6 +781,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
               const activeAsset = filteredAssets[activeIndex];
               if (!activeAsset) return null;
               
+              const activeAssetKey = getTranslationAssetStorageKey(activeAsset) || activeAsset.lemma;
               const typeLabel = activeAsset.kind === "sentence" ? "长句" : (activeAsset.kind === "phrase" ? "短语" : "单词");
               const titleText = activeAsset.title || activeAsset.lemma;
               const posText = activeAsset.pos ? `${activeAsset.pos} · ` : "";
@@ -817,7 +824,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                       <div style={{ position: "absolute", top: "24px", right: "24px" }}>
                         <button 
                           className="clickable-icon" 
-                          onClick={(e) => handleToggleSingleMastery(e, activeAsset.lemma)} 
+                          onClick={(e) => handleToggleSingleMastery(e, activeAssetKey)} 
                           aria-label={activeAsset.mastered ? "标记为未掌握" : "标记为已掌握"} 
                           style={{ 
                             color: activeAsset.mastered ? "var(--color-green)" : "var(--text-faint)", 

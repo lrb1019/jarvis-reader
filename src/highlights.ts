@@ -1,36 +1,14 @@
 // Extracted from main.js L48752-48928 — highlight data operations + TOC generation
 
 import { loadPdfJs, App, TFile } from "obsidian";
-import { normalizeHighlightQuote, formatLocalDateTime } from "./utils";
 import type { BookHighlight, JarvisReaderSettings } from "./types";
+import { buildHighlightMetadata, dedupeHighlightsByCfi, formatHighlightNoteBlock, isHighlightNoteBlockStart } from "./highlight-core";
 
 export function createHighlightId(): string {
   return `ar-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function formatBlockquote(text: string): string {
-  return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
-}
-
-export function formatHighlightNoteBlock(highlight: BookHighlight): string {
-  const title = highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282";
-  const quote = formatBlockquote(highlight.quote);
-  const comment = (highlight.comment || "").trim();
-  const commentBlock = comment ? `>
-> **\u60f3\u6cd5**
-${formatBlockquote(comment)}
-` : ">";
-  const timestamp = formatBlockquote(`**\u65f6\u95f4**\n${formatLocalDateTime(highlight.updated || highlight.created)}`);
-  return `> [!note] ${title}
-${quote}
-${commentBlock}
-${timestamp}
-^${highlight.blockId}`;
-}
-
-export function isHighlightNoteBlockStart(line: string): boolean {
-  return /^> \[!(?:quote|note)\]/i.test(line || "");
-}
+export { buildHighlightMetadata, dedupeHighlightsByCfi, formatHighlightNoteBlock, isHighlightNoteBlockStart };
 
 function normalizeHeadingText(text: string): string {
   return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
@@ -139,22 +117,6 @@ export function getHighlightsForBook(settings: Partial<JarvisReaderSettings>, fi
   const allHighlights = settings.bookHighlights || {};
   const list = allHighlights[filePath];
   return Array.isArray(list) ? list : [];
-}
-
-export function buildHighlightMetadata(highlight: any): any {
-  return {
-    id: highlight.id || highlight.blockId || "",
-    bookPath: highlight.bookPath || "",
-    bookTitle: highlight.bookTitle || "",
-    chapterTitle: highlight.chapterTitle || "",
-    cfiRange: highlight.cfiRange || "",
-    quote: highlight.quote || "",
-    comment: highlight.comment || "",
-    notePath: highlight.notePath || "",
-    blockId: highlight.blockId || highlight.id || "",
-    created: highlight.created || "",
-    updated: highlight.updated || "",
-  };
 }
 
 export function getEpubTocMd(rawToc: any): string {

@@ -314,6 +314,11 @@ export function normalizeTranslationProvider(value: string, baseUrl: string = ""
     return "anthropic";
   if (lowered.includes("googleapis") || lowered.includes("generativelanguage"))
     return "gemini";
+  if (lowered.includes("deepseek")) return "deepseek";
+  if (lowered.includes("bigmodel.cn") || lowered.includes("zhipu")) return "zhipu";
+  if (lowered.includes("dashscope") || lowered.includes("qwen")) return "qwen";
+  if (lowered.includes("moonshot") || lowered.includes("kimi")) return "moonshot";
+  if (lowered.includes("minimax")) return "minimax";
   const provider = String(value || "").trim().toLowerCase();
   if (TRANSLATION_PROVIDER_OPTIONS.includes(provider)) {
     return provider;
@@ -348,6 +353,31 @@ export function getTranslationProviderDefaults(provider: string): { baseUrl: str
         baseUrl: "https://generativelanguage.googleapis.com/v1beta",
         model: "gemini-1.5-flash"
       };
+    case "deepseek":
+      return {
+        baseUrl: "https://api.deepseek.com/v1",
+        model: "deepseek-chat"
+      };
+    case "zhipu":
+      return {
+        baseUrl: "https://open.bigmodel.cn/api/paas/v4",
+        model: "glm-4-flash"
+      };
+    case "qwen":
+      return {
+        baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        model: "qwen-plus"
+      };
+    case "moonshot":
+      return {
+        baseUrl: "https://api.moonshot.cn/v1",
+        model: "moonshot-v1-8k"
+      };
+    case "minimax":
+      return {
+        baseUrl: "https://api.minimax.chat/v1",
+        model: "abab6.5s-chat"
+      };
     case "custom":
       return {
         baseUrl: "",
@@ -356,8 +386,8 @@ export function getTranslationProviderDefaults(provider: string): { baseUrl: str
     case "openai-compatible":
     default:
       return {
-        baseUrl: "https://api.deepseek.com/v1",
-        model: "deepseek-chat"
+        baseUrl: "https://api.openai.com/v1",
+        model: "gpt-4o-mini"
       };
   }
 }

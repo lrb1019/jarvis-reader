@@ -198,8 +198,17 @@ created: {{created}}
       let translationModelText: any = null;
       let translationPromptText: any = null;
 
-      new Setting(contentDiv).setName("翻译服务").setDesc("选择 API 请求格式；自定义会继续按 URL 自动识别").addDropdown((dropdown) => {
-        dropdown.addOption("openai-compatible", "OpenAI 兼容").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("custom", "自定义").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
+      new Setting(contentDiv).setName("翻译服务").setDesc("选择 API 格式，自定义 URL 会自动识别类型").addDropdown((dropdown) => {
+        dropdown.addOption("openai-compatible", "OpenAI 兼容")
+          .addOption("anthropic", "Anthropic Claude")
+          .addOption("gemini", "Google Gemini")
+          .addOption("deepseek", "深度求索 (DeepSeek)")
+          .addOption("zhipu", "智谱清言 (GLM)")
+          .addOption("qwen", "通义千问 (Qwen)")
+          .addOption("moonshot", "Kimi (Moonshot)")
+          .addOption("minimax", "MiniMax")
+          .addOption("custom", "自定义")
+          .setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
           const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
           this.plugin.settings.translationApi.provider = provider;

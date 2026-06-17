@@ -4,11 +4,20 @@ import { TFile, Notice, MarkdownRenderer } from "obsidian";
 import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
 import { getHighlightsForBook } from "../highlights";
 import { buildWordAudioUrl, DEFAULT_WORD_AUDIO_TEMPLATE } from "../word-assets";
+import { confirmDestructiveAction } from "../utils";
 import type { BookHighlight, WordAsset, BookProgress } from "../types";
 import { WordCard } from "../word-book/WordCard";
 
 export interface LibraryAppProps {
   plugin: JarvisReaderPlugin;
+}
+
+type LibrarySortBy = "recent" | "name" | "rating" | "start" | "end";
+
+interface EpubManifestItem {
+  id?: string;
+  href?: string;
+  type?: string;
 }
 
 // 直接读取 Blob 为 Base64，完全避免 canvas 渲染可能带来的像素损失
@@ -92,7 +101,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
-  const [sortBy, setSortBy] = React.useState<"recent" | "name">("recent");
+  const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
   const [viewLayout, setViewLayout] = React.useState<"grid" | "list" | "coverflow">("grid");
   const [coverFlowIndex, setCoverFlowIndex] = React.useState(0);
   const [activeTab, setActiveTab] = React.useState<"highlights" | "words" | "bookmarks">("highlights");
@@ -312,17 +321,19 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               if (!bestBlob) {
                 let maxSize = 0;
                 const manifest = book.packaging?.manifest || {};
-                const imageItems = Object.values(manifest).filter((item: any) => item.type?.startsWith("image/"));
+                const imageItems = Object.values(manifest).filter((item): item is EpubManifestItem => {
+                  return !!item && typeof item === "object" && typeof (item as EpubManifestItem).href === "string" && !!(item as EpubManifestItem).type?.startsWith("image/");
+                });
                 
                 // Prioritize items with "cover" or "front" in name
                 const coverCandidates = imageItems.filter((item: any) => {
-                  const idHref = (item.id + item.href).toLowerCase();
+                  const idHref = `${item.id || ""}${item.href || ""}`.toLowerCase();
                   return idHref.includes("cover") || idHref.includes("front");
                 });
 
                 for (const item of coverCandidates) {
                   try {
-                    const resolvedHref = book.path ? book.path.resolve(item.href) : item.href;
+                      const resolvedHref = book.path ? book.path.resolve(item.href || "") : item.href;
                     const blob = await book.archive.getBlob(resolvedHref);
                     const isBack = item.href.toLowerCase().includes("back");
                     if (blob && !isBack && blob.size > maxSize) {
@@ -338,7 +349,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   for (const item of imageItems) {
                     if (checked++ > 10) break; // Don't scan too many
                     try {
-                      const resolvedHref = book.path ? book.path.resolve(item.href) : item.href;
+                    const resolvedHref = book.path ? book.path.resolve(item.href || "") : item.href;
                       const blob = await book.archive.getBlob(resolvedHref);
                       const isBack = item.href.toLowerCase().includes("back");
                       if (blob && !isBack && blob.size > maxSize) {
@@ -623,8 +634,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   };
 
   const deleteBook = async (file: TFile) => {
-    // Obsidian style notification & prompt
-    if (confirm(`确认要从库中彻底删除《${file.basename}》吗？`)) {
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除书籍", `确认要从库中彻底删除《${file.basename}》吗？`);
+    if (confirmed) {
       try {
         await plugin.app.vault.delete(file);
         new Notice(`已删除书籍: ${file.basename}`);
@@ -855,7 +866,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   <option value="reading">在读</option>
                   <option value="finished">已读完</option>
                 </select>
-                <select value={sortBy} onChange={(e: any) => setSortBy(e.target.value)} className="jarvis-library-select">
+                <select value={sortBy} onChange={(e: any) => setSortBy(e.target.value as LibrarySortBy)} className="jarvis-library-select">
                   <option value="recent">最近阅读/修改</option>
                   <option value="rating">评分最高</option>
                   <option value="start">开始时间排序</option>
@@ -1543,13 +1554,15 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                                 // Actually we should trigger an update. The toggleWordMastery from earlier does it.
                             }
                         }}
-                        onDelete={(lemma) => {
+                        onDelete={(assetKey) => {
                             // Only via context menu
+                            const asset = plugin.settings.wordAssets[assetKey];
+                            if (!asset) return;
                             if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-                                plugin.activeReaderView.deleteWordAsset(plugin.settings.wordAssets[lemma]).catch(console.error);
+                                plugin.activeReaderView.deleteWordAsset(asset).catch(console.error);
                             } else {
-                                delete plugin.settings.wordAssets[lemma];
-                                plugin.saveSettings();
+                                delete plugin.settings.wordAssets[assetKey];
+                                plugin.persistWordAssetSidecar("delete").then(() => plugin.saveSettings());
                             }
                         }}
                     />

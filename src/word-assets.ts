@@ -1,6 +1,6 @@
 // Extracted from main.js L47630–48235 — word-asset constants and functions
 
-import { TFile, App } from "obsidian";
+import type { TFile, App } from "obsidian";
 import {
   normalizeVaultPath,
   joinVaultPath,
@@ -10,7 +10,7 @@ import {
   escapeYamlString,
   normalizeHighlightQuote,
   normalizeWordDisplayText,
-} from "./utils";
+} from "./utils-core.ts";
 import type {
   WordAsset,
   WordAssetSource,
@@ -19,13 +19,13 @@ import type {
 } from "./types";
 
 // Re-export from utils for modules that import from word-assets
-export { escapeRegExp } from "./utils";
+export { escapeRegExp } from "./utils-core.ts";
 
 // --- Constants ---
 
 export const JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 export const JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
-export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "custom"];
+export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
 export const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
 export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词句卡片生成器。
@@ -158,22 +158,28 @@ export function getDictionaryLookupKeys(selectedText: string): string[] {
     return [];
   const word = normalized.lemma;
   const keys = [word];
-  if (word.endsWith("ies") && word.length > 3)
+  if (word.endsWith("ies") && word.length > 3) {
     keys.push(`${word.slice(0, -3)}y`);
-  if (word.endsWith("ied") && word.length > 3)
+  } else if (word.endsWith("ied") && word.length > 3) {
     keys.push(`${word.slice(0, -3)}y`);
-  if (word.endsWith("ing") && word.length > 4) {
-    keys.push(word.slice(0, -3));
-    keys.push(`${word.slice(0, -3)}e`);
-  }
-  if (word.endsWith("ed") && word.length > 3) {
+  } else if (word.endsWith("ing") && word.length > 4) {
+    const stem = word.slice(0, -3);
+    keys.push(stem);
+    if (/([bcdfghjklmnpqrstvwxyz])\1$/i.test(stem))
+      keys.push(stem.slice(0, -1));
+    keys.push(`${stem}e`);
+  } else if (word.endsWith("ed") && word.length > 3) {
     keys.push(word.slice(0, -2));
     keys.push(word.slice(0, -1));
-  }
-  if (word.endsWith("es") && word.length > 3)
-    keys.push(word.slice(0, -2));
-  if (word.endsWith("s") && word.length > 2)
+  } else if (word.endsWith("es") && word.length > 3) {
+    const withoutS = word.slice(0, -1);
+    if (withoutS.endsWith("e"))
+      keys.push(withoutS);
+    else
+      keys.push(word.slice(0, -2));
+  } else if (word.endsWith("s") && word.length > 2) {
     keys.push(word.slice(0, -1));
+  }
   return [...new Set(keys.filter(Boolean))];
 }
 

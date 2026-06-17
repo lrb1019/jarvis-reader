@@ -7,6 +7,7 @@ import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, format
 import { normalizeWordSelection, findWordAssetBySurface, getWordAssetSurfaceForms, getTranslationAssetKind, getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAudioUrl } from "./word-assets";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { findChapterTitle, getReaderProgressLabel, ensureReaderLocations, getReaderProgress } from "./progress";
+import { dedupeHighlightsByCfi } from "./highlight-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
 
@@ -521,12 +522,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     }
   };
   const applyHighlights = (rendition, list) => {
-    const uniqueHighlights = new Map();
-    for (const highlight of list || []) {
-      if (highlight?.cfiRange)
-        uniqueHighlights.set(highlight.cfiRange, highlight);
-    }
-    for (const highlight of uniqueHighlights.values()) {
+    for (const highlight of dedupeHighlightsByCfi(list).filter((item) => item?.cfiRange)) {
       applyHighlight(rendition, highlight);
     }
     refreshHighlightPanes(rendition);

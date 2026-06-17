@@ -1,6 +1,6 @@
 import * as React from "react";
 import type JarvisReaderPlugin from "../main";
-import { buildWordAudioUrl } from "../word-assets";
+import { buildWordAudioUrl, getTranslationAssetStorageKey } from "../word-assets";
 import { Notice, MarkdownRenderer, Menu } from "obsidian";
 import type { WordAsset } from "../types";
 
@@ -51,10 +51,11 @@ export const WordCard: React.FC<WordCardProps> = ({
   const [internalExpanded, setInternalExpanded] = React.useState(false);
   
   const isExpanded = controlledIsExpanded !== undefined ? controlledIsExpanded : internalExpanded;
+  const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
   
   const handleToggleExpand = () => {
     if (onToggleExpand) {
-      onToggleExpand(asset.lemma);
+      onToggleExpand(assetKey);
     } else {
       setInternalExpanded(!internalExpanded);
     }
@@ -62,7 +63,7 @@ export const WordCard: React.FC<WordCardProps> = ({
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (isSelectionMode && onToggleSelect) {
-      onToggleSelect(asset.lemma);
+      onToggleSelect(assetKey);
     } else {
       handleToggleExpand();
     }
@@ -88,21 +89,24 @@ export const WordCard: React.FC<WordCardProps> = ({
     e.stopPropagation();
     
     const menu = new Menu();
+    let itemCount = 0;
     const isMastered = asset.mastered;
 
     if (onToggleMastery) {
+      itemCount += 1;
       menu.addItem((item) => {
           item.setTitle(isMastered ? "标记为未掌握" : "标记为已掌握")
               .setIcon(isMastered ? "cross" : "checkmark")
-              .onClick(() => onToggleMastery(asset.lemma, !isMastered));
+              .onClick(() => onToggleMastery(assetKey, !isMastered));
       });
     }
 
     if (onDelete) {
+      itemCount += 1;
       menu.addItem((item) => {
           item.setTitle("彻底删除")
               .setIcon("trash")
-              .onClick(() => onDelete(asset.lemma));
+              .onClick(() => onDelete(assetKey));
       });
     }
     
@@ -110,14 +114,14 @@ export const WordCard: React.FC<WordCardProps> = ({
         contextMenuAdditionalItems(menu);
     }
 
-    if (menu.items.length > 0) {
+    if (itemCount > 0 || contextMenuAdditionalItems) {
         menu.showAtMouseEvent(e.nativeEvent);
     }
   };
 
   return (
     <div 
-      key={asset.lemma} 
+      key={assetKey} 
       style={{ 
         border: `1px solid ${isSelected ? "var(--interactive-accent)" : "var(--background-modifier-border)"}`,
         borderRadius: "var(--radius-m)",
