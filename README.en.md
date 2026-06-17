@@ -131,3 +131,4 @@ THIRD_PARTY_NOTICES.md  Third-party notices
 - Added one-way Markdown sync, missing-note rebuilding, and permanent deletion for vocabulary assets.
 
 For full history, see the project note `03 改动日志.md`.
+
