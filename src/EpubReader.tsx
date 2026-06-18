@@ -1773,7 +1773,7 @@ const showWordHoverCard = (asset, element) => {
     title: "\u521b\u5efa\u6216\u6253\u5f00\u8bfb\u4e66\u7b14\u8bb0",
     "aria-label": "\u521b\u5efa\u6216\u6253\u5f00\u8bfb\u4e66\u7b14\u8bb0",
     onClick: createBookNote,
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 15h6"></path><path d="M9 18h4"></path></svg>' }
+    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>' }
   }),  React.createElement("button", {
     className: "jarvis-reader-side-button",
     title: "\u653e\u5927",
