@@ -2736,20 +2736,24 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-library-back-btn {
-  background: transparent;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  padding: 6px 12px;
+  background: var(--background-secondary) !important;
+  border: 1px solid var(--background-modifier-border) !important;
+  border-radius: 20px !important;
+  padding: 5px 14px !important;
   font-size: var(--font-ui-small);
+  font-weight: 500;
   color: var(--text-normal);
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  box-shadow: none !important;
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
 .jarvis-library-back-btn:hover {
-  background: var(--background-modifier-hover);
+  background: var(--background-modifier-hover) !important;
+  border-color: var(--background-modifier-border-hover) !important;
 }
 
 .jarvis-library-detail-header {
@@ -3827,17 +3831,24 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-stats-date-btn {
-  background: none;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   cursor: pointer;
-  padding: 2px;
+  padding: 4px !important;
   display: flex;
   align-items: center;
+  justify-content: center;
   color: var(--text-muted);
+  border-radius: 50% !important;
+  width: 24px;
+  height: 24px;
+  transition: background 120ms ease, color 120ms ease;
 }
 
 .jarvis-stats-date-btn:hover {
   color: var(--text-normal);
+  background: var(--background-modifier-hover) !important;
 }
 
 .jarvis-stats-date-text {
