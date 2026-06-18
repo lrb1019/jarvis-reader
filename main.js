@@ -60039,7 +60039,8 @@ function LibraryApp({ plugin }) {
       isTimeRank = false;
     }
     const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-view-container", children: [
+    const isReadable = plugin.app.vault.getConfig ? plugin.app.vault.getConfig("readableLineLength") : true;
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [

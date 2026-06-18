@@ -4407,12 +4407,21 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-library-stats-view-container {
-  max-width: 800px;
   width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.jarvis-library-stats-view-container.is-readable-width {
+  max-width: var(--file-line-width, 700px);
+}
+
+.jarvis-library-stats-view-container.is-full-width {
+  max-width: 100%;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .jarvis-library-stats-view-header {

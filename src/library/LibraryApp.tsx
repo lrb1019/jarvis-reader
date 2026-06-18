@@ -1199,10 +1199,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     }
 
     const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
+    const isReadable = (plugin.app.vault as any).getConfig ? (plugin.app.vault as any).getConfig("readableLineLength") : true;
 
     return (
       <div className="jarvis-library-stats-view">
-        <div className="jarvis-library-stats-view-container">
+        <div className={`jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`}>
           <div className="jarvis-library-stats-view-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <button className="jarvis-library-back-btn" onClick={() => setCurrentView("home")}>
