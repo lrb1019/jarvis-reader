@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-当前版本：v0.8.1
+当前版本：v0.8.2
 
 中文说明 | [English](./README.en.md)
 

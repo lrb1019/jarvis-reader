@@ -187,7 +187,7 @@ export class JarvisReaderBookshelfView extends ItemView {
         this.activePanel = "toc";
         this.render();
       });
-      this.makePanelButton(panelActions, "读书笔记", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4"></path><path d="m14.5 4.5 5 5"></path><path d="M13 6 5 14l-1 5 5-1 8-8"></path></svg>', this.activePanel === "highlights", !hasReader, () => {
+      this.makePanelButton(panelActions, "读书笔记", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>', this.activePanel === "highlights", !hasReader, () => {
         this.activePanel = "highlights";
         this.render();
       });
