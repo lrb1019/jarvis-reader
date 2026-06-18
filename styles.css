@@ -6,7 +6,7 @@
   position: relative;
 }
 
-.jarvis-reader-epub > div {
+.jarvis-reader-epub > div:not(.jarvis-reader-word-card):not(.jarvis-reader-highlight-popover):not(.jarvis-reader-highlight-menu) {
   background: transparent !important;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .jarvis-reader-highlight-popover {
-  background: var(--background-primary);
+  background: var(--background-primary) !important;
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   bottom: 78px;
@@ -749,7 +749,7 @@
 
 .jarvis-reader-word-card {
   animation: jarvis-card-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  background: var(--background-primary);
+  background: var(--background-primary) !important;
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 1px 8px rgba(0, 0, 0, 0.06);
