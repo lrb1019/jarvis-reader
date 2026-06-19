@@ -24,7 +24,7 @@ export class LibraryView extends ItemView {
   }
 
   getIcon() {
-    return "library";
+    return "jarvis-logo";
   }
 
   async onOpen() {

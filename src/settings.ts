@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS = {
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   enableAutoHighlight: true,
   enableWordAudio: true,
+  autoPlayAudioOnReview: true,
   wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
   wordAudioAccent: "us",
   blurWordCardBody: true,
@@ -366,6 +367,11 @@ created: {{created}}
 
       new Setting(contentDiv).setName("启用单词发音").setDesc("优先使用发音链接；失败时回退到浏览器语音合成").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
+        await this.plugin.saveSettings();
+      }));
+
+      new Setting(contentDiv).setName("复习时自动发音").setDesc("打开记忆卡片时自动播放单词读音").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoPlayAudioOnReview !== false).onChange(async (value) => {
+        this.plugin.settings.autoPlayAudioOnReview = value;
         await this.plugin.saveSettings();
       }));
 

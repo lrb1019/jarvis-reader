@@ -306,46 +306,6 @@ export function getTranslationAssetStorageKey(asset: any): string {
 
 
 
-export function buildWordAssetMetadata(asset: any): WordAsset {
-  return {
-    lemma: asset.lemma || "",
-    title: asset.title || "",
-    kind: getTranslationAssetKind(asset),
-    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
-    surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
-    translation: asset.translation || "",
-    display: asset.display || "",
-    phonetic: asset.phonetic || "",
-    partOfSpeech: asset.partOfSpeech || "",
-    example: asset.example || "",
-    tags: asset.tags,
-    collins: asset.collins,
-    oxford: asset.oxford,
-    mastered: !!asset.mastered,
-    sources: Array.isArray(asset.sources) ? asset.sources : [],
-    created: asset.created || "",
-    updated: asset.updated || "",
-  };
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -462,4 +422,30 @@ export function buildWordAssetFromSelection(file: TFile, selection: any, transla
     updated: now,
   };
   return asset;
+}
+export function buildWordAssetMetadata(asset: any): WordAsset {
+  return {
+    lemma: asset.lemma || "",
+    title: asset.title || "",
+    kind: getTranslationAssetKind(asset),
+    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
+    surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
+    translation: asset.translation || "",
+    display: asset.display || "",
+    phonetic: asset.phonetic || "",
+    partOfSpeech: asset.partOfSpeech || "",
+    example: asset.example || "",
+    tags: asset.tags,
+    collins: asset.collins,
+    oxford: asset.oxford,
+    mastered: !!asset.mastered,
+    sources: Array.isArray(asset.sources) ? asset.sources : [],
+    nextReviewDate: asset.nextReviewDate,
+    interval: asset.interval,
+    ease: asset.ease,
+    reviews: asset.reviews,
+    reviewTimeMs: asset.reviewTimeMs,
+    created: asset.created || "",
+    updated: asset.updated || "",
+  };
 }

@@ -23,8 +23,8 @@ export class WordBookView extends ItemView {
     return "英语词条";
   }
 
-  getIcon() {
-    return "library";
+  getIcon(): string {
+    return "book";
   }
 
   async onOpen() {

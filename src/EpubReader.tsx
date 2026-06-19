@@ -2296,7 +2296,7 @@ const showWordHoverCard = (asset, element) => {
       hideWordHoverCard();
       openWordNote(activeWordHover.asset);
     }
-  }, renderObsidianIcon("file-text")), React.createElement("button", {
+  }, renderObsidianIcon("book")), React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
     title: "\u6807\u8bb0\u5df2\u638c\u63e1",
     onClick: markActiveWordMastered

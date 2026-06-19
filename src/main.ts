@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf, Notice, TFile } from "obsidian";
+import { Plugin, WorkspaceLeaf, Notice, TFile, addIcon } from "obsidian";
 import { EpubView } from "./EpubView";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE, HIGHLIGHTS_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
@@ -15,6 +15,8 @@ import { normalizeTranslationProvider } from "./translation";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
 import { registerGlobalMarkdownFeatures } from "./global-markdown";
 
+const JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><path d="M6 8h2"/><path d="M6 12h2"/><path d="M16 8h2"/><path d="M16 12h2"/></svg>`;
+
 export default class JarvisReaderPlugin extends Plugin {
   declare settings: any;
   bookshelfView: any;
@@ -24,6 +26,7 @@ export default class JarvisReaderPlugin extends Plugin {
   lastIndexCounts: any;
 
   async onload() {
+    addIcon("jarvis-logo", JARVIS_LOGO_SVG);
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
@@ -58,7 +61,7 @@ export default class JarvisReaderPlugin extends Plugin {
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
-    this.addRibbonIcon("library", "打开图书库", () => {
+    this.addRibbonIcon("jarvis-logo", "打开图书库", () => {
       this.openLibrary();
     });
     this.addCommand({

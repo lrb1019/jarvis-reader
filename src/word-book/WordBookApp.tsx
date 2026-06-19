@@ -139,6 +139,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         count++;
       }
     }
+    await plugin.persistWordAssetSidecar("save");
     await plugin.saveSettings();
     new Notice(`已将 ${count} 个词条标记为${mastered ? "已掌握" : "未掌握"}`);
     loadAssets();
@@ -149,6 +150,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     if (plugin.settings.wordAssets[lemma]) {
       const current = plugin.settings.wordAssets[lemma].mastered;
       plugin.settings.wordAssets[lemma].mastered = !current;
+      await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
       loadAssets();
     }
@@ -165,6 +167,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             .onClick(async () => {
                 if (plugin.settings.wordAssets[lemma]) {
                     plugin.settings.wordAssets[lemma].mastered = !isMastered;
+                    await plugin.persistWordAssetSidecar("save");
                     await plugin.saveSettings();
                     loadAssets();
                 }
@@ -183,6 +186,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                         await plugin.activeReaderView.deleteWordAsset(asset);
                     } else {
                         delete plugin.settings.wordAssets[lemma];
+                        await plugin.persistWordAssetSidecar("delete");
                     }
                     await plugin.saveSettings();
                     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
@@ -441,7 +445,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             onToggleMastery={(lemma, mastered) => {
                 if (plugin.settings.wordAssets[lemma]) {
                     plugin.settings.wordAssets[lemma].mastered = mastered;
-                    plugin.saveSettings().then(() => loadAssets());
+                    plugin.persistWordAssetSidecar("save").then(() => plugin.saveSettings()).then(() => loadAssets());
                 }
             }}
             onDoubleClick={() => {}}

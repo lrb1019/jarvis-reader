@@ -3,6 +3,7 @@ import type { WordAsset } from "../types";
 import { calculateNextReview, ReviewResponse } from "./SpacedRepetition";
 import { MarkdownPreview } from "./WordCard";
 import { buildWordAudioUrl } from "../word-assets";
+import { Notice } from "obsidian";
 
 interface ReviewSessionProps {
   plugin: any;
@@ -16,9 +17,30 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [startTime, setStartTime] = React.useState(Date.now());
 
+  const playAudio = React.useCallback((text: string) => {
+    if (plugin.settings.enableWordAudio !== false) {
+      try {
+        const accent = plugin.settings.wordAudioAccent || "us";
+        const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
+        const url = buildWordAudioUrl(template, text, accent);
+        if (url) {
+          new Audio(url).play().catch(() => {});
+        }
+      } catch (e) {
+        console.error("Audio playback failed", e);
+      }
+    }
+  }, [plugin]);
+
   React.useEffect(() => {
     setStartTime(Date.now());
-  }, [currentIndex]);
+    if (plugin.settings.autoPlayAudioOnReview !== false && dueAssets[currentIndex]) {
+      const asset = dueAssets[currentIndex];
+      const isSentence = asset.kind === "sentence";
+      const displayWord = isSentence ? (asset.sources?.[0]?.quote || asset.lemma) : asset.lemma;
+      playAudio(displayWord);
+    }
+  }, [currentIndex, dueAssets, plugin, playAudio]);
 
   if (dueAssets.length === 0 || currentIndex >= dueAssets.length) {
     return (
@@ -35,20 +57,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
 
   const asset = dueAssets[currentIndex];
   
-  const playAudio = (text: string) => {
-    if (plugin.settings.enableWordAudio !== false) {
-      try {
-        const accent = plugin.settings.wordAudioAccent || "us";
-        const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
-        const url = buildWordAudioUrl(template, text, accent);
-        if (url) {
-          new Audio(url).play().catch(() => {});
-        }
-      } catch (e) {
-        console.error("Audio playback failed", e);
-      }
-    }
-  };
+
 
   const startingEase = plugin.settings.sm2StartingEase ?? 2.5;
   const easyBonus = plugin.settings.sm2EasyBonus ?? 1.3;
@@ -86,6 +95,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
       plugin.settings.wordReviewStats[today].reviewCount += 1;
       plugin.settings.wordReviewStats[today].reviewTimeMs += timeSpent;
 
+      await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
     }
 
@@ -160,6 +170,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                     const current = asset.mastered;
                     if (plugin.settings.wordAssets[asset.lemma]) {
                       plugin.settings.wordAssets[asset.lemma].mastered = !current;
+                      await plugin.persistWordAssetSidecar("save");
                       await plugin.saveSettings();
                       onAssetUpdate();
                     }
@@ -257,8 +268,99 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
             )}
 
             {/* Bottom Back Button */}
-            <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", flexShrink: 0 }}>
               <button className="jarvis-library-back-btn" onClick={(e) => { e.stopPropagation(); setShowAnswer(false); }}>回到正面</button>
+              {asset.sources && asset.sources[0] && asset.sources[0].bookPath && (
+                <button className="jarvis-library-btn btn-primary" onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    const source = asset.sources[0];
+                    if (!source || !source.bookPath) {
+                      new Notice("没有找到原文来源");
+                      return;
+                    }
+                    const file = plugin.app.vault.getAbstractFileByPath(source.bookPath);
+                    if (!file) {
+                      new Notice("找不到书籍文件: " + source.bookPath);
+                      return;
+                    }
+                    // Find an existing leaf with this book open
+                    const leaves: any[] = [];
+                    plugin.app.workspace.iterateAllLeaves((l) => {
+                      if (l.view?.getViewType() === "epub") {
+                        leaves.push(l);
+                      }
+                    });
+                    
+                    let targetLeaf: any = null;
+                    for (const l of leaves) {
+                      const viewState = l.getViewState();
+                      const filePath = (l.view as any)?.file?.path || viewState?.state?.file;
+                      if (filePath === file.path) {
+                        targetLeaf = l;
+                        break;
+                      }
+                    }
+
+                    if (targetLeaf) {
+                      console.log(`[Jarvis Reader] Found target leaf for book: ${file.path}, jumping to cfi: ${source.cfiRange}`);
+                      
+                      // Save to settings as a fallback in case view reloads or isn't fully ready
+                      plugin.settings.bookInitLocations[file.path] = source.cfiRange;
+                      
+                      // Set ephemeral state (Obsidian native mechanism)
+                      targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
+                      
+                      const jump = () => {
+                        const view = targetLeaf.view as any;
+                        if (view && view.currentRendition) {
+                          try {
+                            if (typeof view.currentRendition.resize === "function") {
+                              view.currentRendition.resize();
+                            }
+                            view.currentRendition.display(source.cfiRange);
+                          } catch (e) {
+                            console.warn("[Jarvis Reader] Direct display failed", e);
+                          }
+                        }
+                      };
+
+                      const onActiveLeafChange = (activeLeaf: any) => {
+                        const activeView = activeLeaf?.view;
+                        const isMatch = activeLeaf === targetLeaf || 
+                          (activeView && activeView.getViewType() === "epub" && (activeView as any).file?.path === file.path);
+                          
+                        if (isMatch) {
+                          plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
+                          clearTimeout(safetyTimeout);
+                          
+                          // Execute multiple display retries to ensure we override Obsidian's tab switch position restoration
+                          setTimeout(jump, 150);
+                          setTimeout(jump, 400);
+                          setTimeout(jump, 800);
+                        }
+                      };
+                      
+                      const safetyTimeout = setTimeout(() => {
+                        plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
+                        console.log("[Jarvis Reader] active-leaf-change listener timeout triggered");
+                        // Fallback jump anyway
+                        jump();
+                      }, 2500);
+                      
+                      plugin.app.workspace.on("active-leaf-change", onActiveLeafChange);
+                      plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+                    } else {
+                      console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
+                      const newLeaf = plugin.app.workspace.getLeaf(true);
+                      await newLeaf.openFile(file as any, { active: true, eState: { epubcifi: source.cfiRange } });
+                    }
+                  } catch (err) {
+                    new Notice("跳转失败: " + String(err));
+                    console.error("Jump to source failed", err);
+                  }
+                }}>跳转原文</button>
+              )}
             </div>
           </div>
 

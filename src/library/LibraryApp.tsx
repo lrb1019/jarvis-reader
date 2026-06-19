@@ -175,7 +175,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     new Notice(`已彻底删除词条：${lemma}`);
   };
 
-  const renderTableRow = (asset: any) => {
+  const renderTableRow = (asset: any, showTagsColumn: boolean = false) => {
     const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
@@ -245,6 +245,23 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             {!isSentence && asset.phonetic && <div style={{ fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }}>{asset.phonetic}</div>}
           </div>
         </td>
+        {showTagsColumn && (
+          <td style={{ padding: "12px 8px" }}>
+            {asset.isWord && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                {asset.oxford === 1 && (
+                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>牛津核心</span>
+                )}
+                {asset.collins && asset.collins > 0 && (
+                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>{'★'.repeat(asset.collins)}</span>
+                )}
+                {asset.tags?.map((tag: string) => (
+                  <span key={tag} className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }}>{tag.toUpperCase()}</span>
+                ))}
+              </div>
+            )}
+          </td>
+        )}
         <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
           {asset.translation && (
             <div 
@@ -2797,6 +2814,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                               <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
                                 <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>标签</th>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
@@ -2805,7 +2823,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                                 </tr>
                               </thead>
-                              <tbody>{wordsAndPhrases.map(renderTableRow)}</tbody>
+                              <tbody>{wordsAndPhrases.map(a => renderTableRow(a, true))}</tbody>
                             </table>
                           </div>
                         )}
@@ -2824,7 +2842,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                                 </tr>
                               </thead>
-                              <tbody>{sentences.map(renderTableRow)}</tbody>
+                              <tbody>{sentences.map(a => renderTableRow(a, false))}</tbody>
                             </table>
                           </div>
                         )}

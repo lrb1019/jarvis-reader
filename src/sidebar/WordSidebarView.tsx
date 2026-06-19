@@ -143,13 +143,11 @@ export class WordSidebarView extends ItemView {
     titleRow.createDiv({ cls: "jarvis-reader-word-sidebar-title", text: displayTitle });
     
     const wordBookBtn = titleRow.createEl("button", {
-      cls: "jarvis-reader-word-sidebar-action",
-      attr: {
-        "aria-label": "打开词条",
-        "title": "打开词条"
-      }
+      cls: "jarvis-reader-word-sidebar-action"
     });
-    setIcon(wordBookBtn, "library");
+    wordBookBtn.setAttr("aria-label", "打开词条");
+    wordBookBtn.setAttr("title", "打开词条");
+    setIcon(wordBookBtn, "book");
     wordBookBtn.onclick = () => this.openWordBook();
 
     header.createDiv({ cls: "jarvis-reader-word-sidebar-subtitle", text: `共 ${assetCount} 个词条` });
@@ -246,6 +244,7 @@ export class WordSidebarView extends ItemView {
              await this.reader.setWordMastered(asset, mastered);
           } else {
              asset.mastered = mastered;
+             await this.plugin.persistWordAssetSidecar("save");
              await this.plugin.saveSettings();
              this.render();
           }
