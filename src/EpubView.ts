@@ -18,11 +18,7 @@ function getWordAssetsMap(settings: any): Record<string, any> {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
 }
 
-function shouldAutoHighlightFile(filePath: string, settings: any): boolean {
-  const autoHighlightPaths: string[] = Array.isArray(settings.autoWordHighlightPaths) ? settings.autoWordHighlightPaths : [];
-  if (!autoHighlightPaths.length) return true;
-  return autoHighlightPaths.some((p: string) => filePath.startsWith(p));
-}
+
 
 export class EpubView extends FileView {
   settings: any;
@@ -149,7 +145,7 @@ export class EpubView extends FileView {
   }
 
   shouldAutoHighlightWords(): boolean {
-    return shouldAutoHighlightFile(this.file!.path, this.plugin.settings);
+    return this.plugin.settings.enableAutoHighlight !== false;
   }
 
   getBookHighlights(): BookHighlight[] {

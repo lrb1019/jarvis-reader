@@ -4,13 +4,26 @@ import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PR
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
 
+export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
+bookname: "[[{{bookname}}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
+created: {{created}}
+---
+
+{{toc}}`;
+
 export const DEFAULT_SETTINGS = {
   scrolledView: false,
   singlePageView: false,
   readerZoom: 1,
   readerLineHeight: 1.6,
   bookNoteFolder: "",
-  bookNoteTemplate: "",
+  bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
+  customCoverFolder: "00-Attachment",
   wordNoteFolder: "09 Books/Words",
   wordBookExportFolder: "",
   wordAssets: {},
@@ -21,7 +34,7 @@ export const DEFAULT_SETTINGS = {
     model: ""
   },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
-  autoHighlightFolders: ["09 Books"],
+  enableAutoHighlight: true,
   enableWordAudio: true,
   wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
   wordAudioAccent: "us",
@@ -65,7 +78,7 @@ export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
 };
 export class JarvisReaderSettingTab extends PluginSettingTab {
   plugin: JarvisReaderPlugin;
-  activeTab: string = "general";
+  activeTab: string = "storage";
   
   constructor(app: App, plugin: JarvisReaderPlugin) {
     super(app, plugin);
@@ -90,10 +103,10 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     
     const tabs = [
-      { id: "general", label: "通用" },
+      { id: "storage", label: "目录与文件" },
       { id: "translation", label: "AI 与翻译" },
-      { id: "words", label: "词句卡片" },
-      { id: "appearance", label: "外观" }
+      { id: "words", label: "词句发音与显示" },
+      { id: "appearance", label: "阅读器与外观" }
     ];
 
     tabs.forEach(tab => {
@@ -115,10 +128,10 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
 
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
 
-    if (this.activeTab === "general") {
-      let folderText: any = null;
+    if (this.activeTab === "storage") {
+      let bookFolderText: any = null;
       new Setting(contentDiv).setName("读书笔记文件夹").setDesc("保存自动生成读书笔记的文件夹").addText((text) => {
-        folderText = text;
+        bookFolderText = text;
         text.setPlaceholder("选择或输入文件夹").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
           await this.plugin.saveSettings();
@@ -127,15 +140,38 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         new JarvisReaderFolderSuggestModal(this.app, async (path) => {
           this.plugin.settings.bookNoteFolder = path;
           await this.plugin.saveSettings();
-          if (folderText) {
-            folderText.setValue(path);
+          if (bookFolderText) {
+            bookFolderText.setValue(path);
           }
         }).open();
       })).addButton((button) => button.setButtonText("清除").onClick(async () => {
         this.plugin.settings.bookNoteFolder = "";
         await this.plugin.saveSettings();
-        if (folderText) {
-          folderText.setValue("");
+        if (bookFolderText) {
+          bookFolderText.setValue("");
+        }
+      }));
+
+      let customCoverFolderText: any = null;
+      new Setting(contentDiv).setName("自定义封面文件夹").setDesc("保存自定义图书封面的文件夹路径").addText((text) => {
+        customCoverFolderText = text;
+        text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
+          this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("选择").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.customCoverFolder = path;
+          await this.plugin.saveSettings();
+          if (customCoverFolderText) {
+            customCoverFolderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
+        this.plugin.settings.customCoverFolder = "";
+        await this.plugin.saveSettings();
+        if (customCoverFolderText) {
+          customCoverFolderText.setValue("");
         }
       }));
 
@@ -181,17 +217,33 @@ created: {{created}}
         text.inputEl.style.width = "100%";
       });
       
-      new Setting(contentDiv).setName("全局 Markdown 划词翻译").setDesc("在 Obsidian 普通 Markdown 笔记中，自动识别并可悬停翻译已保存的单词").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableGlobalMarkdownTranslation !== false).onChange(async (value) => {
-        this.plugin.settings.enableGlobalMarkdownTranslation = value;
-        await this.plugin.saveSettings();
-      }));
-
-      new Setting(contentDiv).setName("自动标记文件夹").setDesc("只在这些文件夹下的 EPUB 中自动标记已保存单词；多个文件夹用英文逗号分隔").addText((text) => {
-        text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
-          this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
+      let wordFolderText: any = null;
+      new Setting(contentDiv).setName("单词卡片存储文件夹").setDesc("保存所有单词笔记和短语笔记的文件夹").addText((text) => {
+        wordFolderText = text;
+        text.setPlaceholder("选择或输入文件夹").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
           await this.plugin.saveSettings();
         });
-      });
+      }).addButton((button) => button.setButtonText("选择").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.wordNoteFolder = path;
+          await this.plugin.saveSettings();
+          if (wordFolderText) {
+            wordFolderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
+        this.plugin.settings.wordNoteFolder = "";
+        await this.plugin.saveSettings();
+        if (wordFolderText) {
+          wordFolderText.setValue("");
+        }
+      }));
+
+      new Setting(contentDiv).setName("自动标记单词").setDesc("开启后，在 EPUB 阅读器中会自动使用蓝色下划线标记已保存的单词。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+        this.plugin.settings.enableAutoHighlight = value;
+        await this.plugin.saveSettings();
+      }));
     }
     
     if (this.activeTab === "translation") {
@@ -334,6 +386,20 @@ created: {{created}}
     }
 
     if (this.activeTab === "appearance") {
+
+      new Setting(contentDiv).setName("阅读器默认缩放比例").setDesc("全局控制阅读器中文字的放大缩小级别").addSlider((slider) => {
+        slider.setLimits(0.5, 3.0, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
+          this.plugin.settings.readerZoom = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+      new Setting(contentDiv).setName("阅读器默认行高").setDesc("全局控制阅读器中文字的行间距").addSlider((slider) => {
+        slider.setLimits(1.0, 3.0, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
+          this.plugin.settings.readerLineHeight = value;
+          await this.plugin.saveSettings();
+        });
+      });
 
       const createColorPicker = (name: string, desc: string, key: "word" | "phrase" | "sentence" | "comment" | "normal") => {
         new Setting(contentDiv)

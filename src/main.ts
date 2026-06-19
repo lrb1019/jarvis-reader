@@ -534,8 +534,10 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
     delete (this.settings as any).localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+    this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
+    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder || "00-Attachment");
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
-    this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];
+    this.settings.enableAutoHighlight = this.settings.enableAutoHighlight !== false;
     this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
     this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);
     this.settings.wordAudioAccent = String(this.settings.wordAudioAccent || "us").toLowerCase() === "uk" ? "uk" : "us";

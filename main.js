@@ -57563,11 +57563,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
 function getWordAssetsMap(settings) {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
 }
-function shouldAutoHighlightFile(filePath, settings) {
-  const autoHighlightPaths = Array.isArray(settings.autoWordHighlightPaths) ? settings.autoWordHighlightPaths : [];
-  if (!autoHighlightPaths.length) return true;
-  return autoHighlightPaths.some((p) => filePath.startsWith(p));
-}
 var EpubView = class extends import_obsidian6.FileView {
   settings;
   plugin;
@@ -57676,7 +57671,7 @@ var EpubView = class extends import_obsidian6.FileView {
     return asset?.display || "";
   }
   shouldAutoHighlightWords() {
-    return shouldAutoHighlightFile(this.file.path, this.plugin.settings);
+    return this.plugin.settings.enableAutoHighlight !== false;
   }
   getBookHighlights() {
     return getHighlightsForBook(this.plugin.settings, this.file.path);
@@ -59142,7 +59137,6 @@ function LibraryApp({ plugin }) {
   const wheelTimeoutRef = React5.useRef(null);
   const [books, setBooks] = React5.useState([]);
   const [coverCache, setCoverCache] = React5.useState(plugin.settings.bookCoverCache || {});
-  const [noteFallbackCovers, setNoteFallbackCovers] = React5.useState({});
   const [statsTab, setStatsTab] = React5.useState("week");
   const [statsDate, setStatsDate] = React5.useState(() => /* @__PURE__ */ new Date());
   const [statsChartType, setStatsChartType] = React5.useState("bar");
@@ -59178,9 +59172,7 @@ function LibraryApp({ plugin }) {
   }, [plugin.settings.bookCoverCache]);
   React5.useEffect(() => {
     if (books.length === 0) return;
-    const fallbacks = {};
     const notesMap = {};
-    let changedFallbacks = false;
     let changedNotes = false;
     books.forEach((book) => {
       const noteFile = findBookNote(plugin.app, book, plugin.settings);
@@ -59188,29 +59180,7 @@ function LibraryApp({ plugin }) {
         notesMap[book.path] = noteFile;
         changedNotes = true;
       }
-      const key = `${book.path}|${book.stat?.mtime || 0}|${book.stat?.size || 0}`;
-      const cover = coverCache[key];
-      if (!cover || !cover.dataUrl) {
-        if (noteFile) {
-          const cache = plugin.app.metadataCache.getFileCache(noteFile);
-          if (cache?.embeds && cache.embeds.length > 0) {
-            const imgEmbed = cache.embeds.find((e) => {
-              const ext = e.link.split(".").pop()?.toLowerCase();
-              return ext && ["png", "jpg", "jpeg", "webp", "gif", "bmp"].includes(ext);
-            }) || cache.embeds[0];
-            const imgFile = plugin.app.metadataCache.getFirstLinkpathDest(imgEmbed.link, noteFile.path);
-            if (imgFile instanceof import_obsidian10.TFile) {
-              const resourcePath = plugin.app.vault.getResourcePath(imgFile);
-              fallbacks[book.path] = resourcePath;
-              changedFallbacks = true;
-            }
-          }
-        }
-      }
     });
-    if (changedFallbacks) {
-      setNoteFallbackCovers(fallbacks);
-    }
     if (changedNotes) {
       setBookNotesMap(notesMap);
     }
@@ -59386,10 +59356,13 @@ function LibraryApp({ plugin }) {
   const getCover = (file) => {
     const key = `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`;
     const cached = coverCache[key];
-    if (cached && cached.dataUrl) return cached;
-    if (noteFallbackCovers[file.path]) {
-      return { ...cached || {}, dataUrl: noteFallbackCovers[file.path] };
+    if (cached?.vaultPath) {
+      const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
+      if (coverFile instanceof import_obsidian10.TFile) {
+        return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
+      }
     }
+    if (cached && cached.dataUrl) return cached;
     return cached;
   };
   const getProgress = (file) => {
@@ -60940,6 +60913,75 @@ function LibraryApp({ plugin }) {
       )
     ] });
   };
+  const hiddenFileInput = React5.useRef(null);
+  const handleCustomCoverUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !activeBook) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        const MAX_DIM = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > height && width > MAX_DIM) {
+          height *= MAX_DIM / width;
+          width = MAX_DIM;
+        } else if (height > MAX_DIM) {
+          width *= MAX_DIM / height;
+          height = MAX_DIM;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          const buffer = await blob.arrayBuffer();
+          const targetFolder = plugin.settings.customCoverFolder || "00-Attachment";
+          const folderAbstract = plugin.app.vault.getAbstractFileByPath(targetFolder);
+          if (!folderAbstract) {
+            try {
+              await plugin.app.vault.createFolder(targetFolder);
+            } catch (e2) {
+            }
+          }
+          const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
+          const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
+          let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
+          if (targetFile instanceof import_obsidian10.TFile) {
+            await plugin.app.vault.modifyBinary(targetFile, buffer);
+          } else {
+            try {
+              targetFile = await plugin.app.vault.createBinary(targetPath, buffer);
+            } catch (e2) {
+              console.error("Failed to create cover file", e2);
+              return;
+            }
+          }
+          if (targetFile instanceof import_obsidian10.TFile) {
+            const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
+            const existingCache = coverCache[key] || {};
+            plugin.settings.bookCoverCache[key] = {
+              ...existingCache,
+              vaultPath: targetFile.path,
+              isCustom: true,
+              updated: (/* @__PURE__ */ new Date()).toISOString()
+            };
+            await plugin.saveSettings();
+            setCoverCache({ ...plugin.settings.bookCoverCache });
+          }
+        }, "image/jpeg", 0.85);
+      };
+      img.src = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.value = "";
+    }
+  };
   const renderDetail = () => {
     if (!activeBook) return null;
     const { title, author } = parseBookInfo(activeBook);
@@ -60978,10 +61020,42 @@ function LibraryApp({ plugin }) {
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-detail-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-warning", onClick: () => deleteBook(activeBook), children: "\u5220\u9664\u56FE\u4E66" }) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-detail-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-header-cover-side", children: cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-title", children: title }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
-        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-header-cover-side", style: { position: "relative" }, onClick: () => hiddenFileInput.current?.click(), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "file", accept: "image/*", ref: hiddenFileInput, onChange: handleCustomCoverUpload, style: { display: "none" } }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cover-hover-overlay", style: {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0,
+            transition: "opacity 0.2s",
+            cursor: "pointer",
+            borderRadius: "8px",
+            zIndex: 10
+          }, onMouseEnter: (e) => e.currentTarget.style.opacity = "1", onMouseLeave: (e) => e.currentTarget.style.opacity = "0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginBottom: "8px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" }),
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "13", r: "4" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontWeight: 600 }, children: "\u66F4\u6362\u5C01\u9762" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { style: { fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }, children: [
+              "\u63A8\u8350\u6BD4\u4F8B 2:3",
+              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("br", {}),
+              "(\u5EFA\u8BAE 600\xD7900 \u53CA\u4EE5\u4E0A)"
+            ] })
+          ] }),
+          cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-title", children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
+          ] })
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-header-info-side", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "detail-book-title", children: title }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-book-meta-row", children: [
@@ -61296,13 +61370,25 @@ var LibraryView = class extends import_obsidian11.ItemView {
 // src/settings.ts
 var import_obsidian12 = require("obsidian");
 init_utils();
+var DEFAULT_BOOK_NOTE_TEMPLATE = `---
+bookname: "[[{{bookname}}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
+created: {{created}}
+---
+
+{{toc}}`;
 var DEFAULT_SETTINGS = {
   scrolledView: false,
   singlePageView: false,
   readerZoom: 1,
   readerLineHeight: 1.6,
   bookNoteFolder: "",
-  bookNoteTemplate: "",
+  bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
+  customCoverFolder: "00-Attachment",
   wordNoteFolder: "09 Books/Words",
   wordBookExportFolder: "",
   wordAssets: {},
@@ -61313,7 +61399,7 @@ var DEFAULT_SETTINGS = {
     model: ""
   },
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
-  autoHighlightFolders: ["09 Books"],
+  enableAutoHighlight: true,
   enableWordAudio: true,
   wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
   wordAudioAccent: "us",
@@ -61357,7 +61443,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian12.FuzzySugges
 };
 var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
   plugin;
-  activeTab = "general";
+  activeTab = "storage";
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -61376,10 +61462,10 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
     tabsContainer.style.gap = "20px";
     tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     const tabs = [
-      { id: "general", label: "\u901A\u7528" },
+      { id: "storage", label: "\u76EE\u5F55\u4E0E\u6587\u4EF6" },
       { id: "translation", label: "AI \u4E0E\u7FFB\u8BD1" },
-      { id: "words", label: "\u8BCD\u53E5\u5361\u7247" },
-      { id: "appearance", label: "\u5916\u89C2" }
+      { id: "words", label: "\u8BCD\u53E5\u53D1\u97F3\u4E0E\u663E\u793A" },
+      { id: "appearance", label: "\u9605\u8BFB\u5668\u4E0E\u5916\u89C2" }
     ];
     tabs.forEach((tab) => {
       const tabEl = tabsContainer.createDiv("jarvis-settings-tab");
@@ -61397,10 +61483,10 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
       };
     });
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
-    if (this.activeTab === "general") {
-      let folderText = null;
+    if (this.activeTab === "storage") {
+      let bookFolderText = null;
       new import_obsidian12.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-        folderText = text;
+        bookFolderText = text;
         text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
           await this.plugin.saveSettings();
@@ -61409,15 +61495,37 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
         new JarvisReaderFolderSuggestModal(this.app, async (path) => {
           this.plugin.settings.bookNoteFolder = path;
           await this.plugin.saveSettings();
-          if (folderText) {
-            folderText.setValue(path);
+          if (bookFolderText) {
+            bookFolderText.setValue(path);
           }
         }).open();
       })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
         this.plugin.settings.bookNoteFolder = "";
         await this.plugin.saveSettings();
-        if (folderText) {
-          folderText.setValue("");
+        if (bookFolderText) {
+          bookFolderText.setValue("");
+        }
+      }));
+      let customCoverFolderText = null;
+      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
+        customCoverFolderText = text;
+        text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
+          this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.customCoverFolder = path;
+          await this.plugin.saveSettings();
+          if (customCoverFolderText) {
+            customCoverFolderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
+        this.plugin.settings.customCoverFolder = "";
+        await this.plugin.saveSettings();
+        if (customCoverFolderText) {
+          customCoverFolderText.setValue("");
         }
       }));
       let exportFolderText = null;
@@ -61460,16 +61568,32 @@ created: {{created}}
         text.inputEl.rows = 13;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u5168\u5C40 Markdown \u5212\u8BCD\u7FFB\u8BD1").setDesc("\u5728 Obsidian \u666E\u901A Markdown \u7B14\u8BB0\u4E2D\uFF0C\u81EA\u52A8\u8BC6\u522B\u5E76\u53EF\u60AC\u505C\u7FFB\u8BD1\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableGlobalMarkdownTranslation !== false).onChange(async (value) => {
-        this.plugin.settings.enableGlobalMarkdownTranslation = value;
-        await this.plugin.saveSettings();
-      }));
-      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u6587\u4EF6\u5939").setDesc("\u53EA\u5728\u8FD9\u4E9B\u6587\u4EF6\u5939\u4E0B\u7684 EPUB \u4E2D\u81EA\u52A8\u6807\u8BB0\u5DF2\u4FDD\u5B58\u5355\u8BCD\uFF1B\u591A\u4E2A\u6587\u4EF6\u5939\u7528\u82F1\u6587\u9017\u53F7\u5206\u9694").addText((text) => {
-        text.setPlaceholder("09 Books").setValue((this.plugin.settings.autoHighlightFolders || []).join(", ")).onChange(async (value) => {
-          this.plugin.settings.autoHighlightFolders = value.split(",").map((item) => normalizeVaultPath(item)).filter(Boolean);
+      let wordFolderText = null;
+      new import_obsidian12.Setting(contentDiv).setName("\u5355\u8BCD\u5361\u7247\u5B58\u50A8\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u6240\u6709\u5355\u8BCD\u7B14\u8BB0\u548C\u77ED\u8BED\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+        wordFolderText = text;
+        text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
           await this.plugin.saveSettings();
         });
-      });
+      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.wordNoteFolder = path;
+          await this.plugin.saveSettings();
+          if (wordFolderText) {
+            wordFolderText.setValue(path);
+          }
+        }).open();
+      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
+        this.plugin.settings.wordNoteFolder = "";
+        await this.plugin.saveSettings();
+        if (wordFolderText) {
+          wordFolderText.setValue("");
+        }
+      }));
+      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+        this.plugin.settings.enableAutoHighlight = value;
+        await this.plugin.saveSettings();
+      }));
     }
     if (this.activeTab === "translation") {
       let translationBaseUrlText = null;
@@ -61588,6 +61712,18 @@ created: {{created}}
       });
     }
     if (this.activeTab === "appearance") {
+      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
+        slider.setLimits(0.5, 3, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
+          this.plugin.settings.readerZoom = value;
+          await this.plugin.saveSettings();
+        });
+      });
+      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
+        slider.setLimits(1, 3, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
+          this.plugin.settings.readerLineHeight = value;
+          await this.plugin.saveSettings();
+        });
+      });
       const createColorPicker = (name, desc, key) => {
         new import_obsidian12.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
           (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
@@ -63866,8 +64002,10 @@ var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
     delete this.settings.localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+    this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
+    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder || "00-Attachment");
     this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
-    this.settings.autoHighlightFolders = Array.isArray(this.settings.autoHighlightFolders) ? this.settings.autoHighlightFolders.map((folder) => normalizeVaultPath(folder)).filter(Boolean) : ["09 Books"];
+    this.settings.enableAutoHighlight = this.settings.enableAutoHighlight !== false;
     this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
     this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);
     this.settings.wordAudioAccent = String(this.settings.wordAudioAccent || "us").toLowerCase() === "uk" ? "uk" : "us";

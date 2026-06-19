@@ -156,11 +156,12 @@ export interface JarvisReaderSettings {
   readerLineHeight: number;
   bookNoteFolder: string;
   bookNoteTemplate: string;
+  customCoverFolder: string;
   wordNoteFolder: string;
   wordAssets: WordAssetMap;
   translationApi: TranslationApiSettings;
   translationPrompt: string;
-  autoHighlightFolders: string[];
+  enableAutoHighlight: boolean;
   enableWordAudio: boolean;
   wordAudioTemplate: string;
   wordAudioAccent: WordAudioAccent;

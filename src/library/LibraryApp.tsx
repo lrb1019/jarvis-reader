@@ -129,7 +129,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   const [books, setBooks] = React.useState<TFile[]>([]);
   const [coverCache, setCoverCache] = React.useState<Record<string, any>>(plugin.settings.bookCoverCache || {});
-  const [noteFallbackCovers, setNoteFallbackCovers] = React.useState<Record<string, string>>({});
   const [statsTab, setStatsTab] = React.useState<"week" | "month" | "year" | "all">("week");
   const [statsDate, setStatsDate] = React.useState<Date>(() => new Date());
   const [statsChartType, setStatsChartType] = React.useState<"bar" | "calendar" | "heatmap">("bar");
@@ -170,12 +169,10 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     setCoverCache(plugin.settings.bookCoverCache || {});
   }, [plugin.settings.bookCoverCache]);
 
-  // Find fallback covers from markdown notes for books without covers
+  // Map book paths to their markdown notes
   React.useEffect(() => {
     if (books.length === 0) return;
-    const fallbacks: Record<string, string> = {};
     const notesMap: Record<string, TFile> = {};
-    let changedFallbacks = false;
     let changedNotes = false;
 
     books.forEach(book => {
@@ -184,30 +181,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         notesMap[book.path] = noteFile;
         changedNotes = true;
       }
-
-      const key = `${book.path}|${book.stat?.mtime || 0}|${book.stat?.size || 0}`;
-      const cover = coverCache[key];
-      if (!cover || !cover.dataUrl) {
-        if (noteFile) {
-          const cache = plugin.app.metadataCache.getFileCache(noteFile);
-          if (cache?.embeds && cache.embeds.length > 0) {
-            const imgEmbed = cache.embeds.find(e => {
-                const ext = e.link.split('.').pop()?.toLowerCase();
-                return ext && ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'].includes(ext);
-            }) || cache.embeds[0];
-            const imgFile = plugin.app.metadataCache.getFirstLinkpathDest(imgEmbed.link, noteFile.path);
-            if (imgFile instanceof TFile) {
-              const resourcePath = plugin.app.vault.getResourcePath(imgFile);
-              fallbacks[book.path] = resourcePath;
-              changedFallbacks = true;
-            }
-          }
-        }
-      }
     });
-    if (changedFallbacks) {
-      setNoteFallbackCovers(fallbacks);
-    }
     if (changedNotes) {
       setBookNotesMap(notesMap);
     }
@@ -411,11 +385,13 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const getCover = (file: TFile) => {
     const key = `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`;
     const cached = coverCache[key];
-    if (cached && cached.dataUrl) return cached;
-    
-    if (noteFallbackCovers[file.path]) {
-      return { ...(cached || {}), dataUrl: noteFallbackCovers[file.path] };
+    if (cached?.vaultPath) {
+      const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
+      if (coverFile instanceof TFile) {
+        return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
+      }
     }
+    if (cached && cached.dataUrl) return cached;
     return cached;
   };
 
@@ -2270,6 +2246,77 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       </div>
     );
   };
+  const hiddenFileInput = React.useRef<HTMLInputElement>(null);
+
+  const handleCustomCoverUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !activeBook) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        const MAX_DIM = 800;
+        let width = img.width;
+        let height = img.height;
+        if (width > height && width > MAX_DIM) {
+          height *= MAX_DIM / width;
+          width = MAX_DIM;
+        } else if (height > MAX_DIM) {
+          width *= MAX_DIM / height;
+          height = MAX_DIM;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          const buffer = await blob.arrayBuffer();
+          const targetFolder = plugin.settings.customCoverFolder || "00-Attachment";
+          const folderAbstract = plugin.app.vault.getAbstractFileByPath(targetFolder);
+          if (!folderAbstract) {
+             try { await plugin.app.vault.createFolder(targetFolder); } catch (e) {}
+          }
+          const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
+          const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
+          
+          let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
+          if (targetFile instanceof TFile) {
+            await plugin.app.vault.modifyBinary(targetFile, buffer);
+          } else {
+            try {
+               targetFile = await plugin.app.vault.createBinary(targetPath, buffer);
+            } catch (e) {
+               console.error("Failed to create cover file", e);
+               return;
+            }
+          }
+          
+          if (targetFile instanceof TFile) {
+            const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
+            const existingCache = coverCache[key] || {};
+            plugin.settings.bookCoverCache[key] = {
+              ...existingCache,
+              vaultPath: targetFile.path,
+              isCustom: true,
+              updated: new Date().toISOString()
+            };
+            await plugin.saveSettings();
+            setCoverCache({ ...plugin.settings.bookCoverCache });
+          }
+        }, "image/jpeg", 0.85);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    if (hiddenFileInput.current) {
+       hiddenFileInput.current.value = "";
+    }
+  };
 
   // Render Detail
   const renderDetail = () => {
@@ -2319,7 +2366,21 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
         {/* Top Info section */}
         <div className="jarvis-library-detail-header">
-          <div className="detail-header-cover-side">
+          <div className="detail-header-cover-side" style={{ position: "relative" }} onClick={() => hiddenFileInput.current?.click()}>
+            <input type="file" accept="image/*" ref={hiddenFileInput} onChange={handleCustomCoverUpload} style={{ display: "none" }} />
+            <div className="cover-hover-overlay" style={{
+              position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+              background: "rgba(0,0,0,0.5)", color: "white",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              opacity: 0, transition: "opacity 0.2s", cursor: "pointer", borderRadius: "8px", zIndex: 10
+            }} onMouseEnter={(e) => e.currentTarget.style.opacity = "1"} onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}>
+               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: "8px" }}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+               <span style={{ fontWeight: 600 }}>更换封面</span>
+               <span style={{ fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }}>
+                 推荐比例 2:3<br/>
+                 (建议 600×900 及以上)
+               </span>
+            </div>
             {cover?.dataUrl ? (
               <img src={cover.dataUrl} alt={title} className="detail-cover" />
             ) : (
