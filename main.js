@@ -53945,6 +53945,9 @@ function normalizeDictionaryEntry(selectedText, key, entry) {
       example: String(entry.example || "").trim(),
       display: display || translation,
       isWord: entry.isWord !== false,
+      tags: Array.isArray(entry.tags) ? entry.tags : typeof entry.tag === "string" ? entry.tag.split(" ") : [],
+      collins: entry.collins,
+      oxford: entry.oxford,
       sourceType: "local-dictionary"
     };
   }
