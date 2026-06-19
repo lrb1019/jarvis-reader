@@ -2272,7 +2272,20 @@ g.jarvis-reader-highlight-with-comment line {
   background-color: color-mix(in srgb, var(--background-modifier-hover) 50%, transparent);
 }
 
-/* Stats Quick Strip */
+/* Stats Quick Strip & Container */
+.jarvis-library-stats-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 10px 18px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
 .jarvis-library-stats-strip {
   display: flex;
   gap: 20px;
@@ -4432,3 +4445,60 @@ g.jarvis-reader-highlight-with-comment line {
   padding-bottom: 16px;
   margin-bottom: 8px;
 }
+
+/* Card Flip styles for Memory Mode */
+.jarvis-flashcard-container {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 580px;
+  height: 440px;
+  margin: 0 auto;
+  animation: flashcard-enter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: left center;
+}
+
+@keyframes flashcard-enter {
+  0% { opacity: 0; transform: rotateY(45deg); }
+  100% { opacity: 1; transform: rotateY(0deg); }
+}
+
+.jarvis-flashcard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jarvis-flashcard.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.jarvis-flashcard-front,
+.jarvis-flashcard-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 32px;
+}
+
+.jarvis-flashcard-front {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+.jarvis-flashcard-back {
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+

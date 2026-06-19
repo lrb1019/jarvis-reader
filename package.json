@@ -1,6 +1,6 @@
 {
   "name": "jarvis-reader",
-  "version": "0.8.2",
+  "version": "1.0.0",
   "private": true,
   "description": "TypeScript source migration workspace for Jarvis Reader",
   "type": "module",
@@ -27,4 +27,4 @@
     "react-dom": "18.2.0",
     "react-reader": "0.20.4"
   }
-}
+}\n

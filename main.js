@@ -1092,7 +1092,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState5(initialState) {
+        function useState7(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1104,7 +1104,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect6(create, deps) {
+        function useEffect7(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1120,7 +1120,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
-        function useMemo4(create, deps) {
+        function useMemo5(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useMemo(create, deps);
         }
@@ -1886,15 +1886,15 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect6;
+        exports.useEffect = useEffect7;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect2;
-        exports.useMemo = useMemo4;
+        exports.useMemo = useMemo5;
         exports.useReducer = useReducer;
         exports.useRef = useRef5;
-        exports.useState = useState5;
+        exports.useState = useState7;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2390,9 +2390,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React11 = require_react();
+        var React13 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React11.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React13.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -2441,7 +2441,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment5 = 7;
+        var Fragment6 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3598,7 +3598,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment5:
+            case Fragment6:
               return "Fragment";
             case HostComponent:
               return type;
@@ -3999,7 +3999,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React11.Children.forEach(props.children, function(child) {
+                React13.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -12472,7 +12472,7 @@ var require_react_dom_development = __commonJS({
           }
         }
         var fakeInternalInstance = {};
-        var emptyRefsObject = new React11.Component().refs;
+        var emptyRefsObject = new React13.Component().refs;
         var didWarnAboutStateAssignmentForComponent;
         var didWarnAboutUninitializedState;
         var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -13296,7 +13296,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment5) {
+            if (current2 === null || current2.tag !== Fragment6) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -13699,7 +13699,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment5) {
+                  if (child.tag === Fragment6) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17874,7 +17874,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment5:
+            case Fragment6:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18146,7 +18146,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment5:
+            case Fragment6:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22407,7 +22407,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment5, elements, key, mode);
+          var fiber = createFiber(Fragment6, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -23785,7 +23785,7 @@ var require_react_is_development = __commonJS({
         var ContextProvider = REACT_PROVIDER_TYPE;
         var Element2 = REACT_ELEMENT_TYPE;
         var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment5 = REACT_FRAGMENT_TYPE;
+        var Fragment6 = REACT_FRAGMENT_TYPE;
         var Lazy = REACT_LAZY_TYPE;
         var Memo = REACT_MEMO_TYPE;
         var Portal = REACT_PORTAL_TYPE;
@@ -23844,7 +23844,7 @@ var require_react_is_development = __commonJS({
         exports.ContextProvider = ContextProvider;
         exports.Element = Element2;
         exports.ForwardRef = ForwardRef;
-        exports.Fragment = Fragment5;
+        exports.Fragment = Fragment6;
         exports.Lazy = Lazy;
         exports.Memo = Memo;
         exports.Portal = Portal;
@@ -51822,7 +51822,7 @@ var require_react_swipeable_umd = __commonJS({
   "node_modules/react-swipeable/dist/react-swipeable.umd.js"(exports, module2) {
     (function(global2, factory) {
       typeof exports === "object" && typeof module2 !== "undefined" ? factory(exports, require_react()) : typeof define === "function" && define.amd ? define(["exports", "react"], factory) : (global2 = global2 || self, factory(global2.swipeable = {}, global2.react));
-    })(exports, (function(exports2, React11) {
+    })(exports, (function(exports2, React13) {
       function _interopNamespace(e) {
         if (e && e.__esModule) return e;
         var n = /* @__PURE__ */ Object.create(null);
@@ -51842,7 +51842,7 @@ var require_react_swipeable_umd = __commonJS({
         n["default"] = e;
         return n;
       }
-      var React__namespace = /* @__PURE__ */ _interopNamespace(React11);
+      var React__namespace = /* @__PURE__ */ _interopNamespace(React13);
       function _extends() {
         _extends = Object.assign || function(target) {
           for (var i = 1; i < arguments.length; i++) {
@@ -52675,7 +52675,7 @@ var require_react_jsx_runtime_development = __commonJS({
     if (true) {
       (function() {
         "use strict";
-        var React11 = require_react();
+        var React13 = require_react();
         var REACT_ELEMENT_TYPE = Symbol.for("react.element");
         var REACT_PORTAL_TYPE = Symbol.for("react.portal");
         var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -52701,7 +52701,7 @@ var require_react_jsx_runtime_development = __commonJS({
           }
           return null;
         }
-        var ReactSharedInternals = React11.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React13.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function error(format) {
           {
             {
@@ -53536,11 +53536,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx4 = jsxWithValidationDynamic;
-        var jsxs4 = jsxWithValidationStatic;
+        var jsx6 = jsxWithValidationDynamic;
+        var jsxs6 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx4;
-        exports.jsxs = jsxs4;
+        exports.jsx = jsx6;
+        exports.jsxs = jsxs6;
       })();
     }
   }
@@ -53564,7 +53564,7 @@ __export(main_exports, {
   default: () => JarvisReaderPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian17 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 
 // src/EpubView.ts
 var import_react3 = __toESM(require_react(), 1);
@@ -54014,6 +54014,9 @@ function buildWordAssetMetadata(asset) {
     phonetic: asset.phonetic || "",
     partOfSpeech: asset.partOfSpeech || "",
     example: asset.example || "",
+    tags: asset.tags,
+    collins: asset.collins,
+    oxford: asset.oxford,
     mastered: !!asset.mastered,
     sources: Array.isArray(asset.sources) ? asset.sources : [],
     created: asset.created || "",
@@ -54112,6 +54115,9 @@ function buildWordAssetFromSelection(file, selection, translation, existingAsset
     partOfSpeech: (translation?.partOfSpeech || existingAsset?.partOfSpeech || "").trim(),
     example: (translation?.example || existingAsset?.example || "").trim(),
     display: (translation?.display || existingAsset?.display || "").trim(),
+    tags: translation?.tags || existingAsset?.tags,
+    collins: translation?.collins || existingAsset?.collins,
+    oxford: translation?.oxford || existingAsset?.oxford,
     mastered: !!existingAsset?.mastered,
     sources: mergeWordSources(existingAsset?.sources, source),
     created: existingAsset?.created || now,
@@ -54653,6 +54659,14 @@ async function translateSelectionWithApi(settings = {}, selectedText, sentence =
   }
   if (!result.display) {
     throw new Error("\u7FFB\u8BD1\u54CD\u5E94\u7F3A\u5C11 display \u5B57\u6BB5\u3002");
+  }
+  if (selectionType === "word") {
+    const localMeta = await lookupLocalDictionary(settings, selectedText, app);
+    if (localMeta) {
+      if (localMeta.tags) result.tags = localMeta.tags;
+      if (localMeta.collins) result.collins = localMeta.collins;
+      if (localMeta.oxford) result.oxford = localMeta.oxford;
+    }
   }
   return result;
 }
@@ -57319,18 +57333,28 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: "jarvis-reader-word-muted"
   }, "\u6B63\u5728\u7FFB\u8BD1...") : null, wordLookupState.status === "error" ? import_react2.default.createElement("div", {
     className: "jarvis-reader-word-error"
-  }, wordLookupState.error || "\u7FFB\u8BD1\u5931\u8D25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? import_react2.default.createElement(import_react2.default.Fragment, null, wordLookupState.result.isWord ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-head"
-  }, import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
-    title: "\u70B9\u51FB\u53D1\u97F3",
-    onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
-    disabled: !enableWordAudio
-  }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-phonetic"
-  }, wordLookupState.result.phonetic) : null) : null, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-translation"
-  }, wordLookupState.result.translation)) : null), import_react2.default.createElement("div", {
+  }, wordLookupState.error || "\u7FFB\u8BD1\u5931\u8D25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? import_react2.default.createElement(
+    import_react2.default.Fragment,
+    null,
+    wordLookupState.result.isWord ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-head"
+    }, import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
+      title: "\u70B9\u51FB\u53D1\u97F3",
+      onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
+      disabled: !enableWordAudio
+    }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? import_react2.default.createElement("div", {}, wordLookupState.result.phonetic) : null) : null,
+    wordLookupState.result.isWord && (wordLookupState.result.tags || wordLookupState.result.collins || wordLookupState.result.oxford) ? import_react2.default.createElement(
+      "div",
+      { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
+      wordLookupState.result.oxford === 1 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
+      wordLookupState.result.collins && wordLookupState.result.collins > 0 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(wordLookupState.result.collins)) : null,
+      wordLookupState.result.tags ? wordLookupState.result.tags.map((tag) => import_react2.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+    ) : null,
+    wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-translation"
+    }, wordLookupState.result.translation)
+  ) : null), import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-actions"
   }, import_react2.default.createElement("button", {
     className: "jarvis-reader-highlight-button",
@@ -57479,82 +57503,94 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
-  }))) : null, activeWordHover ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
-    style: {
-      left: activeWordHover.left,
-      top: activeWordHover.top
+  }))) : null, activeWordHover ? import_react2.default.createElement(
+    "div",
+    {
+      className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
+      style: {
+        left: activeWordHover.left,
+        top: activeWordHover.top
+      },
+      onMouseEnter: clearWordHoverHideTimer,
+      onMouseLeave: scheduleHideWordHoverCard
     },
-    onMouseEnter: clearWordHoverHideTimer,
-    onMouseLeave: scheduleHideWordHoverCard
-  }, import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-head",
-    style: { cursor: "grab" },
-    onPointerDown: beginWordHoverCardMove,
-    onDoubleClick: resetWordHoverCardPosition
-  }, import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-head-row"
-  }, getTranslationAssetKind(activeWordHover.asset) === "sentence" ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
-    style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
-    onPointerDown: (e) => e.stopPropagation()
-  }, "\u539F\u53E5\u7FFB\u8BD1") : import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-lemma",
-    title: "\u70B9\u51FB\u53D1\u97F3",
-    style: { flex: "0 0 auto", cursor: "pointer" },
-    onPointerDown: (e) => e.stopPropagation(),
-    onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
-  }, activeWordHover.asset.title || activeWordHover.asset.lemma), import_react2.default.createElement("div", {
-    style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
-  }), import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-actions",
-    onPointerDown: (e) => e.stopPropagation()
-  }, import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
-    title: "\u6253\u5F00\u8BCD\u53E5\u672C",
-    onClick: () => {
-      hideWordHoverCard();
-      openWordNote(activeWordHover.asset);
-    }
-  }, renderObsidianIcon("file-text")), import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
-    title: "\u6807\u8BB0\u5DF2\u638C\u63E1",
-    onClick: markActiveWordMastered
-  }, renderObsidianIcon("check")), import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
-    title: "\u5220\u9664\u8BCD\u6761",
-    onClick: deleteActiveWordAsset
-  }, renderObsidianIcon("trash")), import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
-    title: "\u5173\u95ED\u5361\u7247",
-    onClick: hideWordHoverCard
-  }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-phonetic"
-  }, activeWordHover.asset.phonetic) : null), import_react2.default.createElement("div", {
-    className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
-  }, getTranslationAssetKind(activeWordHover.asset) === "sentence" || (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-original-sentence",
-    style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
-  }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react2.default.createElement("div", {
-    style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
-  }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-translation"
-  }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-pos"
-  }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-example"
-  }, activeWordHover.asset.example) : null)), activeWordHover.asset.sources && activeWordHover.asset.sources.length ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-sources"
-  }, import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-section-title"
-  }, "\u6765\u6E90"), activeWordHover.asset.sources.slice(0, 3).map((source, index) => import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-source",
-    key: `${source.bookPath || ""}-${source.cfiRange || index}`
-  }, source.bookTitle || source.bookPath || "", source.chapterTitle ? ` \xB7 ${source.chapterTitle}` : "", source.quote ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-source-quote"
-  }, source.quote) : null))) : null, activeWordHover.asset.updated ? import_react2.default.createElement("div", {
-    className: "jarvis-reader-word-card-updated"
-  }, `Updated ${formatLocalDate(activeWordHover.asset.updated)}`) : null) : null, progressLabel ? import_react2.default.createElement("div", {
+    import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-head",
+      style: { cursor: "grab" },
+      onPointerDown: beginWordHoverCardMove,
+      onDoubleClick: resetWordHoverCardPosition
+    }, import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-head-row"
+    }, getTranslationAssetKind(activeWordHover.asset) === "sentence" ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
+      style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
+      onPointerDown: (e) => e.stopPropagation()
+    }, "\u539F\u53E5\u7FFB\u8BD1") : import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-lemma",
+      title: "\u70B9\u51FB\u53D1\u97F3",
+      style: { flex: "0 0 auto", cursor: "pointer" },
+      onPointerDown: (e) => e.stopPropagation(),
+      onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
+    }, activeWordHover.asset.title || activeWordHover.asset.lemma), import_react2.default.createElement("div", {
+      style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
+    }), import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-actions",
+      onPointerDown: (e) => e.stopPropagation()
+    }, import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
+      title: "\u6253\u5F00\u8BCD\u6761",
+      onClick: () => {
+        hideWordHoverCard();
+        openWordNote(activeWordHover.asset);
+      }
+    }, renderObsidianIcon("file-text")), import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
+      title: "\u6807\u8BB0\u5DF2\u638C\u63E1",
+      onClick: markActiveWordMastered
+    }, renderObsidianIcon("check")), import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
+      title: "\u5220\u9664\u8BCD\u6761",
+      onClick: deleteActiveWordAsset
+    }, renderObsidianIcon("trash")), import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
+      title: "\u5173\u95ED\u5361\u7247",
+      onClick: hideWordHoverCard
+    }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {}, activeWordHover.asset.phonetic) : null),
+    activeWordHover.asset.isWord && (activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford) ? import_react2.default.createElement(
+      "div",
+      { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
+      activeWordHover.asset.oxford === 1 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
+      activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(activeWordHover.asset.collins)) : null,
+      activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag) => import_react2.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+    ) : null,
+    import_react2.default.createElement("div", {
+      className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
+    }, getTranslationAssetKind(activeWordHover.asset) === "sentence" || (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-original-sentence",
+      style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
+    }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react2.default.createElement("div", {
+      style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
+    }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-translation"
+    }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-pos"
+    }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-example"
+    }, activeWordHover.asset.example) : null)),
+    activeWordHover.asset.sources && activeWordHover.asset.sources.length ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-sources"
+    }, import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-section-title"
+    }, "\u6765\u6E90"), activeWordHover.asset.sources.slice(0, 3).map((source, index) => import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-source",
+      key: `${source.bookPath || ""}-${source.cfiRange || index}`
+    }, source.bookTitle || source.bookPath || "", source.chapterTitle ? ` \xB7 ${source.chapterTitle}` : "", source.quote ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-source-quote"
+    }, source.quote) : null))) : null,
+    activeWordHover.asset.updated ? import_react2.default.createElement("div", {
+      className: "jarvis-reader-word-card-updated"
+    }, `Updated ${formatLocalDate(activeWordHover.asset.updated)}`) : null
+  ) : null, progressLabel ? import_react2.default.createElement("div", {
     className: "jarvis-reader-progress-label"
   }, progressLabel) : null);
 };
@@ -58901,171 +58937,16 @@ var JarvisReaderBookshelfView = class extends import_obsidian8.ItemView {
 };
 
 // src/library/LibraryView.ts
-var import_obsidian11 = require("obsidian");
-var React6 = __toESM(require_react(), 1);
+var import_obsidian10 = require("obsidian");
+var React5 = __toESM(require_react(), 1);
 var ReactDOM2 = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
-var React5 = __toESM(require_react(), 1);
-var import_obsidian10 = require("obsidian");
-init_book_notes();
-init_utils();
-
-// src/word-book/WordCard.tsx
 var React4 = __toESM(require_react(), 1);
 var import_obsidian9 = require("obsidian");
+init_book_notes();
+init_utils();
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var MarkdownPreview = ({ content, plugin }) => {
-  const ref = React4.useRef(null);
-  React4.useEffect(() => {
-    if (ref.current) {
-      ref.current.empty();
-      import_obsidian9.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
-    }
-  }, [content, plugin]);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref, className: "jarvis-reader-markdown" });
-};
-var WordCard = ({
-  plugin,
-  asset,
-  bookTitle,
-  isExpanded: controlledIsExpanded,
-  isSelected = false,
-  isSelectionMode = false,
-  blurMode = "none",
-  onToggleExpand,
-  onToggleSelect,
-  onToggleMastery,
-  onDelete,
-  onDoubleClick,
-  contextMenuAdditionalItems
-}) => {
-  const [internalExpanded, setInternalExpanded] = React4.useState(false);
-  const isExpanded = controlledIsExpanded !== void 0 ? controlledIsExpanded : internalExpanded;
-  const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-  const handleToggleExpand = () => {
-    if (onToggleExpand) {
-      onToggleExpand(assetKey);
-    } else {
-      setInternalExpanded(!internalExpanded);
-    }
-  };
-  const handleCardClick = (e) => {
-    if (isSelectionMode && onToggleSelect) {
-      onToggleSelect(assetKey);
-    } else {
-      handleToggleExpand();
-    }
-  };
-  const isSentence = asset.kind === "sentence";
-  const displayWord = isSentence ? asset.sources?.[0]?.quote || "\u957F\u53E5" : asset.lemma;
-  const playAudio = (text) => {
-    if (plugin.settings.enableWordAudio === false) return;
-    try {
-      const accent = plugin.settings.wordAudioAccent || "us";
-      const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
-      const url = buildWordAudioUrl(template, text, accent);
-      new Audio(url).play().catch(() => {
-      });
-    } catch (err) {
-      console.warn("Jarvis Reader audio failed", err);
-    }
-  };
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const menu = new import_obsidian9.Menu();
-    let itemCount = 0;
-    const isMastered = asset.mastered;
-    if (onToggleMastery) {
-      itemCount += 1;
-      menu.addItem((item) => {
-        item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(() => onToggleMastery(assetKey, !isMastered));
-      });
-    }
-    if (onDelete) {
-      itemCount += 1;
-      menu.addItem((item) => {
-        item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(() => onDelete(assetKey));
-      });
-    }
-    if (contextMenuAdditionalItems) {
-      contextMenuAdditionalItems(menu);
-    }
-    if (itemCount > 0 || contextMenuAdditionalItems) {
-      menu.showAtMouseEvent(e.nativeEvent);
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-    "div",
-    {
-      style: {
-        border: `1px solid ${isSelected ? "var(--interactive-accent)" : "var(--background-modifier-border)"}`,
-        borderRadius: "var(--radius-m)",
-        background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 10%, transparent)" : "var(--background-secondary)",
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-        cursor: "pointer",
-        position: "relative",
-        transition: "all 0.15s ease",
-        marginBottom: "8px"
-      },
-      onClick: handleCardClick,
-      onDoubleClick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (onDoubleClick) onDoubleClick(asset);
-      },
-      onContextMenu: handleContextMenu,
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { flex: 1, minWidth: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.2em", wordBreak: "break-word" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-              "span",
-              {
-                style: {
-                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
-                  ...isSentence ? { display: "block", fontSize: "0.85em", lineHeight: "1.4", fontWeight: "normal", marginBottom: "8px" } : {}
-                },
-                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
-                onMouseLeave: (e) => e.target.style.textDecoration = "none",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  playAudio(displayWord);
-                },
-                title: "\u70B9\u51FB\u53D1\u97F3",
-                children: displayWord
-              }
-            ) }),
-            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)", marginTop: "2px" }, children: asset.phonetic })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0, marginLeft: "12px" }, children: isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
-          }, style: { pointerEvents: "none" } }) })
-        ] }),
-        asset.translation && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-          "div",
-          {
-            className: blurMode === "translation" ? "jarvis-blur-test" : "",
-            style: {
-              fontSize: "0.95em",
-              color: "var(--text-normal)",
-              whiteSpace: isExpanded ? "normal" : "pre-wrap",
-              marginTop: "4px"
-            },
-            children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
-          }
-        ),
-        bookTitle && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { marginTop: "auto", paddingTop: "8px", borderTop: "1px dashed var(--background-modifier-border)", fontSize: "0.8em", color: "var(--text-faint)" }, children: bookTitle })
-      ]
-    },
-    assetKey
-  );
-};
-
-// src/library/LibraryApp.tsx
-var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 function formatDate(dateStr) {
   if (!dateStr) return "";
   try {
@@ -59105,50 +58986,192 @@ function formatBookStatus(status) {
   return status === "finished" ? "\u5DF2\u8BFB\u5B8C" : status === "reading" ? "\u5728\u8BFB" : "\u672A\u8BFB";
 }
 var MarkdownText = ({ content, plugin }) => {
-  const ref = React5.useRef(null);
-  React5.useEffect(() => {
+  const ref = React4.useRef(null);
+  React4.useEffect(() => {
     if (ref.current) {
       ref.current.empty();
-      import_obsidian10.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
+      import_obsidian9.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
     }
   }, [content, plugin]);
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className: "jarvis-library-markdown" });
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref, className: "jarvis-library-markdown" });
 };
 function LibraryApp({ plugin }) {
-  const [currentView, setCurrentView] = React5.useState("home");
-  const [activeBook, setActiveBook] = React5.useState(null);
-  const [searchQuery, setSearchQuery] = React5.useState("");
-  const [filterStatus, setFilterStatus] = React5.useState("all");
-  const [sortBy, setSortBy] = React5.useState("recent");
-  const [viewLayout, setViewLayout] = React5.useState("grid");
-  const [coverFlowIndex, setCoverFlowIndex] = React5.useState(0);
-  const [activeTab, setActiveTab] = React5.useState("highlights");
-  const [descExpanded, setDescExpanded] = React5.useState(false);
-  const [showFilters, setShowFilters] = React5.useState(false);
-  const [showLayoutMenu, setShowLayoutMenu] = React5.useState(false);
-  const [bookMetadata, setBookMetadata] = React5.useState({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
-  const [tagInput, setTagInput] = React5.useState("");
-  const [isEditingIntro, setIsEditingIntro] = React5.useState(false);
-  const [gridCols, setGridCols] = React5.useState(6);
-  const [selectedGridBook, setSelectedGridBook] = React5.useState(null);
-  const [isSpinning, setIsSpinning] = React5.useState(false);
-  const [bookNotesMap, setBookNotesMap] = React5.useState({});
-  const homeRef = React5.useRef(null);
-  const wheelTimeoutRef = React5.useRef(null);
-  const [books, setBooks] = React5.useState([]);
-  const [coverCache, setCoverCache] = React5.useState(plugin.settings.bookCoverCache || {});
-  const [statsTab, setStatsTab] = React5.useState("week");
-  const [statsDate, setStatsDate] = React5.useState(() => /* @__PURE__ */ new Date());
-  const [statsChartType, setStatsChartType] = React5.useState("bar");
-  const [debugImages, setDebugImages] = React5.useState(null);
-  const loadBooks = React5.useCallback(() => {
+  const [currentView, setCurrentView] = React4.useState("home");
+  const [activeBook, setActiveBook] = React4.useState(null);
+  const [searchQuery, setSearchQuery] = React4.useState("");
+  const [filterStatus, setFilterStatus] = React4.useState("all");
+  const [sortBy, setSortBy] = React4.useState("recent");
+  const [viewLayout, setViewLayout] = React4.useState("grid");
+  const [coverFlowIndex, setCoverFlowIndex] = React4.useState(0);
+  const [activeTab, setActiveTab] = React4.useState("highlights");
+  const [descExpanded, setDescExpanded] = React4.useState(false);
+  const [showFilters, setShowFilters] = React4.useState(false);
+  const [showLayoutMenu, setShowLayoutMenu] = React4.useState(false);
+  const [bookMetadata, setBookMetadata] = React4.useState({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
+  const [tagInput, setTagInput] = React4.useState("");
+  const [isEditingIntro, setIsEditingIntro] = React4.useState(false);
+  const [gridCols, setGridCols] = React4.useState(6);
+  const [selectedGridBook, setSelectedGridBook] = React4.useState(null);
+  const [isSpinning, setIsSpinning] = React4.useState(false);
+  const [bookNotesMap, setBookNotesMap] = React4.useState({});
+  const homeRef = React4.useRef(null);
+  const wheelTimeoutRef = React4.useRef(null);
+  const [books, setBooks] = React4.useState([]);
+  const [coverCache, setCoverCache] = React4.useState(plugin.settings.bookCoverCache || {});
+  const [statsTab, setStatsTab] = React4.useState("week");
+  const [statsDate, setStatsDate] = React4.useState(() => /* @__PURE__ */ new Date());
+  const [statsChartType, setStatsChartType] = React4.useState("bar");
+  const [debugImages, setDebugImages] = React4.useState(null);
+  const [refreshTrigger, setRefreshTrigger] = React4.useState(0);
+  const [expandedItems, setExpandedItems] = React4.useState(/* @__PURE__ */ new Set());
+  const formatDays = (dateStr) => {
+    if (!dateStr) return "\u672A\u8BBE\u7F6E";
+    const today = (0, import_obsidian9.moment)().startOf("day");
+    const target = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD").startOf("day");
+    const diff = target.diff(today, "days");
+    if (diff === 0) return "\u4ECA\u5929";
+    if (diff < 0) return `\u903E\u671F ${Math.abs(diff)} \u5929`;
+    return `${diff} \u5929\u540E`;
+  };
+  const handleToggleSingleMastery = async (e, lemma) => {
+    e.stopPropagation();
+    if (plugin.settings.wordAssets[lemma]) {
+      const current = plugin.settings.wordAssets[lemma].mastered;
+      plugin.settings.wordAssets[lemma].mastered = !current;
+      await plugin.saveSettings();
+      setRefreshTrigger((p) => p + 1);
+      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    }
+  };
+  const handleDeleteWord = async (lemma) => {
+    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761 "${lemma}" \u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
+    if (!confirmed) return;
+    const asset = plugin.settings.wordAssets[lemma];
+    if (!asset) return;
+    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+      await plugin.activeReaderView.deleteWordAsset(asset);
+    } else {
+      delete plugin.settings.wordAssets[lemma];
+      await plugin.persistWordAssetSidecar("delete");
+      await plugin.saveSettings();
+    }
+    setRefreshTrigger((p) => p + 1);
+    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    new import_obsidian9.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
+  };
+  const renderTableRow = (asset) => {
+    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+    const isSentence = asset.kind === "sentence";
+    const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
+    const displayWord = isSentence && quote ? quote : asset.lemma;
+    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
+    const isExpanded = expandedItems.has(assetKey);
+    const handleRowClick = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
+        return;
+      }
+      const newExpanded = /* @__PURE__ */ new Set();
+      if (!expandedItems.has(assetKey)) {
+        newExpanded.add(assetKey);
+      }
+      setExpandedItems(newExpanded);
+    };
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+      "tr",
+      {
+        style: { borderBottom: "1px solid var(--background-modifier-border)", cursor: "pointer" },
+        onClick: handleRowClick,
+        onContextMenu: (e) => {
+          e.preventDefault();
+          const menu = new import_obsidian9.Menu();
+          const isMastered = asset.mastered;
+          menu.addItem((item) => {
+            item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
+              if (plugin.settings.wordAssets[assetKey]) {
+                plugin.settings.wordAssets[assetKey].mastered = !isMastered;
+                await plugin.saveSettings();
+                setRefreshTrigger((p) => p + 1);
+                window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+              }
+            });
+          });
+          menu.addSeparator();
+          menu.addItem((item) => {
+            item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(() => handleDeleteWord(assetKey));
+          });
+          menu.showAtMouseEvent(e.nativeEvent);
+        },
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontWeight: "bold" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "inline-block" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+              "span",
+              {
+                style: {
+                  cursor: "pointer",
+                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
+                  ...isSentence ? { fontWeight: "normal", fontSize: "0.9em" } : {}
+                },
+                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
+                onMouseLeave: (e) => e.target.style.textDecoration = "none",
+                onClick: (e) => {
+                  e.stopPropagation();
+                  playAudio(displayWord);
+                },
+                children: displayWord
+              }
+            ),
+            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: asset.translation && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                color: "var(--text-normal)",
+                marginBottom: "4px",
+                whiteSpace: isExpanded ? "normal" : "pre-wrap"
+              },
+              children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownText, { content: asset.display, plugin }) }) : asset.translation
+            }
+          ) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: bookTitle }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }, children: asset.reviews || 0 }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }, children: asset.ease?.toFixed(2) || "2.50" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }, children: formatDays(asset.nextReviewDate) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "span",
+            {
+              style: {
+                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                width: "fit-content"
+              },
+              className: "clickable-icon",
+              onClick: (e) => {
+                e.stopPropagation();
+                handleToggleSingleMastery(e, assetKey);
+              },
+              title: asset.mastered ? "\u5DF2\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u672A\u638C\u63E1)" : "\u672A\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1)",
+              children: asset.mastered ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "10" }) })
+            }
+          ) })
+        ]
+      },
+      assetKey
+    );
+  };
+  const loadBooks = React4.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof import_obsidian10.TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof import_obsidian9.TFile && file.extension.toLowerCase() === "epub"
     );
     setBooks(filtered);
   }, [plugin]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     loadBooks();
     const onCreate = () => loadBooks();
     const onDelete = () => loadBooks();
@@ -59162,15 +59185,15 @@ function LibraryApp({ plugin }) {
       plugin.app.vault.off("rename", onRename);
     };
   }, [plugin, loadBooks]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     const handleUpdate = () => setBooks([...books]);
     window.addEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
     return () => window.removeEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
   }, [books]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     setCoverCache(plugin.settings.bookCoverCache || {});
   }, [plugin.settings.bookCoverCache]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     if (books.length === 0) return;
     const notesMap = {};
     let changedNotes = false;
@@ -59185,7 +59208,7 @@ function LibraryApp({ plugin }) {
       setBookNotesMap(notesMap);
     }
   }, [books, coverCache, plugin.app, plugin.settings]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     const home = homeRef.current;
     if (!home) return;
     let lastWheelTime = 0;
@@ -59204,7 +59227,7 @@ function LibraryApp({ plugin }) {
     home.addEventListener("wheel", onWheel, { passive: false });
     return () => home.removeEventListener("wheel", onWheel);
   }, [viewLayout]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     if (books.length === 0) return;
     let cancelled = false;
     const runCoverCacheQueue = async () => {
@@ -59332,7 +59355,8 @@ function LibraryApp({ plugin }) {
             const publisher = metadata.publisher || "";
             const pubdate = metadata.pubdate || "";
             plugin.settings.bookCoverCache[key] = {
-              dataUrl,
+              ...cached || {},
+              dataUrl: dataUrl || cached?.dataUrl || "",
               updated: (/* @__PURE__ */ new Date()).toISOString(),
               description,
               creator,
@@ -59358,7 +59382,7 @@ function LibraryApp({ plugin }) {
     const cached = coverCache[key];
     if (cached?.vaultPath) {
       const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
-      if (coverFile instanceof import_obsidian10.TFile) {
+      if (coverFile instanceof import_obsidian9.TFile) {
         return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
       }
     }
@@ -59368,7 +59392,7 @@ function LibraryApp({ plugin }) {
   const getProgress = (file) => {
     return plugin.settings.bookProgress?.[file.path] || null;
   };
-  const stats = React5.useMemo(() => {
+  const stats = React4.useMemo(() => {
     const total = books.length;
     let readingCount = 0;
     let finishedCount = 0;
@@ -59407,8 +59431,8 @@ function LibraryApp({ plugin }) {
       words: totalWords
     };
   }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
-  const selectedStats = React5.useMemo(() => {
-    const today = (0, import_obsidian10.moment)(statsDate);
+  const selectedStats = React4.useMemo(() => {
+    const today = (0, import_obsidian9.moment)(statsDate);
     let startDate;
     let endDate;
     let prevStartDate;
@@ -59429,10 +59453,10 @@ function LibraryApp({ plugin }) {
       prevStartDate = startDate.clone().subtract(1, "year");
       prevEndDate = endDate.clone().subtract(1, "year");
     } else {
-      startDate = (0, import_obsidian10.moment)(0);
-      endDate = (0, import_obsidian10.moment)().endOf("day");
-      prevStartDate = (0, import_obsidian10.moment)(0);
-      prevEndDate = (0, import_obsidian10.moment)().endOf("day");
+      startDate = (0, import_obsidian9.moment)(0);
+      endDate = (0, import_obsidian9.moment)().endOf("day");
+      prevStartDate = (0, import_obsidian9.moment)(0);
+      prevEndDate = (0, import_obsidian9.moment)().endOf("day");
     }
     const statsData = plugin.settings.readingStats || {};
     let totalSeconds = 0;
@@ -59443,7 +59467,7 @@ function LibraryApp({ plugin }) {
     const yearlySecondsMap = {};
     const readDays = /* @__PURE__ */ new Set();
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
@@ -59482,8 +59506,8 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           finishedBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
-          const finishDateVal = fm.finish_date ? (0, import_obsidian10.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian10.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian9.moment)(prog.updated) : (0, import_obsidian9.moment)(0);
+          const finishDateVal = fm.finish_date ? (0, import_obsidian9.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian9.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
           if (isUpdatedInRange || isFinishDateInRange) {
@@ -59494,7 +59518,7 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           readBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian9.moment)(prog.updated) : (0, import_obsidian9.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
           if (isUpdatedInRange || hasTimeSecs) {
@@ -59509,7 +59533,7 @@ function LibraryApp({ plugin }) {
     Object.values(plugin.settings.bookHighlights || {}).forEach((list) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian10.moment)(hl.created);
+          const createdVal = (0, import_obsidian9.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             newHighlightsCount++;
           }
@@ -59518,7 +59542,7 @@ function LibraryApp({ plugin }) {
     });
     let newWordsCount = 0;
     Object.values(plugin.settings.wordAssets || {}).forEach((asset) => {
-      const createdVal = (0, import_obsidian10.moment)(asset.created);
+      const createdVal = (0, import_obsidian9.moment)(asset.created);
       if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
         newWordsCount++;
       }
@@ -59604,7 +59628,7 @@ function LibraryApp({ plugin }) {
   }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache]);
   const handlePrevDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian10.moment)(prev);
+      const m = (0, import_obsidian9.moment)(prev);
       if (statsTab === "week") return m.subtract(1, "week").toDate();
       if (statsTab === "month") return m.subtract(1, "month").toDate();
       if (statsTab === "year") return m.subtract(1, "year").toDate();
@@ -59613,14 +59637,14 @@ function LibraryApp({ plugin }) {
   };
   const handleNextDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian10.moment)(prev);
+      const m = (0, import_obsidian9.moment)(prev);
       if (statsTab === "week") return m.add(1, "week").toDate();
       if (statsTab === "month") return m.add(1, "month").toDate();
       if (statsTab === "year") return m.add(1, "year").toDate();
       return prev;
     });
   };
-  const filteredBooks = React5.useMemo(() => {
+  const filteredBooks = React4.useMemo(() => {
     return books.filter((b) => {
       const { title, author } = parseBookInfo(b);
       const text = `${title} ${author} ${b.basename}`.toLowerCase();
@@ -59668,7 +59692,7 @@ function LibraryApp({ plugin }) {
       }
     });
   }, [books, searchQuery, filterStatus, sortBy, plugin.settings.bookProgress, bookNotesMap, plugin.app.metadataCache]);
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     if (!activeBook || currentView !== "detail") return;
     const loadMetadata = () => {
       const noteFile = findBookNote(plugin.app, activeBook, plugin.settings);
@@ -59680,7 +59704,7 @@ function LibraryApp({ plugin }) {
       let summary = "";
       const progress = getProgress(activeBook);
       const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-      if (noteFile instanceof import_obsidian10.TFile) {
+      if (noteFile instanceof import_obsidian9.TFile) {
         const cache = plugin.app.metadataCache.getFileCache(noteFile);
         if (cache && cache.frontmatter) {
           const fm = cache.frontmatter;
@@ -59727,10 +59751,10 @@ function LibraryApp({ plugin }) {
       }
     } catch (e) {
       console.error("Failed to update frontmatter", e);
-      new import_obsidian10.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
+      new import_obsidian9.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
     }
   };
-  React5.useEffect(() => {
+  React4.useEffect(() => {
     if (viewLayout !== "coverflow" || filteredBooks.length === 0) return;
     const handleKeyDown = (e) => {
       if (e.key === "ArrowLeft") {
@@ -59759,14 +59783,14 @@ function LibraryApp({ plugin }) {
     if (confirmed) {
       try {
         await plugin.app.vault.delete(file);
-        new import_obsidian10.Notice(`\u5DF2\u5220\u9664\u4E66\u7C4D: ${file.basename}`);
+        new import_obsidian9.Notice(`\u5DF2\u5220\u9664\u4E66\u7C4D: ${file.basename}`);
         if (activeBook?.path === file.path) {
           setCurrentView("home");
           setActiveBook(null);
         }
         loadBooks();
       } catch (err) {
-        new import_obsidian10.Notice(`\u5220\u9664\u5931\u8D25: ${err}`);
+        new import_obsidian9.Notice(`\u5220\u9664\u5931\u8D25: ${err}`);
       }
     }
   };
@@ -59792,7 +59816,7 @@ function LibraryApp({ plugin }) {
     if (url) {
       const audio = new Audio(url);
       audio.play().catch((err) => {
-        new import_obsidian10.Notice("\u97F3\u9891\u64AD\u653E\u5931\u8D25");
+        new import_obsidian9.Notice("\u97F3\u9891\u64AD\u653E\u5931\u8D25");
       });
     }
   };
@@ -59811,7 +59835,7 @@ function LibraryApp({ plugin }) {
   };
   const extractAllImages = async (file) => {
     try {
-      new import_obsidian10.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
+      new import_obsidian9.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
       const buffer = await plugin.app.vault.readBinary(file);
       let epubFn = window.JarvisReader_ePub;
       if (!epubFn) {
@@ -59840,27 +59864,27 @@ function LibraryApp({ plugin }) {
       }
       imagesList.sort((a, b) => b.size - a.size);
       setDebugImages(imagesList);
-      new import_obsidian10.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
+      new import_obsidian9.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
     } catch (err) {
-      new import_obsidian10.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
+      new import_obsidian9.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
     }
   };
   const renderDebugModal = () => {
     if (!debugImages) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-modal-overlay", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-modal", onClick: (e) => e.stopPropagation(), style: { width: "80%", height: "80%", maxWidth: "none", overflowY: "auto" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-modal-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { children: "\u56FE\u7247\u63D0\u53D6\u8C03\u8BD5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-stats-close-btn", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 6 6 18M6 6l12 12" }) }) })
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-stats-modal-overlay", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-stats-modal", onClick: (e) => e.stopPropagation(), style: { width: "80%", height: "80%", maxWidth: "none", overflowY: "auto" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-stats-modal-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { children: "\u56FE\u7247\u63D0\u53D6\u8C03\u8BD5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-stats-close-btn", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M18 6 6 18M6 6l12 12" }) }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "16px", padding: "20px" }, children: debugImages.map((img) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { border: "1px solid var(--background-modifier-border)", padding: "12px", borderRadius: "8px", background: "var(--background-secondary)" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: img.dataUrl, style: { maxWidth: "240px", maxHeight: "340px", display: "block", objectFit: "contain" } }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { marginTop: "12px", fontSize: "12px", wordBreak: "break-all", maxWidth: "240px", color: "var(--text-normal)" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: "\u5927\u5C0F:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "16px", padding: "20px" }, children: debugImages.map((img) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { border: "1px solid var(--background-modifier-border)", padding: "12px", borderRadius: "8px", background: "var(--background-secondary)" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: img.dataUrl, style: { maxWidth: "240px", maxHeight: "340px", display: "block", objectFit: "contain" } }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "12px", fontSize: "12px", wordBreak: "break-all", maxWidth: "240px", color: "var(--text-normal)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: "\u5927\u5C0F:" }),
           " ",
           Math.round(img.size / 1024),
           " KB",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("br", {}),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: "\u8DEF\u5F84:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: "\u8DEF\u5F84:" }),
           " ",
           img.href
         ] })
@@ -59888,43 +59912,43 @@ function LibraryApp({ plugin }) {
     } = selectedStats;
     const statsData = plugin.settings.readingStats || {};
     const sortedDates = Object.keys(statsData).sort();
-    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian10.moment)().format("YYYY-MM-DD");
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian9.moment)().format("YYYY-MM-DD");
     const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
     let dateRangeStr = "";
     if (statsTab === "week") {
-      const start = (0, import_obsidian10.moment)(startDate);
-      const end = (0, import_obsidian10.moment)(endDate);
+      const start = (0, import_obsidian9.moment)(startDate);
+      const end = (0, import_obsidian9.moment)(endDate);
       dateRangeStr = `${start.format("YYYY \xB7 M/D")} - ${end.format("M/D")}`;
     } else if (statsTab === "month") {
-      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74M\u6708");
+      dateRangeStr = (0, import_obsidian9.moment)(startDate).format("YYYY\u5E74M\u6708");
     } else if (statsTab === "year") {
-      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74");
+      dateRangeStr = (0, import_obsidian9.moment)(startDate).format("YYYY\u5E74");
     }
     const renderLargeDuration = (secs) => {
       if (secs <= 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
           "0",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5206\u949F" })
         ] });
       }
       const h = Math.floor(secs / 3600);
       const m = Math.round(secs % 3600 / 60);
       if (h > 0 && m > 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
           h,
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C0F\u65F6" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5C0F\u65F6" }),
           m,
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5206\u949F" })
         ] });
       } else if (h > 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
           h,
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C0F\u65F6" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5C0F\u65F6" })
         ] });
       } else {
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
           m,
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5206\u949F" })
         ] });
       }
     };
@@ -59956,7 +59980,7 @@ function LibraryApp({ plugin }) {
     const bookDailyMaxSecs = {};
     const bookRangeHighlightsCount = {};
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       if (isCurrentRange) {
@@ -59970,7 +59994,7 @@ function LibraryApp({ plugin }) {
     Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian10.moment)(hl.created);
+          const createdVal = (0, import_obsidian9.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
           }
@@ -60001,7 +60025,7 @@ function LibraryApp({ plugin }) {
           if (statsTab === "all") {
             progRankList.push([bookPath, prog.percentage]);
           } else {
-            const updatedVal = (0, import_obsidian10.moment)(prog.updated);
+            const updatedVal = (0, import_obsidian9.moment)(prog.updated);
             if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
               progRankList.push([bookPath, prog.percentage]);
             }
@@ -60013,135 +60037,135 @@ function LibraryApp({ plugin }) {
     }
     const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
     const isReadable = plugin.app.vault.getConfig ? plugin.app.vault.getConfig("readableLineLength") : true;
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "12 19 5 12 12 5" })
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polyline", { points: "12 19 5 12 12 5" })
           ] }),
           "\u8FD4\u56DE\u4E66\u67B6"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u9605\u8BFB\u7EDF\u8BA1" })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u9605\u8BFB\u7EDF\u8BA1" })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
         ] }),
-        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-main-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-main-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
           mainCardSub,
-          statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: trendClass, children: trendText })
+          statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: trendClass, children: trendText })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
             ] }),
             readDaysCount,
             "\u5929"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u9605\u8BFB\u5929\u6570" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u9605\u8BFB\u5929\u6570" })
         ] }),
-        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "17 6 23 6 23 12" })
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polyline", { points: "17 6 23 6 23 12" })
             ] }),
             formatDuration(avgSecs),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
         ] }),
-        statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+        statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
               ] }),
               booksReadCount,
               "\u672C"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5728\u8BFB" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5728\u8BFB" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "2" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "2" })
               ] }),
               finishedBooksCount,
               "\u672C"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u8BFB\u5B8C" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u8BFB\u5B8C" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 20h9" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M12 20h9" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
               ] }),
               newHighlightsCount,
               "\u6761"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
               ] }),
               newWordsCount,
               "\u6761"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u6761" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u6761" })
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-chart-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
             activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F" : statsTab === "year" ? "\u6BCF\u6708\u9605\u8BFB\u65F6\u957F" : "\u6BCF\u5E74\u9605\u8BFB\u65F6\u957F"),
             activeChart === "calendar" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F",
             activeChart === "heatmap" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
-            statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
+            statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
               ] }) })
             ] }),
-            (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+            (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
               ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
             ] })
           ] })
         ] }),
@@ -60150,29 +60174,29 @@ function LibraryApp({ plugin }) {
           if (statsTab === "week") {
             const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
             data = Array.from({ length: 7 }).map((_, i) => {
-              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian9.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "month") {
-            const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
+            const daysInMonth = (0, import_obsidian9.moment)(startDate).daysInMonth();
             data = Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian9.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "year") {
             data = Array.from({ length: 12 }).map((_, i) => {
-              const month = (0, import_obsidian10.moment)(startDate).add(i, "months");
+              const month = (0, import_obsidian9.moment)(startDate).add(i, "months");
               const monthStr = month.format("YYYY-MM");
               const secs = monthlySecondsMap[monthStr] || 0;
               return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else {
-            const currentYear = (0, import_obsidian10.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+            const currentYear = (0, import_obsidian9.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian9.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
             const yearsCount = Math.max(currentYear - startYear + 1, 1);
             data = Array.from({ length: yearsCount }).map((_, i) => {
               const year = String(startYear + i);
@@ -60181,49 +60205,49 @@ function LibraryApp({ plugin }) {
             });
           }
           const maxVal = Math.max(...data.map((d) => d.secs), 60);
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "relative" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
               const heightPct = item.secs / maxVal * 85;
-              return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
+              return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
               ] }, idx);
             }) })
           ] });
         })(),
         activeChart === "calendar" && (() => {
-          const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
-          const firstDayOffset = ((0, import_obsidian10.moment)(startDate).clone().startOf("month").day() + 6) % 7;
+          const daysInMonth = (0, import_obsidian9.moment)(startDate).daysInMonth();
+          const firstDayOffset = ((0, import_obsidian9.moment)(startDate).clone().startOf("month").day() + 6) % 7;
           const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
           const cells = [];
           for (let i = 0; i < firstDayOffset; i++) {
-            cells.push(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
+            cells.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
           }
           for (let d = 1; d <= daysInMonth; d++) {
-            const day = (0, import_obsidian10.moment)(startDate).clone().date(d);
+            const day = (0, import_obsidian9.moment)(startDate).clone().date(d);
             const dateStr = day.format("YYYY-MM-DD");
             const secs = dailySecondsMap[dateStr] || 0;
             cells.push(
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
-                secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
+                secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
               ] }, `day-${d}`)
             );
           }
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
           ] });
         })(),
         activeChart === "heatmap" && (() => {
           const renderHeatmapWall = (yearStr) => {
-            const startOfYear = (0, import_obsidian10.moment)(`${yearStr}-01-01`);
+            const startOfYear = (0, import_obsidian9.moment)(`${yearStr}-01-01`);
             const gridStart = startOfYear.clone().startOf("isoWeek");
             const weeksCount = 53;
             const columns = [];
@@ -60250,71 +60274,71 @@ function LibraryApp({ plugin }) {
                 else if (mins > 45) level = 4;
                 const tooltipText = isTargetYear ? `${cellDate.format("YYYY\u5E74M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` : "";
                 colCells.push(
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
                 );
               }
               columns.push(
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
               );
             }
             const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
               return dateStr.startsWith(yearStr) && secs > 0;
             }).length;
             const yearsTotalSecs = Object.entries(dailySecondsMap).filter(([dateStr]) => dateStr.startsWith(yearStr)).reduce((acc, entry) => acc + entry[1], 0);
-            return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { marginBottom: "24px" }, children: [
-              statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E00" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E09" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u4E94" })
+            return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginBottom: "24px" }, children: [
+              statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u4E00" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u4E09" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u4E94" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
                   yearStr,
                   "\u5E74\u5171\u9605\u8BFB ",
                   yearsTotalDays,
                   "\u5929\uFF0C\u7D2F\u8BA1 ",
                   formatDuration(yearsTotalSecs)
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u5C11" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "\u591A" })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u5C11" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\u591A" })
                 ] })
               ] })
             ] }, yearStr);
           };
           if (statsTab === "year") {
-            const yearStr = (0, import_obsidian10.moment)(startDate).format("YYYY");
+            const yearStr = (0, import_obsidian9.moment)(startDate).format("YYYY");
             return renderHeatmapWall(yearStr);
           } else {
-            const currentYear = (0, import_obsidian10.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+            const currentYear = (0, import_obsidian9.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian9.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
             const yearsList = [];
             for (let y = currentYear; y >= startYear; y--) {
               yearsList.push(String(y));
             }
-            return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
+            return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
           }
         })()
       ] }),
-      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-title", children: [
+      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-title", children: [
           isTimeRank ? "\u9605\u8BFB\u65F6\u957F" : "\u9605\u8BFB\u8FDB\u5EA6",
           " TOP ",
           sortedRankBooks.length
         ] }),
-        sortedRankBooks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-list", children: sortedRankBooks.map(([bookPath, val], idx) => {
+        sortedRankBooks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-list", children: sortedRankBooks.map(([bookPath, val], idx) => {
           const book = books.find((b) => b.path === bookPath);
           const cover = book ? getCover(book) : null;
           const { title, author } = book ? parseBookInfo(book) : { title: bookPath.split("/").pop() || "\u672A\u77E5", author: "\u672A\u77E5" };
@@ -60328,37 +60352,37 @@ function LibraryApp({ plugin }) {
           const progressPct = isTimeRank ? maxRankSecs > 0 ? val / maxRankSecs * 100 : 0 : val * 100;
           const isSingleDayMax = bookPath === maxSingleDayBook && maxSingleDaySecs > 0;
           const isMostNotes = bookPath === maxHighlightsBook && maxHighlightsCount > 0;
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-item", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
-            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url(${cover.dataUrl})` } }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-info", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-author", children: displayAuthor }),
-                isSingleDayMax && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-badge", children: "\u5355\u65E5\u9605\u8BFB\u6700\u4E45" }),
-                isMostNotes && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-badge", style: { background: "rgba(45, 140, 240, 0.08)", color: "var(--text-accent)", border: "1px solid rgba(45, 140, 240, 0.2)" }, children: "\u7B14\u8BB0\u6700\u591A" })
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-item", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
+            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url(${cover.dataUrl})` } }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-info", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-author", children: displayAuthor }),
+                isSingleDayMax && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-badge", children: "\u5355\u65E5\u9605\u8BFB\u6700\u4E45" }),
+                isMostNotes && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-badge", style: { background: "rgba(45, 140, 240, 0.08)", color: "var(--text-accent)", border: "1px solid rgba(45, 140, 240, 0.2)" }, children: "\u7B14\u8BB0\u6700\u591A" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-top-time-col", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-top-time", children: isTimeRank ? formatDuration(val) : `\u5DF2\u8BFB ${Math.round(val * 100)}%` }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-progress-bg", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-progress-bar", style: { width: `${progressPct}%` } }) })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-time-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-time", children: isTimeRank ? formatDuration(val) : `\u5DF2\u8BFB ${Math.round(val * 100)}%` }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-progress-bg", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-progress-bar", style: { width: `${progressPct}%` } }) })
             ] })
           ] }, bookPath);
-        }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "12px" }, children: "\u6682\u65E0\u4E66\u7C4D\u9605\u8BFB\u8BB0\u5F55" })
+        }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "12px" }, children: "\u6682\u65E0\u4E66\u7C4D\u9605\u8BFB\u8BB0\u5F55" })
       ] }),
-      (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-top-title", style: { marginTop: "24px", marginBottom: "12px" }, children: "\u504F\u597D\u5206\u6790" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-section", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" })
+      (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-title", style: { marginTop: "24px", marginBottom: "12px" }, children: "\u504F\u597D\u5206\u6790" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-pref-section", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" })
               ] }),
               "\u5206\u7C7B\u504F\u597D"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-pref-sub", children: radarData.length > 0 ? `\u504F\u597D\u9605\u8BFB ${radarData[0].dimension}` : "\u6682\u65E0\u5206\u7C7B\u504F\u597D\u8BB0\u5F55" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-radar-container", children: radarData.length > 0 ? (() => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-pref-sub", children: radarData.length > 0 ? `\u504F\u597D\u9605\u8BFB ${radarData[0].dimension}` : "\u6682\u65E0\u5206\u7C7B\u504F\u597D\u8BB0\u5F55" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-radar-container", children: radarData.length > 0 ? (() => {
               const CX = 75;
               const CY = 75;
               const R = 45;
@@ -60388,8 +60412,8 @@ function LibraryApp({ plugin }) {
                 };
               });
               const polygonPointsStr = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
-              return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { width: "150", height: "150", viewBox: "0 0 150 150", children: [
-                pentagons.map((points, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { width: "150", height: "150", viewBox: "0 0 150 150", children: [
+                pentagons.map((points, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                   "polygon",
                   {
                     points: points.map((p) => `${p.x},${p.y}`).join(" "),
@@ -60399,7 +60423,7 @@ function LibraryApp({ plugin }) {
                   },
                   `p-${idx}`
                 )),
-                axes.map((axis, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                axes.map((axis, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                   "line",
                   {
                     x1: axis.x1,
@@ -60411,7 +60435,7 @@ function LibraryApp({ plugin }) {
                   },
                   `line-${idx}`
                 )),
-                dataPoints.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                dataPoints.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                   "polygon",
                   {
                     points: polygonPointsStr,
@@ -60420,7 +60444,7 @@ function LibraryApp({ plugin }) {
                     strokeWidth: "1.5"
                   }
                 ),
-                dataPoints.map((p, idx) => p.value > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                dataPoints.map((p, idx) => p.value > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                   "circle",
                   {
                     cx: p.x,
@@ -60447,7 +60471,7 @@ function LibraryApp({ plugin }) {
                   } else if (angle > 0 && angle < Math.PI) {
                     dy = "7px";
                   }
-                  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                     "text",
                     {
                       x: tx,
@@ -60462,21 +60486,21 @@ function LibraryApp({ plugin }) {
                   );
                 })
               ] });
-            })() : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontSize: "11px", color: "var(--text-muted)" }, children: "\u6682\u65E0\u5206\u6790\u6570\u636E" }) })
+            })() : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: "11px", color: "var(--text-muted)" }, children: "\u6682\u65E0\u5206\u6790\u6570\u636E" }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "4", y: "2", width: "16", height: "20", rx: "2", ry: "2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "9", y1: "22", x2: "9", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "15", y1: "22", x2: "15", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "9", y1: "16", x2: "15", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M8 6h8M8 10h8M8 14h8" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "4", y: "2", width: "16", height: "20", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "9", y1: "22", x2: "9", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "15", y1: "22", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "9", y1: "16", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M8 6h8M8 10h8M8 14h8" })
               ] }),
               "\u504F\u597D\u51FA\u7248\u65B9"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-stats-pref-sub", children: "\u504F\u597D\u51FA\u7248\u65B9\u6392\u884C" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-publishers-list", children: topPublishers.length > 0 ? topPublishers.map((pub, idx) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-stats-publisher-item", children: pub }, pub)) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "11px" }, children: "\u6682\u65E0\u51FA\u7248\u65B9\u4FE1\u606F" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-pref-sub", children: "\u504F\u597D\u51FA\u7248\u65B9\u6392\u884C" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-publishers-list", children: topPublishers.length > 0 ? topPublishers.map((pub, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-publisher-item", children: pub }, pub)) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "11px" }, children: "\u6682\u65E0\u51FA\u7248\u65B9\u4FE1\u606F" }) })
           ] })
         ] })
       ] })
@@ -60491,15 +60515,15 @@ function LibraryApp({ plugin }) {
         }
       }
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { flex: 1 } }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { flex: 1 } }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "input",
             {
               type: "text",
@@ -60509,97 +60533,116 @@ function LibraryApp({ plugin }) {
               className: "jarvis-library-search-input"
             }
           ),
-          searchQuery && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+          searchQuery && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
           ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
-            viewLayout === "coverflow" && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-library-filter-btn`, onClick: handleRandomSelect, title: "\u968F\u673A\u9009\u4E66", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: isSpinning ? "jarvis-spin-anim" : "", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" }) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }) }),
-            showFilters && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
+            viewLayout === "coverflow" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-filter-btn`, onClick: handleRandomSelect, title: "\u968F\u673A\u9009\u4E66", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: isSpinning ? "jarvis-spin-anim" : "", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" }) }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }) }),
+            showFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "recent", children: "\u6700\u8FD1\u9605\u8BFB/\u4FEE\u6539" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "rating", children: "\u8BC4\u5206\u6700\u9AD8" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "start", children: "\u5F00\u59CB\u65F6\u95F4\u6392\u5E8F" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "end", children: "\u8BFB\u5B8C\u65F6\u95F4\u6392\u5E8F" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "name", children: "\u4E66\u540D\u6392\u5E8F" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "recent", children: "\u6700\u8FD1\u9605\u8BFB/\u4FEE\u6539" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "rating", children: "\u8BC4\u5206\u6700\u9AD8" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "start", children: "\u5F00\u59CB\u65F6\u95F4\u6392\u5E8F" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "end", children: "\u8BFB\u5B8C\u65F6\u95F4\u6392\u5E8F" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "name", children: "\u4E66\u540D\u6392\u5E8F" })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-layout-toggle", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`, onClick: () => setViewLayout("grid"), title: "\u7F51\u683C\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-layout-toggle", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`, onClick: () => setViewLayout("grid"), title: "\u7F51\u683C\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`, onClick: () => setViewLayout("list"), title: "\u5217\u8868\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "6", x2: "21", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "12", x2: "21", y2: "12" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "8", y1: "18", x2: "21", y2: "18" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "3", y1: "18", x2: "3.01", y2: "18" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`, onClick: () => setViewLayout("list"), title: "\u5217\u8868\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "8", y1: "6", x2: "21", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "8", y1: "12", x2: "21", y2: "12" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "8", y1: "18", x2: "21", y2: "18" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "18", x2: "3.01", y2: "18" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "coverflow" ? "is-active" : ""}`, onClick: () => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "coverflow" ? "is-active" : ""}`, onClick: () => {
               setViewLayout("coverflow");
               setCoverFlowIndex(0);
-            }, title: "3D \u5C01\u9762\u6D41", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "2", y: "7", width: "20", height: "10", rx: "2", ry: "2" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "12", y1: "7", x2: "12", y2: "17" })
+            }, title: "3D \u5C01\u9762\u6D41", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "2", y: "7", width: "20", height: "10", rx: "2", ry: "2" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "12", y1: "7", x2: "12", y2: "17" })
             ] }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
             const setting = plugin.app.setting;
             setting.open();
             setting.openTabById(plugin.manifest.id);
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
           ] }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-stats-strip minimalist", onClick: () => setCurrentView("stats"), title: "\u67E5\u770B\u6570\u636E\u7EDF\u8BA1", style: { cursor: "pointer" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", alignItems: "center", opacity: 0.6, marginRight: "4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u603B\u4E66\u7C4D ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.total })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u5728\u8BFB ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.reading })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u5DF2\u8BFB\u5B8C ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.finished })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u7B14\u8BB0 ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.highlights })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u8BCD\u6761 ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: stats.words })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { children: [
-          "\u603B\u9605\u8BFB\u65F6\u957F ",
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("b", { children: formatDuration(totalAppReadingTime) })
-        ] }) })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-stats-container", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", alignItems: "center", opacity: 0.6 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u603B\u4E66\u7C4D ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: stats.total })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u5728\u8BFB ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: stats.reading })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u5DF2\u8BFB\u5B8C ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: stats.finished })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u7B14\u8BB0 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: stats.highlights })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u8BCD\u6761 ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: stats.words })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+            "\u603B\u9605\u8BFB\u65F6\u957F ",
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("b", { children: formatDuration(totalAppReadingTime) })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+          "button",
+          {
+            className: "jarvis-library-back-btn",
+            onClick: () => setCurrentView("stats"),
+            title: "\u67E5\u770B\u6570\u636E\u7EDF\u8BA1",
+            style: { padding: "4px 12px !important" },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+              ] }),
+              "\u8BE6\u7EC6\u7EDF\u8BA1"
+            ]
+          }
+        )
       ] }),
-      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "coverflow" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-coverflow-wrapper", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-coverflow-scene", onWheel: (e) => {
+      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "coverflow" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-coverflow-wrapper", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-coverflow-scene", onWheel: (e) => {
           if (wheelTimeoutRef.current) return;
           if (e.deltaY > 0) {
             setCoverFlowIndex((p) => p + 1);
@@ -60609,7 +60652,7 @@ function LibraryApp({ plugin }) {
           wheelTimeoutRef.current = setTimeout(() => {
             wheelTimeoutRef.current = null;
           }, 80);
-        }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-cf-stage", children: Array.from({ length: 31 }).map((_, idx) => {
+        }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-cf-stage", children: Array.from({ length: 31 }).map((_, idx) => {
           const offset = idx - 15;
           const virtualPos = coverFlowIndex + offset;
           let actualIndex = virtualPos % filteredBooks.length;
@@ -60631,7 +60674,7 @@ function LibraryApp({ plugin }) {
             const hue = Math.abs(hash) % 360;
             gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
           }
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "div",
             {
               className: `jarvis-library-cf-card ${offset === 0 ? "is-active" : ""}`,
@@ -60643,12 +60686,12 @@ function LibraryApp({ plugin }) {
                   setCurrentView("detail");
                 }
               },
-              children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "cf-card-inner", children: cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "cf-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: title }) }) })
+              children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-card-inner", children: cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: cover.dataUrl, alt: title }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: title }) }) })
             },
             virtualPos
           );
         }) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-cf-info", children: (() => {
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-cf-info", children: (() => {
           let actualIndex = coverFlowIndex % filteredBooks.length;
           if (actualIndex < 0) actualIndex += filteredBooks.length;
           const activeB = filteredBooks[actualIndex];
@@ -60674,59 +60717,59 @@ function LibraryApp({ plugin }) {
           const startDate = fm.start_date || "";
           const finishDate = fm.finish_date || "";
           const displayDate = finishDate ? `\u8BFB\u5B8C ${finishDate}` : startDate ? `\u5F00\u59CB ${startDate}` : `\u52A0\u5165 ${formatDate(activeB.stat.ctime).split(" ")[0]}`;
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-info-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "cf-info-title", children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "cf-info-author", children: creator }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-info-stats", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "cf-stat-val", children: [
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-content", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "cf-info-title", children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "cf-info-author", children: creator }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-stats", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "cf-stat-val", children: [
                   percentage,
                   "%"
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u8FDB\u5EA6" })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u8FDB\u5EA6" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-val", children: highlightsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u7B14\u8BB0" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-val", children: highlightsCount }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u7B14\u8BB0" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-val", children: wordsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "cf-stat-lbl", children: "\u8BCD\u6761" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-val", children: wordsCount }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u8BCD\u6761" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                 "\u72B6\u6001\uFF1A",
                 bookStatus
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                 "\u8BC4\u5206\uFF1A",
                 rating
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "text-ellipsis", style: { minHeight: "19px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "text-ellipsis", style: { minHeight: "19px" }, children: [
                 "\u6807\u7B7E\uFF1A",
                 tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "\u65E0"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                 "\u65F6\u957F\uFF1A",
                 formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeB.path))
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                 "\u65F6\u95F4\uFF1A",
                 displayDate
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "cf-info-desc", style: { marginTop: "16px" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: description }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cf-info-actions", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeB), children: percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-info-desc", style: { marginTop: "16px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: description }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-actions", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeB), children: percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => {
                 setActiveBook(activeB);
                 setCurrentView("detail");
               }, children: "\u67E5\u770B\u8BE6\u60C5" })
             ] })
           ] });
         })() })
-      ] }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
+      ] }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
         const { title, author } = parseBookInfo(book);
         const progress = getProgress(book);
         const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
@@ -60748,12 +60791,12 @@ function LibraryApp({ plugin }) {
         const displayDate = finishDate ? `\u8BFB\u5B8C ${finishDate}` : startDate ? `\u5F00\u59CB ${startDate}` : `\u52A0\u5165 ${formatDate(book.stat.ctime).split(" ")[0]}`;
         const isSelected = selectedGridBook === book.path;
         const isLastCol = i % gridCols === gridCols - 1;
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { position: "relative" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-book-card", style: { visibility: "hidden", pointerEvents: "none", margin: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "book-card-cover-wrap" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "book-card-title", children: title })
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-book-card", style: { visibility: "hidden", pointerEvents: "none", margin: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "book-card-cover-wrap" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "book-card-title", children: title })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
             "div",
             {
               className: `jarvis-library-book-card ${isSelected ? "is-selected" : ""}`,
@@ -60762,36 +60805,36 @@ function LibraryApp({ plugin }) {
               onDoubleClick: () => openBook(book),
               title: isSelected ? "\u53CC\u51FB\u76F4\u63A5\u5F00\u59CB\u9605\u8BFB" : "\u5355\u51FB\u67E5\u770B\u8BE6\u60C5\uFF0C\u53CC\u51FB\u5F00\u59CB\u9605\u8BFB",
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-cover-wrap", children: [
-                  cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title, className: "book-card-cover" }) : (() => {
+                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-cover-wrap", children: [
+                  cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: cover.dataUrl, alt: title, className: "book-card-cover" }) : (() => {
                     let hash = 0;
                     for (let j = 0; j < title.length; j++) hash = title.charCodeAt(j) + ((hash << 5) - hash);
                     const hue = Math.abs(hash) % 360;
                     const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-                    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "book-card-cover-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-title", children: title.substring(0, 8) }) });
+                    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "book-card-cover-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "placeholder-title", children: title.substring(0, 8) }) });
                   })(),
-                  !isSelected && percentage > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "pure-cover-progress", children: [
+                  !isSelected && percentage > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "pure-cover-progress", children: [
                     percentage,
                     "%"
                   ] })
                 ] }),
-                isSelected && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-info", style: { display: "flex", flexDirection: "column", gap: "6px", color: "var(--text-normal)" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { className: "book-card-title", title, style: { fontWeight: "normal", fontSize: "16px", margin: 0 }, children: title }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "book-card-author", style: { color: "var(--text-muted)", margin: 0, fontSize: "13px" }, children: creator }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "auto", fontSize: "12px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                isSelected && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-info", style: { display: "flex", flexDirection: "column", gap: "6px", color: "var(--text-normal)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "book-card-title", title, style: { fontWeight: "normal", fontSize: "16px", margin: 0 }, children: title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "book-card-author", style: { color: "var(--text-muted)", margin: 0, fontSize: "13px" }, children: creator }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "auto", fontSize: "12px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                       "\u72B6\u6001\uFF1A",
                       bookStatus
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                       "\u8BC4\u5206\uFF1A",
                       rating
                     ] }),
-                    tags.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                    tags.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                       "\u6807\u7B7E\uFF1A",
                       tags.map((t) => `#${t}`).join(" ")
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                       "\u6570\u636E\uFF1A\u7B14\u8BB0 ",
                       highlightsCount,
                       " \xB7 \u8BCD\u6761 ",
@@ -60799,17 +60842,17 @@ function LibraryApp({ plugin }) {
                       " \xB7 \u65F6\u957F ",
                       formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                       "\u65F6\u95F4\uFF1A",
                       displayDate
                     ] })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "book-card-grid-actions", style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: (e) => {
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-grid-actions", style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: (e) => {
                       e.stopPropagation();
                       openBook(book);
                     }, style: { flex: 1, padding: "6px 0", fontSize: "12px", justifyContent: "center" }, children: percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: (e) => {
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: (e) => {
                       e.stopPropagation();
                       setActiveBook(book);
                       setCurrentView("detail");
@@ -60822,30 +60865,30 @@ function LibraryApp({ plugin }) {
         ] }, book.path);
       }) }) : (
         /* List layout - HTML Table */
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-list", style: { padding: "0 20px 20px 20px", overflowX: "auto", flex: 1, minHeight: 0, overflowY: "auto" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("colgroup", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "28%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "16%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "70px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "90px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "50px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "14%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "110px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "90px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("col", { style: { width: "90px" } })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-list", style: { padding: "0 20px 20px 20px", overflowX: "auto", flex: 1, minHeight: 0, overflowY: "auto" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("colgroup", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "28%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "16%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "70px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "90px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "50px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "14%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "110px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "90px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("col", { style: { width: "90px" } })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 10 }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4E66\u540D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4F5C\u8005" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u72B6\u6001" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u8BCD\u6761/\u65F6\u957F)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 10 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4E66\u540D" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4F5C\u8005" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u72B6\u6001" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u8BCD\u6761/\u65F6\u957F)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("tbody", { children: filteredBooks.map((book) => {
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: filteredBooks.map((book) => {
             const { title, author } = parseBookInfo(book);
             const progress = getProgress(book);
             const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
@@ -60870,7 +60913,7 @@ function LibraryApp({ plugin }) {
             }
             const hue = Math.abs(hash) % 360;
             const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 60%), hsl(${(hue + 40) % 360}, 50%, 45%))`;
-            return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
               "tr",
               {
                 className: "jarvis-library-table-row",
@@ -60880,30 +60923,30 @@ function LibraryApp({ plugin }) {
                 },
                 style: { cursor: "pointer", borderBottom: "1px solid var(--background-modifier-border)" },
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-                    cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title, style: { width: "28px", height: "42px", objectFit: "cover", borderRadius: "4px", flexShrink: 0 } }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { width: "28px", height: "42px", background: gradientBg, borderRadius: "4px", flexShrink: 0 } }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { color: "var(--text-normal)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title, children: title })
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+                    cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: cover.dataUrl, alt: title, style: { width: "28px", height: "42px", objectFit: "cover", borderRadius: "4px", flexShrink: 0 } }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: "28px", height: "42px", background: gradientBg, borderRadius: "4px", flexShrink: 0 } }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { color: "var(--text-normal)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title, children: title })
                   ] }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title: creator, children: creator }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: bookStatus }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { width: "40px", height: "4px", background: "var(--background-modifier-border)", borderRadius: "2px", overflow: "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { width: `${percentage}%`, height: "100%", background: "var(--interactive-accent)" } }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { style: { fontSize: "11px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title: creator, children: creator }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: bookStatus }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: "40px", height: "4px", background: "var(--background-modifier-border)", borderRadius: "2px", overflow: "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: `${percentage}%`, height: "100%", background: "var(--interactive-accent)" } }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { style: { fontSize: "11px" }, children: [
                       percentage,
                       "%"
                     ] })
                   ] }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: rating }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, children: tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "-" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: rating }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, children: tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "-" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
                     highlightsCount,
                     " / ",
                     wordsCount,
                     " / ",
                     formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: startDate }),
-                  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: finishDate })
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: startDate }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: finishDate })
                 ]
               },
               book.path
@@ -60913,7 +60956,7 @@ function LibraryApp({ plugin }) {
       )
     ] });
   };
-  const hiddenFileInput = React5.useRef(null);
+  const hiddenFileInput = React4.useRef(null);
   const handleCustomCoverUpload = (event) => {
     const file = event.target.files?.[0];
     if (!file || !activeBook) return;
@@ -60951,7 +60994,7 @@ function LibraryApp({ plugin }) {
           const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
           const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
-          if (targetFile instanceof import_obsidian10.TFile) {
+          if (targetFile instanceof import_obsidian9.TFile) {
             await plugin.app.vault.modifyBinary(targetFile, buffer);
           } else {
             try {
@@ -60961,7 +61004,7 @@ function LibraryApp({ plugin }) {
               return;
             }
           }
-          if (targetFile instanceof import_obsidian10.TFile) {
+          if (targetFile instanceof import_obsidian9.TFile) {
             const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
             plugin.settings.bookCoverCache[key] = {
@@ -61005,24 +61048,24 @@ function LibraryApp({ plugin }) {
     const publisher = cover?.publisher || "";
     const pubdateRaw = cover?.pubdate || "";
     const pubdate = pubdateRaw ? pubdateRaw.split("T")[0] : "";
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-detail", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-detail-nav", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => {
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-detail", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-detail-nav", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => {
           setCurrentView("home");
           setActiveBook(null);
         }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("polyline", { points: "12 19 5 12 12 5" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polyline", { points: "12 19 5 12 12 5" })
           ] }),
           "\u8FD4\u56DE\u4E66\u67B6"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-detail-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "jarvis-library-btn btn-warning", onClick: () => deleteBook(activeBook), children: "\u5220\u9664\u56FE\u4E66" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-detail-actions", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-warning", onClick: () => deleteBook(activeBook), children: "\u5220\u9664\u56FE\u4E66" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-detail-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-header-cover-side", style: { position: "relative" }, onClick: () => hiddenFileInput.current?.click(), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "file", accept: "image/*", ref: hiddenFileInput, onChange: handleCustomCoverUpload, style: { display: "none" } }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "cover-hover-overlay", style: {
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-detail-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-header-cover-side", style: { position: "relative" }, onClick: () => hiddenFileInput.current?.click(), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "file", accept: "image/*", ref: hiddenFileInput, onChange: handleCustomCoverUpload, style: { display: "none" } }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cover-hover-overlay", style: {
             position: "absolute",
             top: 0,
             left: 0,
@@ -61040,94 +61083,101 @@ function LibraryApp({ plugin }) {
             borderRadius: "8px",
             zIndex: 10
           }, onMouseEnter: (e) => e.currentTarget.style.opacity = "1", onMouseLeave: (e) => e.currentTarget.style.opacity = "0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginBottom: "8px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("circle", { cx: "12", cy: "13", r: "4" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginBottom: "8px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12", cy: "13", r: "4" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontWeight: 600 }, children: "\u66F4\u6362\u5C01\u9762" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { style: { fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontWeight: 600 }, children: "\u66F4\u6362\u5C01\u9762" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { style: { fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }, children: [
               "\u63A8\u8350\u6BD4\u4F8B 2:3",
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("br", {}),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
               "(\u5EFA\u8BAE 600\xD7900 \u53CA\u4EE5\u4E0A)"
             ] })
           ] }),
-          cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-title", children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
+          cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "placeholder-title", children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-header-info-side", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "detail-book-title", children: title }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-book-meta-row", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `book-format-badge format-${activeBook.extension.toLowerCase()}`, children: activeBook.extension.toUpperCase() }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "detail-meta-text", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-header-info-side", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "detail-book-title", children: title }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-book-meta-row", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: `book-format-badge format-${activeBook.extension.toLowerCase()}`, children: activeBook.extension.toUpperCase() }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "detail-meta-text", children: [
               "\u4F5C\u8005: ",
               creator
             ] }),
-            publisher && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "detail-meta-text", children: [
+            publisher && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "detail-meta-text", children: [
               "\u51FA\u7248\u793E: ",
               publisher
             ] }),
-            pubdate && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "detail-meta-text", children: [
+            pubdate && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "detail-meta-text", children: [
               "\u51FA\u7248\u65E5\u671F: ",
               pubdate
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-board", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "progress-stat-value", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-progress-board", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-progress-stat", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "progress-stat-value", children: [
                 percentage,
                 "%"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: percentage >= 99 ? "\u5DF2\u8BFB\u5B8C" : "\u5F53\u524D\u4F4D\u7F6E" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "progress-stat-label", children: percentage >= 99 ? "\u5DF2\u8BFB\u5B8C" : "\u5F53\u524D\u4F4D\u7F6E" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-progress-divider" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "detail-progress-divider" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-progress-stat", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-progress-divider" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-value", children: wordAssets.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "progress-stat-label", children: "\u8BCD\u6761" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "detail-progress-divider" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-progress-stat", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "progress-stat-value", children: wordAssets.length }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "progress-stat-label", children: "\u8BCD\u6761" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeBook), style: { flex: 1 }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%", flexWrap: "wrap" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeBook), style: { flex: 1, minWidth: "120px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
               ] }),
               percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => openOrCreateNote(plugin.app, activeBook, "", plugin.settings), style: { flex: 1 }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 20h9" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => openOrCreateNote(plugin.app, activeBook, "", plugin.settings), style: { flex: 1, minWidth: "120px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M12 20h9" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
               ] }),
               "\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6"
+            ] }),
+            wordAssets.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => plugin.openWordBook(), style: { flex: 1, minWidth: "120px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+              ] }),
+              "\u6253\u5F00\u8BCD\u6761"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-metadata-editor", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u72B6\u6001" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-metadata-editor", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u72B6\u6001" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
                 "select",
                 {
                   className: "metadata-select",
                   value: bookMetadata.status,
                   onChange: (e) => handleUpdateMetadata("status", e.target.value),
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
                   ]
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u8BC4\u5206" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "metadata-stars", children: [1, 2, 3, 4, 5].map((star) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u8BC4\u5206" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "metadata-stars", children: [1, 2, 3, 4, 5].map((star) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "span",
                 {
                   className: `metadata-star ${bookMetadata.rating >= star ? "is-filled" : ""}`,
@@ -61137,9 +61187,9 @@ function LibraryApp({ plugin }) {
                 star
               )) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u5F00\u59CB" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u5F00\u59CB" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "input",
                 {
                   type: "date",
@@ -61149,9 +61199,9 @@ function LibraryApp({ plugin }) {
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u7ED3\u675F" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u7ED3\u675F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "input",
                 {
                   type: "date",
@@ -61161,13 +61211,13 @@ function LibraryApp({ plugin }) {
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u65F6\u957F" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-value", style: { fontSize: "13px", display: "inline-flex", alignItems: "center", height: "30px", color: "var(--text-muted)" }, children: formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path)) })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u65F6\u957F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-value", style: { fontSize: "13px", display: "inline-flex", alignItems: "center", height: "30px", color: "var(--text-muted)" }, children: formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path)) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "metadata-row full-width", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "metadata-label", children: "\u6807\u7B7E" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "metadata-row full-width", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "metadata-label", children: "\u6807\u7B7E" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
                 "input",
                 {
                   type: "text",
@@ -61186,12 +61236,12 @@ function LibraryApp({ plugin }) {
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-header-intro-side", onDoubleClick: () => setIsEditingIntro(true), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h4", { style: { margin: 0 }, children: "\u4E66\u7C4D\u7B80\u4ECB" }),
-            !isEditingIntro && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { style: { fontSize: "12px", cursor: "pointer", color: "var(--text-muted)" }, onClick: () => setIsEditingIntro(true), children: "\u270F\uFE0F \u81EA\u5B9A\u4E49" })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-header-intro-side", onDoubleClick: () => setIsEditingIntro(true), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { style: { margin: 0 }, children: "\u4E66\u7C4D\u7B80\u4ECB" }),
+            !isEditingIntro && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "12px", cursor: "pointer", color: "var(--text-muted)" }, onClick: () => setIsEditingIntro(true), children: "\u270F\uFE0F \u81EA\u5B9A\u4E49" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "detail-intro-scroll", children: isEditingIntro ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "detail-intro-scroll", children: isEditingIntro ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "textarea",
             {
               className: "metadata-textarea",
@@ -61203,106 +61253,116 @@ function LibraryApp({ plugin }) {
               },
               placeholder: "\u5728\u8FD9\u91CC\u8F93\u5165\u60A8\u81EA\u5DF1\u7684\u7B80\u4ECB\u6216\u7B14\u8BB0\u6458\u8981..."
             }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { style: { cursor: "pointer" }, onClick: () => setIsEditingIntro(true), title: "\u70B9\u51FB\u6216\u53CC\u51FB\u7F16\u8F91\u7B80\u4ECB", children: bookMetadata.summary || description || "\u6682\u65E0\u4E66\u7C4D\u7B80\u4ECB" }) })
+          ) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { cursor: "pointer" }, onClick: () => setIsEditingIntro(true), title: "\u70B9\u51FB\u6216\u53CC\u51FB\u7F16\u8F91\u7B80\u4ECB", children: bookMetadata.summary || description || "\u6682\u65E0\u4E66\u7C4D\u7B80\u4ECB" }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-detail-tabs", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "detail-tab-group", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`, onClick: () => setActiveTab("highlights"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 20h9" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-detail-tabs", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "detail-tab-group", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: `detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`, onClick: () => setActiveTab("highlights"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M12 20h9" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
           ] }),
           "\u7B14\u8BB0 (",
           highlights.length,
           ")"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`, onClick: () => setActiveTab("words"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: `detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`, onClick: () => setActiveTab("words"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
           ] }),
           "\u8BCD\u6761 (",
           wordAssets.length,
           ")"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
           "\u4E66\u7B7E (",
           bookmarks.length,
           ")"
         ] })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? (
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? (
         /* Highlights List */
-        highlights.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5212\u7EBF\u6216\u7B14\u8BB0\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u9009\u4E2D\u6587\u672C\u5373\u53EF\u6DFB\u52A0\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-highlights-list", children: highlights.map((h) => {
+        highlights.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5212\u7EBF\u6216\u7B14\u8BB0\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u9009\u4E2D\u6587\u672C\u5373\u53EF\u6DFB\u52A0\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-highlights-list", children: highlights.map((h) => {
           const hasComment = h.comment && h.comment.trim();
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-highlight-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-header", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "hl-card-chapter", children: h.chapterTitle || "\u6B63\u6587\u7AE0\u8282" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "hl-card-date", children: formatDate(h.updated || h.created) })
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-highlight-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-header", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "hl-card-chapter", children: h.chapterTitle || "\u6B63\u6587\u7AE0\u8282" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "hl-card-date", children: formatDate(h.updated || h.created) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-body", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("blockquote", { className: "hl-card-quote", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: h.quote }) }),
-              hasComment && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-comment-bubble", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "comment-label", children: "\u{1F4A1} \u6211\u7684\u7B14\u8BB0\uFF1A" }),
-                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownText, { content: h.comment, plugin })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-body", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("blockquote", { className: "hl-card-quote", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: h.quote }) }),
+              hasComment && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-comment-bubble", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "comment-label", children: "\u{1F4A1} \u6211\u7684\u7B14\u8BB0\uFF1A" }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownText, { content: h.comment, plugin })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-actions", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-actions", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
                 navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${h.quote}\u300D${h.comment ? `\uFF08\u611F\u60F3\uFF1A${h.comment}\uFF09` : ""}`);
-                new import_obsidian10.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
+                new import_obsidian9.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
               }, children: "\u590D\u5236\u5185\u5BB9" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => jumpToHighlight(activeBook, h), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => jumpToHighlight(activeBook, h), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
             ] })
           ] }, h.id || h.blockId);
         }) })
       ) : activeTab === "words" ? (
         /* Word Cards List */
-        wordAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5173\u8054\u7684\u5355\u8BCD\u6216\u7FFB\u8BD1\u5361\u7247\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-word-cards-grid", children: wordAssets.map((w) => {
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-            WordCard,
-            {
-              plugin,
-              asset: w,
-              onToggleMastery: (lemma, mastered) => {
-                if (plugin.settings.wordAssets[lemma]) {
-                  plugin.settings.wordAssets[lemma].mastered = mastered;
-                  plugin.saveSettings();
-                }
-              },
-              onDelete: (assetKey) => {
-                const asset = plugin.settings.wordAssets[assetKey];
-                if (!asset) return;
-                if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-                  plugin.activeReaderView.deleteWordAsset(asset).catch(console.error);
-                } else {
-                  delete plugin.settings.wordAssets[assetKey];
-                  plugin.persistWordAssetSidecar("delete").then(() => plugin.saveSettings());
-                }
-              }
-            },
-            w.lemma
-          );
-        }) })
+        wordAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5173\u8054\u7684\u5355\u8BCD\u6216\u7FFB\u8BD1\u5361\u7247\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-list", style: { overflow: "auto", padding: "0 4px 20px 4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: "32px" }, children: (() => {
+          const wordsAndPhrases = wordAssets.filter((w) => w.kind !== "sentence");
+          const sentences = wordAssets.filter((w) => w.kind === "sentence");
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+            wordsAndPhrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }, children: "\u5355\u8BCD & \u77ED\u8BED" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
+                ] }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: wordsAndPhrases.map(renderTableRow) })
+              ] })
+            ] }),
+            sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }, children: "\u957F\u53E5" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
+                ] }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: sentences.map(renderTableRow) })
+              ] })
+            ] })
+          ] });
+        })() }) })
       ) : (
         /* Bookmarks List */
-        bookmarks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u4FDD\u5B58\u7684\u4E66\u7B7E\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u70B9\u51FB\u53F3\u4FA7\u60AC\u6D6E\u680F\u7684\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u6DFB\u52A0\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-bookmarks-list", style: { display: "flex", flexDirection: "column", gap: "12px" }, children: [...bookmarks].sort((a, b) => b.created - a.created).map((b) => {
+        bookmarks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u4FDD\u5B58\u7684\u4E66\u7B7E\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u70B9\u51FB\u53F3\u4FA7\u60AC\u6D6E\u680F\u7684\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u6DFB\u52A0\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-bookmarks-list", style: { display: "flex", flexDirection: "column", gap: "12px" }, children: [...bookmarks].sort((a, b) => b.created - a.created).map((b) => {
           const dateStr = new Date(b.created).toLocaleString();
-          return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-bookmark-card hl-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-content", style: { paddingBottom: "12px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.1em", marginBottom: "4px", color: "var(--text-normal)" }, children: b.title }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: dateStr })
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-bookmark-card hl-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-content", style: { paddingBottom: "12px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.1em", marginBottom: "4px", color: "var(--text-normal)" }, children: b.title }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: dateStr })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-actions", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn", onClick: (e) => {
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-actions", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn", onClick: (e) => {
                 e.stopPropagation();
                 plugin.settings.bookBookmarks[activeBook.path] = plugin.settings.bookBookmarks[activeBook.path].filter((x) => x.created !== b.created);
                 plugin.saveSettings().then(() => {
                   window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
                 });
               }, children: "\u5220\u9664" }),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => {
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => {
                 let found = false;
                 plugin.app.workspace.iterateAllLeaves((leaf) => {
                   if (leaf.view.getViewType() === "epub" && leaf.view.file?.path === activeBook.path) {
@@ -61327,7 +61387,7 @@ function LibraryApp({ plugin }) {
       ) })
     ] });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-app", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-app", children: [
     currentView === "home" ? renderHome() : currentView === "detail" ? renderDetail() : renderStatsView(),
     renderDebugModal()
   ] });
@@ -61335,7 +61395,7 @@ function LibraryApp({ plugin }) {
 
 // src/library/LibraryView.ts
 var LIBRARY_VIEW_TYPE = "jarvis-reader-library";
-var LibraryView = class extends import_obsidian11.ItemView {
+var LibraryView = class extends import_obsidian10.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -61356,7 +61416,7 @@ var LibraryView = class extends import_obsidian11.ItemView {
     container.empty();
     container.addClass("jarvis-reader-library-view");
     this.root = ReactDOM2.createRoot(container);
-    this.root.render(React6.createElement(LibraryApp, { plugin: this.plugin }));
+    this.root.render(React5.createElement(LibraryApp, { plugin: this.plugin }));
   }
   async onClose() {
     if (this.root) {
@@ -61368,7 +61428,7 @@ var LibraryView = class extends import_obsidian11.ItemView {
 };
 
 // src/settings.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 init_utils();
 var DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -61389,7 +61449,6 @@ var DEFAULT_SETTINGS = {
   bookNoteFolder: "",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
   customCoverFolder: "00-Attachment",
-  wordNoteFolder: "09 Books/Words",
   wordBookExportFolder: "",
   wordAssets: {},
   translationApi: {
@@ -61420,15 +61479,20 @@ var DEFAULT_SETTINGS = {
     comment: "#f97316",
     normal: "#ffeb3b"
   },
-  readingStats: {}
+  readingStats: {},
+  wordReviewStats: {},
+  sm2StartingEase: 2.5,
+  sm2EasyBonus: 1.3,
+  sm2LapseMultiplier: 0.5,
+  sm2MaxInterval: 365
 };
-var JarvisReaderFolderSuggestModal = class extends import_obsidian12.FuzzySuggestModal {
+var JarvisReaderFolderSuggestModal = class extends import_obsidian11.FuzzySuggestModal {
   onChoose;
   folders;
   constructor(app, onChoose) {
     super(app);
     this.onChoose = onChoose;
-    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian12.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
+    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian11.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
     this.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939");
   }
   getItems() {
@@ -61441,7 +61505,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian12.FuzzySugges
     this.onChoose(path);
   }
 };
-var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
+var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
   plugin;
   activeTab = "storage";
   constructor(app, plugin) {
@@ -61456,27 +61520,54 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
     headerDiv.style.flexDirection = "column";
     headerDiv.style.gap = "15px";
     headerDiv.style.marginBottom = "20px";
-    headerDiv.createEl("h2", { text: "Jarvis Reader \u8BBE\u7F6E", cls: "jarvis-reader-settings-title" });
+    const titleEl = headerDiv.createEl("h2", { text: "Jarvis Reader \u8BBE\u7F6E", cls: "jarvis-reader-settings-title" });
+    titleEl.style.fontSize = "1.25em";
+    titleEl.style.fontWeight = "600";
+    titleEl.style.margin = "0";
+    titleEl.style.color = "var(--text-normal)";
     const tabsContainer = headerDiv.createDiv("jarvis-settings-tabs-container");
     tabsContainer.style.display = "flex";
-    tabsContainer.style.gap = "20px";
+    tabsContainer.style.gap = "16px";
     tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     const tabs = [
-      { id: "storage", label: "\u76EE\u5F55\u4E0E\u6587\u4EF6" },
-      { id: "translation", label: "AI \u4E0E\u7FFB\u8BD1" },
-      { id: "words", label: "\u8BCD\u53E5\u53D1\u97F3\u4E0E\u663E\u793A" },
-      { id: "appearance", label: "\u9605\u8BFB\u5668\u4E0E\u5916\u89C2" }
+      {
+        id: "storage",
+        label: "\u76EE\u5F55\u4E0E\u6587\u4EF6",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path></svg>`
+      },
+      {
+        id: "translation",
+        label: "AI \u4E0E\u7FFB\u8BD1",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
+      },
+      {
+        id: "words",
+        label: "\u8BCD\u53E5\u53D1\u97F3\u4E0E\u663E\u793A",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
+      },
+      {
+        id: "appearance",
+        label: "\u9605\u8BFB\u5668\u4E0E\u5916\u89C2",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
+      },
+      {
+        id: "review",
+        label: "\u8BB0\u5FC6\u4E0E\u590D\u4E60",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
+      }
     ];
     tabs.forEach((tab) => {
       const tabEl = tabsContainer.createDiv("jarvis-settings-tab");
-      tabEl.setText(tab.label);
+      tabEl.innerHTML = tab.icon + tab.label;
+      tabEl.style.display = "inline-flex";
+      tabEl.style.alignItems = "center";
       tabEl.style.cursor = "pointer";
-      tabEl.style.padding = "8px 4px";
-      tabEl.style.fontWeight = "600";
-      tabEl.style.fontSize = "1.1em";
+      tabEl.style.padding = "6px 2px";
+      tabEl.style.fontWeight = "500";
+      tabEl.style.fontSize = "13px";
       tabEl.style.color = this.activeTab === tab.id ? "var(--text-accent)" : "var(--text-muted)";
-      tabEl.style.borderBottom = this.activeTab === tab.id ? "3px solid var(--text-accent)" : "3px solid transparent";
-      tabEl.style.transition = "all 0.2s ease";
+      tabEl.style.borderBottom = this.activeTab === tab.id ? "2px solid var(--text-accent)" : "2px solid transparent";
+      tabEl.style.transition = "all 0.15s ease";
       tabEl.onclick = () => {
         this.activeTab = tab.id;
         this.display();
@@ -61485,7 +61576,7 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
       let bookFolderText = null;
-      new import_obsidian12.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
         bookFolderText = text;
         text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
@@ -61507,7 +61598,7 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
         }
       }));
       let customCoverFolderText = null;
-      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
         customCoverFolderText = text;
         text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
           this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
@@ -61529,7 +61620,7 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
         }
       }));
       let exportFolderText = null;
-      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u79EF\u7D2F\u5BFC\u51FA\u6587\u4EF6\u5939").setDesc("\u9009\u62E9\u82F1\u8BED\u8BCD\u53E5\u672C\u5BFC\u51FA\u7684 Markdown \u7B14\u8BB0\u5B58\u653E\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E Vault \u6839\u76EE\u5F55\uFF09").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u79EF\u7D2F\u5BFC\u51FA\u6587\u4EF6\u5939").setDesc("\u9009\u62E9\u82F1\u8BED\u8BCD\u6761\u5BFC\u51FA\u7684 Markdown \u7B14\u8BB0\u5B58\u653E\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E Vault \u6839\u76EE\u5F55\uFF09").addText((text) => {
         exportFolderText = text;
         text.setPlaceholder("\u5982: Export/Wordbooks").setValue(this.plugin.settings.wordBookExportFolder || "").onChange(async (value) => {
           this.plugin.settings.wordBookExportFolder = normalizeVaultPath(value);
@@ -61550,7 +61641,7 @@ var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
           exportFolderText.setValue("");
         }
       }));
-      new import_obsidian12.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -61568,29 +61659,7 @@ created: {{created}}
         text.inputEl.rows = 13;
         text.inputEl.style.width = "100%";
       });
-      let wordFolderText = null;
-      new import_obsidian12.Setting(contentDiv).setName("\u5355\u8BCD\u5361\u7247\u5B58\u50A8\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u6240\u6709\u5355\u8BCD\u7B14\u8BB0\u548C\u77ED\u8BED\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-        wordFolderText = text;
-        text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.wordNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.wordNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.wordNoteFolder = path;
-          await this.plugin.saveSettings();
-          if (wordFolderText) {
-            wordFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
-        this.plugin.settings.wordNoteFolder = "";
-        await this.plugin.saveSettings();
-        if (wordFolderText) {
-          wordFolderText.setValue("");
-        }
-      }));
-      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
         await this.plugin.saveSettings();
       }));
@@ -61599,7 +61668,7 @@ created: {{created}}
       let translationBaseUrlText = null;
       let translationModelText = null;
       let translationPromptText = null;
-      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
         dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
           const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
@@ -61621,7 +61690,7 @@ created: {{created}}
           }
         });
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
         translationBaseUrlText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
@@ -61630,7 +61699,7 @@ created: {{created}}
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
         text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
           this.plugin.settings.translationApi.apiKey = value.trim();
           await this.plugin.saveSettings();
@@ -61638,7 +61707,7 @@ created: {{created}}
         text.inputEl.type = "password";
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
         translationModelText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
@@ -61650,20 +61719,20 @@ created: {{created}}
         try {
           const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
           if (!promptCheck.ok) {
-            new import_obsidian12.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
+            new import_obsidian11.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
             return;
           }
           await translateSelectionWithApi(this.plugin.settings, "test");
-          new import_obsidian12.Notice("\u6D4B\u8BD5\u6210\u529F");
+          new import_obsidian11.Notice("\u6D4B\u8BD5\u6210\u529F");
         } catch (error) {
-          new import_obsidian12.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
+          new import_obsidian11.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
         }
       }));
       contentDiv.createDiv({
         cls: "jarvis-reader-translation-prompt-help",
         text: TRANSLATION_PROMPT_HELP_TEXT
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
         translationPromptText = text;
         text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
           this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
@@ -61672,39 +61741,39 @@ created: {{created}}
         text.inputEl.rows = 6;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian12.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
+      new import_obsidian11.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
         this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
         await this.plugin.saveSettings();
         if (translationPromptText) {
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
-        new import_obsidian12.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
+        new import_obsidian11.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
       }));
     }
     if (this.activeTab === "words") {
-      new import_obsidian12.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian12.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian12.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
         text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
           this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
         dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
           this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
           this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
         text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
           this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
           await this.plugin.saveSettings();
@@ -61712,20 +61781,20 @@ created: {{created}}
       });
     }
     if (this.activeTab === "appearance") {
-      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
         slider.setLimits(0.5, 3, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerZoom = value;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
+      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
         slider.setLimits(1, 3, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerLineHeight = value;
           await this.plugin.saveSettings();
         });
       });
       const createColorPicker = (name, desc, key) => {
-        new import_obsidian12.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
+        new import_obsidian11.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
           (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
             this.plugin.settings.highlightColors = {
               ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
@@ -61743,6 +61812,48 @@ created: {{created}}
       createColorPicker("\u7B14\u8BB0\u989C\u8272", "\u5E26\u6709\u7B14\u8BB0\u7684\u5212\u7EBF\u989C\u8272", "comment");
       createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
     }
+    if (this.activeTab === "review") {
+      new import_obsidian11.Setting(contentDiv).setName("\u8D77\u59CB\u96BE\u5EA6 (Starting Ease)").setDesc("\u65B0\u8BCD\u6761\u521D\u6B21\u590D\u4E60\u6210\u529F\u540E\u7684\u521D\u59CB\u96BE\u5EA6\u7CFB\u6570\uFF08\u9ED8\u8BA4\u503C 2.5\uFF09").addText((text) => {
+        text.setPlaceholder("2.5").setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5)).onChange(async (value) => {
+          const parsed = parseFloat(value);
+          this.plugin.settings.sm2StartingEase = isNaN(parsed) || parsed <= 0 ? 2.5 : parsed;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.addEventListener("blur", () => {
+          text.setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5));
+        });
+      });
+      new import_obsidian11.Setting(contentDiv).setName("\u7B80\u5355\u5956\u52B1\u7CFB\u6570 (Easy Bonus)").setDesc("\u70B9\u51FB\u201C\u7B80\u5355\u201D\u8BC4\u5206\u65F6\uFF0C\u5BF9\u590D\u4E60\u95F4\u9694\u7684\u989D\u5916\u62C9\u957F\u500D\u6570\uFF08\u9ED8\u8BA4\u503C 1.3\uFF09").addText((text) => {
+        text.setPlaceholder("1.3").setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3)).onChange(async (value) => {
+          const parsed = parseFloat(value);
+          this.plugin.settings.sm2EasyBonus = isNaN(parsed) || parsed <= 0 ? 1.3 : parsed;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.addEventListener("blur", () => {
+          text.setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3));
+        });
+      });
+      new import_obsidian11.Setting(contentDiv).setName("\u56F0\u96BE\u6263\u51CF\u7CFB\u6570 (Lapse Multiplier)").setDesc("\u70B9\u51FB\u201C\u56F0\u96BE\u201D\u8BC4\u5206\u65F6\uFF0C\u5F53\u524D\u590D\u4E60\u95F4\u9694\u7684\u7F29\u51CF\u6BD4\u4F8B\u3002\u8303\u56F4\u9700\u5728 0 \u5230 1 \u4E4B\u95F4\uFF08\u9ED8\u8BA4\u503C 0.5\uFF0C\u5982 0.5 \u8868\u793A\u95F4\u9694\u7F29\u77ED\u4E00\u534A\uFF09").addText((text) => {
+        text.setPlaceholder("0.5").setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5)).onChange(async (value) => {
+          const parsed = parseFloat(value);
+          this.plugin.settings.sm2LapseMultiplier = isNaN(parsed) || parsed <= 0 || parsed > 1 ? 0.5 : parsed;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.addEventListener("blur", () => {
+          text.setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5));
+        });
+      });
+      new import_obsidian11.Setting(contentDiv).setName("\u6700\u5927\u590D\u4E60\u95F4\u9694 (Maximum Interval)").setDesc("\u9650\u5236\u8BCD\u6761\u590D\u4E60\u5468\u671F\u7684\u4E0A\u9650\u65F6\u95F4\uFF0C\u5355\u4F4D\u4E3A\u5929\uFF08\u9ED8\u8BA4\u503C 365\uFF09").addText((text) => {
+        text.setPlaceholder("365").setValue(String(this.plugin.settings.sm2MaxInterval ?? 365)).onChange(async (value) => {
+          const parsed = parseInt(value, 10);
+          this.plugin.settings.sm2MaxInterval = isNaN(parsed) || parsed <= 0 ? 365 : parsed;
+          await this.plugin.saveSettings();
+        });
+        text.inputEl.addEventListener("blur", () => {
+          text.setValue(String(this.plugin.settings.sm2MaxInterval ?? 365));
+        });
+      });
+    }
   }
 };
 
@@ -61750,6 +61861,166 @@ created: {{created}}
 var import_obsidian13 = require("obsidian");
 var React7 = __toESM(require_react(), 1);
 var import_client = __toESM(require_client(), 1);
+
+// src/word-book/WordCard.tsx
+var React6 = __toESM(require_react(), 1);
+var import_obsidian12 = require("obsidian");
+var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+var MarkdownPreview = ({ content, plugin }) => {
+  const ref = React6.useRef(null);
+  React6.useEffect(() => {
+    if (ref.current) {
+      ref.current.empty();
+      import_obsidian12.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
+    }
+  }, [content, plugin]);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className: "jarvis-reader-markdown" });
+};
+var WordCard = ({
+  plugin,
+  asset,
+  bookTitle,
+  isExpanded: controlledIsExpanded,
+  isSelected = false,
+  isSelectionMode = false,
+  blurMode = "none",
+  onToggleExpand,
+  onToggleSelect,
+  onToggleMastery,
+  onDelete,
+  onDoubleClick,
+  contextMenuAdditionalItems
+}) => {
+  const [internalExpanded, setInternalExpanded] = React6.useState(false);
+  const isExpanded = controlledIsExpanded !== void 0 ? controlledIsExpanded : internalExpanded;
+  const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+  const handleToggleExpand = () => {
+    if (onToggleExpand) {
+      onToggleExpand(assetKey);
+    } else {
+      setInternalExpanded(!internalExpanded);
+    }
+  };
+  const handleCardClick = (e) => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect(assetKey);
+    } else {
+      handleToggleExpand();
+    }
+  };
+  const isSentence = asset.kind === "sentence";
+  const displayWord = isSentence ? asset.sources?.[0]?.quote || "\u957F\u53E5" : asset.lemma;
+  const playAudio = (text) => {
+    if (plugin.settings.enableWordAudio === false) return;
+    try {
+      const accent = plugin.settings.wordAudioAccent || "us";
+      const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
+      const url = buildWordAudioUrl(template, text, accent);
+      new Audio(url).play().catch(() => {
+      });
+    } catch (err) {
+      console.warn("Jarvis Reader audio failed", err);
+    }
+  };
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const menu = new import_obsidian12.Menu();
+    let itemCount = 0;
+    const isMastered = asset.mastered;
+    if (onToggleMastery) {
+      itemCount += 1;
+      menu.addItem((item) => {
+        item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(() => onToggleMastery(assetKey, !isMastered));
+      });
+    }
+    if (onDelete) {
+      itemCount += 1;
+      menu.addItem((item) => {
+        item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(() => onDelete(assetKey));
+      });
+    }
+    if (contextMenuAdditionalItems) {
+      contextMenuAdditionalItems(menu);
+    }
+    if (itemCount > 0 || contextMenuAdditionalItems) {
+      menu.showAtMouseEvent(e.nativeEvent);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+    "div",
+    {
+      style: {
+        border: `1px solid ${isSelected ? "var(--interactive-accent)" : "var(--background-modifier-border)"}`,
+        borderRadius: "var(--radius-m)",
+        background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 10%, transparent)" : "var(--background-secondary)",
+        padding: "16px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        cursor: "pointer",
+        position: "relative",
+        transition: "all 0.15s ease",
+        marginBottom: "8px"
+      },
+      onClick: handleCardClick,
+      onDoubleClick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onDoubleClick) onDoubleClick(asset);
+      },
+      onContextMenu: handleContextMenu,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { flex: 1, minWidth: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.2em", wordBreak: "break-word" }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              "span",
+              {
+                style: {
+                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
+                  ...isSentence ? { display: "block", fontSize: "0.85em", lineHeight: "1.4", fontWeight: "normal", marginBottom: "8px" } : {}
+                },
+                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
+                onMouseLeave: (e) => e.target.style.textDecoration = "none",
+                onClick: (e) => {
+                  e.stopPropagation();
+                  playAudio(displayWord);
+                },
+                title: "\u70B9\u51FB\u53D1\u97F3",
+                children: displayWord
+              }
+            ) }),
+            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)", marginTop: "2px" }, children: asset.phonetic }),
+            asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }, children: [
+              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
+              asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
+              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0, marginLeft: "12px" }, children: isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
+          }, style: { pointerEvents: "none" } }) })
+        ] }),
+        asset.translation && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          "div",
+          {
+            className: blurMode === "translation" ? "jarvis-blur-test" : "",
+            style: {
+              fontSize: "0.95em",
+              color: "var(--text-normal)",
+              whiteSpace: isExpanded ? "normal" : "pre-wrap",
+              marginTop: "4px"
+            },
+            children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
+          }
+        ),
+        bookTitle && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { marginTop: "auto", paddingTop: "8px", borderTop: "1px dashed var(--background-modifier-border)", fontSize: "0.8em", color: "var(--text-faint)" }, children: bookTitle })
+      ]
+    },
+    assetKey
+  );
+};
+
+// src/sidebar/WordSidebarView.tsx
 var WORD_SIDEBAR_VIEW_TYPE = "jarvis-reader-word-sidebar";
 var WordSidebarView = class extends import_obsidian13.ItemView {
   plugin;
@@ -62047,38 +62318,964 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
 };
 
 // src/word-book/WordBookView.ts
-var import_obsidian15 = require("obsidian");
-var React9 = __toESM(require_react(), 1);
+var import_obsidian16 = require("obsidian");
+var React11 = __toESM(require_react(), 1);
 var ReactDOM3 = __toESM(require_client(), 1);
 
 // src/word-book/WordBookApp.tsx
+var React10 = __toESM(require_react(), 1);
+var import_obsidian15 = require("obsidian");
+init_utils();
+
+// src/word-book/ReviewSession.tsx
 var React8 = __toESM(require_react(), 1);
+
+// src/word-book/SpacedRepetition.ts
+function calculateNextReview(quality, currentInterval = 0, currentEase = 2.5, currentReviews = 0, options) {
+  const startingEase = options?.startingEase ?? 2.5;
+  const easyBonus = options?.easyBonus ?? 1.3;
+  const lapseMultiplier = options?.lapseMultiplier ?? 0.5;
+  const maxInterval = options?.maxInterval ?? 365;
+  let nextInterval;
+  let nextEase = currentReviews === 0 ? startingEase : currentEase;
+  let nextReviews = currentReviews + 1;
+  if (quality === "Hard") {
+    nextInterval = Math.max(1, Math.floor(currentInterval * lapseMultiplier));
+    nextEase = Math.max(1.3, nextEase - 0.15);
+  } else if (quality === "Good") {
+    if (currentReviews === 0) {
+      nextInterval = 1;
+    } else if (currentReviews === 1) {
+      nextInterval = 3;
+    } else {
+      nextInterval = Math.round(currentInterval * nextEase);
+    }
+  } else {
+    if (currentReviews === 0) {
+      nextInterval = 4;
+    } else if (currentReviews === 1) {
+      nextInterval = 7;
+    } else {
+      nextInterval = Math.round(currentInterval * nextEase * easyBonus);
+    }
+    nextEase = nextEase + 0.15;
+  }
+  nextInterval = Math.max(1, nextInterval);
+  nextInterval = Math.min(maxInterval, nextInterval);
+  const now = /* @__PURE__ */ new Date();
+  now.setDate(now.getDate() + nextInterval);
+  const nextReviewDate = now.toISOString().split("T")[0];
+  return {
+    nextReviewDate,
+    interval: nextInterval,
+    ease: nextEase,
+    reviews: nextReviews
+  };
+}
+function getDueCards(assets, bookFilter) {
+  const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+  return assets.filter((asset) => {
+    if (asset.mastered) return false;
+    if (bookFilter && bookFilter !== "all") {
+      const isInBook = asset.sources?.some((source) => source.bookPath === bookFilter);
+      if (!isInBook) return false;
+    }
+    if (!asset.nextReviewDate || asset.nextReviewDate <= today) {
+      return true;
+    }
+    return false;
+  });
+}
+
+// src/word-book/ReviewSession.tsx
+var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
+  const [currentIndex, setCurrentIndex] = React8.useState(0);
+  const [showAnswer, setShowAnswer] = React8.useState(false);
+  const [startTime, setStartTime] = React8.useState(Date.now());
+  React8.useEffect(() => {
+    setStartTime(Date.now());
+  }, [currentIndex]);
+  if (dueAssets.length === 0 || currentIndex >= dueAssets.length) {
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "40px" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", color: "var(--color-green)" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { viewBox: "0 0 24 24", width: "22", height: "22", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { style: { margin: 0, fontSize: "1.4em", fontWeight: "600", color: "var(--color-green)" }, children: "\u590D\u4E60\u5B8C\u6210\uFF01" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { style: { color: "var(--text-muted)", marginBottom: "32px" }, children: "\u60A8\u5DF2\u7ECF\u5B8C\u6210\u4E86\u4ECA\u5929\u6240\u6709\u7684\u590D\u4E60\u4EFB\u52A1\u3002" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "jarvis-library-back-btn", onClick: onComplete, style: { padding: "8px 24px !important", fontSize: "1.1em" }, children: "\u8FD4\u56DE\u8BCD\u6761" })
+    ] });
+  }
+  const asset = dueAssets[currentIndex];
+  const playAudio = (text) => {
+    if (plugin.settings.enableWordAudio !== false) {
+      try {
+        const accent = plugin.settings.wordAudioAccent || "us";
+        const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
+        const url = buildWordAudioUrl(template, text, accent);
+        if (url) {
+          new Audio(url).play().catch(() => {
+          });
+        }
+      } catch (e) {
+        console.error("Audio playback failed", e);
+      }
+    }
+  };
+  const startingEase = plugin.settings.sm2StartingEase ?? 2.5;
+  const easyBonus = plugin.settings.sm2EasyBonus ?? 1.3;
+  const lapseMultiplier = plugin.settings.sm2LapseMultiplier ?? 0.5;
+  const maxInterval = plugin.settings.sm2MaxInterval ?? 365;
+  const reviewOptions = { startingEase, easyBonus, lapseMultiplier, maxInterval };
+  const handleReview = async (response) => {
+    const timeSpent = Date.now() - startTime;
+    const { nextReviewDate, interval, ease, reviews } = calculateNextReview(
+      response,
+      asset.interval || 0,
+      asset.ease || startingEase,
+      asset.reviews || 0,
+      reviewOptions
+    );
+    const lemmaKey = asset.lemma;
+    if (plugin.settings.wordAssets[lemmaKey]) {
+      plugin.settings.wordAssets[lemmaKey].nextReviewDate = nextReviewDate;
+      plugin.settings.wordAssets[lemmaKey].interval = interval;
+      plugin.settings.wordAssets[lemmaKey].ease = ease;
+      plugin.settings.wordAssets[lemmaKey].reviews = reviews;
+      plugin.settings.wordAssets[lemmaKey].reviewTimeMs = (plugin.settings.wordAssets[lemmaKey].reviewTimeMs || 0) + timeSpent;
+      const today = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
+      if (!plugin.settings.wordReviewStats) {
+        plugin.settings.wordReviewStats = {};
+      }
+      if (!plugin.settings.wordReviewStats[today]) {
+        plugin.settings.wordReviewStats[today] = { reviewCount: 0, reviewTimeMs: 0 };
+      }
+      plugin.settings.wordReviewStats[today].reviewCount += 1;
+      plugin.settings.wordReviewStats[today].reviewTimeMs += timeSpent;
+      await plugin.saveSettings();
+    }
+    setShowAnswer(false);
+    setCurrentIndex(currentIndex + 1);
+    onAssetUpdate();
+  };
+  const hardStats = calculateNextReview("Hard", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
+  const goodStats = calculateNextReview("Good", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
+  const easyStats = calculateNextReview("Easy", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
+  const formatInterval = (days) => {
+    if (days < 30) return `${days}\u5929`;
+    if (days < 365) return `${(days / 30).toFixed(1)}\u4E2A\u6708`;
+    return `${(days / 365).toFixed(1)}\u5E74`;
+  };
+  const isSentence = asset.kind === "sentence";
+  const displayWord = isSentence ? asset.sources?.[0]?.quote || asset.lemma : asset.lemma;
+  const posText = asset.partOfSpeech ? `[${asset.partOfSpeech}] ` : "";
+  const typeLabel = asset.kind === "sentence" ? "\u957F\u53E5" : asset.kind === "phrase" ? "\u77ED\u8BED" : "\u5355\u8BCD";
+  const titleFontSize = asset.kind === "sentence" ? "1.6em" : displayWord.length > 15 ? "2em" : "3em";
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", height: "100%", background: "var(--background-primary)", padding: "32px", maxWidth: "800px", margin: "0 auto", width: "100%", alignItems: "center", justifyContent: "center" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", maxWidth: "580px", marginBottom: "24px" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { onClick: onComplete, className: "jarvis-library-back-btn", "aria-label": "\u8FD4\u56DE\u8BCD\u6761", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polyline", { points: "12 19 5 12 12 5" })
+        ] }),
+        "\u8FD4\u56DE\u8BCD\u6761"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { color: "var(--text-muted)", fontSize: "0.9em", fontWeight: "bold" }, children: [
+        currentIndex + 1,
+        " / ",
+        dueAssets.length
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-flashcard-container", onClick: () => !showAnswer && setShowAnswer(true), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: `jarvis-flashcard ${showAnswer ? "is-flipped" : ""}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-flashcard-front", style: { display: "flex", flexDirection: "column", position: "relative", height: "100%" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%", padding: "24px", boxSizing: "border-box" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px", flex: 1, minWidth: 0, paddingRight: "16px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { fontSize: "0.9em", color: "var(--text-muted)", background: "var(--background-secondary)", padding: "4px 12px", borderRadius: "8px" }, children: [
+              posText,
+              typeLabel
+            ] }),
+            asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px" }, children: [
+              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
+              asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
+              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              className: "clickable-icon",
+              onClick: async (e) => {
+                e.stopPropagation();
+                const current = asset.mastered;
+                if (plugin.settings.wordAssets[asset.lemma]) {
+                  plugin.settings.wordAssets[asset.lemma].mastered = !current;
+                  await plugin.saveSettings();
+                  onAssetUpdate();
+                }
+              },
+              "aria-label": asset.mastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1",
+              style: {
+                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)",
+                width: "28px",
+                height: "28px",
+                padding: "0",
+                border: asset.mastered ? "1px solid var(--color-green)" : "1px solid var(--text-faint)",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              },
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M20 6 9 17l-5-5" }) })
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { position: "relative", display: "inline-flex", alignItems: isSentence ? "flex-start" : "center", justifyContent: "center", width: isSentence ? "100%" : "auto" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: titleFontSize, fontFamily: "serif", fontWeight: "bold", textAlign: isSentence ? "left" : "center", lineHeight: 1.4, padding: "0 20px", width: "100%", wordBreak: "break-word", whiteSpace: "pre-wrap", color: "var(--text-normal)" }, children: displayWord }),
+          !isSentence && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { position: "absolute", left: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "clickable-icon", onClick: (e) => {
+            e.stopPropagation();
+            playAudio(displayWord);
+          }, "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "28", height: "28", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
+          ] }) }) })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { padding: "24px", display: "flex", justifyContent: "center", width: "100%", boxSizing: "border-box" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: (e) => {
+          e.stopPropagation();
+          setShowAnswer(true);
+        }, children: "\u67E5\u770B\u91CA\u4E49" }) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-flashcard-back", onClick: (e) => e.stopPropagation(), style: { display: "flex", flexDirection: "column" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", marginBottom: "20px", flexShrink: 0, borderLeft: "4px solid var(--interactive-accent)", borderRadius: "8px", paddingLeft: "16px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: isSentence ? "1.3em" : "2.2em", fontFamily: "serif", fontWeight: "bold", lineHeight: 1.3, color: "var(--text-normal)" }, children: displayWord }),
+            !isSentence && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "clickable-icon", onClick: () => playAudio(displayWord), "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
+            ] }) })
+          ] }),
+          !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "1em", color: "var(--text-muted)", fontStyle: "italic", marginTop: "4px" }, children: asset.phonetic }),
+          asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
+            asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
+            asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
+            asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
+          ] })
+        ] }),
+        !isSentence && asset.sources && asset.sources[0]?.quote && asset.sources[0].quote.trim() !== asset.lemma.trim() && asset.sources[0].quote.trim() !== displayWord.trim() && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { marginBottom: "16px", padding: "12px 16px", background: "var(--background-secondary)", borderRadius: "8px", borderLeft: "4px solid var(--interactive-accent)", flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontStyle: "italic", color: "var(--text-normal)", fontSize: "0.95em", lineHeight: 1.5 }, children: asset.sources[0].quote }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "1.05em", lineHeight: 1.6, flex: "1 1 auto", color: "var(--text-normal)", minHeight: "min-content" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(MarkdownPreview, { content: (asset.display || asset.translation || "").replace(/\\n/g, "\n"), plugin }) }),
+        asset.sources && asset.sources[0] && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { marginTop: "20px", paddingTop: "12px", borderTop: "1px dashed var(--background-modifier-border)", color: "var(--text-muted)", fontSize: "0.85em", display: "flex", justifyContent: "space-between", flexShrink: 0 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u6765\u6E90" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
+            asset.sources[0].bookTitle || asset.sources[0].bookPath,
+            " ",
+            asset.sources[0].chapterTitle ? ` \xB7 ${asset.sources[0].chapterTitle}` : ""
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { marginTop: "24px", display: "flex", justifyContent: "center", flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "jarvis-library-back-btn", onClick: (e) => {
+          e.stopPropagation();
+          setShowAnswer(false);
+        }, children: "\u56DE\u5230\u6B63\u9762" }) })
+      ] })
+    ] }) }, currentIndex),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", gap: "20px", marginTop: "32px", justifyContent: "center", width: "100%", maxWidth: "580px", visibility: showAnswer ? "visible" : "hidden" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-red) 6%, transparent)", color: "var(--color-red)", border: "1px solid color-mix(in srgb, var(--color-red) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-red) 5%, transparent)" },
+          onClick: () => handleReview("Hard"),
+          onMouseEnter: (e) => {
+            e.currentTarget.style.background = "var(--color-red)";
+            e.currentTarget.style.color = "white";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.background = "color-mix(in srgb, var(--color-red) 6%, transparent)";
+            e.currentTarget.style.color = "var(--color-red)";
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u56F0\u96BE" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
+              "(",
+              formatInterval(hardStats.interval),
+              ")"
+            ] })
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-blue) 6%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-blue) 5%, transparent)" },
+          onClick: () => handleReview("Good"),
+          onMouseEnter: (e) => {
+            e.currentTarget.style.background = "var(--color-blue)";
+            e.currentTarget.style.color = "white";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.background = "color-mix(in srgb, var(--color-blue) 6%, transparent)";
+            e.currentTarget.style.color = "var(--color-blue)";
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u826F\u597D" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
+              "(",
+              formatInterval(goodStats.interval),
+              ")"
+            ] })
+          ]
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        "button",
+        {
+          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-green) 6%, transparent)", color: "var(--color-green)", border: "1px solid color-mix(in srgb, var(--color-green) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-green) 5%, transparent)" },
+          onClick: () => handleReview("Easy"),
+          onMouseEnter: (e) => {
+            e.currentTarget.style.background = "var(--color-green)";
+            e.currentTarget.style.color = "white";
+          },
+          onMouseLeave: (e) => {
+            e.currentTarget.style.background = "color-mix(in srgb, var(--color-green) 6%, transparent)";
+            e.currentTarget.style.color = "var(--color-green)";
+          },
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u7B80\u5355" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
+              "(",
+              formatInterval(easyStats.interval),
+              ")"
+            ] })
+          ]
+        }
+      )
+    ] })
+  ] });
+}
+
+// src/word-book/WordBookStats.tsx
+var React9 = __toESM(require_react(), 1);
 var import_obsidian14 = require("obsidian");
 init_utils();
-var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
+var moment2 = import_obsidian14.moment;
+function WordBookStats({ plugin, assets, onClose }) {
+  const [statsTab, setStatsTab] = React9.useState("week");
+  const [statsDate, setStatsDate] = React9.useState(/* @__PURE__ */ new Date());
+  const [statsChartType, setStatsChartType] = React9.useState("bar");
+  const selectedStats = React9.useMemo(() => {
+    const today = moment2(statsDate);
+    let startDate2;
+    let endDate2;
+    let prevStartDate;
+    let prevEndDate;
+    if (statsTab === "week") {
+      startDate2 = today.clone().startOf("isoWeek");
+      endDate2 = today.clone().endOf("isoWeek");
+      prevStartDate = startDate2.clone().subtract(1, "week");
+      prevEndDate = endDate2.clone().subtract(1, "week");
+    } else if (statsTab === "month") {
+      startDate2 = today.clone().startOf("month");
+      endDate2 = today.clone().endOf("month");
+      prevStartDate = startDate2.clone().subtract(1, "month");
+      prevEndDate = endDate2.clone().subtract(1, "month");
+    } else if (statsTab === "year") {
+      startDate2 = today.clone().startOf("year");
+      endDate2 = today.clone().endOf("year");
+      prevStartDate = startDate2.clone().subtract(1, "year");
+      prevEndDate = endDate2.clone().subtract(1, "year");
+    } else {
+      startDate2 = moment2(0);
+      endDate2 = moment2().endOf("day");
+      prevStartDate = moment2(0);
+      prevEndDate = moment2().endOf("day");
+    }
+    const statsData2 = plugin.settings.wordReviewStats || {};
+    let totalSeconds2 = 0;
+    let prevTotalSeconds = 0;
+    let totalReviews2 = 0;
+    let prevTotalReviews = 0;
+    const dailySecondsMap2 = {};
+    const monthlySecondsMap2 = {};
+    const yearlySecondsMap2 = {};
+    const reviewDays = /* @__PURE__ */ new Set();
+    Object.entries(statsData2).forEach(([dateStr, dailyData]) => {
+      const dateVal = moment2(dateStr, "YYYY-MM-DD");
+      if (!dateVal.isValid()) return;
+      const isCurrentRange = dateVal.isBetween(startDate2, endDate2, "day", "[]");
+      const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
+      const count = dailyData.reviewCount || 0;
+      const ms = dailyData.reviewTimeMs || 0;
+      const secs = Math.round(ms / 1e3);
+      if (isCurrentRange) {
+        totalSeconds2 += secs;
+        totalReviews2 += count;
+        if (count > 0 || secs > 0) {
+          reviewDays.add(dateStr);
+          dailySecondsMap2[dateStr] = (dailySecondsMap2[dateStr] || 0) + secs;
+          const monthStr = dateVal.format("YYYY-MM");
+          monthlySecondsMap2[monthStr] = (monthlySecondsMap2[monthStr] || 0) + secs;
+          const yearStr = dateVal.format("YYYY");
+          yearlySecondsMap2[yearStr] = (yearlySecondsMap2[yearStr] || 0) + secs;
+        }
+      } else if (isPrevRange && statsTab !== "all") {
+        prevTotalSeconds += secs;
+        prevTotalReviews += count;
+      }
+    });
+    let newWordsCount2 = 0;
+    assets.forEach((asset) => {
+      const createdVal = moment2(asset.created);
+      if (createdVal.isValid() && createdVal.isBetween(startDate2, endDate2, "day", "[]")) {
+        newWordsCount2++;
+      }
+    });
+    let trendPercent2 = 0;
+    if (prevTotalSeconds > 0) {
+      trendPercent2 = Math.round((totalSeconds2 - prevTotalSeconds) / prevTotalSeconds * 100);
+    } else if (totalSeconds2 > 0) {
+      trendPercent2 = 100;
+    }
+    const bookWordCountMap = {};
+    assets.forEach((asset) => {
+      const createdVal = moment2(asset.created);
+      if (createdVal.isValid() && createdVal.isBetween(startDate2, endDate2, "day", "[]")) {
+        const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
+        if (bookTitle) {
+          bookWordCountMap[bookTitle] = (bookWordCountMap[bookTitle] || 0) + 1;
+        }
+      }
+    });
+    const topBooks2 = Object.entries(bookWordCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const activeAssets = assets.filter((a) => !a.mastered);
+    const sortedByDifficulty = [...activeAssets].sort((a, b) => {
+      const aReviews = a.reviews || 0;
+      const bReviews = b.reviews || 0;
+      if (aReviews !== bReviews) return bReviews - aReviews;
+      const aEase = a.ease || 2.5;
+      const bEase = b.ease || 2.5;
+      return aEase - bEase;
+    });
+    const totalWords2 = assets.length;
+    const masteredWords2 = assets.filter((a) => a.mastered).length;
+    const dueWords2 = getDueCards(assets).length;
+    return {
+      startDate: startDate2,
+      endDate: endDate2,
+      totalSeconds: totalSeconds2,
+      prevTotalSeconds,
+      trendPercent: trendPercent2,
+      readDaysCount: reviewDays.size,
+      newWordsCount: newWordsCount2,
+      totalReviews: totalReviews2,
+      dailySecondsMap: dailySecondsMap2,
+      monthlySecondsMap: monthlySecondsMap2,
+      yearlySecondsMap: yearlySecondsMap2,
+      topBooks: topBooks2,
+      difficultWords: sortedByDifficulty.slice(0, 10),
+      totalWords: totalWords2,
+      masteredWords: masteredWords2,
+      dueWords: dueWords2
+    };
+  }, [statsTab, statsDate, assets, plugin.settings.wordReviewStats]);
+  const handlePrevDate = () => {
+    setStatsDate((prev) => {
+      const m = moment2(prev);
+      if (statsTab === "week") return m.subtract(1, "week").toDate();
+      if (statsTab === "month") return m.subtract(1, "month").toDate();
+      if (statsTab === "year") return m.subtract(1, "year").toDate();
+      return prev;
+    });
+  };
+  const handleNextDate = () => {
+    setStatsDate((prev) => {
+      const m = moment2(prev);
+      if (statsTab === "week") return m.add(1, "week").toDate();
+      if (statsTab === "month") return m.add(1, "month").toDate();
+      if (statsTab === "year") return m.add(1, "year").toDate();
+      return prev;
+    });
+  };
+  const renderLargeDuration = (secs) => {
+    if (secs <= 0) {
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        "0",
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+      ] });
+    }
+    const h = Math.floor(secs / 3600);
+    const m = Math.round(secs % 3600 / 60);
+    if (h > 0 && m > 0) {
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        h,
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C0F\u65F6" }),
+        m,
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+      ] });
+    } else if (h > 0) {
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        h,
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C0F\u65F6" })
+      ] });
+    } else {
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        m,
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+      ] });
+    }
+  };
+  const formatDays = (dateStr) => {
+    if (!dateStr) return "\u65B0\u8BCD";
+    const diff = new Date(dateStr).getTime() - (/* @__PURE__ */ new Date()).getTime();
+    const days = Math.ceil(diff / (1e3 * 3600 * 24));
+    if (days < 0) return "\u5DF2\u8D85\u671F";
+    if (days === 0) return "\u4ECA\u65E5";
+    return `${days}\u5929\u540E`;
+  };
+  const {
+    startDate,
+    endDate,
+    totalSeconds,
+    trendPercent,
+    readDaysCount,
+    newWordsCount,
+    totalReviews,
+    dailySecondsMap,
+    monthlySecondsMap,
+    yearlySecondsMap,
+    topBooks,
+    difficultWords,
+    totalWords,
+    masteredWords,
+    dueWords
+  } = selectedStats;
+  const statsData = plugin.settings.wordReviewStats || {};
+  const sortedDates = Object.keys(statsData).sort();
+  const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : moment2().format("YYYY-MM-DD");
+  const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
+  let dateRangeStr = "";
+  if (statsTab === "week") {
+    dateRangeStr = `${moment2(startDate).format("YYYY \xB7 M/D")} - ${moment2(endDate).format("M/D")}`;
+  } else if (statsTab === "month") {
+    dateRangeStr = moment2(startDate).format("YYYY\u5E74M\u6708");
+  } else if (statsTab === "year") {
+    dateRangeStr = moment2(startDate).format("YYYY\u5E74");
+  }
+  const avgSecs = Math.round(totalSeconds / (readDaysCount || 1));
+  const trendText = trendPercent > 0 ? `\u2191 ${trendPercent}%` : trendPercent < 0 ? `\u2193 ${Math.abs(trendPercent)}%` : "--";
+  const trendClass = trendPercent > 0 ? "jarvis-stats-trend-up" : trendPercent < 0 ? "jarvis-stats-trend-down" : "";
+  let mainCardSub = "";
+  if (statsTab === "week") {
+    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u5468 `;
+  } else if (statsTab === "month") {
+    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u6708 `;
+  } else if (statsTab === "year") {
+    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u53BB\u5E74 `;
+  } else {
+    mainCardSub = `${firstDateStr}\u81F3\u4ECA \xB7 \u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u4E0E Jarvis Reader \u8BB0\u5FC6\u76F8\u4F34 ${readDaysCount} \u5929`;
+  }
+  let activeChart = statsChartType;
+  if (statsTab === "week") {
+    activeChart = "bar";
+  } else if (statsTab === "month" && activeChart === "heatmap") {
+    activeChart = "bar";
+  } else if ((statsTab === "year" || statsTab === "all") && activeChart === "calendar") {
+    activeChart = "heatmap";
+  }
+  const isReadable = plugin.app.vault.getConfig ? plugin.app.vault.getConfig("readableLineLength") : true;
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-stats-view", style: { overflowY: "auto", height: "100%", width: "100%", padding: "20px 0" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, style: { margin: "0 auto" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-stats-view-header", style: { marginBottom: "20px" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-back-btn", onClick: onClose, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "12 19 5 12 12 5" })
+        ] }),
+        "\u8FD4\u56DE\u8BCD\u6761"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u8BCD\u5E93\u7EDF\u8BA1\u770B\u677F" })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
+      ] }),
+      statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-main-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
+        mainCardSub,
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: trendClass, children: trendText })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-mini-grid", children: statsTab === "all" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+          ] }),
+          readDaysCount,
+          "\u5929"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7D2F\u8BA1\u590D\u4E60\u5929\u6570" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "12", y1: "17", x2: "12.01", y2: "17" })
+          ] }),
+          totalWords,
+          "\u4E2A"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u5E93\u603B\u6570" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
+          ] }),
+          masteredWords,
+          "\u4E2A"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u638C\u63E1" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "12 6 12 12 16 14" })
+          ] }),
+          totalReviews,
+          "\u6B21"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7D2F\u8BA1\u590D\u4E60\u6B21\u6570" })
+      ] })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+          ] }),
+          readDaysCount,
+          "\u5929"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BB0\u5FC6\u5929\u6570" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "17 6 23 6 23 12" })
+          ] }),
+          formatDuration(avgSecs),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M12 20h9" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
+          ] }),
+          newWordsCount,
+          "\u4E2A"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65B0\u589E\u8BCD\u6761" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "12 6 12 12 16 14" })
+          ] }),
+          totalReviews,
+          "\u6B21"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u590D\u4E60\u6B21\u6570" })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-section", style: { marginBottom: "32px" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
+          activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4" : statsTab === "year" ? "\u6BCF\u6708\u8BB0\u5FC6\u65F6\u95F4" : "\u6BCF\u5E74\u8BB0\u5FC6\u65F6\u95F4"),
+          activeChart === "calendar" && "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4",
+          activeChart === "heatmap" && "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4"
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
+          statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+            ] }) })
+          ] }),
+          (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
+          ] })
+        ] })
+      ] }),
+      activeChart === "bar" && (() => {
+        let data = [];
+        if (statsTab === "week") {
+          const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
+          data = Array.from({ length: 7 }).map((_, i) => {
+            const day = moment2(startDate).add(i, "days");
+            const dateStr = day.format("YYYY-MM-DD");
+            const secs = dailySecondsMap[dateStr] || 0;
+            return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
+          });
+        } else if (statsTab === "month") {
+          const daysInMonth = moment2(startDate).daysInMonth();
+          data = Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = moment2(startDate).add(i, "days");
+            const dateStr = day.format("YYYY-MM-DD");
+            const secs = dailySecondsMap[dateStr] || 0;
+            return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
+          });
+        } else if (statsTab === "year") {
+          data = Array.from({ length: 12 }).map((_, i) => {
+            const month = moment2(startDate).add(i, "months");
+            const monthStr = month.format("YYYY-MM");
+            const secs = monthlySecondsMap[monthStr] || 0;
+            return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
+          });
+        } else {
+          const currentYear = moment2().year();
+          const startYear = earliestYearStr ? moment2(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+          const yearsCount = Math.max(currentYear - startYear + 1, 1);
+          data = Array.from({ length: yearsCount }).map((_, i) => {
+            const year = String(startYear + i);
+            const secs = yearlySecondsMap[year] || 0;
+            return { label: year, secs, tooltip: `${year}\u5E74 \u8BB0\u5FC6 ${formatDuration(secs)}` };
+          });
+        }
+        const maxVal = Math.max(...data.map((d) => d.secs), 60);
+        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "relative" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
+            const heightPct = item.secs / maxVal * 85;
+            return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
+            ] }, idx);
+          }) })
+        ] });
+      })(),
+      activeChart === "calendar" && (() => {
+        const daysInMonth = moment2(startDate).daysInMonth();
+        const firstDayOffset = (moment2(startDate).clone().startOf("month").day() + 6) % 7;
+        const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
+        const cells = [];
+        for (let i = 0; i < firstDayOffset; i++) {
+          cells.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const day = moment2(startDate).clone().date(d);
+          const dateStr = day.format("YYYY-MM-DD");
+          const secs = dailySecondsMap[dateStr] || 0;
+          cells.push(
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
+              secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
+            ] }, `day-${d}`)
+          );
+        }
+        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
+        ] });
+      })(),
+      activeChart === "heatmap" && (() => {
+        const renderHeatmapWall = (yearStr) => {
+          const startOfYear = moment2(`${yearStr}-01-01`);
+          const gridStart = startOfYear.clone().startOf("isoWeek");
+          const weeksCount = 53;
+          const columns = [];
+          const monthLabels = [];
+          let lastMonth = -1;
+          for (let w = 0; w < weeksCount; w++) {
+            const colCells = [];
+            const colMonday = gridStart.clone().add(w * 7, "days");
+            const m = colMonday.month();
+            if (m !== lastMonth) {
+              monthLabels.push({ label: `${m + 1}\u6708`, colIndex: w });
+              lastMonth = m;
+            }
+            for (let d = 0; d < 7; d++) {
+              const cellDate = gridStart.clone().add(w * 7 + d, "days");
+              const isTargetYear = cellDate.year() === Number(yearStr);
+              const dateStr = cellDate.format("YYYY-MM-DD");
+              const secs = isTargetYear ? dailySecondsMap[dateStr] || 0 : 0;
+              const mins = secs / 60;
+              let level = 0;
+              if (mins > 0 && mins <= 1) level = 1;
+              else if (mins > 1 && mins <= 3) level = 2;
+              else if (mins > 3 && mins <= 10) level = 3;
+              else if (mins > 10) level = 4;
+              const tooltipText = isTargetYear ? `${cellDate.format("YYYY\u5E74M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` : "";
+              colCells.push(
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
+              );
+            }
+            columns.push(
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
+            );
+          }
+          const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
+            return dateStr.startsWith(yearStr) && secs > 0;
+          }).length;
+          const yearsTotalSecs = Object.entries(dailySecondsMap).filter(([dateStr]) => dateStr.startsWith(yearStr)).reduce((acc, entry) => acc + entry[1], 0);
+          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { marginBottom: "24px" }, children: [
+            statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E00" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E09" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E94" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+                yearStr,
+                "\u5E74\u5171\u8BB0\u5FC6 ",
+                yearsTotalDays,
+                "\u5929\uFF0C\u7D2F\u8BA1 ",
+                formatDuration(yearsTotalSecs)
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C11" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u591A" })
+              ] })
+            ] })
+          ] }, yearStr);
+        };
+        if (statsTab === "year") {
+          const yearStr = moment2(startDate).format("YYYY");
+          return renderHeatmapWall(yearStr);
+        } else {
+          const currentYear = moment2().year();
+          const startYear = earliestYearStr ? moment2(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+          const yearsList = [];
+          for (let y = currentYear; y >= startYear; y--) {
+            yearsList.push(String(y));
+          }
+          return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
+        }
+      })()
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }, children: [
+      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-pref-card", style: { padding: "24px", minHeight: "200px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px", fontWeight: "700", marginBottom: "16px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
+          ] }),
+          "\u6765\u6E90\u4E66\u7C4D\u8D21\u732E\u699C"
+        ] }),
+        topBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "0.95em", textAlign: "center", paddingTop: "40px" }, children: "\u8BE5\u5468\u671F\u5185\u672A\u65B0\u589E\u8BCD\u6761" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: "12px" }, children: topBooks.map(([title, count], idx) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--background-modifier-border)", paddingBottom: "8px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "10px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "13px", fontWeight: "bold", background: "var(--background-modifier-border)", borderRadius: "4px", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }, children: idx + 1 }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "14px", color: "var(--text-normal)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }, children: title })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { style: { fontSize: "13.5px", color: "var(--interactive-accent)", fontWeight: "bold" }, children: [
+            "+",
+            count,
+            " \u8BCD\u6761"
+          ] })
+        ] }, title)) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-pref-card", style: { padding: "24px", gridColumn: statsTab === "week" ? "span 2" : "span 1" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px", fontWeight: "700", marginBottom: "16px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" }) }),
+          "\u6700\u96BE\u653B\u514B\u699C\u5355 (Top 10)"
+        ] }),
+        difficultWords.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "0.95em", textAlign: "center", paddingTop: "40px" }, children: "\u65E0\u5B66\u4E60\u4E2D\u7684\u5355\u8BCD" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("table", { style: { width: "100%", borderCollapse: "collapse", textAlign: "left" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal" }, children: "\u8BCD\u6761" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "right" }, children: "\u4E0B\u6B21\u590D\u4E60" })
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("tbody", { children: difficultWords.map((word) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "8px 0", fontWeight: "bold", fontSize: "13.5px", color: "var(--text-normal)" }, children: word.lemma }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("td", { style: { padding: "8px 0", color: "var(--color-orange)", fontSize: "13px", textAlign: "center" }, children: [
+              word.reviews || 0,
+              "\u6B21"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "8px 0", fontSize: "13px", textAlign: "center" }, children: word.ease?.toFixed(2) || "2.50" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "13px", textAlign: "right" }, children: formatDays(word.nextReviewDate) })
+          ] }, word.lemma)) })
+        ] })
+      ] })
+    ] })
+  ] }) });
+}
+
+// src/word-book/WordBookApp.tsx
+var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 function WordBookApp({ plugin }) {
-  const [assets, setAssets] = React8.useState([]);
-  const [search, setSearch] = React8.useState("");
-  const [filterKind, setFilterKind] = React8.useState("all");
-  const [filterStatus, setFilterStatus] = React8.useState("all");
-  const [filterBook, setFilterBook] = React8.useState("all");
-  const [sortBy, setSortBy] = React8.useState("created_desc");
-  const [selected, setSelected] = React8.useState(/* @__PURE__ */ new Set());
-  const [isSelectionMode, setIsSelectionMode] = React8.useState(false);
-  const [viewMode, setViewMode] = React8.useState("grid");
-  const [exportState, setExportState] = React8.useState("none");
-  const [blurMode, setBlurMode] = React8.useState("none");
-  const [singleCardIndex, setSingleCardIndex] = React8.useState(0);
-  const [singleCardFlipped, setSingleCardFlipped] = React8.useState(false);
-  const [expandedItems, setExpandedItems] = React8.useState(/* @__PURE__ */ new Set());
-  const loadAssets = React8.useCallback(() => {
+  const [assets, setAssets] = React10.useState([]);
+  const [search, setSearch] = React10.useState("");
+  const [filterKind, setFilterKind] = React10.useState("all");
+  const [filterStatus, setFilterStatus] = React10.useState("all");
+  const [filterBook, setFilterBook] = React10.useState("all");
+  const [sortBy, setSortBy] = React10.useState("created_desc");
+  const [selected, setSelected] = React10.useState(/* @__PURE__ */ new Set());
+  const [isSelectionMode, setIsSelectionMode] = React10.useState(false);
+  const [exportState, setExportState] = React10.useState("none");
+  const [blurMode, setBlurMode] = React10.useState("none");
+  const [expandedItems, setExpandedItems] = React10.useState(/* @__PURE__ */ new Set());
+  const [isReviewMode, setIsReviewMode] = React10.useState(false);
+  const [isStatsMode, setIsStatsMode] = React10.useState(false);
+  const [showFilterMenuPopup, setShowFilterMenuPopup] = React10.useState(false);
+  const loadAssets = React10.useCallback(() => {
     if (plugin.settings.wordAssets && typeof plugin.settings.wordAssets === "object") {
       setAssets(Object.values(plugin.settings.wordAssets));
     } else {
       setAssets([]);
     }
   }, [plugin.settings.wordAssets]);
-  React8.useEffect(() => {
+  React10.useEffect(() => {
     loadAssets();
     const handleRefresh = () => loadAssets();
     window.addEventListener("jarvis-reader-word-assets-changed", handleRefresh);
@@ -62129,7 +63326,7 @@ function WordBookApp({ plugin }) {
     await plugin.persistWordAssetSidecar("delete");
     await plugin.saveSettings();
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-    new import_obsidian14.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
+    new import_obsidian15.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
     setSelected(/* @__PURE__ */ new Set());
     loadAssets();
   };
@@ -62151,7 +63348,7 @@ function WordBookApp({ plugin }) {
     await plugin.persistWordAssetSidecar("delete");
     await plugin.saveSettings();
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-    new import_obsidian14.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
+    new import_obsidian15.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
     const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
     leaves.forEach((leaf) => {
       if (leaf.view && typeof leaf.view.render === "function") {
@@ -62170,7 +63367,7 @@ function WordBookApp({ plugin }) {
       }
     }
     await plugin.saveSettings();
-    new import_obsidian14.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
+    new import_obsidian15.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
     loadAssets();
   };
   const handleToggleSingleMastery = async (e, lemma) => {
@@ -62184,7 +63381,7 @@ function WordBookApp({ plugin }) {
   };
   const handleContextMenu = (e, lemma) => {
     e.preventDefault();
-    const menu = new import_obsidian14.Menu();
+    const menu = new import_obsidian15.Menu();
     const isMastered = plugin.settings.wordAssets[lemma]?.mastered;
     menu.addItem((item) => {
       item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
@@ -62208,7 +63405,7 @@ function WordBookApp({ plugin }) {
           await plugin.saveSettings();
           window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
           loadAssets();
-          new import_obsidian14.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
+          new import_obsidian15.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
           if (selected.has(lemma)) {
             const next = new Set(selected);
             next.delete(lemma);
@@ -62221,7 +63418,7 @@ function WordBookApp({ plugin }) {
   };
   const handleExportPrint = () => {
     if (selected.size === 0) {
-      new import_obsidian14.Notice("\u8BF7\u5148\u9009\u62E9\u8981\u5BFC\u51FA\u7684\u8BCD\u6761");
+      new import_obsidian15.Notice("\u8BF7\u5148\u9009\u62E9\u8981\u5BFC\u51FA\u7684\u8BCD\u6761");
       return;
     }
     setExportState("select_template");
@@ -62229,8 +63426,8 @@ function WordBookApp({ plugin }) {
   const executeExport = async (templateType) => {
     setExportState("none");
     const selectedList = filteredAssets.filter((a) => selected.has(a.lemma));
-    const words = selectedList.filter((a) => !a.kind || a.kind === "word");
-    const phrases = selectedList.filter((a) => a.kind === "phrase");
+    const words2 = selectedList.filter((a) => !a.kind || a.kind === "word");
+    const phrases2 = selectedList.filter((a) => a.kind === "phrase");
     const sentences2 = selectedList.filter((a) => a.kind === "sentence");
     const dateStrDisp = (/* @__PURE__ */ new Date()).toLocaleDateString();
     let markdown = `
@@ -62265,14 +63462,14 @@ function WordBookApp({ plugin }) {
     };
     const sectionTitleStyle = `${baseStyle} font-size: 1.1em; font-weight: 600; color: #1e293b; margin: 24px 0 8px 0; border-bottom: 1px solid #94a3b8; padding-bottom: 4px;`;
     const gridStyle = `${baseStyle} display: block; column-count: 2; column-gap: 32px;`;
-    if (words.length > 0) {
+    if (words2.length > 0) {
       markdown += `<div style="${sectionTitleStyle}">\u5355\u8BCD (Words)</div><div style="${gridStyle}">`;
-      words.forEach((w) => markdown += renderItem(w));
+      words2.forEach((w) => markdown += renderItem(w));
       markdown += `</div>`;
     }
-    if (phrases.length > 0) {
+    if (phrases2.length > 0) {
       markdown += `<div style="${sectionTitleStyle}">\u77ED\u8BED (Phrases)</div><div style="${gridStyle}">`;
-      phrases.forEach((p) => markdown += renderItem(p));
+      phrases2.forEach((p) => markdown += renderItem(p));
       markdown += `</div>`;
     }
     if (sentences2.length > 0) {
@@ -62301,22 +63498,22 @@ function WordBookApp({ plugin }) {
       const file = await plugin.app.vault.create(fileName, markdown);
       const leaf = plugin.app.workspace.getLeaf("split", "vertical");
       await leaf.openFile(file);
-      new import_obsidian14.Notice(`\u5BFC\u51FA\u6210\u529F\uFF1A${fileName}\u3002\u6B63\u5728\u6253\u5F00 PDF \u5BFC\u51FA...`);
+      new import_obsidian15.Notice(`\u5BFC\u51FA\u6210\u529F\uFF1A${fileName}\u3002\u6B63\u5728\u6253\u5F00 PDF \u5BFC\u51FA...`);
       setTimeout(() => {
         try {
           if (plugin.app.commands && typeof plugin.app.commands.executeCommandById === "function") {
             plugin.app.commands.executeCommandById("workspace:export-pdf");
           } else {
-            new import_obsidian14.Notice("\u4E0D\u652F\u6301\u81EA\u52A8\u6253\u5F00\u5BFC\u51FA\u5F39\u7A97\uFF0C\u8BF7\u624B\u52A8\u4ECE\u7B14\u8BB0\u53F3\u4E0A\u89D2\u83DC\u5355\u5BFC\u51FA PDF");
+            new import_obsidian15.Notice("\u4E0D\u652F\u6301\u81EA\u52A8\u6253\u5F00\u5BFC\u51FA\u5F39\u7A97\uFF0C\u8BF7\u624B\u52A8\u4ECE\u7B14\u8BB0\u53F3\u4E0A\u89D2\u83DC\u5355\u5BFC\u51FA PDF");
           }
         } catch (err) {
-          new import_obsidian14.Notice("\u81EA\u52A8\u6253\u5F00 PDF \u5BFC\u51FA\u754C\u9762\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u64CD\u4F5C");
+          new import_obsidian15.Notice("\u81EA\u52A8\u6253\u5F00 PDF \u5BFC\u51FA\u754C\u9762\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u64CD\u4F5C");
           console.warn("Jarvis Reader export PDF failed", err);
         }
       }, 500);
     } catch (e) {
       console.error(e);
-      new import_obsidian14.Notice("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
+      new import_obsidian15.Notice("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
     }
   };
   const playAudio = (lemma) => {
@@ -62332,7 +63529,7 @@ function WordBookApp({ plugin }) {
       }
     }
   };
-  const booksMap = React8.useMemo(() => {
+  const booksMap = React10.useMemo(() => {
     const map = /* @__PURE__ */ new Map();
     assets.forEach((a) => {
       if (a.sources && a.sources[0] && a.sources[0].bookPath) {
@@ -62341,7 +63538,7 @@ function WordBookApp({ plugin }) {
     });
     return map;
   }, [assets]);
-  const filteredAssets = React8.useMemo(() => {
+  const filteredAssets = React10.useMemo(() => {
     let list = [...assets];
     if (filterKind !== "all") {
       list = list.filter((a) => filterKind === "word" ? !a.kind || a.kind === "word" : a.kind === filterKind);
@@ -62374,8 +63571,9 @@ function WordBookApp({ plugin }) {
     });
     return list;
   }, [assets, filterKind, filterStatus, filterBook, search, sortBy]);
-  const wordsAndPhrases = React8.useMemo(() => filteredAssets.filter((a) => a.kind !== "sentence"), [filteredAssets]);
-  const sentences = React8.useMemo(() => filteredAssets.filter((a) => a.kind === "sentence"), [filteredAssets]);
+  const words = React10.useMemo(() => filteredAssets.filter((a) => a.kind === "word"), [filteredAssets]);
+  const phrases = React10.useMemo(() => filteredAssets.filter((a) => a.kind === "phrase"), [filteredAssets]);
+  const sentences = React10.useMemo(() => filteredAssets.filter((a) => a.kind === "sentence"), [filteredAssets]);
   const renderCard = (asset) => {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
@@ -62398,7 +63596,7 @@ function WordBookApp({ plugin }) {
         setExpandedItems(newExpanded);
       }
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
       WordCard,
       {
         plugin,
@@ -62431,14 +63629,22 @@ function WordBookApp({ plugin }) {
       }
     );
   };
-  const renderTableRow = (asset) => {
-    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+  const formatDays = (dateStr) => {
+    if (!dateStr) return "\u65B0\u8BCD";
+    const diff = new Date(dateStr).getTime() - (/* @__PURE__ */ new Date()).getTime();
+    const days = Math.ceil(diff / (1e3 * 3600 * 24));
+    if (days < 0) return "\u5DF2\u8D85\u671F";
+    if (days === 0) return "\u4ECA\u65E5";
+    return `${days}\u5929\u540E`;
+  };
+  const renderTableRow = (asset, showTagsColumn = false) => {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
-    const displayWord = isSentence && quote ? quote : asset.lemma;
-    const isSelected = isSelectionMode && selected.has(assetKey);
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
+    const displayWord = isSentence ? quote || asset.lemma : asset.title || asset.lemma;
+    const assetKey = isSentence ? getTranslationAssetStorageKey(asset) : asset.lemma;
+    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle || "\u672A\u77E5\u4E66\u7C4D" : "\u624B\u52A8\u6DFB\u52A0";
     const isExpanded = expandedItems.has(assetKey);
+    const isSelected = selected.has(assetKey);
     const handleRowClick = (e) => {
       if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
         return;
@@ -62453,17 +63659,17 @@ function WordBookApp({ plugin }) {
         setExpandedItems(newExpanded);
       }
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
       "tr",
       {
-        style: { borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "var(--background-modifier-hover)" : "transparent", cursor: "pointer" },
+        style: { borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 8%, transparent)" : "transparent", cursor: "pointer" },
         onContextMenu: (e) => handleContextMenu(e, assetKey),
         onClick: handleRowClick,
         children: [
-          isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("td", { style: { padding: "8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
+          isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
           } }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("td", { style: { padding: "8px", fontWeight: "bold" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { display: "inline-block" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontWeight: "bold" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { display: "inline-block" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
               "span",
               {
                 style: {
@@ -62480,9 +63686,14 @@ function WordBookApp({ plugin }) {
                 children: displayWord
               }
             ),
-            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
+            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("td", { style: { padding: "8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: asset.translation && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          showTagsColumn && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px" }, children: asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }, children: [
+            asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u725B\u6D25\u6838\u5FC3" }),
+            asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u2605".repeat(asset.collins) }),
+            asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }, children: tag.toUpperCase() }, tag))
+          ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: asset.translation && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "div",
             {
               className: blurMode === "translation" ? "jarvis-blur-test" : "",
@@ -62491,11 +63702,14 @@ function WordBookApp({ plugin }) {
                 marginBottom: "4px",
                 whiteSpace: isExpanded ? "normal" : "pre-wrap"
               },
-              children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
+              children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
             }
           ) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("td", { style: { padding: "8px", fontSize: "0.9em", cursor: isSelectionMode ? "pointer" : "default" }, onClick: () => isSelectionMode && toggleSelect(assetKey), children: bookTitle }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("td", { style: { padding: "8px", cursor: isSelectionMode ? "pointer" : "default" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", cursor: isSelectionMode ? "pointer" : "default" }, onClick: () => isSelectionMode && toggleSelect(assetKey), children: bookTitle }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }, children: asset.reviews || 0 }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }, children: asset.ease?.toFixed(2) || "2.50" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }, children: formatDays(asset.nextReviewDate) }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", cursor: isSelectionMode ? "pointer" : "default" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "span",
             {
               style: {
@@ -62511,10 +63725,10 @@ function WordBookApp({ plugin }) {
                 handleToggleSingleMastery(e, assetKey);
               },
               title: asset.mastered ? "\u5DF2\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u672A\u638C\u63E1)" : "\u672A\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1)",
-              children: asset.mastered ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("circle", { cx: "12", cy: "12", r: "10" }) })
+              children: asset.mastered ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "10" }) })
             }
           ) })
         ]
@@ -62522,28 +63736,27 @@ function WordBookApp({ plugin }) {
       assetKey
     );
   };
-  const showFilterMenu = React8.useCallback((e) => {
-    const menu = new import_obsidian14.Menu();
-    menu.addItem((item) => item.setTitle("\u663E\u793A\u6240\u6709\u72B6\u6001").setChecked(filterStatus === "all").onClick(() => setFilterStatus("all")));
-    menu.addItem((item) => item.setTitle("\u5DF2\u638C\u63E1").setChecked(filterStatus === "mastered").onClick(() => setFilterStatus("mastered")));
-    menu.addItem((item) => item.setTitle("\u672A\u638C\u63E1").setChecked(filterStatus === "unmastered").onClick(() => setFilterStatus("unmastered")));
-    menu.addSeparator();
-    menu.addItem((item) => item.setTitle("\u65F6\u95F4\u964D\u5E8F (\u6700\u65B0)").setChecked(sortBy === "created_desc").onClick(() => setSortBy("created_desc")));
-    menu.addItem((item) => item.setTitle("\u65F6\u95F4\u5347\u5E8F (\u6700\u65E9)").setChecked(sortBy === "created_asc").onClick(() => setSortBy("created_asc")));
-    menu.addItem((item) => item.setTitle("\u5B57\u6BCD\u987A\u5E8F").setChecked(sortBy === "alpha_asc").onClick(() => setSortBy("alpha_asc")));
-    menu.addItem((item) => item.setTitle("\u6587\u7AE0\u4F4D\u7F6E").setChecked(sortBy === "cfi_asc").onClick(() => setSortBy("cfi_asc")));
-    menu.addSeparator();
-    if (booksMap.size > 0) {
-      menu.addSeparator();
-      menu.addItem((item) => item.setTitle("\u4E66\u7C4D\uFF1A\u6240\u6709\u4E66\u7C4D").setChecked(filterBook === "all").onClick(() => setFilterBook("all")));
-      Array.from(booksMap.entries()).forEach(([path, title]) => {
-        menu.addItem((item) => item.setTitle(`\u4E66\u7C4D\uFF1A${title}`).setChecked(filterBook === path).onClick(() => setFilterBook(path)));
-      });
-    }
-    menu.showAtMouseEvent(e.nativeEvent);
-  }, [filterStatus, sortBy, viewMode, blurMode, filterBook, booksMap]);
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-word-book-app", style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("style", { children: `
+  const dueCards = React10.useMemo(() => getDueCards(assets, filterBook), [assets, filterBook]);
+  const stats = React10.useMemo(() => {
+    let total = 0;
+    let mastered = 0;
+    assets.forEach((a) => {
+      if (filterBook !== "all") {
+        if (!a.sources?.some((s) => s.bookPath === filterBook)) return;
+      }
+      total++;
+      if (a.mastered) mastered++;
+    });
+    return { total, mastered, due: dueCards.length, learning: total - mastered - dueCards.length };
+  }, [assets, filterBook, dueCards]);
+  if (isReviewMode) {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ReviewSession, { plugin, dueAssets: dueCards, onComplete: () => setIsReviewMode(false), onAssetUpdate: loadAssets });
+  }
+  if (isStatsMode) {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(WordBookStats, { plugin, assets, onClose: () => setIsStatsMode(false) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-app jarvis-word-book-app", style: { height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("style", { children: `
         .jarvis-blur-test {
           filter: blur(5px);
           opacity: 0.6;
@@ -62554,271 +63767,261 @@ function WordBookApp({ plugin }) {
           opacity: 1;
         }
       ` }),
-    exportState === "select_template" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-modal-overlay", style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", zIndex: 999, display: "flex", justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-modal-content", style: { background: "var(--background-primary)", padding: "24px", borderRadius: "var(--radius-l)", width: "400px", boxShadow: "0 4px 16px rgba(0,0,0,0.2)", border: "1px solid var(--background-modifier-border)" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { style: { marginTop: 0 }, children: "\u9009\u62E9\u5BFC\u51FA\u6A21\u677F" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { style: { color: "var(--text-muted)", fontSize: "0.9em" }, children: [
+    exportState === "select_template" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-modal-overlay", style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", zIndex: 999, display: "flex", justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-modal-content", style: { background: "var(--background-primary)", padding: "24px", borderRadius: "var(--radius-l)", width: "400px", boxShadow: "0 4px 16px rgba(0,0,0,0.2)", border: "1px solid var(--background-modifier-border)" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { style: { marginTop: 0 }, children: "\u9009\u62E9\u5BFC\u51FA\u6A21\u677F" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("p", { style: { color: "var(--text-muted)", fontSize: "0.9em" }, children: [
         "\u4E3A\u4F60\u6311\u9009\u7684 ",
         selected.size,
         " \u4E2A\u8BCD\u6761\u9009\u62E9\u7528\u4E8E PDF \u6253\u5370\u7684\u6A21\u677F\u683C\u5F0F\uFF1A"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "12px", margin: "24px 0" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: () => executeExport("full"), style: { padding: "12px" }, children: "\u5B8C\u6574\u5BF9\u7167\u7248 (\u82F1\u6587 + \u8BD1\u6587 + \u4F8B\u53E5)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_zh"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u4E2D\u6587\u7248 (\u7F3A\u91CA\u4E49\uFF0C\u7559\u767D\u624B\u5199)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_en"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u82F1\u6587\u7248 (\u7F3A\u5355\u8BCD\uFF0C\u7559\u767D\u624B\u5199)" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "12px", margin: "24px 0" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mod-cta", onClick: () => executeExport("full"), style: { padding: "12px" }, children: "\u5B8C\u6574\u5BF9\u7167\u7248 (\u82F1\u6587 + \u8BD1\u6587 + \u4F8B\u53E5)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_zh"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u4E2D\u6587\u7248 (\u7F3A\u91CA\u4E49\uFF0C\u7559\u767D\u624B\u5199)" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_en"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u82F1\u6587\u7248 (\u7F3A\u5355\u8BCD\uFF0C\u7559\u767D\u624B\u5199)" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { display: "flex", justifyContent: "flex-end" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setExportState("none"), children: "\u53D6\u6D88" }) })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", justifyContent: "flex-end" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => setExportState("none"), children: "\u53D6\u6D88" }) })
     ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-word-book-header", style: { padding: "16px", borderBottom: "1px solid var(--background-modifier-border)", flexShrink: 0 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: "\u82F1\u8BED\u8BCD\u6761" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px", alignItems: "center" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          "input",
-          {
-            type: "text",
-            placeholder: "\u641C\u7D22...",
-            value: search,
-            onChange: (e) => setSearch(e.target.value),
-            style: { width: "200px" }
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { display: "flex", background: "var(--background-modifier-form-field)", borderRadius: "var(--radius-s)", padding: "2px" }, children: [{ id: "all", label: "\u5168\u90E8" }, { id: "word", label: "\u5355\u8BCD" }, { id: "phrase", label: "\u77ED\u8BED" }, { id: "sentence", label: "\u957F\u53E5" }].map((item) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          "div",
-          {
-            onClick: () => setFilterKind(item.id),
-            style: {
-              padding: "4px 12px",
-              fontSize: "0.9em",
-              cursor: "pointer",
-              borderRadius: "var(--radius-s)",
-              background: filterKind === item.id ? "var(--background-modifier-active-hover)" : "transparent",
-              color: filterKind === item.id ? "var(--text-normal)" : "var(--text-muted)",
-              fontWeight: filterKind === item.id ? "bold" : "normal",
-              transition: "all 0.2s ease"
-            },
-            children: item.label
-          },
-          item.id
-        )) }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-          "button",
-          {
-            className: "clickable-icon jarvis-reader-filter-btn",
-            onClick: showFilterMenu,
-            "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F",
-            style: { display: "flex", alignItems: "center", justifyContent: "center", padding: "4px 8px", background: "var(--background-modifier-form-field)" },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "svg-icon lucide-filter", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { marginLeft: "6px", fontSize: "0.9em" }, children: "\u7B5B\u9009\u6392\u5E8F" })
-            ]
-          }
-        ),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { width: "1px", height: "24px", background: "var(--background-modifier-border)", margin: "0 4px" } }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontSize: "0.9em", color: "var(--text-muted)" }, children: "\u89C6\u56FE\uFF1A" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("select", { value: viewMode, onChange: (e) => setViewMode(e.target.value), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "grid", children: "\u5361\u7247\u7F51\u683C" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "table", children: "\u7D27\u51D1\u8868\u683C" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "single", children: "\u5355\u5361\u6A21\u5F0F" })
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-home", style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexShrink: 0 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h2", { style: { margin: 0, fontSize: "24px", fontWeight: 700 }, children: "\u82F1\u8BED\u8BCD\u6761" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+            "input",
+            {
+              type: "text",
+              placeholder: "\u641C\u7D22\u8BCD\u6761\u3001\u91CA\u4E49...",
+              value: search,
+              onChange: (e) => setSearch(e.target.value),
+              className: "jarvis-library-search-input"
+            }
+          ),
+          search && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearch(""), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+          ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { fontSize: "0.9em", color: "var(--text-muted)", marginLeft: "4px" }, children: "\u6A21\u7CCA\uFF1A" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("select", { value: blurMode, onChange: (e) => setBlurMode(e.target.value), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "none", children: "\u5173\u95ED" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "word", children: "\u6A21\u7CCA\u539F\u6587" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "translation", children: "\u6A21\u7CCA\u8BD1\u6587" })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+              "button",
+              {
+                className: `jarvis-library-filter-btn ${showFilterMenuPopup ? "is-active" : ""}`,
+                onClick: () => setShowFilterMenuPopup(!showFilterMenuPopup),
+                title: "\u7B5B\u9009\u4E0E\u6392\u5E8F",
+                children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) })
+              }
+            ),
+            showFilterMenuPopup && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-filter-popup", style: { right: 0, minWidth: "200px" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "10px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)", fontWeight: "bold", borderBottom: "1px solid var(--background-modifier-border)", paddingBottom: "4px" }, children: "\u7B5B\u9009\u4E0E\u6392\u5E8F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u7C7B\u578B" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: filterKind, onChange: (e) => setFilterKind(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "all", children: "\u6240\u6709\u7C7B\u578B" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "word", children: "\u5355\u8BCD" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "phrase", children: "\u77ED\u8BED" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "sentence", children: "\u957F\u53E5" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u72B6\u6001" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "mastered", children: "\u5DF2\u638C\u63E1" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "unmastered", children: "\u672A\u638C\u63E1" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u6392\u5E8F" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "created_desc", children: "\u65F6\u95F4\u964D\u5E8F" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "created_asc", children: "\u65F6\u95F4\u5347\u5E8F" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "alpha_asc", children: "\u5B57\u6BCD\u987A\u5E8F" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "cfi_asc", children: "\u6587\u7AE0\u4F4D\u7F6E" })
+                ] })
+              ] }),
+              booksMap.size > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u6765\u6E90\u4E66\u7C4D" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: filterBook, onChange: (e) => setFilterBook(e.target.value), className: "jarvis-library-select", style: { width: "100%", textOverflow: "ellipsis" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "all", children: "\u6240\u6709\u4E66\u7C4D" }),
+                  Array.from(booksMap.entries()).map(([path, title]) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: path, children: title }, path))
+                ] })
+              ] })
+            ] }) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
+            const setting = plugin.app.setting;
+            setting.open();
+            setting.openTabById(plugin.manifest.id);
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
+          ] }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { display: "flex", gap: "8px", alignItems: "center" }, children: !isSelectionMode ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(React8.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setIsSelectionMode(true), className: "mod-cta", children: "\u6279\u91CF\u7BA1\u7406 / \u5BFC\u51FA" }),
-        filterBook !== "all" && filteredAssets.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "var(--background-secondary)", padding: "14px 20px", borderRadius: "12px", border: "1px solid var(--background-modifier-border)", flexShrink: 0 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", gap: "24px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: "\u603B\u8BCD\u6C47" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--text-normal)" }, children: stats.total })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.85em", color: "var(--color-green)" }, children: "\u5DF2\u638C\u63E1" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--color-green)" }, children: stats.mastered })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.85em", color: "var(--interactive-accent)" }, children: "\u5B66\u4E60\u4E2D" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--interactive-accent)" }, children: stats.learning })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.85em", color: "var(--color-red)" }, children: "\u5F85\u590D\u4E60" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--color-red)" }, children: stats.due })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", gap: "12px", alignItems: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginRight: "8px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: "\u6A21\u7CCA\uFF1A" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: blurMode, onChange: (e) => setBlurMode(e.target.value), className: "jarvis-library-select", style: { padding: "4px 8px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "none", children: "\u65E0" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "word", children: "\u6A21\u7CCA\u5355\u8BCD" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "translation", children: "\u6A21\u7CCA\u8BD1\u6587" })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+            "button",
+            {
+              className: "jarvis-library-back-btn",
+              onClick: () => setIsStatsMode(true),
+              style: { padding: "6px 16px !important" },
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+                ] }),
+                "\u8BE6\u7EC6\u7EDF\u8BA1"
+              ]
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+            "button",
+            {
+              className: "jarvis-library-back-btn",
+              onClick: () => setIsReviewMode(true),
+              disabled: stats.due === 0,
+              style: {
+                padding: "6px 16px !important",
+                background: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-secondary) !important",
+                color: stats.due > 0 ? "var(--text-on-accent) !important" : "var(--text-muted) !important",
+                borderColor: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-modifier-border) !important"
+              },
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polygon", { points: "5 3 19 12 5 21 5 3" }) }),
+                "\u5F00\u59CB\u8BB0\u5FC6"
+              ]
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", gap: "8px", alignItems: "center", marginBottom: "16px", flexShrink: 0 }, children: !isSelectionMode ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(React10.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => setIsSelectionMode(true), className: "jarvis-library-back-btn", style: { padding: "6px 14px !important" }, children: "\u6279\u91CF\u7BA1\u7406 / \u5BFC\u51FA" }),
+        filterBook !== "all" && filteredAssets.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
           "button",
           {
             onClick: handleDeleteFilteredBookWords,
-            style: { backgroundColor: "var(--color-red)", color: "white", border: "none" },
-            children: "\u{1F5D1}\uFE0F \u4E00\u952E\u5220\u9664\u6B64\u4E66\u8BCD\u6761"
+            className: "jarvis-library-back-btn",
+            style: { backgroundColor: "var(--color-red) !important", color: "white !important", borderColor: "var(--color-red) !important", padding: "6px 14px !important" },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "3 6 5 6 21 6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
+              ] }),
+              "\u4E00\u952E\u5220\u9664\u6B64\u4E66\u8BCD\u6761"
+            ]
           }
         )
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { style: { fontSize: "0.9em", color: "var(--text-muted)", marginRight: "8px" }, children: [
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { style: { fontSize: "0.9em", color: "var(--text-muted)", marginRight: "8px" }, children: [
           "\u5DF2\u9009 ",
           selected.size,
           " / ",
           filteredAssets.length
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: toggleSelectAll, children: "\u5168\u9009" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: invertSelection, children: "\u53CD\u9009" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => handleMarkMastered(true), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => handleMarkMastered(false), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: handleDeleteSelected, disabled: selected.size === 0, style: { color: "var(--text-error)" }, children: "\u5F7B\u5E95\u5220\u9664" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { flex: 1 } }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => {
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: toggleSelectAll, children: "\u5168\u9009" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: invertSelection, children: "\u53CD\u9009" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => handleMarkMastered(true), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => handleMarkMastered(false), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important", color: "var(--text-error) !important", borderColor: "var(--text-error) !important" }, onClick: handleDeleteSelected, disabled: selected.size === 0, children: "\u5F7B\u5E95\u5220\u9664" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { flex: 1 } }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => {
           setIsSelectionMode(false);
           setSelected(/* @__PURE__ */ new Set());
         }, children: "\u53D6\u6D88" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: handleExportPrint, disabled: selected.size === 0, className: "mod-cta", children: "\u5BFC\u51FA\u6253\u5370\u7B14\u8BB0" })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important", background: "var(--interactive-accent) !important", color: "var(--text-on-accent) !important", borderColor: "var(--interactive-accent) !important" }, onClick: handleExportPrint, disabled: selected.size === 0, children: "\u5BFC\u51FA\u6253\u5370\u7B14\u8BB0" })
+      ] }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: `jarvis-library-list`, style: { flex: 1, overflow: "auto", padding: "0 4px 20px 4px", minHeight: 0 }, children: filteredAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { padding: "32px", textAlign: "center", color: "var(--text-muted)" }, children: "\u6CA1\u6709\u5339\u914D\u7684\u8BCD\u6761\u3002" }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "32px" }, children: [
+        words.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u5355\u8BCD" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u6807\u7B7E" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: words.map((a) => renderTableRow(a, true)) })
+          ] })
+        ] }),
+        phrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u77ED\u8BED" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: phrases.map((a) => renderTableRow(a, false)) })
+          ] })
+        ] }),
+        sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u957F\u53E5" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: sentences.map((a) => renderTableRow(a, false)) })
+          ] })
+        ] })
       ] }) })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: `jarvis-word-book-${viewMode}-wrap`, style: { flex: 1, overflow: "auto", padding: viewMode === "grid" ? "16px" : "0" }, children: filteredAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { padding: "32px", textAlign: "center", color: "var(--text-muted)" }, children: "\u6CA1\u6709\u5339\u914D\u7684\u8BCD\u6761\u3002" }) : viewMode === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "24px" }, children: [
-      wordsAndPhrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u5355\u8BCD & \u77ED\u8BED" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-word-book-grid", style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }, children: wordsAndPhrases.map(renderCard) })
-      ] }),
-      sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { style: { marginTop: wordsAndPhrases.length > 0 ? "16px" : 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u957F\u53E5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-word-book-grid", style: { display: "grid", gridTemplateColumns: "1fr", gap: "16px" }, children: sentences.map(renderCard) })
-      ] })
-    ] }) : viewMode === "table" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "32px", padding: "16px" }, children: [
-      wordsAndPhrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px" }, children: "\u5355\u8BCD & \u77ED\u8BED" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("table", { className: "jarvis-word-book-table", style: { width: "100%", borderCollapse: "collapse", textAlign: "left" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-secondary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("tr", { children: [
-            isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", width: "40px", borderBottom: "1px solid var(--background-modifier-border)" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u8BCD\u6761" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "40%" }, children: "\u91CA\u4E49" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "20%" }, children: "\u4E66\u7C4D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "80px" }, children: "\u72B6\u6001" })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("tbody", { children: wordsAndPhrases.map(renderTableRow) })
-        ] })
-      ] }),
-      sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px" }, children: "\u957F\u53E5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("table", { className: "jarvis-word-book-table", style: { width: "100%", borderCollapse: "collapse", textAlign: "left" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-secondary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("tr", { children: [
-            isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", width: "40px", borderBottom: "1px solid var(--background-modifier-border)" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u8BCD\u6761" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "40%" }, children: "\u91CA\u4E49" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "20%" }, children: "\u4E66\u7C4D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("th", { style: { padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "80px" }, children: "\u72B6\u6001" })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("tbody", { children: sentences.map(renderTableRow) })
-        ] })
-      ] })
-    ] }) : viewMode === "single" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-      "div",
-      {
-        className: "jarvis-word-book-single-mode",
-        style: { display: "flex", justifyContent: "center", alignItems: "center", padding: "40px", height: "100%", overflow: "hidden" },
-        onWheel: (e) => {
-          if (singleCardFlipped) return;
-          e.preventDefault();
-          if (e.deltaY > 0) {
-            setSingleCardIndex((i) => (i + 1) % filteredAssets.length);
-            setSingleCardFlipped(false);
-          } else if (e.deltaY < 0) {
-            setSingleCardIndex((i) => (i - 1 + filteredAssets.length) % filteredAssets.length);
-            setSingleCardFlipped(false);
-          }
-        },
-        children: (() => {
-          const activeIndex = singleCardIndex % filteredAssets.length;
-          const activeAsset = filteredAssets[activeIndex];
-          if (!activeAsset) return null;
-          const activeAssetKey = getTranslationAssetStorageKey(activeAsset) || activeAsset.lemma;
-          const typeLabel = activeAsset.kind === "sentence" ? "\u957F\u53E5" : activeAsset.kind === "phrase" ? "\u77ED\u8BED" : "\u5355\u8BCD";
-          const titleText = activeAsset.title || activeAsset.lemma;
-          const posText = activeAsset.pos ? `${activeAsset.pos} \xB7 ` : "";
-          let titleFontSize = "4em";
-          if (activeAsset.kind === "sentence") {
-            if (titleText.length > 200) titleFontSize = "1.5em";
-            else if (titleText.length > 100) titleFontSize = "1.8em";
-            else if (titleText.length > 50) titleFontSize = "2.2em";
-            else titleFontSize = "2.5em";
-          } else if (titleText.length > 20) {
-            titleFontSize = "2.5em";
-          }
-          return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-            "div",
-            {
-              className: "jarvis-single-card",
-              style: {
-                width: "800px",
-                maxWidth: "100%",
-                height: "500px",
-                background: "var(--background-primary)",
-                borderRadius: "16px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                border: "1px solid var(--background-modifier-border)",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative"
-              },
-              onClick: () => !singleCardFlipped && setSingleCardFlipped(true),
-              children: !singleCardFlipped ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 40px 40px", cursor: "pointer", position: "relative" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { position: "absolute", top: "24px", left: "24px", fontSize: "1.1em", color: "var(--text-muted)", background: "var(--background-secondary)", padding: "4px 12px", borderRadius: "8px" }, children: [
-                  posText,
-                  typeLabel
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { position: "absolute", top: "24px", right: "24px" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
-                  {
-                    className: "clickable-icon",
-                    onClick: (e) => handleToggleSingleMastery(e, activeAssetKey),
-                    "aria-label": activeAsset.mastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1",
-                    style: {
-                      color: activeAsset.mastered ? "var(--color-green)" : "var(--text-faint)",
-                      width: "28px",
-                      height: "28px",
-                      padding: "0",
-                      border: activeAsset.mastered ? "1px solid var(--color-green)" : "1px solid var(--text-faint)",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    },
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M20 6 9 17l-5-5" }) })
-                  }
-                ) }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { position: "relative", display: "inline-flex", alignItems: activeAsset.kind === "sentence" ? "flex-start" : "center", justifyContent: "center", width: activeAsset.kind === "sentence" ? "100%" : "auto" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: titleFontSize, fontFamily: "serif", textAlign: activeAsset.kind === "sentence" ? "left" : "center", lineHeight: 1.4, padding: "0 20px", width: "100%", wordBreak: "break-word", whiteSpace: "pre-wrap" }, children: titleText }),
-                  activeAsset.kind !== "sentence" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { position: "absolute", left: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "clickable-icon", onClick: (e) => {
-                    e.stopPropagation();
-                    playAudio(activeAsset.lemma);
-                  }, "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "28", height: "28", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
-                  ] }) }) })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { marginTop: "auto", paddingTop: "40px" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: (e) => {
-                  e.stopPropagation();
-                  setSingleCardFlipped(true);
-                }, children: "\u67E5\u770B\u91CA\u4E49" }) })
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { flex: 1, display: "flex", flexDirection: "column", padding: "40px", overflowY: "auto" }, onWheel: (e) => e.stopPropagation(), children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", flexDirection: "column", marginBottom: "24px", flexShrink: 0, borderLeft: "4px solid var(--interactive-accent)", borderRadius: "8px", paddingLeft: "16px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: activeAsset.kind === "sentence" ? "1.4em" : "2.5em", fontFamily: "serif", lineHeight: 1.3 }, children: titleText }),
-                    activeAsset.kind !== "sentence" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "clickable-icon", onClick: (e) => {
-                      playAudio(activeAsset.lemma);
-                    }, "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
-                    ] }) })
-                  ] }),
-                  activeAsset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "1.1em", color: "var(--text-muted)", fontStyle: "italic", marginTop: "8px" }, children: activeAsset.phonetic })
-                ] }),
-                activeAsset.kind !== "sentence" && activeAsset.sources && activeAsset.sources[0]?.quote && activeAsset.sources[0].quote.trim() !== activeAsset.lemma.trim() && activeAsset.sources[0].quote.trim() !== titleText.trim() && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { marginBottom: "20px", padding: "16px", background: "var(--background-secondary)", borderRadius: "8px", borderLeft: "4px solid var(--interactive-accent)", flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontStyle: "italic", color: "var(--text-normal)", lineHeight: 1.5 }, children: activeAsset.sources[0].quote }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "1.2em", lineHeight: 1.6, flex: "1 1 auto", color: "var(--text-normal)", minHeight: "min-content" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(MarkdownPreview, { content: activeAsset.display || activeAsset.translation || "", plugin }) }),
-                activeAsset.sources && activeAsset.sources[0] && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { marginTop: "24px", paddingTop: "16px", borderTop: "1px dashed var(--background-modifier-border)", color: "var(--text-muted)", fontSize: "0.9em", display: "flex", justifyContent: "space-between", flexShrink: 0 }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\u6765\u6E90" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
-                    activeAsset.sources[0].bookTitle || activeAsset.sources[0].bookPath,
-                    " ",
-                    activeAsset.sources[0].chapterTitle ? ` \xB7 ${activeAsset.sources[0].chapterTitle}` : ""
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { marginTop: "32px", display: "flex", justifyContent: "center", flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setSingleCardFlipped(false), children: "\u56DE\u5230\u6B63\u9762" }) })
-              ] })
-            }
-          );
-        })()
-      }
-    ) : null })
+    ] })
   ] });
 }
 
 // src/word-book/WordBookView.ts
 var WORD_BOOK_VIEW_TYPE = "jarvis-reader-word-book";
-var WordBookView = class extends import_obsidian15.ItemView {
+var WordBookView = class extends import_obsidian16.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -62839,7 +64042,7 @@ var WordBookView = class extends import_obsidian15.ItemView {
     container.empty();
     container.addClass("jarvis-reader-word-book-view");
     this.root = ReactDOM3.createRoot(container);
-    this.root.render(React9.createElement(WordBookApp, { plugin: this.plugin }));
+    this.root.render(React11.createElement(WordBookApp, { plugin: this.plugin }));
   }
   async onClose() {
     if (this.root) {
@@ -62857,7 +64060,7 @@ init_utils();
 // src/global-markdown.ts
 var import_react4 = __toESM(require_react(), 1);
 var import_react_dom2 = __toESM(require_react_dom(), 1);
-var import_obsidian16 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 function truncateWordDisplay2(value) {
   const raw = String(value || "");
   if (raw.length <= 8e3) return raw;
@@ -62930,8 +64133,8 @@ var GlobalTranslationCard = ({
         while (element.firstChild) {
           element.removeChild(element.firstChild);
         }
-        if (typeof import_obsidian16.setIcon === "function") {
-          (0, import_obsidian16.setIcon)(element, name);
+        if (typeof import_obsidian17.setIcon === "function") {
+          (0, import_obsidian17.setIcon)(element, name);
         }
       }
     });
@@ -63008,7 +64211,7 @@ var GlobalTranslationCard = ({
     try {
       const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
-        new import_obsidian16.Notice("Failed to save word.");
+        new import_obsidian17.Notice("Failed to save word.");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
@@ -63022,7 +64225,7 @@ var GlobalTranslationCard = ({
         plugin.settings
       );
       if (!asset) {
-        new import_obsidian16.Notice("Failed to build word asset.");
+        new import_obsidian17.Notice("Failed to build word asset.");
         return;
       }
       plugin.settings.wordAssets = plugin.settings.wordAssets || {};
@@ -63030,14 +64233,14 @@ var GlobalTranslationCard = ({
       await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
       setIsSaved(true);
-      new import_obsidian16.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
+      new import_obsidian17.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian16.Notice("Save failed.");
+      new import_obsidian17.Notice("Save failed.");
     }
   };
   const handleAiTranslate = async () => {
@@ -63069,14 +64272,14 @@ var GlobalTranslationCard = ({
       await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
       setIsMastered(nextMastered);
-      new import_obsidian16.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
+      new import_obsidian17.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian16.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
+      new import_obsidian17.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
     }
   };
   const handleDeleteWord = async () => {
@@ -63084,7 +64287,7 @@ var GlobalTranslationCard = ({
       delete plugin.settings.wordAssets[word.toLowerCase()];
       await plugin.persistWordAssetSidecar("delete");
       await plugin.saveSettingsData();
-      new import_obsidian16.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+      new import_obsidian17.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
       onClose();
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
@@ -63092,7 +64295,7 @@ var GlobalTranslationCard = ({
         }
       });
     } catch (err) {
-      new import_obsidian16.Notice("\u5220\u9664\u5931\u8D25\u3002");
+      new import_obsidian17.Notice("\u5220\u9664\u5931\u8D25\u3002");
     }
   };
   const handlePlayAudio = () => {
@@ -63275,6 +64478,13 @@ var GlobalTranslationCard = ({
           }, word),
           result.phonetic && import_react4.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, `[${result.phonetic}]`)
         ),
+        result.isWord && (result.tags || result.collins || result.oxford) ? import_react4.default.createElement(
+          "div",
+          { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
+          result.oxford === 1 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
+          result.collins && result.collins > 0 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(result.collins)) : null,
+          result.tags ? result.tags.map((tag) => import_react4.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+        ) : null,
         result.display ? renderWordDisplayContent(result.display) : import_react4.default.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
     ),
@@ -63493,7 +64703,7 @@ function registerGlobalMarkdownFeatures(plugin) {
 }
 
 // src/main.ts
-var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
+var JarvisReaderPlugin = class extends import_obsidian18.Plugin {
   bookshelfView;
   highlightsView;
   activeReaderView;
@@ -63566,7 +64776,7 @@ var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
       }
     });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file instanceof import_obsidian17.TFile && file.extension.toLowerCase() === "pdf") {
+      if (file instanceof import_obsidian18.TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0").setIcon("pencil").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -63923,7 +65133,7 @@ var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
-      new import_obsidian17.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
+      new import_obsidian18.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
       throw error;
     }
   }
@@ -64004,7 +65214,6 @@ var JarvisReaderPlugin = class extends import_obsidian17.Plugin {
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
     this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder || "00-Attachment");
-    this.settings.wordNoteFolder = normalizeVaultPath(this.settings.wordNoteFolder || "09 Books/Words");
     this.settings.enableAutoHighlight = this.settings.enableAutoHighlight !== false;
     this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
     this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);

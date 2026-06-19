@@ -1,9 +1,9 @@
 import * as React from "react";
 import type JarvisReaderPlugin from "../main";
-import { TFile, Notice, MarkdownRenderer, moment } from "obsidian";
+import { TFile, Notice, MarkdownRenderer, moment, Menu } from "obsidian";
 import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
 import { getHighlightsForBook } from "../highlights";
-import { buildWordAudioUrl, DEFAULT_WORD_AUDIO_TEMPLATE } from "../word-assets";
+import { buildWordAudioUrl, DEFAULT_WORD_AUDIO_TEMPLATE, getTranslationAssetStorageKey } from "../word-assets";
 import { confirmDestructiveAction, formatDuration, getBookTotalSeconds } from "../utils";
 import type { BookHighlight, WordAsset, BookProgress } from "../types";
 import { WordCard } from "../word-book/WordCard";
@@ -133,6 +133,164 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [statsDate, setStatsDate] = React.useState<Date>(() => new Date());
   const [statsChartType, setStatsChartType] = React.useState<"bar" | "calendar" | "heatmap">("bar");
   const [debugImages, setDebugImages] = React.useState<{href: string, size: number, dataUrl: string}[] | null>(null);
+
+  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
+  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
+
+  const formatDays = (dateStr?: string) => {
+    if (!dateStr) return "未设置";
+    const today = (moment as any)().startOf("day");
+    const target = (moment as any)(dateStr, "YYYY-MM-DD").startOf("day");
+    const diff = target.diff(today, "days");
+    if (diff === 0) return "今天";
+    if (diff < 0) return `逾期 ${Math.abs(diff)} 天`;
+    return `${diff} 天后`;
+  };
+
+  const handleToggleSingleMastery = async (e: React.MouseEvent, lemma: string) => {
+    e.stopPropagation();
+    if (plugin.settings.wordAssets[lemma]) {
+      const current = plugin.settings.wordAssets[lemma].mastered;
+      plugin.settings.wordAssets[lemma].mastered = !current;
+      await plugin.saveSettings();
+      setRefreshTrigger(p => p + 1);
+      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    }
+  };
+
+  const handleDeleteWord = async (lemma: string) => {
+    const confirmed = await confirmDestructiveAction(plugin.app, "删除词条", `确定要彻底删除词条 "${lemma}" 吗？此操作不可恢复。`);
+    if (!confirmed) return;
+    const asset = plugin.settings.wordAssets[lemma];
+    if (!asset) return;
+    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
+        await plugin.activeReaderView.deleteWordAsset(asset);
+    } else {
+        delete plugin.settings.wordAssets[lemma];
+        await plugin.persistWordAssetSidecar("delete");
+        await plugin.saveSettings();
+    }
+    setRefreshTrigger(p => p + 1);
+    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    new Notice(`已彻底删除词条：${lemma}`);
+  };
+
+  const renderTableRow = (asset: any) => {
+    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+    const isSentence = asset.kind === "sentence";
+    const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
+    const displayWord = isSentence && quote ? quote : asset.lemma;
+    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "未知";
+    const isExpanded = expandedItems.has(assetKey);
+    
+    const handleRowClick = (e: React.MouseEvent) => {
+        if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).closest('svg')) {
+            return;
+        }
+        
+        const newExpanded = new Set<string>();
+        if (!expandedItems.has(assetKey)) {
+            newExpanded.add(assetKey);
+        }
+        setExpandedItems(newExpanded);
+    };
+
+    return (
+      <tr 
+        key={assetKey} 
+        style={{ borderBottom: "1px solid var(--background-modifier-border)", cursor: "pointer" }}
+        onClick={handleRowClick}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          const menu = new Menu();
+          const isMastered = asset.mastered;
+
+          menu.addItem((item) => {
+              item.setTitle(isMastered ? "标记为未掌握" : "标记为已掌握")
+                  .setIcon(isMastered ? "cross" : "checkmark")
+                  .onClick(async () => {
+                      if (plugin.settings.wordAssets[assetKey]) {
+                          plugin.settings.wordAssets[assetKey].mastered = !isMastered;
+                          await plugin.saveSettings();
+                          setRefreshTrigger(p => p + 1);
+                          window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+                      }
+                  });
+          });
+
+          menu.addSeparator();
+
+          menu.addItem((item) => {
+              item.setTitle("彻底删除")
+                  .setIcon("trash")
+                  .onClick(() => handleDeleteWord(assetKey));
+          });
+          menu.showAtMouseEvent(e.nativeEvent);
+        }}
+      >
+        <td style={{ padding: "12px 8px", fontWeight: "bold" }}>
+          <div style={{ display: "inline-block" }}>
+            <span 
+              style={{ 
+                cursor: "pointer", 
+                color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
+                ...(isSentence ? { fontWeight: "normal", fontSize: "0.9em" } : {})
+              }}
+              onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = "underline"}
+              onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = "none"}
+              onClick={(e) => { e.stopPropagation(); playAudio(displayWord); }}
+            >
+              {displayWord}
+            </span>
+            {!isSentence && asset.phonetic && <div style={{ fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }}>{asset.phonetic}</div>}
+          </div>
+        </td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
+          {asset.translation && (
+            <div 
+              style={{ 
+                color: "var(--text-normal)", 
+                marginBottom: "4px", 
+                whiteSpace: isExpanded ? "normal" : "pre-wrap"
+              }}
+            >
+              {isExpanded && asset.display ? (
+                  <div>
+                      <MarkdownText content={asset.display} plugin={plugin} />
+                  </div>
+              ) : (
+                  asset.translation
+              )}
+            </div>
+          )}
+        </td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>{bookTitle}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }}>{asset.reviews || 0}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }}>{asset.ease?.toFixed(2) || "2.50"}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }}>{formatDays(asset.nextReviewDate)}</td>
+        <td style={{ padding: "12px 8px" }}>
+          <span 
+              style={{ 
+                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)", 
+                display: "flex", 
+                alignItems: "center",
+                cursor: "pointer",
+                width: "fit-content"
+              }}
+              className="clickable-icon" 
+              onClick={(e) => { e.stopPropagation(); handleToggleSingleMastery(e, assetKey); }}
+              title={asset.mastered ? "已掌握 (点击标记为未掌握)" : "未掌握 (点击标记为已掌握)"}
+          >
+            {asset.mastered ? (
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
+            )}
+          </span>
+        </td>
+      </tr>
+    );
+  };
 
   // Scan books from Vault
   const loadBooks = React.useCallback(() => {
@@ -357,7 +515,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             const pubdate = metadata.pubdate || "";
 
             plugin.settings.bookCoverCache[key] = {
-              dataUrl,
+              ...(cached || {}),
+              dataUrl: dataUrl || cached?.dataUrl || "",
               updated: new Date().toISOString(),
               description,
               creator,
@@ -1865,28 +2024,40 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         </div>
 
         {/* Stats Quick Strip */}
-        <div className="jarvis-library-stats-strip minimalist" onClick={() => setCurrentView("stats")} title="查看数据统计" style={{ cursor: 'pointer' }}>
-          <div style={{ display: 'flex', alignItems: 'center', opacity: 0.6, marginRight: '4px' }}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <div className="jarvis-library-stats-container">
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', opacity: 0.6 }}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <div className="stats-strip-item">
+              <span>总书籍 <b>{stats.total}</b></span>
+            </div>
+            <div className="stats-strip-item">
+              <span>在读 <b>{stats.reading}</b></span>
+            </div>
+            <div className="stats-strip-item">
+              <span>已读完 <b>{stats.finished}</b></span>
+            </div>
+            <div className="stats-strip-item">
+              <span>笔记 <b>{stats.highlights}</b></span>
+            </div>
+            <div className="stats-strip-item">
+              <span>词条 <b>{stats.words}</b></span>
+            </div>
+            <div className="stats-strip-item">
+              <span>总阅读时长 <b>{formatDuration(totalAppReadingTime)}</b></span>
+            </div>
           </div>
-          <div className="stats-strip-item">
-            <span>总书籍 <b>{stats.total}</b></span>
-          </div>
-          <div className="stats-strip-item">
-            <span>在读 <b>{stats.reading}</b></span>
-          </div>
-          <div className="stats-strip-item">
-            <span>已读完 <b>{stats.finished}</b></span>
-          </div>
-          <div className="stats-strip-item">
-            <span>笔记 <b>{stats.highlights}</b></span>
-          </div>
-          <div className="stats-strip-item">
-            <span>词条 <b>{stats.words}</b></span>
-          </div>
-          <div className="stats-strip-item">
-            <span>总阅读时长 <b>{formatDuration(totalAppReadingTime)}</b></span>
-          </div>
+          
+          <button 
+            className="jarvis-library-back-btn" 
+            onClick={() => setCurrentView("stats")}
+            title="查看数据统计"
+            style={{ padding: "4px 12px !important" }}
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            详细统计
+          </button>
         </div>
 
         {/* Books shelf grid/list */}
@@ -2422,15 +2593,21 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             </div>
 
             {/* Action buttons */}
-            <div className="detail-action-buttons" style={{ display: 'flex', gap: '12px', width: '100%' }}>
-              <button className="jarvis-library-btn btn-primary" onClick={() => openBook(activeBook)} style={{ flex: 1 }}>
+            <div className="detail-action-buttons" style={{ display: 'flex', gap: '12px', width: '100%', flexWrap: 'wrap' }}>
+              <button className="jarvis-library-btn btn-primary" onClick={() => openBook(activeBook)} style={{ flex: 1, minWidth: '120px' }}>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
                 {percentage > 0 ? "继续阅读" : "开始阅读"}
               </button>
-              <button className="jarvis-library-btn btn-secondary" onClick={() => openOrCreateNote(plugin.app, activeBook, "", plugin.settings)} style={{ flex: 1 }}>
+              <button className="jarvis-library-btn btn-secondary" onClick={() => openOrCreateNote(plugin.app, activeBook, "", plugin.settings)} style={{ flex: 1, minWidth: '120px' }}>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 打开笔记文件
               </button>
+              {wordAssets.length > 0 && (
+                <button className="jarvis-library-btn btn-secondary" onClick={() => plugin.openWordBook()} style={{ flex: 1, minWidth: '120px' }}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                  打开词条
+                </button>
+              )}
             </div>
 
             {/* Interactive Metadata Editor */}
@@ -2606,35 +2783,55 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 <p>本书暂无关联的单词或翻译卡片。</p>
               </div>
             ) : (
-              <div className="jarvis-library-word-cards-grid">
-                {wordAssets.map((w: WordAsset) => {
-                  return (
-                    <WordCard 
-                        key={w.lemma}
-                        plugin={plugin}
-                        asset={w}
-                        onToggleMastery={(lemma, mastered) => {
-                            if (plugin.settings.wordAssets[lemma]) {
-                                plugin.settings.wordAssets[lemma].mastered = mastered;
-                                plugin.saveSettings();
-                                // We don't need a strict re-load here since React might trigger or we just let it update visually?
-                                // Actually we should trigger an update. The toggleWordMastery from earlier does it.
-                            }
-                        }}
-                        onDelete={(assetKey) => {
-                            // Only via context menu
-                            const asset = plugin.settings.wordAssets[assetKey];
-                            if (!asset) return;
-                            if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-                                plugin.activeReaderView.deleteWordAsset(asset).catch(console.error);
-                            } else {
-                                delete plugin.settings.wordAssets[assetKey];
-                                plugin.persistWordAssetSidecar("delete").then(() => plugin.saveSettings());
-                            }
-                        }}
-                    />
-                  );
-                })}
+              <div className="jarvis-library-list" style={{ overflow: "auto", padding: "0 4px 20px 4px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+                  {(() => {
+                    const wordsAndPhrases = (wordAssets as WordAsset[]).filter(w => w.kind !== "sentence");
+                    const sentences = (wordAssets as WordAsset[]).filter(w => w.kind === "sentence");
+                    return (
+                      <>
+                        {wordsAndPhrases.length > 0 && (
+                          <div>
+                            <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }}>单词 & 短语</h3>
+                            <table className="jarvis-library-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                              <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
+                                <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
+                                </tr>
+                              </thead>
+                              <tbody>{wordsAndPhrases.map(renderTableRow)}</tbody>
+                            </table>
+                          </div>
+                        )}
+                        {sentences.length > 0 && (
+                          <div>
+                            <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }}>长句</h3>
+                            <table className="jarvis-library-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                              <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
+                                <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
+                                </tr>
+                              </thead>
+                              <tbody>{sentences.map(renderTableRow)}</tbody>
+                            </table>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
             )
           ) : (

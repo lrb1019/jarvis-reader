@@ -2102,8 +2102,13 @@ const showWordHoverCard = (asset, element) => {
     onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
     disabled: !enableWordAudio
   }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ?  React.createElement("div", {
-    className: "jarvis-reader-word-phonetic"
-  }, wordLookupState.result.phonetic) : null) : null, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) :  React.createElement("div", {
+  }, wordLookupState.result.phonetic) : null) : null, 
+  wordLookupState.result.isWord && (wordLookupState.result.tags || wordLookupState.result.collins || wordLookupState.result.oxford) ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
+    wordLookupState.result.oxford === 1 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "牛津核心") : null,
+    wordLookupState.result.collins && wordLookupState.result.collins > 0 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, '★'.repeat(wordLookupState.result.collins)) : null,
+    wordLookupState.result.tags ? wordLookupState.result.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+  ) : null,
+  wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) :  React.createElement("div", {
     className: "jarvis-reader-word-translation"
   }, wordLookupState.result.translation)) : null),  React.createElement("div", {
     className: "jarvis-reader-highlight-actions"
@@ -2286,7 +2291,7 @@ const showWordHoverCard = (asset, element) => {
     onPointerDown: (e) => e.stopPropagation()
   },  React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
-    title: "打开词句本",
+    title: "打开词条",
     onClick: () => {
       hideWordHoverCard();
       openWordNote(activeWordHover.asset);
@@ -2304,8 +2309,13 @@ const showWordHoverCard = (asset, element) => {
     title: "\u5173\u95ed\u5361\u7247",
     onClick: hideWordHoverCard
   }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
-    className: "jarvis-reader-word-phonetic"
-  }, activeWordHover.asset.phonetic) : null),  React.createElement("div", {
+  }, activeWordHover.asset.phonetic) : null), 
+  activeWordHover.asset.isWord && (activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford) ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
+    activeWordHover.asset.oxford === 1 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "牛津核心") : null,
+    activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, '★'.repeat(activeWordHover.asset.collins)) : null,
+    activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+  ) : null,
+  React.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
   }, (getTranslationAssetKind(activeWordHover.asset) === "sentence" || (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30) ?  React.createElement("div", {
     className: "jarvis-reader-word-card-original-sentence",

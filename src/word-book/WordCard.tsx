@@ -160,6 +160,25 @@ export const WordCard: React.FC<WordCardProps> = ({
             </span>
           </div>
           {!isSentence && asset.phonetic && <div style={{ fontSize: "0.85em", color: "var(--text-muted)", marginTop: "2px" }}>{asset.phonetic}</div>}
+          {asset.isWord && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
+              {asset.oxford === 1 && (
+                <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }}>
+                  牛津核心
+                </span>
+              )}
+              {asset.collins && asset.collins > 0 && (
+                <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }}>
+                  {'★'.repeat(asset.collins)}
+                </span>
+              )}
+              {asset.tags?.map((tag: string) => (
+                <span key={tag} className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }}>
+                  {tag.toUpperCase()}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0, marginLeft: "12px" }}>

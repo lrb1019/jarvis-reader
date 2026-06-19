@@ -561,5 +561,13 @@ export async function translateSelectionWithApi(settings: any = {}, selectedText
   if (!result.display) {
     throw new Error("翻译响应缺少 display 字段。");
   }
+  if (selectionType === "word") {
+    const localMeta = await lookupLocalDictionary(settings, selectedText, app);
+    if (localMeta) {
+      if (localMeta.tags) result.tags = localMeta.tags;
+      if (localMeta.collins) result.collins = localMeta.collins;
+      if (localMeta.oxford) result.oxford = localMeta.oxford;
+    }
+  }
   return result;
 }

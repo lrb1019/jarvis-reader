@@ -10,6 +10,9 @@ export interface WordBookAppProps {
 }
 
 import { WordCard, MarkdownPreview } from "./WordCard";
+import { ReviewSession } from "./ReviewSession";
+import { WordBookStats } from "./WordBookStats";
+import { getDueCards } from "./SpacedRepetition";
 
 export function WordBookApp({ plugin }: WordBookAppProps) {
   const [assets, setAssets] = React.useState<WordAsset[]>([]);
@@ -20,14 +23,12 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
   const [sortBy, setSortBy] = React.useState("created_desc");
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [isSelectionMode, setIsSelectionMode] = React.useState(false);
-  const [viewMode, setViewMode] = React.useState<"grid" | "table" | "single">("grid");
   const [exportState, setExportState] = React.useState<"none" | "select_template">("none");
   const [blurMode, setBlurMode] = React.useState<"none" | "word" | "translation">("none");
-  const [singleCardIndex, setSingleCardIndex] = React.useState(0);
-  const [singleCardFlipped, setSingleCardFlipped] = React.useState(false);
   const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
-
-  // Load assets
+  const [isReviewMode, setIsReviewMode] = React.useState(false);
+  const [isStatsMode, setIsStatsMode] = React.useState(false);
+  const [showFilterMenuPopup, setShowFilterMenuPopup] = React.useState(false);
   const loadAssets = React.useCallback(() => {
     if (plugin.settings.wordAssets && typeof plugin.settings.wordAssets === "object") {
       setAssets(Object.values(plugin.settings.wordAssets) as WordAsset[]);
@@ -390,7 +391,8 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     return list;
   }, [assets, filterKind, filterStatus, filterBook, search, sortBy]);
 
-  const wordsAndPhrases = React.useMemo(() => filteredAssets.filter(a => a.kind !== "sentence"), [filteredAssets]);
+  const words = React.useMemo(() => filteredAssets.filter(a => a.kind === "word"), [filteredAssets]);
+  const phrases = React.useMemo(() => filteredAssets.filter(a => a.kind === "phrase"), [filteredAssets]);
   const sentences = React.useMemo(() => filteredAssets.filter(a => a.kind === "sentence"), [filteredAssets]);
 
   const renderCard = (asset: any) => {
@@ -452,15 +454,24 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     );
   };
 
-  const renderTableRow = (asset: any) => {
-    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+  const formatDays = (dateStr: string | undefined) => {
+    if (!dateStr) return "新词";
+    const diff = new Date(dateStr).getTime() - new Date().getTime();
+    const days = Math.ceil(diff / (1000 * 3600 * 24));
+    if (days < 0) return "已超期";
+    if (days === 0) return "今日";
+    return `${days}天后`;
+  };
+
+  const renderTableRow = (asset: any, showTagsColumn: boolean = false) => {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
-    const displayWord = isSentence && quote ? quote : asset.lemma;
-    const isSelected = isSelectionMode && selected.has(assetKey);
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "未知";
+    const displayWord = isSentence ? quote || asset.lemma : asset.title || asset.lemma;
+    const assetKey = isSentence ? getTranslationAssetStorageKey(asset) : asset.lemma;
+    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle || "未知书籍" : "手动添加";
     const isExpanded = expandedItems.has(assetKey);
-    
+    const isSelected = selected.has(assetKey);
+
     const handleRowClick = (e: React.MouseEvent) => {
         // Prevent toggle if clicking on an input or specific action button
         if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).closest('svg')) {
@@ -481,16 +492,16 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     return (
       <tr 
         key={assetKey} 
-        style={{ borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "var(--background-modifier-hover)" : "transparent", cursor: "pointer" }}
+        style={{ borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 8%, transparent)" : "transparent", cursor: "pointer" }}
         onContextMenu={(e) => handleContextMenu(e, assetKey)}
         onClick={handleRowClick}
       >
         {isSelectionMode && (
-          <td style={{ padding: "8px" }}>
+          <td style={{ padding: "12px 8px" }}>
             <input type="checkbox" checked={isSelected} onChange={() => {}} />
           </td>
         )}
-        <td style={{ padding: "8px", fontWeight: "bold" }}>
+        <td style={{ padding: "12px 8px", fontWeight: "bold" }}>
           <div className={blurMode === "word" ? "jarvis-blur-test" : ""} style={{ display: "inline-block" }}>
             <span 
               style={{ 
@@ -507,7 +518,24 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             {!isSentence && asset.phonetic && <div style={{ fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }}>{asset.phonetic}</div>}
           </div>
         </td>
-        <td style={{ padding: "8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
+        {showTagsColumn && (
+          <td style={{ padding: "12px 8px" }}>
+            {asset.isWord && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                {asset.oxford === 1 && (
+                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>牛津核心</span>
+                )}
+                {asset.collins && asset.collins > 0 && (
+                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>{'★'.repeat(asset.collins)}</span>
+                )}
+                {asset.tags?.map((tag: string) => (
+                  <span key={tag} className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }}>{tag.toUpperCase()}</span>
+                ))}
+              </div>
+            )}
+          </td>
+        )}
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
           {asset.translation && (
             <div 
               className={blurMode === "translation" ? "jarvis-blur-test" : ""}
@@ -527,8 +555,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             </div>
           )}
         </td>
-        <td style={{ padding: "8px", fontSize: "0.9em", cursor: isSelectionMode ? "pointer" : "default" }} onClick={() => isSelectionMode && toggleSelect(assetKey)}>{bookTitle}</td>
-        <td style={{ padding: "8px", cursor: isSelectionMode ? "pointer" : "default" }}>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", cursor: isSelectionMode ? "pointer" : "default" }} onClick={() => isSelectionMode && toggleSelect(assetKey)}>{bookTitle}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }}>{asset.reviews || 0}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }}>{asset.ease?.toFixed(2) || "2.50"}</td>
+        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }}>{formatDays(asset.nextReviewDate)}</td>
+        <td style={{ padding: "12px 8px", cursor: isSelectionMode ? "pointer" : "default" }}>
           <span 
               style={{ 
                 color: asset.mastered ? "var(--color-green)" : "var(--text-faint)", 
@@ -552,35 +583,32 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     );
   };
 
-  const showFilterMenu = React.useCallback((e: React.MouseEvent) => {
-    const menu = new Menu();
 
-    menu.addItem(item => item.setTitle("显示所有状态").setChecked(filterStatus === "all").onClick(() => setFilterStatus("all")));
-    menu.addItem(item => item.setTitle("已掌握").setChecked(filterStatus === "mastered").onClick(() => setFilterStatus("mastered")));
-    menu.addItem(item => item.setTitle("未掌握").setChecked(filterStatus === "unmastered").onClick(() => setFilterStatus("unmastered")));
-    
-    menu.addSeparator();
 
-    menu.addItem(item => item.setTitle("时间降序 (最新)").setChecked(sortBy === "created_desc").onClick(() => setSortBy("created_desc")));
-    menu.addItem(item => item.setTitle("时间升序 (最早)").setChecked(sortBy === "created_asc").onClick(() => setSortBy("created_asc")));
-    menu.addItem(item => item.setTitle("字母顺序").setChecked(sortBy === "alpha_asc").onClick(() => setSortBy("alpha_asc")));
-    menu.addItem(item => item.setTitle("文章位置").setChecked(sortBy === "cfi_asc").onClick(() => setSortBy("cfi_asc")));
+  const dueCards = React.useMemo(() => getDueCards(assets, filterBook), [assets, filterBook]);
+  const stats = React.useMemo(() => {
+    let total = 0;
+    let mastered = 0;
+    assets.forEach(a => {
+      if (filterBook !== "all") {
+        if (!a.sources?.some(s => s.bookPath === filterBook)) return;
+      }
+      total++;
+      if (a.mastered) mastered++;
+    });
+    return { total, mastered, due: dueCards.length, learning: total - mastered - dueCards.length };
+  }, [assets, filterBook, dueCards]);
 
-    menu.addSeparator();
+  if (isReviewMode) {
+    return <ReviewSession plugin={plugin} dueAssets={dueCards} onComplete={() => setIsReviewMode(false)} onAssetUpdate={loadAssets} />;
+  }
 
-    if (booksMap.size > 0) {
-      menu.addSeparator();
-      menu.addItem(item => item.setTitle("书籍：所有书籍").setChecked(filterBook === "all").onClick(() => setFilterBook("all")));
-      Array.from(booksMap.entries()).forEach(([path, title]) => {
-        menu.addItem(item => item.setTitle(`书籍：${title}`).setChecked(filterBook === path).onClick(() => setFilterBook(path)));
-      });
-    }
-
-    menu.showAtMouseEvent(e.nativeEvent);
-  }, [filterStatus, sortBy, viewMode, blurMode, filterBook, booksMap]);
+  if (isStatsMode) {
+    return <WordBookStats plugin={plugin} assets={assets} onClose={() => setIsStatsMode(false)} />;
+  }
 
   return (
-    <div className="jarvis-word-book-app" style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+    <div className="jarvis-library-app jarvis-word-book-app" style={{ height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <style>{`
         .jarvis-blur-test {
           filter: blur(5px);
@@ -611,74 +639,170 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         </div>
       )}
 
-      {/* Header & Controls */}
-      <div className="jarvis-word-book-header" style={{ padding: "16px", borderBottom: "1px solid var(--background-modifier-border)", flexShrink: 0 }}>
-        <h2>英语词条</h2>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px", alignItems: "center" }}>
-          <input 
-            type="text" 
-            placeholder="搜索..." 
-            value={search} 
-            onChange={e => setSearch(e.target.value)} 
-            style={{ width: "200px" }}
-          />
-          <div style={{ display: "flex", background: "var(--background-modifier-form-field)", borderRadius: "var(--radius-s)", padding: "2px" }}>
-            {[ { id: "all", label: "全部" }, { id: "word", label: "单词" }, { id: "phrase", label: "短语" }, { id: "sentence", label: "长句" } ].map(item => (
-              <div 
-                key={item.id}
-                onClick={() => setFilterKind(item.id as any)}
-                style={{
-                  padding: "4px 12px",
-                  fontSize: "0.9em",
-                  cursor: "pointer",
-                  borderRadius: "var(--radius-s)",
-                  background: filterKind === item.id ? "var(--background-modifier-active-hover)" : "transparent",
-                  color: filterKind === item.id ? "var(--text-normal)" : "var(--text-muted)",
-                  fontWeight: filterKind === item.id ? "bold" : "normal",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                {item.label}
-              </div>
-            ))}
+      <div className="jarvis-library-home" style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+        {/* Header toolbar (Modelled after LibraryApp) */}
+        <div className="jarvis-library-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexShrink: 0 }}>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>英语词条</h2>
           </div>
-          
-          <button 
-            className="clickable-icon jarvis-reader-filter-btn" 
-            onClick={showFilterMenu}
-            aria-label="筛选与排序"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "4px 8px", background: "var(--background-modifier-form-field)" }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="svg-icon lucide-filter"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-            <span style={{ marginLeft: "6px", fontSize: "0.9em" }}>筛选排序</span>
-          </button>
-          
-          <div style={{ width: "1px", height: "24px", background: "var(--background-modifier-border)", margin: "0 4px" }}></div>
-          <span style={{ fontSize: "0.9em", color: "var(--text-muted)" }}>视图：</span>
-          <select value={viewMode} onChange={e => setViewMode(e.target.value as any)}>
-            <option value="grid">卡片网格</option>
-            <option value="table">紧凑表格</option>
-            <option value="single">单卡模式</option>
-          </select>
-          <span style={{ fontSize: "0.9em", color: "var(--text-muted)", marginLeft: "4px" }}>模糊：</span>
-          <select value={blurMode} onChange={e => setBlurMode(e.target.value as any)}>
-            <option value="none">关闭</option>
-            <option value="word">模糊原文</option>
-            <option value="translation">模糊译文</option>
-          </select>
+
+          {/* Center Search Input */}
+          <div className="jarvis-library-search-wrap" style={{ flex: 1.5, display: 'flex', justifyContent: 'center' }}>
+            <svg className="jarvis-search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input
+              type="text"
+              placeholder="搜索词条、释义..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="jarvis-library-search-input"
+            />
+            {search && (
+              <button className="jarvis-library-search-clear" onClick={() => setSearch("")}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            )}
+          </div>
+
+          {/* Right side controls */}
+          <div className="jarvis-library-header-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
+            <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
+              <button 
+                className={`jarvis-library-filter-btn ${showFilterMenuPopup ? 'is-active' : ''}`} 
+                onClick={() => setShowFilterMenuPopup(!showFilterMenuPopup)} 
+                title="筛选与排序"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              </button>
+
+              {showFilterMenuPopup && (
+                <div className="jarvis-library-filter-popup" style={{ right: 0, minWidth: "200px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div style={{ fontSize: "0.85em", color: "var(--text-muted)", fontWeight: "bold", borderBottom: "1px solid var(--background-modifier-border)", paddingBottom: "4px" }}>筛选与排序</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <span style={{ fontSize: "0.8em", color: "var(--text-muted)" }}>类型</span>
+                      <select value={filterKind} onChange={(e) => setFilterKind(e.target.value as any)} className="jarvis-library-select" style={{ width: "100%" }}>
+                        <option value="all">所有类型</option>
+                        <option value="word">单词</option>
+                        <option value="phrase">短语</option>
+                        <option value="sentence">长句</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <span style={{ fontSize: "0.8em", color: "var(--text-muted)" }}>状态</span>
+                      <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="jarvis-library-select" style={{ width: "100%" }}>
+                        <option value="all">所有状态</option>
+                        <option value="mastered">已掌握</option>
+                        <option value="unmastered">未掌握</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <span style={{ fontSize: "0.8em", color: "var(--text-muted)" }}>排序</span>
+                      <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="jarvis-library-select" style={{ width: "100%" }}>
+                        <option value="created_desc">时间降序</option>
+                        <option value="created_asc">时间升序</option>
+                        <option value="alpha_asc">字母顺序</option>
+                        <option value="cfi_asc">文章位置</option>
+                      </select>
+                    </div>
+                    {booksMap.size > 0 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <span style={{ fontSize: "0.8em", color: "var(--text-muted)" }}>来源书籍</span>
+                        <select value={filterBook} onChange={(e) => setFilterBook(e.target.value)} className="jarvis-library-select" style={{ width: "100%", textOverflow: "ellipsis" }}>
+                          <option value="all">所有书籍</option>
+                          {Array.from(booksMap.entries()).map(([path, title]) => (
+                            <option key={path} value={path}>{title}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="jarvis-library-header-actions">
+              <button className="jarvis-library-action-icon-btn" title="插件设置" onClick={() => {
+                const setting = (plugin as any).app.setting;
+                setting.open();
+                setting.openTabById(plugin.manifest.id);
+              }}>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              </button>
+            </div>
+          </div>
         </div>
-        
+
+        {/* Stats Panel & Action Buttons above the list (Modelled after Library detail tabs and back button Capsule styles) */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "var(--background-secondary)", padding: "14px 20px", borderRadius: "12px", border: "1px solid var(--background-modifier-border)", flexShrink: 0 }}>
+          {/* Metadata Display */}
+          <div style={{ display: "flex", gap: "24px" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "0.85em", color: "var(--text-muted)" }}>总词汇</span>
+              <span style={{ fontSize: "1.15em", fontWeight: "600", color: "var(--text-normal)" }}>{stats.total}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "0.85em", color: "var(--color-green)" }}>已掌握</span>
+              <span style={{ fontSize: "1.15em", fontWeight: "600", color: "var(--color-green)" }}>{stats.mastered}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "0.85em", color: "var(--interactive-accent)" }}>学习中</span>
+              <span style={{ fontSize: "1.15em", fontWeight: "600", color: "var(--interactive-accent)" }}>{stats.learning}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "0.85em", color: "var(--color-red)" }}>待复习</span>
+              <span style={{ fontSize: "1.15em", fontWeight: "600", color: "var(--color-red)" }}>{stats.due}</span>
+            </div>
+          </div>
+
+          {/* Buttons and Blur filter */}
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginRight: "8px" }}>
+              <span style={{ fontSize: "0.85em", color: "var(--text-muted)" }}>模糊：</span>
+              <select value={blurMode} onChange={e => setBlurMode(e.target.value as any)} className="jarvis-library-select" style={{ padding: "4px 8px" }}>
+                <option value="none">无</option>
+                <option value="word">模糊单词</option>
+                <option value="translation">模糊译文</option>
+              </select>
+            </div>
+
+            <button 
+              className="jarvis-library-back-btn" 
+              onClick={() => setIsStatsMode(true)}
+              style={{ padding: "6px 16px !important" }}
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              详细统计
+            </button>
+            <button 
+              className="jarvis-library-back-btn" 
+              onClick={() => setIsReviewMode(true)}
+              disabled={stats.due === 0}
+              style={{
+                padding: "6px 16px !important",
+                background: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-secondary) !important",
+                color: stats.due > 0 ? "var(--text-on-accent) !important" : "var(--text-muted) !important",
+                borderColor: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-modifier-border) !important"
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              开始记忆
+            </button>
+          </div>
+        </div>
+
         {/* Bulk Actions */}
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "16px", flexShrink: 0 }}>
           {!isSelectionMode ? (
             <React.Fragment>
-              <button onClick={() => setIsSelectionMode(true)} className="mod-cta">批量管理 / 导出</button>
+              <button onClick={() => setIsSelectionMode(true)} className="jarvis-library-back-btn" style={{ padding: "6px 14px !important" }}>批量管理 / 导出</button>
               {filterBook !== "all" && filteredAssets.length > 0 && (
                 <button 
                   onClick={handleDeleteFilteredBookWords} 
-                  style={{ backgroundColor: 'var(--color-red)', color: 'white', border: 'none' }}
+                  className="jarvis-library-back-btn"
+                  style={{ backgroundColor: 'var(--color-red) !important', color: 'white !important', borderColor: 'var(--color-red) !important', padding: "6px 14px !important" }}
                 >
-                  🗑️ 一键删除此书词条
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  一键删除此书词条
                 </button>
               )}
             </React.Fragment>
@@ -687,221 +811,88 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
               <span style={{ fontSize: "0.9em", color: "var(--text-muted)", marginRight: "8px" }}>
                 已选 {selected.size} / {filteredAssets.length}
               </span>
-              <button onClick={toggleSelectAll}>全选</button>
-              <button onClick={invertSelection}>反选</button>
-              <button onClick={() => handleMarkMastered(true)} disabled={selected.size === 0}>标记为已掌握</button>
-              <button onClick={() => handleMarkMastered(false)} disabled={selected.size === 0}>标记为未掌握</button>
-              <button onClick={handleDeleteSelected} disabled={selected.size === 0} style={{ color: "var(--text-error)" }}>彻底删除</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important" }} onClick={toggleSelectAll}>全选</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important" }} onClick={invertSelection}>反选</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important" }} onClick={() => handleMarkMastered(true)} disabled={selected.size === 0}>标记为已掌握</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important" }} onClick={() => handleMarkMastered(false)} disabled={selected.size === 0}>标记为未掌握</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important", color: "var(--text-error) !important", borderColor: "var(--text-error) !important" }} onClick={handleDeleteSelected} disabled={selected.size === 0}>彻底删除</button>
               <div style={{ flex: 1 }}></div>
-              <button onClick={() => { setIsSelectionMode(false); setSelected(new Set()); }}>取消</button>
-              <button onClick={handleExportPrint} disabled={selected.size === 0} className="mod-cta">导出打印笔记</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important" }} onClick={() => { setIsSelectionMode(false); setSelected(new Set()); }}>取消</button>
+              <button className="jarvis-library-back-btn" style={{ padding: "6px 12px !important", background: "var(--interactive-accent) !important", color: "var(--text-on-accent) !important", borderColor: "var(--interactive-accent) !important" }} onClick={handleExportPrint} disabled={selected.size === 0}>导出打印笔记</button>
             </>
           )}
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className={`jarvis-word-book-${viewMode}-wrap`} style={{ flex: 1, overflow: "auto", padding: viewMode === "grid" ? "16px" : "0" }}>
-        {filteredAssets.length === 0 ? (
-          <div style={{ padding: "32px", textAlign: "center", color: "var(--text-muted)" }}>没有匹配的词条。</div>
-        ) : viewMode === "grid" ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {wordsAndPhrases.length > 0 && (
-              <div>
-                <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>单词 & 短语</h3>
-                <div className="jarvis-word-book-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
-                  {wordsAndPhrases.map(renderCard)}
+        {/* Main Content Area */}
+        <div className={`jarvis-library-list`} style={{ flex: 1, overflow: "auto", padding: "0 4px 20px 4px", minHeight: 0 }}>
+          {filteredAssets.length === 0 ? (
+            <div style={{ padding: "32px", textAlign: "center", color: "var(--text-muted)" }}>没有匹配的词条。</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+              {words.length > 0 && (
+                <div>
+                  <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>单词</h3>
+                  <table className="jarvis-library-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                    <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
+                      <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
+                        {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>标签</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>{words.map(a => renderTableRow(a, true))}</tbody>
+                  </table>
                 </div>
-              </div>
-            )}
-            {sentences.length > 0 && (
-              <div>
-                <h3 style={{ marginTop: wordsAndPhrases.length > 0 ? "16px" : 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>长句</h3>
-                <div className="jarvis-word-book-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }}>
-                  {sentences.map(renderCard)}
+              )}
+              {phrases.length > 0 && (
+                <div>
+                  <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>短语</h3>
+                  <table className="jarvis-library-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                    <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
+                      <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
+                        {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>{phrases.map(a => renderTableRow(a, false))}</tbody>
+                  </table>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : viewMode === "table" ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "32px", padding: "16px" }}>
-            {wordsAndPhrases.length > 0 && (
-              <div>
-                <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px" }}>单词 & 短语</h3>
-                <table className="jarvis-word-book-table" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-                  <thead style={{ position: "sticky", top: 0, background: "var(--background-secondary)", zIndex: 1 }}>
-                    <tr>
-                      {isSelectionMode && <th style={{ padding: "8px", width: "40px", borderBottom: "1px solid var(--background-modifier-border)" }}></th>}
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>词条</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "40%" }}>释义</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "20%" }}>书籍</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "80px" }}>状态</th>
-                    </tr>
-                  </thead>
-                  <tbody>{wordsAndPhrases.map(renderTableRow)}</tbody>
-                </table>
-              </div>
-            )}
-            {sentences.length > 0 && (
-              <div>
-                <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px" }}>长句</h3>
-                <table className="jarvis-word-book-table" style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-                  <thead style={{ position: "sticky", top: 0, background: "var(--background-secondary)", zIndex: 1 }}>
-                    <tr>
-                      {isSelectionMode && <th style={{ padding: "8px", width: "40px", borderBottom: "1px solid var(--background-modifier-border)" }}></th>}
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>词条</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "40%" }}>释义</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "20%" }}>书籍</th>
-                      <th style={{ padding: "8px", borderBottom: "1px solid var(--background-modifier-border)", width: "80px" }}>状态</th>
-                    </tr>
-                  </thead>
-                  <tbody>{sentences.map(renderTableRow)}</tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        ) : viewMode === "single" ? (
-          <div 
-            className="jarvis-word-book-single-mode" 
-            style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px", height: "100%", overflow: "hidden" }}
-            onWheel={(e) => {
-              if (singleCardFlipped) return; // Allow scrolling inside the back side without switching
-              e.preventDefault();
-              if (e.deltaY > 0) {
-                setSingleCardIndex(i => (i + 1) % filteredAssets.length);
-                setSingleCardFlipped(false);
-              } else if (e.deltaY < 0) {
-                setSingleCardIndex(i => (i - 1 + filteredAssets.length) % filteredAssets.length);
-                setSingleCardFlipped(false);
-              }
-            }}
-          >
-            {(() => {
-              const activeIndex = singleCardIndex % filteredAssets.length;
-              const activeAsset = filteredAssets[activeIndex];
-              if (!activeAsset) return null;
-              
-              const activeAssetKey = getTranslationAssetStorageKey(activeAsset) || activeAsset.lemma;
-              const typeLabel = activeAsset.kind === "sentence" ? "长句" : (activeAsset.kind === "phrase" ? "短语" : "单词");
-              const titleText = activeAsset.title || activeAsset.lemma;
-              const posText = activeAsset.pos ? `${activeAsset.pos} · ` : "";
-              
-              let titleFontSize = "4em";
-              if (activeAsset.kind === "sentence") {
-                if (titleText.length > 200) titleFontSize = "1.5em";
-                else if (titleText.length > 100) titleFontSize = "1.8em";
-                else if (titleText.length > 50) titleFontSize = "2.2em";
-                else titleFontSize = "2.5em";
-              } else if (titleText.length > 20) {
-                titleFontSize = "2.5em";
-              }
-
-              return (
-                <div 
-                  className="jarvis-single-card"
-                  style={{
-                    width: "800px",
-                    maxWidth: "100%",
-                    height: "500px",
-                    background: "var(--background-primary)",
-                    borderRadius: "16px",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                    border: "1px solid var(--background-modifier-border)",
-                    display: "flex",
-                    flexDirection: "column",
-                    position: "relative"
-                  }}
-                  onClick={() => !singleCardFlipped && setSingleCardFlipped(true)}
-                >
-                  {!singleCardFlipped ? (
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 40px 40px", cursor: "pointer", position: "relative" }}>
-                      {/* Top Left: Type Label */}
-                      <div style={{ position: "absolute", top: "24px", left: "24px", fontSize: "1.1em", color: "var(--text-muted)", background: "var(--background-secondary)", padding: "4px 12px", borderRadius: "8px" }}>
-                        {posText}{typeLabel}
-                      </div>
-
-                      {/* Top Right: Mastery Status */}
-                      <div style={{ position: "absolute", top: "24px", right: "24px" }}>
-                        <button 
-                          className="clickable-icon" 
-                          onClick={(e) => handleToggleSingleMastery(e, activeAssetKey)} 
-                          aria-label={activeAsset.mastered ? "标记为未掌握" : "标记为已掌握"} 
-                          style={{ 
-                            color: activeAsset.mastered ? "var(--color-green)" : "var(--text-faint)", 
-                            width: "28px",
-                            height: "28px",
-                            padding: "0", 
-                            border: activeAsset.mastered ? "1px solid var(--color-green)" : "1px solid var(--text-faint)", 
-                            borderRadius: "50%", 
-                            display: "flex", 
-                            alignItems: "center", 
-                            justifyContent: "center" 
-                          }}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        </button>
-                      </div>
-
-                      {/* Center: Word + Audio Icon */}
-                      <div style={{ position: "relative", display: "inline-flex", alignItems: activeAsset.kind === "sentence" ? "flex-start" : "center", justifyContent: "center", width: activeAsset.kind === "sentence" ? "100%" : "auto" }}>
-                        <div style={{ fontSize: titleFontSize, fontFamily: "serif", textAlign: activeAsset.kind === "sentence" ? "left" : "center", lineHeight: 1.4, padding: "0 20px", width: "100%", wordBreak: "break-word", whiteSpace: "pre-wrap" }}>{titleText}</div>
-                        {activeAsset.kind !== "sentence" && (
-                          <div style={{ position: "absolute", left: "100%" }}>
-                            <button className="clickable-icon" onClick={(e) => { e.stopPropagation(); playAudio(activeAsset.lemma); }} aria-label="发音" title="发音" style={{ opacity: 0.7 }}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Bottom: "查看释义" button */}
-                      <div style={{ marginTop: "auto", paddingTop: "40px" }}>
-                        <button className="mod-cta" onClick={(e) => { e.stopPropagation(); setSingleCardFlipped(true); }}>查看释义</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "40px", overflowY: "auto" }} onWheel={e => e.stopPropagation()}>
-                      <div style={{ display: "flex", flexDirection: "column", marginBottom: "24px", flexShrink: 0, borderLeft: "4px solid var(--interactive-accent)", borderRadius: "8px", paddingLeft: "16px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <div style={{ fontSize: activeAsset.kind === "sentence" ? "1.4em" : "2.5em", fontFamily: "serif", lineHeight: 1.3 }}>{titleText}</div>
-                          {activeAsset.kind !== "sentence" && (
-                            <button className="clickable-icon" onClick={(e) => { playAudio(activeAsset.lemma); }} aria-label="发音" title="发音" style={{ opacity: 0.7 }}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                            </button>
-                          )}
-                        </div>
-                        {activeAsset.phonetic && (
-                          <div style={{ fontSize: "1.1em", color: "var(--text-muted)", fontStyle: "italic", marginTop: "8px" }}>
-                            {activeAsset.phonetic}
-                          </div>
-                        )}
-                      </div>
-                      {activeAsset.kind !== "sentence" && activeAsset.sources && activeAsset.sources[0]?.quote && activeAsset.sources[0].quote.trim() !== activeAsset.lemma.trim() && activeAsset.sources[0].quote.trim() !== titleText.trim() && (
-                        <div style={{ marginBottom: "20px", padding: "16px", background: "var(--background-secondary)", borderRadius: "8px", borderLeft: "4px solid var(--interactive-accent)", flexShrink: 0 }}>
-                           <div style={{ fontStyle: "italic", color: "var(--text-normal)", lineHeight: 1.5 }}>
-                             {activeAsset.sources[0].quote}
-                           </div>
-                        </div>
-                      )}
-                      <div style={{ fontSize: "1.2em", lineHeight: 1.6, flex: "1 1 auto", color: "var(--text-normal)", minHeight: "min-content" }}>
-                         <MarkdownPreview content={activeAsset.display || activeAsset.translation || ""} plugin={plugin} />
-                      </div>
-                      {activeAsset.sources && activeAsset.sources[0] && (
-                        <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px dashed var(--background-modifier-border)", color: "var(--text-muted)", fontSize: "0.9em", display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
-                           <span>来源</span>
-                           <span>{activeAsset.sources[0].bookTitle || activeAsset.sources[0].bookPath} {activeAsset.sources[0].chapterTitle ? ` · ${activeAsset.sources[0].chapterTitle}` : ""}</span>
-                        </div>
-                      )}
-                      <div style={{ marginTop: "32px", display: "flex", justifyContent: "center", flexShrink: 0 }}>
-                        <button onClick={() => setSingleCardFlipped(false)}>回到正面</button>
-                      </div>
-                    </div>
-                  )}
+              )}
+              {sentences.length > 0 && (
+                <div>
+                  <h3 style={{ marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }}>长句</h3>
+                  <table className="jarvis-library-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }}>
+                    <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
+                      <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
+                        {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>{sentences.map(a => renderTableRow(a, false))}</tbody>
+                  </table>
                 </div>
-              );
-            })()}
-          </div>
-        ) : null}
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

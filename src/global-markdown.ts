@@ -448,6 +448,11 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
           }, word),
           result.phonetic && React.createElement("div", { className: "jarvis-reader-word-phonetic" }, `[${result.phonetic}]`)
         ),
+        result.isWord && (result.tags || result.collins || result.oxford) ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
+          result.oxford === 1 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "牛津核心") : null,
+          result.collins && result.collins > 0 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, '★'.repeat(result.collins)) : null,
+          result.tags ? result.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+        ) : null,
         result.display ? renderWordDisplayContent(result.display) : React.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
     ),

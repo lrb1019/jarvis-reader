@@ -57,10 +57,15 @@ export interface WordAsset {
   sources: WordAssetSource[];
   created: string;
   updated: string;
+  tags?: string[];
+  collins?: number;
+  oxford?: number;
   // Anki-style review fields (optional for now)
   nextReviewDate?: string;
   interval?: number;
   ease?: number;
+  reviews?: number;
+  reviewTimeMs?: number;
   pos?: string;
 }
 
@@ -98,6 +103,12 @@ export interface DailyReadingStat {
   [bookPath: string]: number;
 }
 export type ReadingStatsMap = Record<string, DailyReadingStat>;
+
+export interface DailyWordReviewStat {
+  reviewCount: number;
+  reviewTimeMs: number;
+}
+export type WordReviewStatsMap = Record<string, DailyWordReviewStat>;
 
 export interface BookBookmark {
   cfi: string;
@@ -157,7 +168,6 @@ export interface JarvisReaderSettings {
   bookNoteFolder: string;
   bookNoteTemplate: string;
   customCoverFolder: string;
-  wordNoteFolder: string;
   wordAssets: WordAssetMap;
   translationApi: TranslationApiSettings;
   translationPrompt: string;
@@ -178,6 +188,11 @@ export interface JarvisReaderSettings {
   highlightColors: Record<string, string>;
   enableGlobalMarkdownTranslation: boolean;
   readingStats?: ReadingStatsMap;
+  wordReviewStats?: WordReviewStatsMap;
+  sm2StartingEase: number;
+  sm2EasyBonus: number;
+  sm2LapseMultiplier: number;
+  sm2MaxInterval: number;
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &
