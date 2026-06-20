@@ -293,6 +293,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                     });
                     
                     let targetLeaf: any = null;
+                    // 1. Exact path match
                     for (const l of leaves) {
                       const viewState = l.getViewState();
                       const filePath = (l.view as any)?.file?.path || viewState?.state?.file;
@@ -302,11 +303,34 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                       }
                     }
 
+                    // 2. Loose basename match fallback (handles renamed or differently punctuated files)
+                    if (!targetLeaf) {
+                      const normalizeBookName = (p: string) => {
+                        if (!p) return "";
+                        const filename = p.split("/").pop() || p;
+                        return filename.toLowerCase()
+                          .replace(/[\s\-_]/g, "")
+                          .replace(/[（(]/g, "(")
+                          .replace(/[）)]/g, ")");
+                      };
+                      const targetName = normalizeBookName(file.path);
+                      for (const l of leaves) {
+                        const viewState = l.getViewState();
+                        const filePath = (l.view as any)?.file?.path || viewState?.state?.file;
+                        if (filePath && normalizeBookName(filePath) === targetName) {
+                          targetLeaf = l;
+                          break;
+                        }
+                      }
+                    }
+
                     if (targetLeaf) {
-                      console.log(`[Jarvis Reader] Found target leaf for book: ${file.path}, jumping to cfi: ${source.cfiRange}`);
+                      const viewState = targetLeaf.getViewState();
+                      const activeFilePath = (targetLeaf.view as any)?.file?.path || viewState?.state?.file || file.path;
+                      console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
                       
                       // Save to settings as a fallback in case view reloads or isn't fully ready
-                      plugin.settings.bookInitLocations[file.path] = source.cfiRange;
+                      plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
                       
                       // Set ephemeral state (Obsidian native mechanism)
                       targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });

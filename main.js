@@ -62637,9 +62637,27 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
                   break;
                 }
               }
+              if (!targetLeaf) {
+                const normalizeBookName = (p) => {
+                  if (!p) return "";
+                  const filename = p.split("/").pop() || p;
+                  return filename.toLowerCase().replace(/[\s\-_]/g, "").replace(/[（(]/g, "(").replace(/[）)]/g, ")");
+                };
+                const targetName = normalizeBookName(file.path);
+                for (const l of leaves) {
+                  const viewState = l.getViewState();
+                  const filePath = l.view?.file?.path || viewState?.state?.file;
+                  if (filePath && normalizeBookName(filePath) === targetName) {
+                    targetLeaf = l;
+                    break;
+                  }
+                }
+              }
               if (targetLeaf) {
-                console.log(`[Jarvis Reader] Found target leaf for book: ${file.path}, jumping to cfi: ${source.cfiRange}`);
-                plugin.settings.bookInitLocations[file.path] = source.cfiRange;
+                const viewState = targetLeaf.getViewState();
+                const activeFilePath = targetLeaf.view?.file?.path || viewState?.state?.file || file.path;
+                console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
+                plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
                 targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
                 const jump = () => {
                   const view = targetLeaf.view;
