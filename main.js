@@ -53564,7 +53564,7 @@ __export(main_exports, {
   default: () => JarvisReaderPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian19 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 
 // src/EpubView.ts
 var import_react3 = __toESM(require_react(), 1);
@@ -58180,12 +58180,198 @@ var EpubView = class extends import_obsidian6.FileView {
   }
 };
 
+// src/conflict-resolver.ts
+var import_obsidian7 = require("obsidian");
+async function resolveSyncConflicts(plugin) {
+  const adapter = plugin.app.vault.adapter;
+  if (!adapter || typeof adapter.list !== "function" || typeof adapter.read !== "function") {
+    return;
+  }
+  let conflictsFound = 0;
+  try {
+    const indexFolder = ".obsidian/plugins/jarvis-reader/index";
+    if (await adapter.exists(indexFolder)) {
+      const indexFiles = await adapter.list(indexFolder);
+      const wordAssetConflicts = indexFiles.files.filter(
+        (f) => f.match(/word-assets[- (].*\.json$/) && !f.endsWith("word-assets.json")
+      );
+      const highlightConflicts = indexFiles.files.filter(
+        (f) => f.match(/highlights[- (].*\.json$/) && !f.endsWith("highlights.json")
+      );
+      for (const file of wordAssetConflicts) {
+        await mergeWordAssetConflict(plugin, file);
+        conflictsFound++;
+      }
+      for (const file of highlightConflicts) {
+        await mergeHighlightConflict(plugin, file);
+        conflictsFound++;
+      }
+    }
+    const rootFolder = ".obsidian/plugins/jarvis-reader";
+    if (await adapter.exists(rootFolder)) {
+      const rootFiles = await adapter.list(rootFolder);
+      const dataConflicts = rootFiles.files.filter(
+        (f) => f.match(/data[- (].*\.json$/) && !f.endsWith("data.json")
+      );
+      for (const file of dataConflicts) {
+        await mergeDataConflict(plugin, file);
+        conflictsFound++;
+      }
+    }
+    if (conflictsFound > 0) {
+      await plugin.saveSettings();
+      if (typeof plugin.persistIndexSidecars === "function") {
+        await plugin.persistIndexSidecars("auto-conflict-resolve");
+      }
+      new import_obsidian7.Notice(`Jarvis Reader \u81EA\u52A8\u5408\u5E76\u4E86 ${conflictsFound} \u4E2A\u7F51\u76D8\u6570\u636E\u51B2\u7A81\u6587\u4EF6\u3002`);
+    }
+  } catch (err) {
+    console.warn("Jarvis Reader auto conflict resolution failed", err);
+  }
+}
+async function mergeWordAssetConflict(plugin, conflictPath) {
+  const adapter = plugin.app.vault.adapter;
+  const raw = await adapter.read(conflictPath);
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    console.error("Invalid word asset conflict file:", conflictPath);
+    return;
+  }
+  const conflictAssets = parsed.wordAssets || {};
+  const currentAssets = plugin.settings.wordAssets || {};
+  for (const [key, asset2] of Object.entries(conflictAssets)) {
+    const asset2Typed = asset2;
+    if (!currentAssets[key]) {
+      currentAssets[key] = asset2;
+    } else {
+      const asset1 = currentAssets[key];
+      const mergedSources = [...asset1.sources || []];
+      for (const src2 of asset2Typed.sources || []) {
+        const exists = mergedSources.find((s) => s.bookPath === src2.bookPath && s.cfiRange === src2.cfiRange);
+        if (!exists) mergedSources.push(src2);
+      }
+      const d1 = new Date(asset1.updated || asset1.created).getTime();
+      const d2 = new Date(asset2Typed.updated || asset2Typed.created).getTime();
+      const reviewFields = ["nextReviewDate", "interval", "ease", "reviews", "reviewTimeMs", "phonetic", "partOfSpeech", "example", "tags", "collins", "oxford"];
+      let useNewer = d2 > d1;
+      if (useNewer) {
+        asset1.translation = asset2Typed.translation;
+        asset1.display = asset2Typed.display;
+        asset1.mastered = asset2Typed.mastered;
+        asset1.updated = asset2Typed.updated;
+      }
+      for (const field of reviewFields) {
+        if (asset2Typed[field] !== void 0) {
+          if (asset1[field] === void 0 || useNewer) {
+            asset1[field] = asset2Typed[field];
+          }
+        }
+      }
+      asset1.sources = mergedSources;
+    }
+  }
+  plugin.settings.wordAssets = currentAssets;
+  await adapter.trashSystem(conflictPath);
+}
+async function mergeHighlightConflict(plugin, conflictPath) {
+  const adapter = plugin.app.vault.adapter;
+  const raw = await adapter.read(conflictPath);
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    return;
+  }
+  const conflictHighlights = parsed.bookHighlights || {};
+  plugin.settings.bookHighlights = plugin.settings.bookHighlights || {};
+  const currentHighlights = plugin.settings.bookHighlights;
+  for (const [bookPath, list2] of Object.entries(conflictHighlights)) {
+    const list2Typed = list2;
+    if (!currentHighlights[bookPath]) {
+      currentHighlights[bookPath] = list2Typed;
+    } else {
+      const existingHl = currentHighlights[bookPath];
+      for (const h2 of list2Typed) {
+        const exists = existingHl.find((h1) => h1.id === h2.id || h1.cfiRange === h2.cfiRange);
+        if (!exists) {
+          existingHl.push(h2);
+        } else {
+          const d1 = new Date(exists.updated || exists.created).getTime();
+          const d2 = new Date(h2.updated || h2.created).getTime();
+          if (d2 > d1) {
+            Object.assign(exists, h2);
+          }
+        }
+      }
+    }
+  }
+  await adapter.trashSystem(conflictPath);
+}
+async function mergeDataConflict(plugin, conflictPath) {
+  const adapter = plugin.app.vault.adapter;
+  const raw = await adapter.read(conflictPath);
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    return;
+  }
+  if (parsed.readingStats) {
+    plugin.settings.readingStats = plugin.settings.readingStats || {};
+    for (const [dateKey, books] of Object.entries(parsed.readingStats)) {
+      if (!plugin.settings.readingStats[dateKey]) {
+        plugin.settings.readingStats[dateKey] = books;
+      } else {
+        for (const [bPath, bStats] of Object.entries(books)) {
+          if (!plugin.settings.readingStats[dateKey][bPath]) {
+            plugin.settings.readingStats[dateKey][bPath] = bStats;
+          } else {
+            plugin.settings.readingStats[dateKey][bPath] += bStats;
+          }
+        }
+      }
+    }
+  }
+  if (parsed.wordReviewStats) {
+    plugin.settings.wordReviewStats = plugin.settings.wordReviewStats || {};
+    for (const [dateKey, stat] of Object.entries(parsed.wordReviewStats)) {
+      if (!plugin.settings.wordReviewStats[dateKey]) {
+        plugin.settings.wordReviewStats[dateKey] = stat;
+      } else {
+        const existing = plugin.settings.wordReviewStats[dateKey];
+        const incoming = stat;
+        existing.reviewCount = Math.max(existing.reviewCount || 0, incoming.reviewCount || 0);
+        existing.reviewTimeMs = Math.max(existing.reviewTimeMs || 0, incoming.reviewTimeMs || 0);
+      }
+    }
+  }
+  if (parsed.bookProgress) {
+    plugin.settings.bookProgress = plugin.settings.bookProgress || {};
+    for (const [bookPath, progress] of Object.entries(parsed.bookProgress)) {
+      const incoming = progress;
+      if (!plugin.settings.bookProgress[bookPath]) {
+        plugin.settings.bookProgress[bookPath] = incoming;
+      } else {
+        const existing = plugin.settings.bookProgress[bookPath];
+        const d1 = new Date(existing.updated || 0).getTime();
+        const d2 = new Date(incoming.updated || 0).getTime();
+        if (d2 > d1) {
+          plugin.settings.bookProgress[bookPath] = incoming;
+        }
+      }
+    }
+  }
+  await adapter.trashSystem(conflictPath);
+}
+
 // src/sidebar/BookshelfView.ts
-var import_obsidian8 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 
 // src/sidebar/HighlightsView.ts
-var import_obsidian7 = require("obsidian");
-var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
+var import_obsidian8 = require("obsidian");
+var JarvisReaderHighlightsView = class extends import_obsidian8.ItemView {
   plugin;
   reader;
   searchQuery;
@@ -58346,7 +58532,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
   renderMoreMenu(event) {
     event.preventDefault();
     event.stopPropagation();
-    const menu = new import_obsidian7.Menu();
+    const menu = new import_obsidian8.Menu();
     menu.addItem((item) => {
       item.setTitle("\u5F53\u524D\u7AE0\u8282").setIcon(this.currentChapterOnly ? "check" : "list").onClick(() => {
         this.currentChapterOnly = !this.currentChapterOnly;
@@ -58520,7 +58706,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
       };
       card.oncontextmenu = (event) => {
         event.preventDefault();
-        const menu = new import_obsidian7.Menu();
+        const menu = new import_obsidian8.Menu();
         menu.addItem((item) => {
           item.setTitle("\u5220\u9664\u7B14\u8BB0").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
@@ -58561,7 +58747,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian7.ItemView {
 // src/sidebar/BookshelfView.ts
 var HIGHLIGHTS_VIEW_TYPE = "jarvis-reader-highlights";
 var BOOKSHELF_VIEW_TYPE = "jarvis-reader-bookshelf";
-var JarvisReaderBookshelfView = class extends import_obsidian8.ItemView {
+var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
   plugin;
   activePanel;
   dualHighlightsMode;
@@ -58695,7 +58881,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian8.ItemView {
     button.onclick = (event) => {
       event.preventDefault();
       if (disabled) {
-        new import_obsidian8.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
+        new import_obsidian9.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
         return;
       }
       onClick();
@@ -58955,13 +59141,13 @@ var JarvisReaderBookshelfView = class extends import_obsidian8.ItemView {
 };
 
 // src/library/LibraryView.ts
-var import_obsidian10 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 var React5 = __toESM(require_react(), 1);
 var ReactDOM = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
 var React4 = __toESM(require_react(), 1);
-var import_obsidian9 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 init_book_notes();
 init_utils();
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
@@ -59008,7 +59194,7 @@ var MarkdownText = ({ content, plugin }) => {
   React4.useEffect(() => {
     if (ref.current) {
       ref.current.empty();
-      import_obsidian9.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
+      import_obsidian10.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
     }
   }, [content, plugin]);
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref, className: "jarvis-library-markdown" });
@@ -59044,8 +59230,8 @@ function LibraryApp({ plugin }) {
   const [expandedItems, setExpandedItems] = React4.useState(/* @__PURE__ */ new Set());
   const formatDays = (dateStr) => {
     if (!dateStr) return "\u672A\u8BBE\u7F6E";
-    const today = (0, import_obsidian9.moment)().startOf("day");
-    const target = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD").startOf("day");
+    const today = (0, import_obsidian10.moment)().startOf("day");
+    const target = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD").startOf("day");
     const diff = target.diff(today, "days");
     if (diff === 0) return "\u4ECA\u5929";
     if (diff < 0) return `\u903E\u671F ${Math.abs(diff)} \u5929`;
@@ -59075,7 +59261,7 @@ function LibraryApp({ plugin }) {
     }
     setRefreshTrigger((p) => p + 1);
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-    new import_obsidian9.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
+    new import_obsidian10.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
   };
   const renderTableRow = (asset, showTagsColumn = false) => {
     const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
@@ -59101,7 +59287,7 @@ function LibraryApp({ plugin }) {
         onClick: handleRowClick,
         onContextMenu: (e) => {
           e.preventDefault();
-          const menu = new import_obsidian9.Menu();
+          const menu = new import_obsidian10.Menu();
           const isMastered = asset.mastered;
           menu.addItem((item) => {
             item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
@@ -59190,7 +59376,7 @@ function LibraryApp({ plugin }) {
   const loadBooks = React4.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof import_obsidian9.TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof import_obsidian10.TFile && file.extension.toLowerCase() === "epub"
     );
     setBooks(filtered);
   }, [plugin]);
@@ -59405,7 +59591,7 @@ function LibraryApp({ plugin }) {
     const cached = coverCache[key];
     if (cached?.vaultPath) {
       const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
-      if (coverFile instanceof import_obsidian9.TFile) {
+      if (coverFile instanceof import_obsidian10.TFile) {
         return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
       }
     }
@@ -59455,7 +59641,7 @@ function LibraryApp({ plugin }) {
     };
   }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
   const selectedStats = React4.useMemo(() => {
-    const today = (0, import_obsidian9.moment)(statsDate);
+    const today = (0, import_obsidian10.moment)(statsDate);
     let startDate;
     let endDate;
     let prevStartDate;
@@ -59476,10 +59662,10 @@ function LibraryApp({ plugin }) {
       prevStartDate = startDate.clone().subtract(1, "year");
       prevEndDate = endDate.clone().subtract(1, "year");
     } else {
-      startDate = (0, import_obsidian9.moment)(0);
-      endDate = (0, import_obsidian9.moment)().endOf("day");
-      prevStartDate = (0, import_obsidian9.moment)(0);
-      prevEndDate = (0, import_obsidian9.moment)().endOf("day");
+      startDate = (0, import_obsidian10.moment)(0);
+      endDate = (0, import_obsidian10.moment)().endOf("day");
+      prevStartDate = (0, import_obsidian10.moment)(0);
+      prevEndDate = (0, import_obsidian10.moment)().endOf("day");
     }
     const statsData = plugin.settings.readingStats || {};
     let totalSeconds = 0;
@@ -59490,7 +59676,7 @@ function LibraryApp({ plugin }) {
     const yearlySecondsMap = {};
     const readDays = /* @__PURE__ */ new Set();
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
@@ -59529,8 +59715,8 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           finishedBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian9.moment)(prog.updated) : (0, import_obsidian9.moment)(0);
-          const finishDateVal = fm.finish_date ? (0, import_obsidian9.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian9.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
+          const finishDateVal = fm.finish_date ? (0, import_obsidian10.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian10.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
           if (isUpdatedInRange || isFinishDateInRange) {
@@ -59541,7 +59727,7 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           readBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian9.moment)(prog.updated) : (0, import_obsidian9.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian10.moment)(prog.updated) : (0, import_obsidian10.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
           if (isUpdatedInRange || hasTimeSecs) {
@@ -59556,7 +59742,7 @@ function LibraryApp({ plugin }) {
     Object.values(plugin.settings.bookHighlights || {}).forEach((list) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian9.moment)(hl.created);
+          const createdVal = (0, import_obsidian10.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             newHighlightsCount++;
           }
@@ -59565,7 +59751,7 @@ function LibraryApp({ plugin }) {
     });
     let newWordsCount = 0;
     Object.values(plugin.settings.wordAssets || {}).forEach((asset) => {
-      const createdVal = (0, import_obsidian9.moment)(asset.created);
+      const createdVal = (0, import_obsidian10.moment)(asset.created);
       if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
         newWordsCount++;
       }
@@ -59651,7 +59837,7 @@ function LibraryApp({ plugin }) {
   }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache]);
   const handlePrevDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian9.moment)(prev);
+      const m = (0, import_obsidian10.moment)(prev);
       if (statsTab === "week") return m.subtract(1, "week").toDate();
       if (statsTab === "month") return m.subtract(1, "month").toDate();
       if (statsTab === "year") return m.subtract(1, "year").toDate();
@@ -59660,7 +59846,7 @@ function LibraryApp({ plugin }) {
   };
   const handleNextDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian9.moment)(prev);
+      const m = (0, import_obsidian10.moment)(prev);
       if (statsTab === "week") return m.add(1, "week").toDate();
       if (statsTab === "month") return m.add(1, "month").toDate();
       if (statsTab === "year") return m.add(1, "year").toDate();
@@ -59727,7 +59913,7 @@ function LibraryApp({ plugin }) {
       let summary = "";
       const progress = getProgress(activeBook);
       const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-      if (noteFile instanceof import_obsidian9.TFile) {
+      if (noteFile instanceof import_obsidian10.TFile) {
         const cache = plugin.app.metadataCache.getFileCache(noteFile);
         if (cache && cache.frontmatter) {
           const fm = cache.frontmatter;
@@ -59774,7 +59960,7 @@ function LibraryApp({ plugin }) {
       }
     } catch (e) {
       console.error("Failed to update frontmatter", e);
-      new import_obsidian9.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
+      new import_obsidian10.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
     }
   };
   React4.useEffect(() => {
@@ -59806,14 +59992,14 @@ function LibraryApp({ plugin }) {
     if (confirmed) {
       try {
         await plugin.app.vault.delete(file);
-        new import_obsidian9.Notice(`\u5DF2\u5220\u9664\u4E66\u7C4D: ${file.basename}`);
+        new import_obsidian10.Notice(`\u5DF2\u5220\u9664\u4E66\u7C4D: ${file.basename}`);
         if (activeBook?.path === file.path) {
           setCurrentView("home");
           setActiveBook(null);
         }
         loadBooks();
       } catch (err) {
-        new import_obsidian9.Notice(`\u5220\u9664\u5931\u8D25: ${err}`);
+        new import_obsidian10.Notice(`\u5220\u9664\u5931\u8D25: ${err}`);
       }
     }
   };
@@ -59839,7 +60025,7 @@ function LibraryApp({ plugin }) {
     if (url) {
       const audio = new Audio(url);
       audio.play().catch((err) => {
-        new import_obsidian9.Notice("\u97F3\u9891\u64AD\u653E\u5931\u8D25");
+        new import_obsidian10.Notice("\u97F3\u9891\u64AD\u653E\u5931\u8D25");
       });
     }
   };
@@ -59858,7 +60044,7 @@ function LibraryApp({ plugin }) {
   };
   const extractAllImages = async (file) => {
     try {
-      new import_obsidian9.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
+      new import_obsidian10.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
       const buffer = await plugin.app.vault.readBinary(file);
       let epubFn = window.JarvisReader_ePub;
       if (!epubFn) {
@@ -59887,9 +60073,9 @@ function LibraryApp({ plugin }) {
       }
       imagesList.sort((a, b) => b.size - a.size);
       setDebugImages(imagesList);
-      new import_obsidian9.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
+      new import_obsidian10.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
     } catch (err) {
-      new import_obsidian9.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
+      new import_obsidian10.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
     }
   };
   const renderDebugModal = () => {
@@ -59935,17 +60121,17 @@ function LibraryApp({ plugin }) {
     } = selectedStats;
     const statsData = plugin.settings.readingStats || {};
     const sortedDates = Object.keys(statsData).sort();
-    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian9.moment)().format("YYYY-MM-DD");
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian10.moment)().format("YYYY-MM-DD");
     const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
     let dateRangeStr = "";
     if (statsTab === "week") {
-      const start = (0, import_obsidian9.moment)(startDate);
-      const end = (0, import_obsidian9.moment)(endDate);
+      const start = (0, import_obsidian10.moment)(startDate);
+      const end = (0, import_obsidian10.moment)(endDate);
       dateRangeStr = `${start.format("YYYY \xB7 M/D")} - ${end.format("M/D")}`;
     } else if (statsTab === "month") {
-      dateRangeStr = (0, import_obsidian9.moment)(startDate).format("YYYY\u5E74M\u6708");
+      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74M\u6708");
     } else if (statsTab === "year") {
-      dateRangeStr = (0, import_obsidian9.moment)(startDate).format("YYYY\u5E74");
+      dateRangeStr = (0, import_obsidian10.moment)(startDate).format("YYYY\u5E74");
     }
     const renderLargeDuration = (secs) => {
       if (secs <= 0) {
@@ -60003,7 +60189,7 @@ function LibraryApp({ plugin }) {
     const bookDailyMaxSecs = {};
     const bookRangeHighlightsCount = {};
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian9.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian10.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       if (isCurrentRange) {
@@ -60017,7 +60203,7 @@ function LibraryApp({ plugin }) {
     Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian9.moment)(hl.created);
+          const createdVal = (0, import_obsidian10.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
           }
@@ -60048,7 +60234,7 @@ function LibraryApp({ plugin }) {
           if (statsTab === "all") {
             progRankList.push([bookPath, prog.percentage]);
           } else {
-            const updatedVal = (0, import_obsidian9.moment)(prog.updated);
+            const updatedVal = (0, import_obsidian10.moment)(prog.updated);
             if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
               progRankList.push([bookPath, prog.percentage]);
             }
@@ -60197,29 +60383,29 @@ function LibraryApp({ plugin }) {
           if (statsTab === "week") {
             const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
             data = Array.from({ length: 7 }).map((_, i) => {
-              const day = (0, import_obsidian9.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "month") {
-            const daysInMonth = (0, import_obsidian9.moment)(startDate).daysInMonth();
+            const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
             data = Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = (0, import_obsidian9.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian10.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "year") {
             data = Array.from({ length: 12 }).map((_, i) => {
-              const month = (0, import_obsidian9.moment)(startDate).add(i, "months");
+              const month = (0, import_obsidian10.moment)(startDate).add(i, "months");
               const monthStr = month.format("YYYY-MM");
               const secs = monthlySecondsMap[monthStr] || 0;
               return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else {
-            const currentYear = (0, import_obsidian9.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian9.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+            const currentYear = (0, import_obsidian10.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
             const yearsCount = Math.max(currentYear - startYear + 1, 1);
             data = Array.from({ length: yearsCount }).map((_, i) => {
               const year = String(startYear + i);
@@ -60245,15 +60431,15 @@ function LibraryApp({ plugin }) {
           ] });
         })(),
         activeChart === "calendar" && (() => {
-          const daysInMonth = (0, import_obsidian9.moment)(startDate).daysInMonth();
-          const firstDayOffset = ((0, import_obsidian9.moment)(startDate).clone().startOf("month").day() + 6) % 7;
+          const daysInMonth = (0, import_obsidian10.moment)(startDate).daysInMonth();
+          const firstDayOffset = ((0, import_obsidian10.moment)(startDate).clone().startOf("month").day() + 6) % 7;
           const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
           const cells = [];
           for (let i = 0; i < firstDayOffset; i++) {
             cells.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
           }
           for (let d = 1; d <= daysInMonth; d++) {
-            const day = (0, import_obsidian9.moment)(startDate).clone().date(d);
+            const day = (0, import_obsidian10.moment)(startDate).clone().date(d);
             const dateStr = day.format("YYYY-MM-DD");
             const secs = dailySecondsMap[dateStr] || 0;
             cells.push(
@@ -60270,7 +60456,7 @@ function LibraryApp({ plugin }) {
         })(),
         activeChart === "heatmap" && (() => {
           const renderHeatmapWall = (yearStr) => {
-            const startOfYear = (0, import_obsidian9.moment)(`${yearStr}-01-01`);
+            const startOfYear = (0, import_obsidian10.moment)(`${yearStr}-01-01`);
             const gridStart = startOfYear.clone().startOf("isoWeek");
             const weeksCount = 53;
             const columns = [];
@@ -60342,11 +60528,11 @@ function LibraryApp({ plugin }) {
             ] }, yearStr);
           };
           if (statsTab === "year") {
-            const yearStr = (0, import_obsidian9.moment)(startDate).format("YYYY");
+            const yearStr = (0, import_obsidian10.moment)(startDate).format("YYYY");
             return renderHeatmapWall(yearStr);
           } else {
-            const currentYear = (0, import_obsidian9.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian9.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+            const currentYear = (0, import_obsidian10.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian10.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
             const yearsList = [];
             for (let y = currentYear; y >= startYear; y--) {
               yearsList.push(String(y));
@@ -61017,7 +61203,7 @@ function LibraryApp({ plugin }) {
           const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
           const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
-          if (targetFile instanceof import_obsidian9.TFile) {
+          if (targetFile instanceof import_obsidian10.TFile) {
             await plugin.app.vault.modifyBinary(targetFile, buffer);
           } else {
             try {
@@ -61027,7 +61213,7 @@ function LibraryApp({ plugin }) {
               return;
             }
           }
-          if (targetFile instanceof import_obsidian9.TFile) {
+          if (targetFile instanceof import_obsidian10.TFile) {
             const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
             plugin.settings.bookCoverCache[key] = {
@@ -61324,7 +61510,7 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "hl-card-actions", children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
                 navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${h.quote}\u300D${h.comment ? `\uFF08\u611F\u60F3\uFF1A${h.comment}\uFF09` : ""}`);
-                new import_obsidian9.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
+                new import_obsidian10.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F");
               }, children: "\u590D\u5236\u5185\u5BB9" }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => jumpToHighlight(activeBook, h), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
             ] })
@@ -61419,7 +61605,7 @@ function LibraryApp({ plugin }) {
 
 // src/library/LibraryView.ts
 var LIBRARY_VIEW_TYPE = "jarvis-reader-library";
-var LibraryView = class extends import_obsidian10.ItemView {
+var LibraryView = class extends import_obsidian11.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -61452,7 +61638,7 @@ var LibraryView = class extends import_obsidian10.ItemView {
 };
 
 // src/settings.ts
-var import_obsidian11 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 init_utils();
 var DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -61511,13 +61697,13 @@ var DEFAULT_SETTINGS = {
   sm2LapseMultiplier: 0.5,
   sm2MaxInterval: 365
 };
-var JarvisReaderFolderSuggestModal = class extends import_obsidian11.FuzzySuggestModal {
+var JarvisReaderFolderSuggestModal = class extends import_obsidian12.FuzzySuggestModal {
   onChoose;
   folders;
   constructor(app, onChoose) {
     super(app);
     this.onChoose = onChoose;
-    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian11.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
+    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian12.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
     this.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939");
   }
   getItems() {
@@ -61530,7 +61716,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian11.FuzzySugges
     this.onChoose(path);
   }
 };
-var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
+var JarvisReaderSettingTab = class extends import_obsidian12.PluginSettingTab {
   plugin;
   activeTab = "storage";
   constructor(app, plugin) {
@@ -61601,7 +61787,7 @@ var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
       let bookFolderText = null;
-      new import_obsidian11.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
         bookFolderText = text;
         text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
@@ -61623,7 +61809,7 @@ var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
         }
       }));
       let customCoverFolderText = null;
-      new import_obsidian11.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
         customCoverFolderText = text;
         text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
           this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
@@ -61645,7 +61831,7 @@ var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
         }
       }));
       let exportFolderText = null;
-      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u79EF\u7D2F\u5BFC\u51FA\u6587\u4EF6\u5939").setDesc("\u9009\u62E9\u82F1\u8BED\u8BCD\u6761\u5BFC\u51FA\u7684 Markdown \u7B14\u8BB0\u5B58\u653E\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E Vault \u6839\u76EE\u5F55\uFF09").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u79EF\u7D2F\u5BFC\u51FA\u6587\u4EF6\u5939").setDesc("\u9009\u62E9\u82F1\u8BED\u8BCD\u6761\u5BFC\u51FA\u7684 Markdown \u7B14\u8BB0\u5B58\u653E\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E Vault \u6839\u76EE\u5F55\uFF09").addText((text) => {
         exportFolderText = text;
         text.setPlaceholder("\u5982: Export/Wordbooks").setValue(this.plugin.settings.wordBookExportFolder || "").onChange(async (value) => {
           this.plugin.settings.wordBookExportFolder = normalizeVaultPath(value);
@@ -61666,7 +61852,7 @@ var JarvisReaderSettingTab = class extends import_obsidian11.PluginSettingTab {
           exportFolderText.setValue("");
         }
       }));
-      new import_obsidian11.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -61684,7 +61870,7 @@ created: {{created}}
         text.inputEl.rows = 13;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
         await this.plugin.saveSettings();
       }));
@@ -61693,7 +61879,7 @@ created: {{created}}
       let translationBaseUrlText = null;
       let translationModelText = null;
       let translationPromptText = null;
-      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
         dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
           const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
@@ -61715,7 +61901,7 @@ created: {{created}}
           }
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
         translationBaseUrlText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
@@ -61724,7 +61910,7 @@ created: {{created}}
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
         text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
           this.plugin.settings.translationApi.apiKey = value.trim();
           await this.plugin.saveSettings();
@@ -61732,7 +61918,7 @@ created: {{created}}
         text.inputEl.type = "password";
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
         translationModelText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
@@ -61744,20 +61930,20 @@ created: {{created}}
         try {
           const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
           if (!promptCheck.ok) {
-            new import_obsidian11.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
+            new import_obsidian12.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
             return;
           }
           await translateSelectionWithApi(this.plugin.settings, "test");
-          new import_obsidian11.Notice("\u6D4B\u8BD5\u6210\u529F");
+          new import_obsidian12.Notice("\u6D4B\u8BD5\u6210\u529F");
         } catch (error) {
-          new import_obsidian11.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
+          new import_obsidian12.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
         }
       }));
       contentDiv.createDiv({
         cls: "jarvis-reader-translation-prompt-help",
         text: TRANSLATION_PROMPT_HELP_TEXT
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
         translationPromptText = text;
         text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
           this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
@@ -61766,43 +61952,43 @@ created: {{created}}
         text.inputEl.rows = 6;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian11.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
+      new import_obsidian12.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
         this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
         await this.plugin.saveSettings();
         if (translationPromptText) {
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
-        new import_obsidian11.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
+        new import_obsidian12.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
       }));
     }
     if (this.activeTab === "words") {
-      new import_obsidian11.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian11.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian11.Setting(contentDiv).setName("\u590D\u4E60\u65F6\u81EA\u52A8\u53D1\u97F3").setDesc("\u6253\u5F00\u8BB0\u5FC6\u5361\u7247\u65F6\u81EA\u52A8\u64AD\u653E\u5355\u8BCD\u8BFB\u97F3").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoPlayAudioOnReview !== false).onChange(async (value) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u590D\u4E60\u65F6\u81EA\u52A8\u53D1\u97F3").setDesc("\u6253\u5F00\u8BB0\u5FC6\u5361\u7247\u65F6\u81EA\u52A8\u64AD\u653E\u5355\u8BCD\u8BFB\u97F3").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoPlayAudioOnReview !== false).onChange(async (value) => {
         this.plugin.settings.autoPlayAudioOnReview = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian11.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
         text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
           this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
         dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
           this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
           this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
         text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
           this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
           await this.plugin.saveSettings();
@@ -61810,20 +61996,20 @@ created: {{created}}
       });
     }
     if (this.activeTab === "appearance") {
-      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
         slider.setLimits(0.5, 3, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerZoom = value;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
         slider.setLimits(1, 3, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerLineHeight = value;
           await this.plugin.saveSettings();
         });
       });
       const createColorPicker = (name, desc, key) => {
-        new import_obsidian11.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
+        new import_obsidian12.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
           (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
             this.plugin.settings.highlightColors = {
               ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
@@ -61842,7 +62028,7 @@ created: {{created}}
       createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
     }
     if (this.activeTab === "review") {
-      new import_obsidian11.Setting(contentDiv).setName("\u8D77\u59CB\u96BE\u5EA6 (Starting Ease)").setDesc("\u65B0\u8BCD\u6761\u521D\u6B21\u590D\u4E60\u6210\u529F\u540E\u7684\u521D\u59CB\u96BE\u5EA6\u7CFB\u6570\uFF08\u9ED8\u8BA4\u503C 2.5\uFF09").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u8D77\u59CB\u96BE\u5EA6 (Starting Ease)").setDesc("\u65B0\u8BCD\u6761\u521D\u6B21\u590D\u4E60\u6210\u529F\u540E\u7684\u521D\u59CB\u96BE\u5EA6\u7CFB\u6570\uFF08\u9ED8\u8BA4\u503C 2.5\uFF09").addText((text) => {
         text.setPlaceholder("2.5").setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5)).onChange(async (value) => {
           const parsed = parseFloat(value);
           this.plugin.settings.sm2StartingEase = isNaN(parsed) || parsed <= 0 ? 2.5 : parsed;
@@ -61852,7 +62038,7 @@ created: {{created}}
           text.setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5));
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u7B80\u5355\u5956\u52B1\u7CFB\u6570 (Easy Bonus)").setDesc("\u70B9\u51FB\u201C\u7B80\u5355\u201D\u8BC4\u5206\u65F6\uFF0C\u5BF9\u590D\u4E60\u95F4\u9694\u7684\u989D\u5916\u62C9\u957F\u500D\u6570\uFF08\u9ED8\u8BA4\u503C 1.3\uFF09").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u7B80\u5355\u5956\u52B1\u7CFB\u6570 (Easy Bonus)").setDesc("\u70B9\u51FB\u201C\u7B80\u5355\u201D\u8BC4\u5206\u65F6\uFF0C\u5BF9\u590D\u4E60\u95F4\u9694\u7684\u989D\u5916\u62C9\u957F\u500D\u6570\uFF08\u9ED8\u8BA4\u503C 1.3\uFF09").addText((text) => {
         text.setPlaceholder("1.3").setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3)).onChange(async (value) => {
           const parsed = parseFloat(value);
           this.plugin.settings.sm2EasyBonus = isNaN(parsed) || parsed <= 0 ? 1.3 : parsed;
@@ -61862,7 +62048,7 @@ created: {{created}}
           text.setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3));
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u56F0\u96BE\u6263\u51CF\u7CFB\u6570 (Lapse Multiplier)").setDesc("\u70B9\u51FB\u201C\u56F0\u96BE\u201D\u8BC4\u5206\u65F6\uFF0C\u5F53\u524D\u590D\u4E60\u95F4\u9694\u7684\u7F29\u51CF\u6BD4\u4F8B\u3002\u8303\u56F4\u9700\u5728 0 \u5230 1 \u4E4B\u95F4\uFF08\u9ED8\u8BA4\u503C 0.5\uFF0C\u5982 0.5 \u8868\u793A\u95F4\u9694\u7F29\u77ED\u4E00\u534A\uFF09").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u56F0\u96BE\u6263\u51CF\u7CFB\u6570 (Lapse Multiplier)").setDesc("\u70B9\u51FB\u201C\u56F0\u96BE\u201D\u8BC4\u5206\u65F6\uFF0C\u5F53\u524D\u590D\u4E60\u95F4\u9694\u7684\u7F29\u51CF\u6BD4\u4F8B\u3002\u8303\u56F4\u9700\u5728 0 \u5230 1 \u4E4B\u95F4\uFF08\u9ED8\u8BA4\u503C 0.5\uFF0C\u5982 0.5 \u8868\u793A\u95F4\u9694\u7F29\u77ED\u4E00\u534A\uFF09").addText((text) => {
         text.setPlaceholder("0.5").setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5)).onChange(async (value) => {
           const parsed = parseFloat(value);
           this.plugin.settings.sm2LapseMultiplier = isNaN(parsed) || parsed <= 0 || parsed > 1 ? 0.5 : parsed;
@@ -61872,7 +62058,7 @@ created: {{created}}
           text.setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5));
         });
       });
-      new import_obsidian11.Setting(contentDiv).setName("\u6700\u5927\u590D\u4E60\u95F4\u9694 (Maximum Interval)").setDesc("\u9650\u5236\u8BCD\u6761\u590D\u4E60\u5468\u671F\u7684\u4E0A\u9650\u65F6\u95F4\uFF0C\u5355\u4F4D\u4E3A\u5929\uFF08\u9ED8\u8BA4\u503C 365\uFF09").addText((text) => {
+      new import_obsidian12.Setting(contentDiv).setName("\u6700\u5927\u590D\u4E60\u95F4\u9694 (Maximum Interval)").setDesc("\u9650\u5236\u8BCD\u6761\u590D\u4E60\u5468\u671F\u7684\u4E0A\u9650\u65F6\u95F4\uFF0C\u5355\u4F4D\u4E3A\u5929\uFF08\u9ED8\u8BA4\u503C 365\uFF09").addText((text) => {
         text.setPlaceholder("365").setValue(String(this.plugin.settings.sm2MaxInterval ?? 365)).onChange(async (value) => {
           const parsed = parseInt(value, 10);
           this.plugin.settings.sm2MaxInterval = isNaN(parsed) || parsed <= 0 ? 365 : parsed;
@@ -61887,20 +62073,20 @@ created: {{created}}
 };
 
 // src/sidebar/WordSidebarView.tsx
-var import_obsidian13 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 var React7 = __toESM(require_react(), 1);
 var import_client2 = __toESM(require_client(), 1);
 
 // src/word-book/WordCard.tsx
 var React6 = __toESM(require_react(), 1);
-var import_obsidian12 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 var MarkdownPreview = ({ content, plugin }) => {
   const ref = React6.useRef(null);
   React6.useEffect(() => {
     if (ref.current) {
       ref.current.empty();
-      import_obsidian12.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
+      import_obsidian13.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
     }
   }, [content, plugin]);
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className: "jarvis-reader-markdown" });
@@ -61954,7 +62140,7 @@ var WordCard = ({
   const handleContextMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const menu = new import_obsidian12.Menu();
+    const menu = new import_obsidian13.Menu();
     let itemCount = 0;
     const isMastered = asset.mastered;
     if (onToggleMastery) {
@@ -62051,7 +62237,7 @@ var WordCard = ({
 
 // src/sidebar/WordSidebarView.tsx
 var WORD_SIDEBAR_VIEW_TYPE = "jarvis-reader-word-sidebar";
-var WordSidebarView = class extends import_obsidian13.ItemView {
+var WordSidebarView = class extends import_obsidian14.ItemView {
   plugin;
   reader;
   searchQuery;
@@ -62165,7 +62351,7 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
     });
     wordBookBtn.setAttr("aria-label", "\u6253\u5F00\u8BCD\u6761");
     wordBookBtn.setAttr("title", "\u6253\u5F00\u8BCD\u6761");
-    (0, import_obsidian13.setIcon)(wordBookBtn, "book");
+    (0, import_obsidian14.setIcon)(wordBookBtn, "book");
     wordBookBtn.onclick = () => this.openWordBook();
     header.createDiv({ cls: "jarvis-reader-word-sidebar-subtitle", text: `\u5171 ${assetCount} \u4E2A\u8BCD\u6761` });
   }
@@ -62207,9 +62393,9 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
       cls: "clickable-icon jarvis-reader-filter-btn",
       attr: { "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F" }
     });
-    (0, import_obsidian13.setIcon)(filterBtn, "filter");
+    (0, import_obsidian14.setIcon)(filterBtn, "filter");
     filterBtn.onclick = (e) => {
-      const menu = new import_obsidian13.Menu();
+      const menu = new import_obsidian14.Menu();
       menu.addItem((item) => item.setTitle("\u663E\u793A\u6240\u6709\u72B6\u6001").setChecked(this.filterStatus === "all").onClick(() => {
         this.filterStatus = "all";
         this.render();
@@ -62346,13 +62532,13 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
 };
 
 // src/word-book/WordBookView.ts
-var import_obsidian17 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 var React11 = __toESM(require_react(), 1);
 var ReactDOM2 = __toESM(require_client(), 1);
 
 // src/word-book/WordBookApp.tsx
 var React10 = __toESM(require_react(), 1);
-var import_obsidian16 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 init_utils();
 
 // src/word-book/ReviewSession.tsx
@@ -62416,7 +62602,7 @@ function getDueCards(assets, bookFilter) {
 }
 
 // src/word-book/ReviewSession.tsx
-var import_obsidian14 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
   const [currentIndex, setCurrentIndex] = React8.useState(0);
@@ -62622,12 +62808,12 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
             try {
               const source = asset.sources[0];
               if (!source || !source.bookPath) {
-                new import_obsidian14.Notice("\u6CA1\u6709\u627E\u5230\u539F\u6587\u6765\u6E90");
+                new import_obsidian15.Notice("\u6CA1\u6709\u627E\u5230\u539F\u6587\u6765\u6E90");
                 return;
               }
               const file = plugin.app.vault.getAbstractFileByPath(source.bookPath);
               if (!file) {
-                new import_obsidian14.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
+                new import_obsidian15.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
                 return;
               }
               const leaves = [];
@@ -62704,7 +62890,7 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
                 await newLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
               }
             } catch (err) {
-              new import_obsidian14.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
+              new import_obsidian15.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
               console.error("Jump to source failed", err);
             }
           }, children: "\u8DF3\u8F6C\u539F\u6587" })
@@ -62787,10 +62973,10 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
 
 // src/word-book/WordBookStats.tsx
 var React9 = __toESM(require_react(), 1);
-var import_obsidian15 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 init_utils();
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
-var moment2 = import_obsidian15.moment;
+var moment2 = import_obsidian16.moment;
 function WordBookStats({ plugin, assets, onClose }) {
   const [statsTab, setStatsTab] = React9.useState("week");
   const [statsDate, setStatsDate] = React9.useState(/* @__PURE__ */ new Date());
@@ -63456,7 +63642,7 @@ function WordBookApp({ plugin }) {
     await plugin.persistWordAssetSidecar("delete");
     await plugin.saveSettings();
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-    new import_obsidian16.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
+    new import_obsidian17.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
     setSelected(/* @__PURE__ */ new Set());
     loadAssets();
   };
@@ -63478,7 +63664,7 @@ function WordBookApp({ plugin }) {
     await plugin.persistWordAssetSidecar("delete");
     await plugin.saveSettings();
     window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
-    new import_obsidian16.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
+    new import_obsidian17.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
     const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
     leaves.forEach((leaf) => {
       if (leaf.view && typeof leaf.view.render === "function") {
@@ -63498,7 +63684,7 @@ function WordBookApp({ plugin }) {
     }
     await plugin.persistWordAssetSidecar("save");
     await plugin.saveSettings();
-    new import_obsidian16.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
+    new import_obsidian17.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
     loadAssets();
   };
   const handleToggleSingleMastery = async (e, lemma) => {
@@ -63513,7 +63699,7 @@ function WordBookApp({ plugin }) {
   };
   const handleContextMenu = (e, lemma) => {
     e.preventDefault();
-    const menu = new import_obsidian16.Menu();
+    const menu = new import_obsidian17.Menu();
     const isMastered = plugin.settings.wordAssets[lemma]?.mastered;
     menu.addItem((item) => {
       item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
@@ -63539,7 +63725,7 @@ function WordBookApp({ plugin }) {
           await plugin.saveSettings();
           window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
           loadAssets();
-          new import_obsidian16.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
+          new import_obsidian17.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
           if (selected.has(lemma)) {
             const next = new Set(selected);
             next.delete(lemma);
@@ -63552,7 +63738,7 @@ function WordBookApp({ plugin }) {
   };
   const handleExportPrint = () => {
     if (selected.size === 0) {
-      new import_obsidian16.Notice("\u8BF7\u5148\u9009\u62E9\u8981\u5BFC\u51FA\u7684\u8BCD\u6761");
+      new import_obsidian17.Notice("\u8BF7\u5148\u9009\u62E9\u8981\u5BFC\u51FA\u7684\u8BCD\u6761");
       return;
     }
     setExportState("select_template");
@@ -63632,22 +63818,22 @@ function WordBookApp({ plugin }) {
       const file = await plugin.app.vault.create(fileName, markdown);
       const leaf = plugin.app.workspace.getLeaf("split", "vertical");
       await leaf.openFile(file);
-      new import_obsidian16.Notice(`\u5BFC\u51FA\u6210\u529F\uFF1A${fileName}\u3002\u6B63\u5728\u6253\u5F00 PDF \u5BFC\u51FA...`);
+      new import_obsidian17.Notice(`\u5BFC\u51FA\u6210\u529F\uFF1A${fileName}\u3002\u6B63\u5728\u6253\u5F00 PDF \u5BFC\u51FA...`);
       setTimeout(() => {
         try {
           if (plugin.app.commands && typeof plugin.app.commands.executeCommandById === "function") {
             plugin.app.commands.executeCommandById("workspace:export-pdf");
           } else {
-            new import_obsidian16.Notice("\u4E0D\u652F\u6301\u81EA\u52A8\u6253\u5F00\u5BFC\u51FA\u5F39\u7A97\uFF0C\u8BF7\u624B\u52A8\u4ECE\u7B14\u8BB0\u53F3\u4E0A\u89D2\u83DC\u5355\u5BFC\u51FA PDF");
+            new import_obsidian17.Notice("\u4E0D\u652F\u6301\u81EA\u52A8\u6253\u5F00\u5BFC\u51FA\u5F39\u7A97\uFF0C\u8BF7\u624B\u52A8\u4ECE\u7B14\u8BB0\u53F3\u4E0A\u89D2\u83DC\u5355\u5BFC\u51FA PDF");
           }
         } catch (err) {
-          new import_obsidian16.Notice("\u81EA\u52A8\u6253\u5F00 PDF \u5BFC\u51FA\u754C\u9762\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u64CD\u4F5C");
+          new import_obsidian17.Notice("\u81EA\u52A8\u6253\u5F00 PDF \u5BFC\u51FA\u754C\u9762\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u64CD\u4F5C");
           console.warn("Jarvis Reader export PDF failed", err);
         }
       }, 500);
     } catch (e) {
       console.error(e);
-      new import_obsidian16.Notice("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
+      new import_obsidian17.Notice("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
     }
   };
   const playAudio = (lemma) => {
@@ -64155,7 +64341,7 @@ function WordBookApp({ plugin }) {
 
 // src/word-book/WordBookView.ts
 var WORD_BOOK_VIEW_TYPE = "jarvis-reader-word-book";
-var WordBookView = class extends import_obsidian17.ItemView {
+var WordBookView = class extends import_obsidian18.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -64194,7 +64380,7 @@ init_utils();
 // src/global-markdown.ts
 var import_react4 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
-var import_obsidian18 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 function truncateWordDisplay2(value) {
   const raw = String(value || "");
   if (raw.length <= 8e3) return raw;
@@ -64267,8 +64453,8 @@ var GlobalTranslationCard = ({
         while (element.firstChild) {
           element.removeChild(element.firstChild);
         }
-        if (typeof import_obsidian18.setIcon === "function") {
-          (0, import_obsidian18.setIcon)(element, name);
+        if (typeof import_obsidian19.setIcon === "function") {
+          (0, import_obsidian19.setIcon)(element, name);
         }
       }
     });
@@ -64345,7 +64531,7 @@ var GlobalTranslationCard = ({
     try {
       const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
-        new import_obsidian18.Notice("Failed to save word.");
+        new import_obsidian19.Notice("Failed to save word.");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
@@ -64359,7 +64545,7 @@ var GlobalTranslationCard = ({
         plugin.settings
       );
       if (!asset) {
-        new import_obsidian18.Notice("Failed to build word asset.");
+        new import_obsidian19.Notice("Failed to build word asset.");
         return;
       }
       plugin.settings.wordAssets = plugin.settings.wordAssets || {};
@@ -64367,14 +64553,14 @@ var GlobalTranslationCard = ({
       await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
       setIsSaved(true);
-      new import_obsidian18.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
+      new import_obsidian19.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian18.Notice("Save failed.");
+      new import_obsidian19.Notice("Save failed.");
     }
   };
   const handleAiTranslate = async () => {
@@ -64406,14 +64592,14 @@ var GlobalTranslationCard = ({
       await plugin.persistWordAssetSidecar("save");
       await plugin.saveSettings();
       setIsMastered(nextMastered);
-      new import_obsidian18.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
+      new import_obsidian19.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian18.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
+      new import_obsidian19.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
     }
   };
   const handleDeleteWord = async () => {
@@ -64421,7 +64607,7 @@ var GlobalTranslationCard = ({
       delete plugin.settings.wordAssets[word.toLowerCase()];
       await plugin.persistWordAssetSidecar("delete");
       await plugin.saveSettingsData();
-      new import_obsidian18.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+      new import_obsidian19.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
       onClose();
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
@@ -64429,7 +64615,7 @@ var GlobalTranslationCard = ({
         }
       });
     } catch (err) {
-      new import_obsidian18.Notice("\u5220\u9664\u5931\u8D25\u3002");
+      new import_obsidian19.Notice("\u5220\u9664\u5931\u8D25\u3002");
     }
   };
   const handlePlayAudio = () => {
@@ -64838,17 +65024,18 @@ function registerGlobalMarkdownFeatures(plugin) {
 
 // src/main.ts
 var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><path d="M6 8h2"/><path d="M6 12h2"/><path d="M16 8h2"/><path d="M16 12h2"/></svg>`;
-var JarvisReaderPlugin = class extends import_obsidian19.Plugin {
+var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
   bookshelfView;
   highlightsView;
   activeReaderView;
   wordSidebarView;
   lastIndexCounts;
   async onload() {
-    (0, import_obsidian19.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
+    (0, import_obsidian20.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
+    await resolveSyncConflicts(this);
     await this.persistIndexSidecars("startup");
     await this.saveSettingsData();
     this.registerView("epub", (leaf) => {
@@ -64912,7 +65099,7 @@ var JarvisReaderPlugin = class extends import_obsidian19.Plugin {
       }
     });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file instanceof import_obsidian19.TFile && file.extension.toLowerCase() === "pdf") {
+      if (file instanceof import_obsidian20.TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0").setIcon("pencil").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -65269,7 +65456,7 @@ var JarvisReaderPlugin = class extends import_obsidian19.Plugin {
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
-      new import_obsidian19.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
+      new import_obsidian20.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
       throw error;
     }
   }

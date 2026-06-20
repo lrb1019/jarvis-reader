@@ -1,5 +1,6 @@
 import { Plugin, WorkspaceLeaf, Notice, TFile, addIcon } from "obsidian";
 import { EpubView } from "./EpubView";
+import { resolveSyncConflicts } from "./conflict-resolver";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE, HIGHLIGHTS_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
 import { JarvisReaderHighlightsView } from "./sidebar/HighlightsView";
@@ -30,6 +31,7 @@ export default class JarvisReaderPlugin extends Plugin {
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
+    await resolveSyncConflicts(this);
     await this.persistIndexSidecars("startup");
     await this.saveSettingsData();
     this.registerView("epub", (leaf) => {
