@@ -1,7 +1,7 @@
 // Extracted from main.js L51297-51821 — EpubView (Obsidian FileView for epub files)
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot, type Root } from "react-dom/client";
 import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
 import { openOrCreateNote, getOrCreateBookNote } from "./book-notes";
@@ -34,6 +34,7 @@ export class EpubView extends FileView {
   pendingStatsSeconds: number = 0;
   statsSaveTimer: any = null;
   interactionCleanup: (() => void) | null = null;
+  reactRoot: Root | null = null;
 
   constructor(leaf: WorkspaceLeaf, settings: any, plugin: any) {
     super(leaf);
@@ -474,7 +475,10 @@ export class EpubView extends FileView {
   async onLoadFile(file: TFile): Promise<void> {
     this.setHeaderMenuVisibility(true);
     this.stopThemeSync();
-    ReactDOM.unmountComponentAtNode(this.contentEl);
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
     (this.contentEl as any).empty();
 
     this.lastInteractionTime = Date.now();
@@ -498,7 +502,8 @@ export class EpubView extends FileView {
     const contents = await this.app.vault.adapter.readBinary(file.path);
     this.plugin.activeReaderView = this;
     await this.plugin.setActiveReader(this, "toc");
-    ReactDOM.render(React.createElement(EpubReader, {
+    this.reactRoot = createRoot(this.contentEl);
+    this.reactRoot.render(React.createElement(EpubReader, {
       contents,
       title: file.basename,
       bookPath: file.path,
@@ -543,14 +548,17 @@ export class EpubView extends FileView {
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
       onInteraction: () => { this.lastInteractionTime = Date.now(); }
-    }), this.contentEl);
+    }));
   }
 
   onunload(): void {
     this.setHeaderMenuVisibility(false);
     this.stopThemeSync();
     this.plugin.clearActiveReader(this);
-    ReactDOM.unmountComponentAtNode(this.contentEl);
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
   }
 
   async setEphemeralState(state: any): Promise<void> {

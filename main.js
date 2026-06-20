@@ -23075,7 +23075,7 @@ var require_react_dom_development = __commonJS({
             unmarkContainerAsRoot(container);
           }
         };
-        function createRoot4(container, options2) {
+        function createRoot5(container, options2) {
           if (!isValidContainer(container)) {
             throw new Error("createRoot(...): Target container is not a DOM element.");
           }
@@ -23446,7 +23446,7 @@ var require_react_dom_development = __commonJS({
               error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
             }
           }
-          return createRoot4(container, options2);
+          return createRoot5(container, options2);
         }
         function hydrateRoot$1(container, initialChildren, options2) {
           {
@@ -23510,6 +23510,37 @@ var require_react_dom = __commonJS({
     } else {
       module2.exports = require_react_dom_development();
     }
+  }
+});
+
+// node_modules/react-dom/client.js
+var require_client = __commonJS({
+  "node_modules/react-dom/client.js"(exports) {
+    "use strict";
+    var m = require_react_dom();
+    if (false) {
+      exports.createRoot = m.createRoot;
+      exports.hydrateRoot = m.hydrateRoot;
+    } else {
+      i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+      exports.createRoot = function(c, o) {
+        i.usingClientEntryPoint = true;
+        try {
+          return m.createRoot(c, o);
+        } finally {
+          i.usingClientEntryPoint = false;
+        }
+      };
+      exports.hydrateRoot = function(c, h, o) {
+        i.usingClientEntryPoint = true;
+        try {
+          return m.hydrateRoot(c, h, o);
+        } finally {
+          i.usingClientEntryPoint = false;
+        }
+      };
+    }
+    var i;
   }
 });
 
@@ -52637,37 +52668,6 @@ var require_lib3 = __commonJS({
   }
 });
 
-// node_modules/react-dom/client.js
-var require_client = __commonJS({
-  "node_modules/react-dom/client.js"(exports) {
-    "use strict";
-    var m = require_react_dom();
-    if (false) {
-      exports.createRoot = m.createRoot;
-      exports.hydrateRoot = m.hydrateRoot;
-    } else {
-      i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-      exports.createRoot = function(c, o) {
-        i.usingClientEntryPoint = true;
-        try {
-          return m.createRoot(c, o);
-        } finally {
-          i.usingClientEntryPoint = false;
-        }
-      };
-      exports.hydrateRoot = function(c, h, o) {
-        i.usingClientEntryPoint = true;
-        try {
-          return m.hydrateRoot(c, h, o);
-        } finally {
-          i.usingClientEntryPoint = false;
-        }
-      };
-    }
-    var i;
-  }
-});
-
 // node_modules/react/cjs/react-jsx-runtime.development.js
 var require_react_jsx_runtime_development = __commonJS({
   "node_modules/react/cjs/react-jsx-runtime.development.js"(exports) {
@@ -53568,7 +53568,7 @@ var import_obsidian19 = require("obsidian");
 
 // src/EpubView.ts
 var import_react3 = __toESM(require_react(), 1);
-var import_react_dom = __toESM(require_react_dom(), 1);
+var import_client = __toESM(require_client(), 1);
 var import_obsidian6 = require("obsidian");
 init_utils();
 init_book_notes();
@@ -57621,6 +57621,7 @@ var EpubView = class extends import_obsidian6.FileView {
   pendingStatsSeconds = 0;
   statsSaveTimer = null;
   interactionCleanup = null;
+  reactRoot = null;
   constructor(leaf, settings, plugin) {
     super(leaf);
     this.settings = settings;
@@ -58016,7 +58017,10 @@ var EpubView = class extends import_obsidian6.FileView {
   async onLoadFile(file) {
     this.setHeaderMenuVisibility(true);
     this.stopThemeSync();
-    import_react_dom.default.unmountComponentAtNode(this.contentEl);
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
     this.contentEl.empty();
     this.lastInteractionTime = Date.now();
     this.pendingStatsSeconds = 0;
@@ -58039,7 +58043,8 @@ var EpubView = class extends import_obsidian6.FileView {
     const contents = await this.app.vault.adapter.readBinary(file.path);
     this.plugin.activeReaderView = this;
     await this.plugin.setActiveReader(this, "toc");
-    import_react_dom.default.render(import_react3.default.createElement(EpubReader, {
+    this.reactRoot = (0, import_client.createRoot)(this.contentEl);
+    this.reactRoot.render(import_react3.default.createElement(EpubReader, {
       contents,
       title: file.basename,
       bookPath: file.path,
@@ -58117,13 +58122,16 @@ var EpubView = class extends import_obsidian6.FileView {
       onInteraction: () => {
         this.lastInteractionTime = Date.now();
       }
-    }), this.contentEl);
+    }));
   }
   onunload() {
     this.setHeaderMenuVisibility(false);
     this.stopThemeSync();
     this.plugin.clearActiveReader(this);
-    import_react_dom.default.unmountComponentAtNode(this.contentEl);
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
   }
   async setEphemeralState(state) {
     if (state && state.epubcifi) {
@@ -58949,7 +58957,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian8.ItemView {
 // src/library/LibraryView.ts
 var import_obsidian10 = require("obsidian");
 var React5 = __toESM(require_react(), 1);
-var ReactDOM2 = __toESM(require_client(), 1);
+var ReactDOM = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
 var React4 = __toESM(require_react(), 1);
@@ -61431,7 +61439,7 @@ var LibraryView = class extends import_obsidian10.ItemView {
     const container = this.contentEl;
     container.empty();
     container.addClass("jarvis-reader-library-view");
-    this.root = ReactDOM2.createRoot(container);
+    this.root = ReactDOM.createRoot(container);
     this.root.render(React5.createElement(LibraryApp, { plugin: this.plugin }));
   }
   async onClose() {
@@ -61881,7 +61889,7 @@ created: {{created}}
 // src/sidebar/WordSidebarView.tsx
 var import_obsidian13 = require("obsidian");
 var React7 = __toESM(require_react(), 1);
-var import_client = __toESM(require_client(), 1);
+var import_client2 = __toESM(require_client(), 1);
 
 // src/word-book/WordCard.tsx
 var React6 = __toESM(require_react(), 1);
@@ -62236,7 +62244,7 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
   }
   renderList(listContainer) {
     if (!this.reactRoot) {
-      this.reactRoot = (0, import_client.createRoot)(listContainer);
+      this.reactRoot = (0, import_client2.createRoot)(listContainer);
     }
     if (!this.reader) {
       this.reactRoot.render(
@@ -62340,7 +62348,7 @@ var WordSidebarView = class extends import_obsidian13.ItemView {
 // src/word-book/WordBookView.ts
 var import_obsidian17 = require("obsidian");
 var React11 = __toESM(require_react(), 1);
-var ReactDOM3 = __toESM(require_client(), 1);
+var ReactDOM2 = __toESM(require_client(), 1);
 
 // src/word-book/WordBookApp.tsx
 var React10 = __toESM(require_react(), 1);
@@ -64167,7 +64175,7 @@ var WordBookView = class extends import_obsidian17.ItemView {
     const container = this.contentEl;
     container.empty();
     container.addClass("jarvis-reader-word-book-view");
-    this.root = ReactDOM3.createRoot(container);
+    this.root = ReactDOM2.createRoot(container);
     this.root.render(React11.createElement(WordBookApp, { plugin: this.plugin }));
   }
   async onClose() {
@@ -64185,7 +64193,7 @@ init_utils();
 
 // src/global-markdown.ts
 var import_react4 = __toESM(require_react(), 1);
-var import_react_dom2 = __toESM(require_react_dom(), 1);
+var import_react_dom = __toESM(require_react_dom(), 1);
 var import_obsidian18 = require("obsidian");
 function truncateWordDisplay2(value) {
   const raw = String(value || "");
@@ -64650,8 +64658,8 @@ var GlobalTranslationManager = class {
   showSelectionCard(rect, word, sentence = "") {
     this.clearHideTimeout();
     this.ensureContainer();
-    import_react_dom2.default.unmountComponentAtNode(this.containerEl);
-    import_react_dom2.default.render(
+    import_react_dom.default.unmountComponentAtNode(this.containerEl);
+    import_react_dom.default.render(
       import_react4.default.createElement(GlobalTranslationCard, {
         word,
         sentence,
@@ -64667,8 +64675,8 @@ var GlobalTranslationManager = class {
     this.clearHideTimeout();
     this.ensureContainer();
     const rect = targetEl.getBoundingClientRect();
-    import_react_dom2.default.unmountComponentAtNode(this.containerEl);
-    import_react_dom2.default.render(
+    import_react_dom.default.unmountComponentAtNode(this.containerEl);
+    import_react_dom.default.render(
       import_react4.default.createElement(GlobalTranslationCard, {
         word,
         rect,
@@ -64693,7 +64701,7 @@ var GlobalTranslationManager = class {
   }
   closeCard() {
     if (this.containerEl) {
-      import_react_dom2.default.unmountComponentAtNode(this.containerEl);
+      import_react_dom.default.unmountComponentAtNode(this.containerEl);
       this.containerEl.remove();
       this.containerEl = null;
     }
