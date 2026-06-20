@@ -57923,6 +57923,8 @@ var EpubView = class extends import_obsidian6.FileView {
   }
   async saveReadingStats() {
     if (this.pendingStatsSeconds <= 0) return;
+    const file = this.file;
+    if (!file) return;
     const seconds = this.pendingStatsSeconds;
     this.pendingStatsSeconds = 0;
     const today = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
@@ -57932,7 +57934,7 @@ var EpubView = class extends import_obsidian6.FileView {
     if (!this.plugin.settings.readingStats[today]) {
       this.plugin.settings.readingStats[today] = {};
     }
-    const bookPath = this.file.path;
+    const bookPath = file.path;
     if (!this.plugin.settings.readingStats[today][bookPath]) {
       this.plugin.settings.readingStats[today][bookPath] = 0;
     }
@@ -57945,7 +57947,7 @@ var EpubView = class extends import_obsidian6.FileView {
     try {
       const { getOrCreateBookNote: getOrCreateBookNote2 } = await Promise.resolve().then(() => (init_book_notes(), book_notes_exports));
       const { formatDuration: formatDuration2 } = await Promise.resolve().then(() => (init_utils(), utils_exports));
-      const noteFile = await getOrCreateBookNote2(this.plugin.app, this.file, "", this.plugin.settings);
+      const noteFile = await getOrCreateBookNote2(this.plugin.app, file, "", this.plugin.settings);
       if (noteFile) {
         await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm) => {
           fm.reading_time = formatDuration2(totalSecs);

@@ -370,6 +370,8 @@ export class EpubView extends FileView {
 
   async saveReadingStats(): Promise<void> {
     if (this.pendingStatsSeconds <= 0) return;
+    const file = this.file;
+    if (!file) return;
     const seconds = this.pendingStatsSeconds;
     this.pendingStatsSeconds = 0;
     const today = new Date().toLocaleDateString("en-CA");
@@ -379,7 +381,7 @@ export class EpubView extends FileView {
     if (!this.plugin.settings.readingStats[today]) {
       this.plugin.settings.readingStats[today] = {};
     }
-    const bookPath = this.file!.path;
+    const bookPath = file.path;
     if (!this.plugin.settings.readingStats[today][bookPath]) {
       this.plugin.settings.readingStats[today][bookPath] = 0;
     }
@@ -395,7 +397,7 @@ export class EpubView extends FileView {
     try {
       const { getOrCreateBookNote } = await import("./book-notes");
       const { formatDuration } = await import("./utils");
-      const noteFile = await getOrCreateBookNote(this.plugin.app, this.file!, "", this.plugin.settings);
+      const noteFile = await getOrCreateBookNote(this.plugin.app, file, "", this.plugin.settings);
       if (noteFile) {
         await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm: any) => {
           fm.reading_time = formatDuration(totalSecs);
