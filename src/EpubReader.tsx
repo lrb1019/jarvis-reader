@@ -1032,6 +1032,35 @@ const showWordHoverCard = (asset, element) => {
       new Notice(error && error.message ? error.message : "Failed to delete translation card.");
     }
   };
+  const translateActiveWordWithAi = async () => {
+    const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!asset || !assetKey || typeof translateSelection !== "function" || typeof saveWordAsset !== "function")
+      return;
+    new Notice("正在使用AI翻译...");
+    try {
+      const quote = asset.title || asset.lemma || "";
+      const sentence = (asset.sources && asset.sources[0] && asset.sources[0].sentence) || (asset.sources && asset.sources[0] && asset.sources[0].quote) || "";
+      const result = await translateSelection(quote, sentence, { forceAi: true });
+      if (!result) return;
+      const updatedAsset = await saveWordAsset({
+        quote,
+        sentence,
+        chapterTitle: (asset.sources && asset.sources[0] && asset.sources[0].chapterTitle) || "",
+        cfiRange: (asset.sources && asset.sources[0] && asset.sources[0].cfiRange) || ""
+      }, result);
+      if (!updatedAsset) return;
+      setCurrentWordAssets((current) => {
+        const next = { ...current, [assetKey]: updatedAsset };
+        wordAssetsRef.current = next;
+        return next;
+      });
+      setActiveWordHover((current) => current ? { ...current, asset: updatedAsset } : null);
+      new Notice("AI翻译完成并已更新词卡");
+    } catch (error) {
+      new Notice(error && error.message ? error.message : "AI翻译失败");
+    }
+  };
   const clearAutoWordHighlights = (rendition) => {
     if (!rendition || !rendition.annotations)
       return;
@@ -1711,7 +1740,7 @@ const showWordHoverCard = (asset, element) => {
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
   const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
-  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4fdd\u5b58\u53e5\u5b50" : pendingTranslationKind === "phrase" ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
+  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4fdd\u5b58\u957f\u53e5" : pendingTranslationKind === "phrase" ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
   const renderObsidianIcon = (name) => React.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
@@ -2278,7 +2307,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
     style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
     onPointerDown: (e) => e.stopPropagation()
-  }, "\u539f\u53e5\u7ffb\u8bd1") :  React.createElement("button", {
+  }, "\u957f\u53e5\u7ffb\u8bd1") :  React.createElement("button", {
     className: "jarvis-reader-word-card-lemma",
     title: "\u70b9\u51fb\u53d1\u97f3",
     style: { flex: "0 0 auto", cursor: "pointer" },
@@ -2297,6 +2326,10 @@ const showWordHoverCard = (asset, element) => {
       openWordNote(activeWordHover.asset);
     }
   }, renderObsidianIcon("book")), React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
+    title: "AI翻译",
+    onClick: translateActiveWordWithAi
+  }, renderObsidianIcon("bot")), React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
     title: "\u6807\u8bb0\u5df2\u638c\u63e1",
     onClick: markActiveWordMastered

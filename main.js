@@ -53781,26 +53781,31 @@ init_utils_core();
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
 var BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 var DEFAULT_TRANSLATION_PROMPT = `\u4F60\u662F Obsidian \u82F1\u8BED\u7FFB\u8BD1\u4E0E\u8BCD\u53E5\u5361\u7247\u751F\u6210\u5668\u3002
-\u4F60\u5FC5\u987B\u53EA\u8FD4\u56DE\u5355\u884C\u5408\u6CD5 JSON\u3002
-\u6574\u4E2A\u54CD\u5E94\u4E0D\u80FD\u5305\u542B\u4EFB\u4F55\u771F\u5B9E\u6362\u884C\u7B26\u3002
-\u4E0D\u8981 markdown \u4EE3\u7801\u5757\u3002
-\u4E0D\u8981\u89E3\u91CA\u3002
-\u4E0D\u8981\u8F93\u51FA JSON \u4EE5\u5916\u7684\u4EFB\u4F55\u6587\u5B57\u3002
-Return ONLY valid JSON on a single line:
-{"lemma":"{{word}}","translation":"\u6587\u4E2D\u5BF9\u5E94\u7684\u7B80\u6D01\u4E2D\u6587\u91CA\u4E49\u6216\u6574\u53E5\u8BD1\u6587","display":"\u5982\u679C selectionType \u662F word \u6216 phrase\uFF1A**\u8BCD\u6027** /\u97F3\u6807/\\n\\n**\u82F1\u82F1\u91CA\u4E49**\uFF1A\u4F18\u5148\u5199\u8F93\u5165\u8BCD\u6216\u77ED\u8BED\u5728\u4E0A\u4E0B\u6587\u4E2D\u7684\u82F1\u6587\u91CA\u4E49\u3002\\n\\n**\u4E2D\u6587\u91CA\u4E49**\uFF1A\u6587\u4E2D\u542B\u4E49\uFF1A\u7ED3\u5408\u539F\u53E5\u8BED\u5883\u89E3\u91CA\u3002\u5176\u4ED6\u5E38\u89C1\u542B\u4E49\uFF1A\u7B80\u8981\u5217\u51FA\uFF1B\u6CA1\u6709\u5219\u5199\u65E0\u3002\\n\\n---\\n\\n**\u4F8B\u53E5**\uFF1AEnglish example sentence matching the context meaning.\\n\u4E2D\u6587\u4F8B\u53E5\u7FFB\u8BD1\u3002\\n\\n---\\n\\n**\u642D\u914D**\uFF1Acommon collocation\\n**\u6D3E\u751F**\uFF1Acommon derivative if any\\n**\u8BCD\u6E90**\uFF1A\u7B80\u6D01\u8BCD\u6E90\u8BF4\u660E\\n**\u540C\u4E49\u8BCD**\uFF1Asynonym1, synonym2\u3002\u5982\u679C selectionType \u662F sentence\uFF1A\u53EA\u5199\u81EA\u7136\u4E2D\u6587\u8BD1\u6587\uFF0C\u4E0D\u8981\u8BCD\u6027\u3001\u97F3\u6807\u3001\u4F8B\u53E5\u3001\u642D\u914D\u3001\u6D3E\u751F\u3001\u8BCD\u6E90\u3001\u540C\u4E49\u8BCD\u3002","isWord":true}
+
+\u3010\u6838\u5FC3\u4EFB\u52A1\uFF1A\u8BED\u5883\u7B2C\u4E00\u3011
+\u4F60\u5FC5\u987B\u6DF1\u5EA6\u5206\u6790\u8F93\u5165\u8BCD/\u77ED\u8BED\u5728<\u4E0A\u4E0B\u6587>\u53E5\u5B50\u4E2D\u7684\u7CBE\u786E\u542B\u4E49\u3002\u7EDD\u4E0D\u80FD\u751F\u642C\u786C\u5957\u8BCD\u5178\u7684\u9996\u9009\u542B\u4E49\uFF0C\u5FC5\u987B\u7ED3\u5408\u8BED\u5883\u5224\u65AD\u5176\u5F15\u7533\u4E49\u3001\u6BD4\u55BB\u4E49\u6216\u56FA\u5B9A\u642D\u914D\u3002
+\u4F8B\u5982 "stall" \u5728 "I stalled. Ten seconds to remember..." \u4E2D\u662F\u201C\u652F\u652F\u543E\u543E/\u62D6\u5EF6\u65F6\u95F4\u201D\u800C\u4E0D\u662F\u201C\u8D27\u644A\u201D\u3002
+
+\u5728\u8F93\u51FA\u6700\u7EC8\u7ED3\u679C\u524D\uFF0C\u4F60\u53EF\u4EE5\u5148\u7528 <thinking> \u6807\u7B7E\u7B80\u8981\u5206\u6790\u8BE5\u8BCD\u5728\u53E5\u4E2D\u7684\u5B9E\u9645\u4F5C\u7528\u3002
+\u7136\u540E\uFF0C\u5FC5\u987B\u4E14\u53EA\u80FD\u8F93\u51FA\u4E00\u6BB5\u5408\u6CD5\u7684 JSON\uFF0C\u6574\u4E2A JSON \u8FD4\u56DE\u7ED3\u679C\u8BF7\u653E\u5728 \`\`\`json \u548C \`\`\` \u4E4B\u95F4\u3002
+
+JSON \u7ED3\u6784\u8981\u6C42\uFF1A
+{
+  "lemma": "{{word}}",
+  "translation": "\u6587\u4E2D\u5BF9\u5E94\u7684\u7B80\u6D01\u4E2D\u6587\u91CA\u4E49\u6216\u6574\u53E5\u8BD1\u6587",
+  "display": "\u5982\u679C selectionType \u662F word \u6216 phrase\uFF1A**\u8BCD\u6027** /\u97F3\u6807/\\n\\n**\u82F1\u82F1\u91CA\u4E49**\uFF1A\u4F18\u5148\u5199\u8F93\u5165\u8BCD\u6216\u77ED\u8BED\u5728\u4E0A\u4E0B\u6587\u4E2D\u7684\u82F1\u6587\u91CA\u4E49\u3002\\n\\n**\u4E2D\u6587\u91CA\u4E49**\uFF1A\u6587\u4E2D\u542B\u4E49\uFF1A\u5FC5\u987B\u7ED3\u5408\u539F\u53E5\u8BED\u5883\u5177\u4F53\u89E3\u91CA\uFF08\u4F8B\u5982\uFF1A\u5728\u8FD9\u91CC\u6307...\uFF09\u3002\u5176\u4ED6\u5E38\u89C1\u542B\u4E49\uFF1A\u7B80\u8981\u5217\u51FA\uFF1B\u6CA1\u6709\u5219\u5199\u65E0\u3002\\n\\n---\\n\\n**\u4F8B\u53E5**\uFF1AEnglish example sentence matching the context meaning.\\n\u4E2D\u6587\u4F8B\u53E5\u7FFB\u8BD1\u3002\\n\\n---\\n\\n**\u642D\u914D**\uFF1Acommon collocation\\n**\u6D3E\u751F**\uFF1Acommon derivative if any\\n**\u8BCD\u6E90**\uFF1A\u7B80\u6D01\u8BCD\u6E90\u8BF4\u660E\\n**\u540C\u4E49\u8BCD**\uFF1Asynonym1, synonym2\u3002\u5982\u679C selectionType \u662F sentence\uFF1A\u53EA\u5199\u81EA\u7136\u4E2D\u6587\u8BD1\u6587\uFF0C\u4E0D\u8981\u8BCD\u6027\u3001\u97F3\u6807\u3001\u4F8B\u53E5\u3001\u642D\u914D\u3001\u6D3E\u751F\u3001\u8BCD\u6E90\u3001\u540C\u4E49\u8BCD\u3002",
+  "isWord": true
+}
+
 \u89C4\u5219\uFF1A
-1. \u53EA\u8FD4\u56DE\u5355\u884C JSON\uFF0C\u6574\u4E2A\u54CD\u5E94\u4E0D\u80FD\u6362\u884C\u3002
-2. \u5FC5\u987B\u5305\u542B\u4E14\u53EA\u9700\u8981\u5305\u542B\uFF1Alemma\u3001translation\u3001display\u3001isWord\u3002
-3. selectionType \u4E3A word \u6216 phrase \u65F6\uFF0C\u6309\u8BCD\u53E5\u5361\u7247\u7ED3\u6784\u8F93\u51FA\uFF1Adisplay \u662F\u552F\u4E00\u6B63\u6587\u663E\u793A\u6E90\uFF0C\u5FC5\u987B\u5305\u542B\u97F3\u6807\u3001\u8BCD\u6027\u3001\u82F1\u82F1\u91CA\u4E49\u3001\u4E2D\u6587\u91CA\u4E49\u3001\u4F8B\u53E5\u3001\u642D\u914D\u3001\u6D3E\u751F\u3001\u8BCD\u6E90\u3001\u540C\u4E49\u8BCD\uFF1BisWord \u5FC5\u987B\u662F true\u3002
-4. selectionType \u4E3A sentence \u65F6\uFF0C\u53EA\u7FFB\u8BD1\u6574\u53E5\uFF1Atranslation \u5199\u81EA\u7136\u4E2D\u6587\u8BD1\u6587\uFF0Cdisplay \u4E5F\u53EA\u5199\u540C\u4E00\u6BB5\u4E2D\u6587\u8BD1\u6587\uFF1Blemma \u5199\u7A7A\u5B57\u7B26\u4E32\uFF1BisWord \u5FC5\u987B\u662F false\uFF1B\u7981\u6B62\u8F93\u51FA\u8BCD\u6027\u3001\u97F3\u6807\u3001\u4F8B\u53E5\u3001\u642D\u914D\u3001\u6D3E\u751F\u3001\u8BCD\u6E90\u3001\u540C\u4E49\u8BCD\u3002
-5. \u4F18\u5148\u6839\u636E\u4E0A\u4E0B\u6587\u5224\u65AD\u8F93\u5165\u8BCD\u6216\u77ED\u8BED\u5728\u539F\u53E5\u4E2D\u7684\u5177\u4F53\u542B\u4E49\u3002word \u6216 phrase \u7684 display \u5FC5\u987B\u5148\u5C55\u793A\u6587\u4E2D\u542B\u4E49\uFF0C\u518D\u8865\u5145\u5176\u4ED6\u5E38\u89C1\u542B\u4E49\uFF1Btranslation \u4E5F\u4F18\u5148\u5199\u6587\u4E2D\u542B\u4E49\u3002
-6. display \u5185\u6362\u884C\u53EA\u80FD\u5199\u6210 \\n\uFF0C\u4E0D\u80FD\u76F4\u63A5\u6362\u884C\u3002
-7. display \u5185\u53CC\u5F15\u53F7\u5FC5\u987B\u8F6C\u4E49\u6210 \\"\u3002
-8. word \u6216 phrase \u7684 display \u5185\u6807\u7B7E\u8BCD\u5FC5\u987B\u52A0\u7C97\uFF1A**\u8BCD\u6027**\u3001**\u82F1\u82F1\u91CA\u4E49**\u3001**\u4E2D\u6587\u91CA\u4E49**\u3001**\u4F8B\u53E5**\u3001**\u642D\u914D**\u3001**\u6D3E\u751F**\u3001**\u8BCD\u6E90**\u3001**\u540C\u4E49\u8BCD**\u3002
-9. word \u6216 phrase \u7684 translation \u53EA\u5199\u7B80\u6D01\u4E2D\u6587\u91CA\u4E49\uFF0C\u4E0D\u8981\u5199\u5B8C\u6574\u5361\u7247\u3002
-10. word \u7684 lemma \u5FC5\u987B\u662F\u5C0F\u5199\u539F\u5F62\uFF1Bphrase \u7684 lemma \u5199\u5C0F\u5199\u77ED\u8BED\u539F\u5F62\u3002
-11. \u5982\u679C\u6CA1\u6709\u5E38\u89C1\u6D3E\u751F\u6216\u540C\u4E49\u8BCD\uFF0C\u53EF\u4EE5\u5199"\u65E0"\uFF0C\u4E0D\u8981\u7F16\u9020\u3002
-12. display \u5185\u7981\u6B62\u91CD\u590D\u5806\u53E0\u8F93\u5165\u8BCD\u672C\u8EAB\u3002
+1. JSON \u5FC5\u987B\u5408\u6CD5\u3002JSON \u5B57\u7B26\u4E32\u5185\u90E8\uFF08\u5C24\u5176\u662F display \u5B57\u6BB5\uFF09\u7EDD\u5BF9\u4E0D\u80FD\u51FA\u73B0\u771F\u5B9E\u7684\u6362\u884C\u7B26\uFF0C\u6240\u6709\u6362\u884C\u5FC5\u987B\u8F6C\u4E49\u5199\u6210 \\n\u3002
+2. JSON \u5B57\u7B26\u4E32\u5185\u7684\u53CC\u5F15\u53F7\u5FC5\u987B\u8F6C\u4E49\u4E3A \\"\u3002
+3. \u5FC5\u987B\u5305\u542B\u4E14\u53EA\u9700\u8981\u5305\u542B\uFF1Alemma\u3001translation\u3001display\u3001isWord\u3002
+4. \u3010\u4E2D\u6587\u91CA\u4E49\u3011\u5FC5\u987B\u9996\u5148\u5217\u51FA\u3010\u6587\u4E2D\u542B\u4E49\u3011\uFF0C\u660E\u786E\u6307\u51FA\u8BE5\u8BCD\u5728\u8FD9\u4E2A\u53E5\u5B50\u4E2D\u7684\u786E\u5207\u610F\u601D\uFF0C\u4E0D\u8981\u76F4\u63A5\u80CC\u8BF5\u8BCD\u5178\uFF1B\u7136\u540E\u518D\u8865\u5145\u5176\u4ED6\u5E38\u89C1\u542B\u4E49\u3002
+5. selectionType \u4E3A word \u6216 phrase \u65F6\uFF0Cdisplay \u662F\u552F\u4E00\u6B63\u6587\u663E\u793A\u6E90\uFF0C\u5FC5\u987B\u6309\u4E0A\u8FF0\u683C\u5F0F\u5305\u542B\u6240\u6709\u4FE1\u606F\uFF1BisWord \u4E3A true\u3002
+6. selectionType \u4E3A sentence \u65F6\uFF0C\u53EA\u7FFB\u8BD1\u6574\u53E5\uFF0Ctranslation \u548C display \u5199\u540C\u4E00\u6BB5\u4E2D\u6587\u8BD1\u6587\uFF1Blemma \u5199\u7A7A\u5B57\u7B26\u4E32\uFF1BisWord \u4E3A false\u3002
+7. word \u7684 lemma \u5FC5\u987B\u662F\u5C0F\u5199\u539F\u5F62\uFF1Bphrase \u7684 lemma \u5199\u5C0F\u5199\u77ED\u8BED\u539F\u5F62\u3002
+
 \u8F93\u5165\u5185\u5BB9\uFF1A{{word}}
 \u9009\u62E9\u7C7B\u578B\uFF1A{{selectionType}}
 \u4E0A\u4E0B\u6587\uFF1A{{sentence}}`;
@@ -54084,6 +54089,7 @@ function buildWordAssetFromSelection(file, selection, translation, existingAsset
     chapterTitle: selection?.chapterTitle || file.basename,
     cfiRange: selection?.cfiRange || "",
     quote,
+    sentence: selection?.sentence || "",
     created: now
   };
   const asset = {
@@ -54169,10 +54175,10 @@ function parseTranslationResponseText(text) {
     } catch (error) {
     }
   }
-  const objectMatch = raw.match(/\{[\s\S]*\}/);
-  if (objectMatch && objectMatch[0]) {
+  const objectText = getFirstJsonObjectText(raw);
+  if (objectText) {
     try {
-      return JSON.parse(objectMatch[0]);
+      return JSON.parse(objectText);
     } catch (error) {
     }
   }
@@ -56283,6 +56289,35 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       new import_obsidian5.Notice(error && error.message ? error.message : "Failed to delete translation card.");
     }
   };
+  const translateActiveWordWithAi = async () => {
+    const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
+    const assetKey = getTranslationAssetStorageKey(asset);
+    if (!asset || !assetKey || typeof translateSelection !== "function" || typeof saveWordAsset !== "function")
+      return;
+    new import_obsidian5.Notice("\u6B63\u5728\u4F7F\u7528AI\u7FFB\u8BD1...");
+    try {
+      const quote = asset.title || asset.lemma || "";
+      const sentence = asset.sources && asset.sources[0] && asset.sources[0].sentence || asset.sources && asset.sources[0] && asset.sources[0].quote || "";
+      const result = await translateSelection(quote, sentence, { forceAi: true });
+      if (!result) return;
+      const updatedAsset = await saveWordAsset({
+        quote,
+        sentence,
+        chapterTitle: asset.sources && asset.sources[0] && asset.sources[0].chapterTitle || "",
+        cfiRange: asset.sources && asset.sources[0] && asset.sources[0].cfiRange || ""
+      }, result);
+      if (!updatedAsset) return;
+      setCurrentWordAssets((current) => {
+        const next = { ...current, [assetKey]: updatedAsset };
+        wordAssetsRef.current = next;
+        return next;
+      });
+      setActiveWordHover((current) => current ? { ...current, asset: updatedAsset } : null);
+      new import_obsidian5.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
+    } catch (error) {
+      new import_obsidian5.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
+    }
+  };
   const clearAutoWordHighlights = (rendition) => {
     if (!rendition || !rendition.annotations)
       return;
@@ -56962,7 +56997,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
   const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
-  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4FDD\u5B58\u53E5\u5B50" : pendingTranslationKind === "phrase" ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
+  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4FDD\u5B58\u957F\u53E5" : pendingTranslationKind === "phrase" ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
   const renderObsidianIcon = (name) => import_react2.default.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
@@ -57533,7 +57568,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
       style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
       onPointerDown: (e) => e.stopPropagation()
-    }, "\u539F\u53E5\u7FFB\u8BD1") : import_react2.default.createElement("button", {
+    }, "\u957F\u53E5\u7FFB\u8BD1") : import_react2.default.createElement("button", {
       className: "jarvis-reader-word-card-lemma",
       title: "\u70B9\u51FB\u53D1\u97F3",
       style: { flex: "0 0 auto", cursor: "pointer" },
@@ -57552,6 +57587,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         openWordNote(activeWordHover.asset);
       }
     }, renderObsidianIcon("book")), import_react2.default.createElement("button", {
+      className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
+      title: "AI\u7FFB\u8BD1",
+      onClick: translateActiveWordWithAi
+    }, renderObsidianIcon("bot")), import_react2.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
       title: "\u6807\u8BB0\u5DF2\u638C\u63E1",
       onClick: markActiveWordMastered
@@ -60563,7 +60602,7 @@ function LibraryApp({ plugin }) {
           const isMostNotes = bookPath === maxHighlightsBook && maxHighlightsCount > 0;
           return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-item", children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
-            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url(${cover.dataUrl})` } }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
+            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url("${cover.dataUrl}")` } }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-info", children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
@@ -62608,6 +62647,45 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
   const [currentIndex, setCurrentIndex] = React8.useState(0);
   const [showAnswer, setShowAnswer] = React8.useState(false);
   const [startTime, setStartTime] = React8.useState(Date.now());
+  const [isTranslating, setIsTranslating] = React8.useState(false);
+  const handleAiTranslation = async (e) => {
+    e.stopPropagation();
+    if (isTranslating) return;
+    const asset2 = dueAssets[currentIndex];
+    if (!asset2) return;
+    const lemmaKey = asset2.lemma;
+    if (!plugin.settings.wordAssets[lemmaKey]) return;
+    setIsTranslating(true);
+    new import_obsidian15.Notice("\u6B63\u5728\u4F7F\u7528AI\u91CD\u65B0\u7FFB\u8BD1...");
+    try {
+      const quote = asset2.title || asset2.lemma || "";
+      const sentence = asset2.sources && asset2.sources[0] && asset2.sources[0].sentence || asset2.sources && asset2.sources[0] && asset2.sources[0].quote || "";
+      const result = await translateSelectionWithApi(plugin.settings, quote, sentence, plugin.app, { forceAi: true });
+      if (result) {
+        const currentAsset = plugin.settings.wordAssets[lemmaKey];
+        currentAsset.translation = result.translation || currentAsset.translation;
+        if (result.display) currentAsset.display = result.display;
+        if (result.phonetic) currentAsset.phonetic = result.phonetic;
+        if (result.partOfSpeech) currentAsset.partOfSpeech = result.partOfSpeech;
+        if (result.example) currentAsset.example = result.example;
+        if (result.tags) currentAsset.tags = result.tags;
+        if (result.collins !== void 0) currentAsset.collins = result.collins;
+        if (result.oxford !== void 0) currentAsset.oxford = result.oxford;
+        currentAsset.updated = (/* @__PURE__ */ new Date()).toISOString();
+        await plugin.persistWordAssetSidecar("save");
+        await plugin.saveSettings();
+        new import_obsidian15.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
+        onAssetUpdate();
+      } else {
+        new import_obsidian15.Notice("AI\u7FFB\u8BD1\u6CA1\u6709\u8FD4\u56DE\u7ED3\u679C");
+      }
+    } catch (error) {
+      new import_obsidian15.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
+      console.error(error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
   const playAudio = React8.useCallback((text) => {
     if (plugin.settings.enableWordAudio !== false) {
       try {
@@ -62798,102 +62876,148 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
             asset.sources[0].chapterTitle ? ` \xB7 ${asset.sources[0].chapterTitle}` : ""
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", flexShrink: 0 }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "jarvis-library-back-btn", onClick: (e) => {
-            e.stopPropagation();
-            setShowAnswer(false);
-          }, children: "\u56DE\u5230\u6B63\u9762" }),
-          asset.sources && asset.sources[0] && asset.sources[0].bookPath && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: async (e) => {
-            e.stopPropagation();
-            try {
-              const source = asset.sources[0];
-              if (!source || !source.bookPath) {
-                new import_obsidian15.Notice("\u6CA1\u6709\u627E\u5230\u539F\u6587\u6765\u6E90");
-                return;
-              }
-              const file = plugin.app.vault.getAbstractFileByPath(source.bookPath);
-              if (!file) {
-                new import_obsidian15.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
-                return;
-              }
-              const leaves = [];
-              plugin.app.workspace.iterateAllLeaves((l) => {
-                if (l.view?.getViewType() === "epub") {
-                  leaves.push(l);
-                }
-              });
-              let targetLeaf = null;
-              for (const l of leaves) {
-                const viewState = l.getViewState();
-                const filePath = l.view?.file?.path || viewState?.state?.file;
-                if (filePath === file.path) {
-                  targetLeaf = l;
-                  break;
-                }
-              }
-              if (!targetLeaf) {
-                const normalizeBookName = (p) => {
-                  if (!p) return "";
-                  const filename = p.split("/").pop() || p;
-                  return filename.toLowerCase().replace(/[\s\-_]/g, "").replace(/[（(]/g, "(").replace(/[）)]/g, ")");
-                };
-                const targetName = normalizeBookName(file.path);
-                for (const l of leaves) {
-                  const viewState = l.getViewState();
-                  const filePath = l.view?.file?.path || viewState?.state?.file;
-                  if (filePath && normalizeBookName(filePath) === targetName) {
-                    targetLeaf = l;
-                    break;
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", width: "100%", flexShrink: 0 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--text-muted) 6%, transparent)", color: "var(--text-muted)", border: "1px solid color-mix(in srgb, var(--text-muted) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
+              onClick: (e) => {
+                e.stopPropagation();
+                setShowAnswer(false);
+              },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.background = "var(--text-muted)";
+                e.currentTarget.style.color = "var(--background-primary)";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.background = "color-mix(in srgb, var(--text-muted) 6%, transparent)";
+                e.currentTarget.style.color = "var(--text-muted)";
+              },
+              children: "\u56DE\u5230\u6B63\u9762"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
+              onClick: handleAiTranslation,
+              onMouseEnter: (e) => {
+                e.currentTarget.style.background = "var(--interactive-accent)";
+                e.currentTarget.style.color = "white";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)";
+                e.currentTarget.style.color = "var(--interactive-accent)";
+              },
+              children: isTranslating ? "\u7FFB\u8BD1\u4E2D..." : "AI\u7FFB\u8BD1"
+            }
+          ),
+          asset.sources && asset.sources[0] && asset.sources[0].bookPath && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
+              onMouseEnter: (e) => {
+                e.currentTarget.style.background = "var(--interactive-accent)";
+                e.currentTarget.style.color = "white";
+              },
+              onMouseLeave: (e) => {
+                e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)";
+                e.currentTarget.style.color = "var(--interactive-accent)";
+              },
+              onClick: async (e) => {
+                e.stopPropagation();
+                try {
+                  const source = asset.sources[0];
+                  if (!source || !source.bookPath) {
+                    new import_obsidian15.Notice("\u6CA1\u6709\u627E\u5230\u539F\u6587\u6765\u6E90");
+                    return;
                   }
-                }
-              }
-              if (targetLeaf) {
-                const viewState = targetLeaf.getViewState();
-                const activeFilePath = targetLeaf.view?.file?.path || viewState?.state?.file || file.path;
-                console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
-                plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
-                targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
-                const jump = () => {
-                  const view = targetLeaf.view;
-                  if (view && view.currentRendition) {
-                    try {
-                      if (typeof view.currentRendition.resize === "function") {
-                        view.currentRendition.resize();
-                      }
-                      view.currentRendition.display(source.cfiRange);
-                    } catch (e2) {
-                      console.warn("[Jarvis Reader] Direct display failed", e2);
+                  const file = plugin.app.vault.getAbstractFileByPath(source.bookPath);
+                  if (!file) {
+                    new import_obsidian15.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
+                    return;
+                  }
+                  const leaves = [];
+                  plugin.app.workspace.iterateAllLeaves((l) => {
+                    if (l.view?.getViewType() === "epub") {
+                      leaves.push(l);
+                    }
+                  });
+                  let targetLeaf = null;
+                  for (const l of leaves) {
+                    const viewState = l.getViewState();
+                    const filePath = l.view?.file?.path || viewState?.state?.file;
+                    if (filePath === file.path) {
+                      targetLeaf = l;
+                      break;
                     }
                   }
-                };
-                const onActiveLeafChange = (activeLeaf) => {
-                  const activeView = activeLeaf?.view;
-                  const isMatch = activeLeaf === targetLeaf || activeView && activeView.getViewType() === "epub" && activeView.file?.path === file.path;
-                  if (isMatch) {
-                    plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                    clearTimeout(safetyTimeout);
-                    setTimeout(jump, 150);
-                    setTimeout(jump, 400);
-                    setTimeout(jump, 800);
+                  if (!targetLeaf) {
+                    const normalizeBookName = (p) => {
+                      if (!p) return "";
+                      const filename = p.split("/").pop() || p;
+                      return filename.toLowerCase().replace(/[\s\-_]/g, "").replace(/[（(]/g, "(").replace(/[）)]/g, ")");
+                    };
+                    const targetName = normalizeBookName(file.path);
+                    for (const l of leaves) {
+                      const viewState = l.getViewState();
+                      const filePath = l.view?.file?.path || viewState?.state?.file;
+                      if (filePath && normalizeBookName(filePath) === targetName) {
+                        targetLeaf = l;
+                        break;
+                      }
+                    }
                   }
-                };
-                const safetyTimeout = setTimeout(() => {
-                  plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                  console.log("[Jarvis Reader] active-leaf-change listener timeout triggered");
-                  jump();
-                }, 2500);
-                plugin.app.workspace.on("active-leaf-change", onActiveLeafChange);
-                plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
-              } else {
-                console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
-                const newLeaf = plugin.app.workspace.getLeaf(true);
-                await newLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
-              }
-            } catch (err) {
-              new import_obsidian15.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
-              console.error("Jump to source failed", err);
+                  if (targetLeaf) {
+                    const viewState = targetLeaf.getViewState();
+                    const activeFilePath = targetLeaf.view?.file?.path || viewState?.state?.file || file.path;
+                    console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
+                    plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
+                    targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
+                    const jump = () => {
+                      const view = targetLeaf.view;
+                      if (view && view.currentRendition) {
+                        try {
+                          if (typeof view.currentRendition.resize === "function") {
+                            view.currentRendition.resize();
+                          }
+                          view.currentRendition.display(source.cfiRange);
+                        } catch (e2) {
+                          console.warn("[Jarvis Reader] Direct display failed", e2);
+                        }
+                      }
+                    };
+                    const onActiveLeafChange = (activeLeaf) => {
+                      const activeView = activeLeaf?.view;
+                      const isMatch = activeLeaf === targetLeaf || activeView && activeView.getViewType() === "epub" && activeView.file?.path === file.path;
+                      if (isMatch) {
+                        plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
+                        clearTimeout(safetyTimeout);
+                        setTimeout(jump, 150);
+                        setTimeout(jump, 400);
+                        setTimeout(jump, 800);
+                      }
+                    };
+                    const safetyTimeout = setTimeout(() => {
+                      plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
+                      console.log("[Jarvis Reader] active-leaf-change listener timeout triggered");
+                      jump();
+                    }, 2500);
+                    plugin.app.workspace.on("active-leaf-change", onActiveLeafChange);
+                    plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+                  } else {
+                    console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
+                    const newLeaf = plugin.app.workspace.getLeaf(true);
+                    await newLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
+                  }
+                } catch (err) {
+                  new import_obsidian15.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
+                  console.error("Jump to source failed", err);
+                }
+              },
+              children: "\u8DF3\u8F6C\u539F\u6587"
             }
-          }, children: "\u8DF3\u8F6C\u539F\u6587" })
+          )
         ] })
       ] })
     ] }) }, currentIndex),

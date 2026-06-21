@@ -39,6 +39,7 @@ export interface WordAssetSource {
   chapterTitle: string;
   cfiRange: string;
   quote: string;
+  sentence?: string;
   created: string;
 }
 

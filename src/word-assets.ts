@@ -29,26 +29,31 @@ export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "
 export const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
 export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词句卡片生成器。
-你必须只返回单行合法 JSON。
-整个响应不能包含任何真实换行符。
-不要 markdown 代码块。
-不要解释。
-不要输出 JSON 以外的任何文字。
-Return ONLY valid JSON on a single line:
-{"lemma":"{{word}}","translation":"文中对应的简洁中文释义或整句译文","display":"如果 selectionType 是 word 或 phrase：**词性** /音标/\\n\\n**英英释义**：优先写输入词或短语在上下文中的英文释义。\\n\\n**中文释义**：文中含义：结合原句语境解释。其他常见含义：简要列出；没有则写无。\\n\\n---\\n\\n**例句**：English example sentence matching the context meaning.\\n中文例句翻译。\\n\\n---\\n\\n**搭配**：common collocation\\n**派生**：common derivative if any\\n**词源**：简洁词源说明\\n**同义词**：synonym1, synonym2。如果 selectionType 是 sentence：只写自然中文译文，不要词性、音标、例句、搭配、派生、词源、同义词。","isWord":true}
+
+【核心任务：语境第一】
+你必须深度分析输入词/短语在<上下文>句子中的精确含义。绝不能生搬硬套词典的首选含义，必须结合语境判断其引申义、比喻义或固定搭配。
+例如 "stall" 在 "I stalled. Ten seconds to remember..." 中是“支支吾吾/拖延时间”而不是“货摊”。
+
+在输出最终结果前，你可以先用 <thinking> 标签简要分析该词在句中的实际作用。
+然后，必须且只能输出一段合法的 JSON，整个 JSON 返回结果请放在 \`\`\`json 和 \`\`\` 之间。
+
+JSON 结构要求：
+{
+  "lemma": "{{word}}",
+  "translation": "文中对应的简洁中文释义或整句译文",
+  "display": "如果 selectionType 是 word 或 phrase：**词性** /音标/\\n\\n**英英释义**：优先写输入词或短语在上下文中的英文释义。\\n\\n**中文释义**：文中含义：必须结合原句语境具体解释（例如：在这里指...）。其他常见含义：简要列出；没有则写无。\\n\\n---\\n\\n**例句**：English example sentence matching the context meaning.\\n中文例句翻译。\\n\\n---\\n\\n**搭配**：common collocation\\n**派生**：common derivative if any\\n**词源**：简洁词源说明\\n**同义词**：synonym1, synonym2。如果 selectionType 是 sentence：只写自然中文译文，不要词性、音标、例句、搭配、派生、词源、同义词。",
+  "isWord": true
+}
+
 规则：
-1. 只返回单行 JSON，整个响应不能换行。
-2. 必须包含且只需要包含：lemma、translation、display、isWord。
-3. selectionType 为 word 或 phrase 时，按词句卡片结构输出：display 是唯一正文显示源，必须包含音标、词性、英英释义、中文释义、例句、搭配、派生、词源、同义词；isWord 必须是 true。
-4. selectionType 为 sentence 时，只翻译整句：translation 写自然中文译文，display 也只写同一段中文译文；lemma 写空字符串；isWord 必须是 false；禁止输出词性、音标、例句、搭配、派生、词源、同义词。
-5. 优先根据上下文判断输入词或短语在原句中的具体含义。word 或 phrase 的 display 必须先展示文中含义，再补充其他常见含义；translation 也优先写文中含义。
-6. display 内换行只能写成 \\n，不能直接换行。
-7. display 内双引号必须转义成 \\"。
-8. word 或 phrase 的 display 内标签词必须加粗：**词性**、**英英释义**、**中文释义**、**例句**、**搭配**、**派生**、**词源**、**同义词**。
-9. word 或 phrase 的 translation 只写简洁中文释义，不要写完整卡片。
-10. word 的 lemma 必须是小写原形；phrase 的 lemma 写小写短语原形。
-11. 如果没有常见派生或同义词，可以写"无"，不要编造。
-12. display 内禁止重复堆叠输入词本身。
+1. JSON 必须合法。JSON 字符串内部（尤其是 display 字段）绝对不能出现真实的换行符，所有换行必须转义写成 \\n。
+2. JSON 字符串内的双引号必须转义为 \\"。
+3. 必须包含且只需要包含：lemma、translation、display、isWord。
+4. 【中文释义】必须首先列出【文中含义】，明确指出该词在这个句子中的确切意思，不要直接背诵词典；然后再补充其他常见含义。
+5. selectionType 为 word 或 phrase 时，display 是唯一正文显示源，必须按上述格式包含所有信息；isWord 为 true。
+6. selectionType 为 sentence 时，只翻译整句，translation 和 display 写同一段中文译文；lemma 写空字符串；isWord 为 false。
+7. word 的 lemma 必须是小写原形；phrase 的 lemma 写小写短语原形。
+
 输入内容：{{word}}
 选择类型：{{selectionType}}
 上下文：{{sentence}}`;
@@ -400,6 +405,7 @@ export function buildWordAssetFromSelection(file: TFile, selection: any, transla
     chapterTitle: selection?.chapterTitle || file.basename,
     cfiRange: selection?.cfiRange || "",
     quote,
+    sentence: selection?.sentence || "",
     created: now,
   };
   const asset: WordAsset = {

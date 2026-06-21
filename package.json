@@ -1,9 +1,8 @@
 {
   "name": "jarvis-reader",
-  "version": "1.0.5",
-  "description": "A customized Obsidian epub reader and spaced-repetition word book.",
-  "private": true,
+  "version": "1.0.6",
   "description": "TypeScript source migration workspace for Jarvis Reader",
+  "private": true,
   "type": "module",
   "overrides": {
     "@xmldom/xmldom": "0.8.13"

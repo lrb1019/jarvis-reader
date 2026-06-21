@@ -1756,7 +1756,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                       <div key={bookPath} className="jarvis-stats-top-item">
                         <div className="jarvis-stats-top-rank">{idx + 1}</div>
                         {cover?.dataUrl ? (
-                          <div className="jarvis-stats-top-cover" style={{ backgroundImage: `url(${cover.dataUrl})` }} />
+                          <div className="jarvis-stats-top-cover" style={{ backgroundImage: `url("${cover.dataUrl}")` }} />
                         ) : (
                           <div className="jarvis-stats-top-cover" style={{ background: '#E6E6E6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', textAlign: 'center', padding: '2px', color: 'var(--text-muted)' }}>
                             {title.slice(0, 4)}

@@ -46,10 +46,10 @@ export function parseTranslationResponseText(text: string): any {
     } catch (error) {
     }
   }
-  const objectMatch = raw.match(/\{[\s\S]*\}/);
-  if (objectMatch && objectMatch[0]) {
+  const objectText = getFirstJsonObjectText(raw);
+  if (objectText) {
     try {
-      return JSON.parse(objectMatch[0]);
+      return JSON.parse(objectText);
     } catch (error) {
     }
   }

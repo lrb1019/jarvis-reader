@@ -4,6 +4,7 @@ import { calculateNextReview, ReviewResponse } from "./SpacedRepetition";
 import { MarkdownPreview } from "./WordCard";
 import { buildWordAudioUrl } from "../word-assets";
 import { Notice } from "obsidian";
+import { translateSelectionWithApi } from "../translation";
 
 interface ReviewSessionProps {
   plugin: any;
@@ -16,6 +17,50 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [startTime, setStartTime] = React.useState(Date.now());
+  const [isTranslating, setIsTranslating] = React.useState(false);
+
+  const handleAiTranslation = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isTranslating) return;
+    const asset = dueAssets[currentIndex];
+    if (!asset) return;
+    const lemmaKey = asset.lemma;
+    if (!plugin.settings.wordAssets[lemmaKey]) return;
+    
+    setIsTranslating(true);
+    new Notice("正在使用AI重新翻译...");
+    try {
+      const quote = asset.title || asset.lemma || "";
+      const sentence = (asset.sources && asset.sources[0] && asset.sources[0].sentence) || (asset.sources && asset.sources[0] && asset.sources[0].quote) || "";
+      
+      const result = await translateSelectionWithApi(plugin.settings, quote, sentence, plugin.app, { forceAi: true });
+      if (result) {
+        const currentAsset = plugin.settings.wordAssets[lemmaKey];
+        currentAsset.translation = result.translation || currentAsset.translation;
+        if (result.display) currentAsset.display = result.display;
+        if (result.phonetic) currentAsset.phonetic = result.phonetic;
+        if (result.partOfSpeech) currentAsset.partOfSpeech = result.partOfSpeech;
+        if (result.example) currentAsset.example = result.example;
+        if (result.tags) currentAsset.tags = result.tags;
+        if (result.collins !== undefined) currentAsset.collins = result.collins;
+        if (result.oxford !== undefined) currentAsset.oxford = result.oxford;
+        currentAsset.updated = new Date().toISOString();
+
+        await plugin.persistWordAssetSidecar("save");
+        await plugin.saveSettings();
+        
+        new Notice("AI翻译完成并已更新词卡");
+        onAssetUpdate();
+      } else {
+        new Notice("AI翻译没有返回结果");
+      }
+    } catch (error: any) {
+      new Notice(error && error.message ? error.message : "AI翻译失败");
+      console.error(error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const playAudio = React.useCallback((text: string) => {
     if (plugin.settings.enableWordAudio !== false) {
@@ -268,13 +313,30 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
             )}
 
             {/* Bottom Back Button */}
-            <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", flexShrink: 0 }}>
-              <button className="jarvis-library-back-btn" onClick={(e) => { e.stopPropagation(); setShowAnswer(false); }}>回到正面</button>
+            <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", width: "100%", flexShrink: 0 }}>
+              <button 
+                style={{ flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--text-muted) 6%, transparent)", color: "var(--text-muted)", border: "1px solid color-mix(in srgb, var(--text-muted) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" }}
+                onClick={(e) => { e.stopPropagation(); setShowAnswer(false); }}
+                onMouseEnter={e => { e.currentTarget.style.background = "var(--text-muted)"; e.currentTarget.style.color = "var(--background-primary)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--text-muted) 6%, transparent)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+              >回到正面</button>
+
+              <button 
+                style={{ flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" }}
+                onClick={handleAiTranslation}
+                onMouseEnter={e => { e.currentTarget.style.background = "var(--interactive-accent)"; e.currentTarget.style.color = "white"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)"; e.currentTarget.style.color = "var(--interactive-accent)"; }}
+              >{isTranslating ? "翻译中..." : "AI翻译"}</button>
+
               {asset.sources && asset.sources[0] && asset.sources[0].bookPath && (
-                <button className="jarvis-library-btn btn-primary" onClick={async (e) => {
-                  e.stopPropagation();
-                  try {
-                    const source = asset.sources[0];
+                <button 
+                  style={{ flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--interactive-accent)"; e.currentTarget.style.color = "white"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)"; e.currentTarget.style.color = "var(--interactive-accent)"; }}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      const source = asset.sources[0];
                     if (!source || !source.bookPath) {
                       new Notice("没有找到原文来源");
                       return;
