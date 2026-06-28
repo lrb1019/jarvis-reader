@@ -199,4 +199,4 @@ export interface JarvisReaderSettings {
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &
   Record<string, unknown>;
 
-export type PersistedSettingsData = Omit<JarvisReaderSettings, "wordAssets">;
+export type PersistedSettingsData = Omit<JarvisReaderSettings, "wordAssets" | "bookHighlights">;

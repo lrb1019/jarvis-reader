@@ -55444,6 +55444,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const highlightPopoverRectRef = (0, import_react2.useRef)(null);
   const renditionRef = (0, import_react2.useRef)(null);
   const currentLocationRef = (0, import_react2.useRef)(initLocation);
+  const pendingInitLocationRef = (0, import_react2.useRef)(initLocation);
   const highlightListRef = (0, import_react2.useRef)(highlights || []);
   const wordAssetsRef = (0, import_react2.useRef)(wordAssets || {});
   const wordDisplayCacheRef = (0, import_react2.useRef)(/* @__PURE__ */ new Map());
@@ -55680,9 +55681,37 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     epubOptions.spread = "none";
   }
   const locationChanged = (epubcifi) => {
+    const pendingInitLocation = pendingInitLocationRef.current;
+    if (pendingInitLocation && epubcifi && epubcifi !== pendingInitLocation) {
+      return;
+    }
+    if (pendingInitLocation && epubcifi === pendingInitLocation) {
+      pendingInitLocationRef.current = null;
+    }
     setLocation(epubcifi);
     currentLocationRef.current = epubcifi;
     saveLocation(epubcifi);
+  };
+  const applyPendingInitLocation = (rendition) => {
+    const targetCfi = pendingInitLocationRef.current;
+    if (!targetCfi || !rendition || typeof rendition.display !== "function") {
+      return;
+    }
+    let attempts = 0;
+    const maxAttempts = 8;
+    const run = () => {
+      const latestTarget = pendingInitLocationRef.current;
+      if (!latestTarget) {
+        return;
+      }
+      attempts += 1;
+      Promise.resolve(rendition.display(latestTarget)).catch(() => void 0).finally(() => {
+        if (pendingInitLocationRef.current === latestTarget && attempts < maxAttempts) {
+          window.setTimeout(run, 180);
+        }
+      });
+    };
+    window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
     window.setTimeout(() => {
@@ -56545,6 +56574,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     highlightListRef.current = highlights || [];
   }, [highlights]);
   (0, import_react2.useEffect)(() => {
+    pendingInitLocationRef.current = initLocation;
+    if (initLocation) {
+      setLocation(initLocation);
+      currentLocationRef.current = initLocation;
+    }
+  }, [initLocation, bookPath]);
+  (0, import_react2.useEffect)(() => {
     highlightListRef.current = highlightList;
     applyHighlights(renditionRef.current, highlightList);
   }, [highlightList]);
@@ -57109,6 +57145,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     },
     getRendition: (rendition) => {
       renditionRef.current = rendition;
+      applyPendingInitLocation(rendition);
       syncRenditionTheme(rendition);
       applyHighlights(rendition, highlightList);
       syncAutoWordHighlights(rendition);
@@ -57136,11 +57173,16 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           }
         });
         rendition.on("relocated", (relocated) => {
+          const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
+          if (pendingInitLocationRef.current && relocatedCfi === pendingInitLocationRef.current) {
+            pendingInitLocationRef.current = null;
+          }
           updateReaderTitle(relocated);
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
         rendition.on("rendered", () => {
+          applyPendingInitLocation(rendition);
           applyHighlights(rendition, highlightListRef.current);
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
@@ -60452,18 +60494,49 @@ function LibraryApp({ plugin }) {
               return { label: year, secs, tooltip: `${year}\u5E74 \u9605\u8BFB ${formatDuration(secs)}` };
             });
           }
-          const maxVal = Math.max(...data.map((d) => d.secs), 60);
+          const chartHeightPx = 136;
+          const getStep = (seconds) => {
+            if (seconds <= 15 * 60) return 5 * 60;
+            if (seconds <= 30 * 60) return 10 * 60;
+            if (seconds <= 60 * 60) return 15 * 60;
+            if (seconds <= 2 * 3600) return 30 * 60;
+            if (seconds <= 4 * 3600) return 60 * 60;
+            return 2 * 3600;
+          };
+          const rawMax = Math.max(...data.map((d) => d.secs), 0);
+          const maxVal = rawMax <= 60 * 60 ? 60 * 60 : Math.max(Math.ceil(rawMax / getStep(rawMax || 60)) * getStep(rawMax || 60), 60);
+          const tickStep = getStep(maxVal);
+          const yAxisTicks = [];
+          for (let tick = maxVal; tick >= 0; tick -= tickStep) {
+            yAxisTicks.push(tick);
+          }
+          if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
           return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
-            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", pointerEvents: "none", zIndex: 1 }, children: yAxisTicks.map((tick) => {
+              const ratio = maxVal > 0 ? tick / maxVal : 0;
+              return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                "div",
+                {
+                  style: {
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: `${ratio * 100}%`,
+                    borderBottom: "1px dashed var(--background-modifier-border)",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-start"
+                  },
+                  children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: tick === 0 ? "0" : formatDuration(tick) })
+                },
+                tick
+              );
+            }) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
-              const heightPct = item.secs / maxVal * 85;
+              const heightPx = item.secs > 0 ? Math.max(item.secs / maxVal * chartHeightPx, 6) : 0;
               return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPx}px` } }),
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
               ] }, idx);
             }) })
@@ -62937,6 +63010,32 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
                     new import_obsidian15.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
                     return;
                   }
+                  const armJumpRetries = (leaf, logPrefix) => {
+                    let attempts = 0;
+                    const maxAttempts = 8;
+                    const run = () => {
+                      attempts += 1;
+                      const view = leaf?.view;
+                      if (!view || !view.currentRendition) {
+                        if (attempts < maxAttempts) setTimeout(run, 180);
+                        return;
+                      }
+                      try {
+                        if (typeof view.jumpToCfi === "function") {
+                          view.jumpToCfi(source.cfiRange);
+                        } else {
+                          view.currentRendition.display(source.cfiRange);
+                        }
+                      } catch (e2) {
+                        if (attempts < maxAttempts) {
+                          setTimeout(run, 180);
+                        } else {
+                          console.warn(logPrefix, e2);
+                        }
+                      }
+                    };
+                    setTimeout(run, 120);
+                  };
                   const leaves = [];
                   plugin.app.workspace.iterateAllLeaves((l) => {
                     if (l.view?.getViewType() === "epub") {
@@ -62973,42 +63072,18 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
                     const activeFilePath = targetLeaf.view?.file?.path || viewState?.state?.file || file.path;
                     console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
                     plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
-                    targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
-                    const jump = () => {
-                      const view = targetLeaf.view;
-                      if (view && view.currentRendition) {
-                        try {
-                          if (typeof view.currentRendition.resize === "function") {
-                            view.currentRendition.resize();
-                          }
-                          view.currentRendition.display(source.cfiRange);
-                        } catch (e2) {
-                          console.warn("[Jarvis Reader] Direct display failed", e2);
-                        }
-                      }
-                    };
-                    const onActiveLeafChange = (activeLeaf) => {
-                      const activeView = activeLeaf?.view;
-                      const isMatch = activeLeaf === targetLeaf || activeView && activeView.getViewType() === "epub" && activeView.file?.path === file.path;
-                      if (isMatch) {
-                        plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                        clearTimeout(safetyTimeout);
-                        setTimeout(jump, 150);
-                        setTimeout(jump, 400);
-                        setTimeout(jump, 800);
-                      }
-                    };
-                    const safetyTimeout = setTimeout(() => {
-                      plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                      console.log("[Jarvis Reader] active-leaf-change listener timeout triggered");
-                      jump();
-                    }, 2500);
-                    plugin.app.workspace.on("active-leaf-change", onActiveLeafChange);
+                    await targetLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
+                    await targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
                     plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+                    armJumpRetries(targetLeaf, "[Jarvis Reader] Direct display failed");
                   } else {
                     console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
                     const newLeaf = plugin.app.workspace.getLeaf(true);
+                    plugin.settings.bookInitLocations[file.path] = source.cfiRange;
                     await newLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
+                    await newLeaf.setEphemeralState({ epubcifi: source.cfiRange });
+                    plugin.app.workspace.setActiveLeaf(newLeaf, { focus: true });
+                    armJumpRetries(newLeaf, "[Jarvis Reader] New leaf direct display failed");
                   }
                 } catch (err) {
                   new import_obsidian15.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
@@ -63515,18 +63590,49 @@ function WordBookStats({ plugin, assets, onClose }) {
             return { label: year, secs, tooltip: `${year}\u5E74 \u8BB0\u5FC6 ${formatDuration(secs)}` };
           });
         }
-        const maxVal = Math.max(...data.map((d) => d.secs), 60);
+        const chartHeightPx = 136;
+        const getStep = (seconds) => {
+          if (seconds <= 15 * 60) return 5 * 60;
+          if (seconds <= 30 * 60) return 10 * 60;
+          if (seconds <= 60 * 60) return 15 * 60;
+          if (seconds <= 2 * 3600) return 30 * 60;
+          if (seconds <= 4 * 3600) return 60 * 60;
+          return 2 * 3600;
+        };
+        const rawMax = Math.max(...data.map((d) => d.secs), 0);
+        const maxVal = rawMax <= 60 * 60 ? 60 * 60 : Math.max(Math.ceil(rawMax / getStep(rawMax || 60)) * getStep(rawMax || 60), 60);
+        const tickStep = getStep(maxVal);
+        const yAxisTicks = [];
+        for (let tick = maxVal; tick >= 0; tick -= tickStep) {
+          yAxisTicks.push(tick);
+        }
+        if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
         return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "relative" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none", zIndex: 1 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(maxVal) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: formatDuration(Math.round(maxVal / 2)) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { borderBottom: "1px dashed var(--background-modifier-border)", width: "100%", display: "flex", justifyContent: "flex-start" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: "0" }) })
-          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", pointerEvents: "none", zIndex: 1 }, children: yAxisTicks.map((tick) => {
+            const ratio = maxVal > 0 ? tick / maxVal : 0;
+            return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              "div",
+              {
+                style: {
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  bottom: `${ratio * 100}%`,
+                  borderBottom: "1px dashed var(--background-modifier-border)",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "flex-start"
+                },
+                children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: tick === 0 ? "0" : formatDuration(tick) })
+              },
+              tick
+            );
+          }) }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
-            const heightPct = item.secs / maxVal * 85;
+            const heightPx = item.secs > 0 ? Math.max(item.secs / maxVal * chartHeightPx, 6) : 0;
             return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPct || 2}%` } }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPx}px` } }),
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
             ] }, idx);
           }) })
@@ -65686,6 +65792,7 @@ var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
       ...this.settings
     };
     delete settingsData.wordAssets;
+    delete settingsData.bookHighlights;
     await this.saveData(settingsData);
   }
 };

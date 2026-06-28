@@ -566,6 +566,7 @@ export default class JarvisReaderPlugin extends Plugin {
       ...this.settings
     };
     delete settingsData.wordAssets;
+    delete settingsData.bookHighlights;
     await this.saveData(settingsData);
   }
 };

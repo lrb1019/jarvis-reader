@@ -1525,30 +1525,63 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 });
               }
 
-              const maxVal = Math.max(...data.map(d => d.secs), 60);
+              const chartHeightPx = 136;
+              const getStep = (seconds: number) => {
+                if (seconds <= 15 * 60) return 5 * 60;
+                if (seconds <= 30 * 60) return 10 * 60;
+                if (seconds <= 60 * 60) return 15 * 60;
+                if (seconds <= 2 * 3600) return 30 * 60;
+                if (seconds <= 4 * 3600) return 60 * 60;
+                return 2 * 3600;
+              };
+              const rawMax = Math.max(...data.map(d => d.secs), 0);
+              const maxVal = rawMax <= 60 * 60
+                ? 60 * 60
+                : Math.max(Math.ceil(rawMax / getStep(rawMax || 60)) * getStep(rawMax || 60), 60);
+              const tickStep = getStep(maxVal);
+              const yAxisTicks: number[] = [];
+              for (let tick = maxVal; tick >= 0; tick -= tickStep) {
+                yAxisTicks.push(tick);
+              }
+              if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
 
               return (
                 <div style={{ position: 'relative' }}>
                   {/* Grid Lines */}
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '20px', bottom: '38px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', pointerEvents: 'none', zIndex: 1 }}>
-                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
-                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>{formatDuration(maxVal)}</span>
-                    </div>
-                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
-                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>{formatDuration(Math.round(maxVal / 2))}</span>
-                    </div>
-                    <div style={{ borderBottom: '1px dashed var(--background-modifier-border)', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
-                      <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>0</span>
-                    </div>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '20px', bottom: '38px', pointerEvents: 'none', zIndex: 1 }}>
+                    {yAxisTicks.map((tick) => {
+                      const ratio = maxVal > 0 ? tick / maxVal : 0;
+                      return (
+                        <div
+                          key={tick}
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: `${ratio * 100}%`,
+                            borderBottom: '1px dashed var(--background-modifier-border)',
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'flex-start'
+                          }}
+                        >
+                          <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>
+                            {tick === 0 ? '0' : formatDuration(tick)}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="jarvis-stats-bar-chart-container" style={{ position: 'relative', zIndex: 2 }}>
                     {data.map((item, idx) => {
-                      const heightPct = (item.secs / maxVal) * 85;
+                      const heightPx = item.secs > 0
+                        ? Math.max((item.secs / maxVal) * chartHeightPx, 6)
+                        : 0;
                       return (
                         <div key={idx} className="jarvis-stats-bar-column">
                           <div className="jarvis-stats-bar-tooltip">{item.tooltip}</div>
-                          <div className="jarvis-stats-bar" style={{ height: `${heightPct || 2}%` }} />
+                          <div className="jarvis-stats-bar" style={{ height: `${heightPx}px` }} />
                           <span className="jarvis-stats-bar-label">{item.label}</span>
                         </div>
                       );

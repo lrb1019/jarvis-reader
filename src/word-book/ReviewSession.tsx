@@ -346,6 +346,32 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                       new Notice("找不到书籍文件: " + source.bookPath);
                       return;
                     }
+                    const armJumpRetries = (leaf: any, logPrefix: string) => {
+                      let attempts = 0;
+                      const maxAttempts = 8;
+                      const run = () => {
+                        attempts += 1;
+                        const view = leaf?.view as any;
+                        if (!view || !view.currentRendition) {
+                          if (attempts < maxAttempts) setTimeout(run, 180);
+                          return;
+                        }
+                        try {
+                          if (typeof view.jumpToCfi === "function") {
+                            view.jumpToCfi(source.cfiRange);
+                          } else {
+                            view.currentRendition.display(source.cfiRange);
+                          }
+                        } catch (e) {
+                          if (attempts < maxAttempts) {
+                            setTimeout(run, 180);
+                          } else {
+                            console.warn(logPrefix, e);
+                          }
+                        }
+                      };
+                      setTimeout(run, 120);
+                    };
                     // Find an existing leaf with this book open
                     const leaves: any[] = [];
                     plugin.app.workspace.iterateAllLeaves((l) => {
@@ -390,56 +416,22 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                       const viewState = targetLeaf.getViewState();
                       const activeFilePath = (targetLeaf.view as any)?.file?.path || viewState?.state?.file || file.path;
                       console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
-                      
+
                       // Save to settings as a fallback in case view reloads or isn't fully ready
                       plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
-                      
-                      // Set ephemeral state (Obsidian native mechanism)
-                      targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
-                      
-                      const jump = () => {
-                        const view = targetLeaf.view as any;
-                        if (view && view.currentRendition) {
-                          try {
-                            if (typeof view.currentRendition.resize === "function") {
-                              view.currentRendition.resize();
-                            }
-                            view.currentRendition.display(source.cfiRange);
-                          } catch (e) {
-                            console.warn("[Jarvis Reader] Direct display failed", e);
-                          }
-                        }
-                      };
 
-                      const onActiveLeafChange = (activeLeaf: any) => {
-                        const activeView = activeLeaf?.view;
-                        const isMatch = activeLeaf === targetLeaf || 
-                          (activeView && activeView.getViewType() === "epub" && (activeView as any).file?.path === file.path);
-                          
-                        if (isMatch) {
-                          plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                          clearTimeout(safetyTimeout);
-                          
-                          // Execute multiple display retries to ensure we override Obsidian's tab switch position restoration
-                          setTimeout(jump, 150);
-                          setTimeout(jump, 400);
-                          setTimeout(jump, 800);
-                        }
-                      };
-                      
-                      const safetyTimeout = setTimeout(() => {
-                        plugin.app.workspace.off("active-leaf-change", onActiveLeafChange);
-                        console.log("[Jarvis Reader] active-leaf-change listener timeout triggered");
-                        // Fallback jump anyway
-                        jump();
-                      }, 2500);
-                      
-                      plugin.app.workspace.on("active-leaf-change", onActiveLeafChange);
+                      await targetLeaf.openFile(file as any, { active: true, eState: { epubcifi: source.cfiRange } });
+                      await targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
                       plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
+                      armJumpRetries(targetLeaf, "[Jarvis Reader] Direct display failed");
                     } else {
                       console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
                       const newLeaf = plugin.app.workspace.getLeaf(true);
+                      plugin.settings.bookInitLocations[file.path] = source.cfiRange;
                       await newLeaf.openFile(file as any, { active: true, eState: { epubcifi: source.cfiRange } });
+                      await newLeaf.setEphemeralState({ epubcifi: source.cfiRange });
+                      plugin.app.workspace.setActiveLeaf(newLeaf, { focus: true });
+                      armJumpRetries(newLeaf, "[Jarvis Reader] New leaf direct display failed");
                     }
                   } catch (err) {
                     new Notice("跳转失败: " + String(err));

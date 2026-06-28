@@ -178,6 +178,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const highlightPopoverRectRef = useRef<any>(null);
   const renditionRef = useRef<any>(null);
   const currentLocationRef = useRef<string | null>(initLocation);
+  const pendingInitLocationRef = useRef<string | null>(initLocation);
   const highlightListRef = useRef<any[]>(highlights || []);
   const wordAssetsRef = useRef<any>(wordAssets || {});
   const wordDisplayCacheRef = useRef<any>( new Map());
@@ -421,9 +422,37 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     epubOptions.spread = "none";
   }
   const locationChanged = (epubcifi) => {
+    const pendingInitLocation = pendingInitLocationRef.current;
+    if (pendingInitLocation && epubcifi && epubcifi !== pendingInitLocation) {
+      return;
+    }
+    if (pendingInitLocation && epubcifi === pendingInitLocation) {
+      pendingInitLocationRef.current = null;
+    }
     setLocation(epubcifi);
     currentLocationRef.current = epubcifi;
     saveLocation(epubcifi);
+  };
+  const applyPendingInitLocation = (rendition) => {
+    const targetCfi = pendingInitLocationRef.current;
+    if (!targetCfi || !rendition || typeof rendition.display !== "function") {
+      return;
+    }
+    let attempts = 0;
+    const maxAttempts = 8;
+    const run = () => {
+      const latestTarget = pendingInitLocationRef.current;
+      if (!latestTarget) {
+        return;
+      }
+      attempts += 1;
+      Promise.resolve(rendition.display(latestTarget)).catch(() => void 0).finally(() => {
+        if (pendingInitLocationRef.current === latestTarget && attempts < maxAttempts) {
+          window.setTimeout(run, 180);
+        }
+      });
+    };
+    window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
     window.setTimeout(() => {
@@ -1288,6 +1317,13 @@ const showWordHoverCard = (asset, element) => {
     highlightListRef.current = highlights || [];
   }, [highlights]);
   useEffect(() => {
+    pendingInitLocationRef.current = initLocation;
+    if (initLocation) {
+      setLocation(initLocation);
+      currentLocationRef.current = initLocation;
+    }
+  }, [initLocation, bookPath]);
+  useEffect(() => {
     highlightListRef.current = highlightList;
     applyHighlights(renditionRef.current, highlightList);
   }, [highlightList]);
@@ -1852,6 +1888,7 @@ const showWordHoverCard = (asset, element) => {
     },
     getRendition: (rendition) => {
       renditionRef.current = rendition;
+      applyPendingInitLocation(rendition);
       syncRenditionTheme(rendition);
       applyHighlights(rendition, highlightList);
       syncAutoWordHighlights(rendition);
@@ -1882,11 +1919,16 @@ const showWordHoverCard = (asset, element) => {
         });
 
         rendition.on("relocated", (relocated) => {
+          const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
+          if (pendingInitLocationRef.current && relocatedCfi === pendingInitLocationRef.current) {
+            pendingInitLocationRef.current = null;
+          }
           updateReaderTitle(relocated);
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
         });
         rendition.on("rendered", () => {
+          applyPendingInitLocation(rendition);
           applyHighlights(rendition, highlightListRef.current);
           syncAutoWordHighlights(rendition);
           refreshHighlightPanes(rendition);
