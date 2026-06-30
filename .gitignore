@@ -5,6 +5,7 @@ data.json
 *.log
 node_modules/
 build/
+.codebase-memory/
 .DS_Store
 Thumbs.db
 index/
