@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-当前版本：v1.0.6
+当前版本：v1.0.8
 
 中文说明 | [English](./README.en.md)
 
@@ -64,6 +64,12 @@ README.en.md            English README
 THIRD_PARTY_NOTICES.md  第三方许可说?```
 
 ## 近期版本
+
+### v1.0.8
+
+- 统一排查 Ribbon、View 标签页、侧栏按钮与内联 SVG 四类图标入口。
+- 左侧“打开图书库”入口切回 Obsidian 原生 library-big 图标名。
+- 补充 Obsidian 插件中使用 Lucide 原生图标的排查说明与源码示例。
 
 ### v0.7.0
 

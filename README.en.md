@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-Current version: v1.0.6
+Current version: v1.0.8
 
 [中文说明](./README.md) | English
 
@@ -115,6 +115,12 @@ THIRD_PARTY_NOTICES.md  Third-party notices
 ```
 
 ## Recent Releases
+
+### v1.0.8
+
+- Audited four icon entry paths: ribbon icons, view tab icons, button icons, and inline SVG icons.
+- Switched the left Open Library ribbon entry back to the native Obsidian library-big icon name.
+- Added a reference note explaining how to use native Lucide icons in Obsidian plugins with real source examples.
 
 ### v0.7.0
 

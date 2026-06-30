@@ -46,7 +46,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     return "阅读辅助边栏";
   }
   getIcon() {
-    return "book-open";
+    return "jarvis-library-big";
   }
   async onOpen() {
     this.render();
@@ -183,7 +183,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     const panelActions = toolbar.createDiv({ cls: "jarvis-reader-sidebar-panel-actions" });
     
     if (mode === "single") {
-      this.makePanelButton(panelActions, "目录", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16"></path><path d="M7 7h4"></path><path d="M11 7h8"></path><path d="M7 12h4"></path><path d="M11 12h8"></path><path d="M7 17h4"></path><path d="M11 17h8"></path></svg>', this.activePanel === "toc", !hasReader, () => {
+      this.makePanelButton(panelActions, "目录", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
         this.activePanel = "toc";
         this.render();
       });

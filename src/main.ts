@@ -15,8 +15,8 @@ import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
 import { registerGlobalMarkdownFeatures } from "./global-markdown";
-
-const JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><path d="M6 8h2"/><path d="M6 12h2"/><path d="M16 8h2"/><path d="M16 12h2"/></svg>`;
+const JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
+const LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 
 export default class JarvisReaderPlugin extends Plugin {
   declare settings: any;
@@ -28,6 +28,7 @@ export default class JarvisReaderPlugin extends Plugin {
 
   async onload() {
     addIcon("jarvis-logo", JARVIS_LOGO_SVG);
+    addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
@@ -63,7 +64,7 @@ export default class JarvisReaderPlugin extends Plugin {
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
-    this.addRibbonIcon("jarvis-logo", "打开图书库", () => {
+    this.addRibbonIcon("library-big", "打开图书库", () => {
       this.openLibrary();
     });
     this.addCommand({

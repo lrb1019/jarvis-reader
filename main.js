@@ -58857,7 +58857,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     return "\u9605\u8BFB\u8F85\u52A9\u8FB9\u680F";
   }
   getIcon() {
-    return "book-open";
+    return "jarvis-library-big";
   }
   async onOpen() {
     this.render();
@@ -58988,7 +58988,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     layoutButton.onclick = () => this.toggleLayoutMode();
     const panelActions = toolbar.createDiv({ cls: "jarvis-reader-sidebar-panel-actions" });
     if (mode === "single") {
-      this.makePanelButton(panelActions, "\u76EE\u5F55", '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16"></path><path d="M7 7h4"></path><path d="M11 7h8"></path><path d="M7 12h4"></path><path d="M11 12h8"></path><path d="M7 17h4"></path><path d="M11 17h8"></path></svg>', this.activePanel === "toc", !hasReader, () => {
+      this.makePanelButton(panelActions, "\u76EE\u5F55", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
         this.activePanel = "toc";
         this.render();
       });
@@ -65253,7 +65253,8 @@ function registerGlobalMarkdownFeatures(plugin) {
 }
 
 // src/main.ts
-var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><path d="M6 8h2"/><path d="M6 12h2"/><path d="M16 8h2"/><path d="M16 12h2"/></svg>`;
+var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
+var LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
   bookshelfView;
   highlightsView;
@@ -65262,6 +65263,7 @@ var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
   lastIndexCounts;
   async onload() {
     (0, import_obsidian20.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
+    (0, import_obsidian20.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
@@ -65297,7 +65299,7 @@ var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
-    this.addRibbonIcon("jarvis-logo", "\u6253\u5F00\u56FE\u4E66\u5E93", () => {
+    this.addRibbonIcon("library-big", "\u6253\u5F00\u56FE\u4E66\u5E93", () => {
       this.openLibrary();
     });
     this.addCommand({
