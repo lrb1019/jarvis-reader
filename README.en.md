@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-Current version: v1.0.8
+Current version: v1.0.9
 
 [中文说明](./README.md) | English
 
@@ -115,6 +115,12 @@ THIRD_PARTY_NOTICES.md  Third-party notices
 ```
 
 ## Recent Releases
+
+### v1.0.9
+
+- Extended the existing word popup flow from CodeMirror Markdown notes to ordinary article/body DOM selections when the page is controllable.
+- Reused the same offline lookup, `AI Translate`, and `Save Word` card flow instead of creating a second vocabulary pipeline.
+- Intentionally stopped short of automatic saved-word highlighting inside third-party article renderers; valuable content should still be saved to local Markdown for long-term reuse.
 
 ### v1.0.8
 

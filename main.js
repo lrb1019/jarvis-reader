@@ -26017,7 +26017,7 @@ var require_dom = __commonJS({
         return node;
       },
       createTextNode: function(data) {
-        var node = new Text();
+        var node = new Text2();
         node.ownerDocument = this;
         node.appendData(data);
         return node;
@@ -26247,9 +26247,9 @@ var require_dom = __commonJS({
       }
     };
     _extends(CharacterData, Node2);
-    function Text() {
+    function Text2() {
     }
-    Text.prototype = {
+    Text2.prototype = {
       nodeName: "#text",
       nodeType: TEXT_NODE,
       splitText: function(offset) {
@@ -26265,7 +26265,7 @@ var require_dom = __commonJS({
         return newNode;
       }
     };
-    _extends(Text, CharacterData);
+    _extends(Text2, CharacterData);
     function Comment() {
     }
     Comment.prototype = {
@@ -65123,6 +65123,91 @@ var GlobalTranslationManager = class {
     }
   }
 };
+function isEditableTarget(target) {
+  const element = target instanceof HTMLElement ? target : null;
+  if (!element) return false;
+  if (element.isContentEditable) return true;
+  if (element.closest("input, textarea, select, [contenteditable='true']")) return true;
+  return false;
+}
+function isIgnoredSelectionTarget(target) {
+  const element = target instanceof HTMLElement ? target : target instanceof Text ? target.parentElement : null;
+  if (!element) return true;
+  if (element.closest(".cm-editor, .markdown-source-view, .markdown-preview-view")) return true;
+  if (element.closest(".jarvis-reader-word-card, .jarvis-reader-word-translate")) return true;
+  return false;
+}
+function extractSentenceFromRange(range) {
+  const sourceText = range.commonAncestorContainer.textContent || "";
+  if (!sourceText) return "";
+  const selected = range.toString().trim();
+  if (!selected) return "";
+  const index = sourceText.indexOf(selected);
+  if (index < 0) return "";
+  let start = index;
+  while (start > 0) {
+    const char = sourceText[start - 1];
+    if (char === "." || char === "?" || char === "!" || char === "\n") break;
+    start--;
+  }
+  let end = index + selected.length;
+  while (end < sourceText.length) {
+    const char = sourceText[end];
+    if (char === "." || char === "?" || char === "!" || char === "\n") {
+      end++;
+      break;
+    }
+    end++;
+  }
+  return sourceText.slice(start, end).replace(/\s+/g, " ").trim();
+}
+function getSelectionWordPayload() {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const text = selection.toString().trim();
+  if (!/^[a-zA-Z]+(?:'[a-zA-Z]+)?$/.test(text) || text.length < 2 || text.length > 30) return null;
+  if (isIgnoredSelectionTarget(range.startContainer) || isIgnoredSelectionTarget(range.endContainer)) return null;
+  const rect = range.getBoundingClientRect();
+  if (!rect || !rect.width && !rect.height) return null;
+  return {
+    word: text,
+    rect,
+    sentence: extractSentenceFromRange(range)
+  };
+}
+function registerGlobalDomSelectionFeatures(plugin) {
+  let selectionTimer = null;
+  const clearTimer = () => {
+    if (selectionTimer != null) {
+      window.clearTimeout(selectionTimer);
+      selectionTimer = null;
+    }
+  };
+  const handlePointerDown = (event) => {
+    const target = event.target;
+    if (!target?.closest(".jarvis-reader-word-card, .jarvis-reader-word-translate")) {
+      plugin.globalTranslationManager.closeCard();
+    }
+  };
+  const handleMouseUp = (event) => {
+    if (plugin.settings.enableGlobalMarkdownTranslation === false) return;
+    if (isEditableTarget(event.target)) return;
+    clearTimer();
+    selectionTimer = window.setTimeout(() => {
+      const payload = getSelectionWordPayload();
+      if (!payload) return;
+      plugin.globalTranslationManager.showSelectionCard(payload.rect, payload.word, payload.sentence);
+    }, 20);
+  };
+  document.addEventListener("mousedown", handlePointerDown, true);
+  document.addEventListener("mouseup", handleMouseUp, true);
+  plugin.register(() => {
+    clearTimer();
+    document.removeEventListener("mousedown", handlePointerDown, true);
+    document.removeEventListener("mouseup", handleMouseUp, true);
+  });
+}
 function createWordHighlighterExtension(plugin) {
   const cm = getJarvisReaderCodeMirrorModules();
   if (!cm) return [];
@@ -65245,6 +65330,7 @@ function createWordHighlighterExtension(plugin) {
 function registerGlobalMarkdownFeatures(plugin) {
   plugin.globalTranslationManager = new GlobalTranslationManager(plugin);
   plugin.registerEditorExtension(createWordHighlighterExtension(plugin));
+  registerGlobalDomSelectionFeatures(plugin);
   plugin.register(() => {
     if (plugin.globalTranslationManager) {
       plugin.globalTranslationManager.closeCard();

@@ -552,6 +552,108 @@ export class GlobalTranslationManager {
   }
 }
 
+function isEditableTarget(target: EventTarget | null): boolean {
+  const element = target instanceof HTMLElement ? target : null;
+  if (!element) return false;
+  if (element.isContentEditable) return true;
+  if (element.closest("input, textarea, select, [contenteditable='true']")) return true;
+  return false;
+}
+
+function isIgnoredSelectionTarget(target: Node | null): boolean {
+  const element = target instanceof HTMLElement
+    ? target
+    : target instanceof Text
+      ? target.parentElement
+      : null;
+  if (!element) return true;
+  if (element.closest(".cm-editor, .markdown-source-view, .markdown-preview-view")) return true;
+  if (element.closest(".jarvis-reader-word-card, .jarvis-reader-word-translate")) return true;
+  return false;
+}
+
+function extractSentenceFromRange(range: Range): string {
+  const sourceText = range.commonAncestorContainer.textContent || "";
+  if (!sourceText) return "";
+  const selected = range.toString().trim();
+  if (!selected) return "";
+  const index = sourceText.indexOf(selected);
+  if (index < 0) return "";
+
+  let start = index;
+  while (start > 0) {
+    const char = sourceText[start - 1];
+    if (char === "." || char === "?" || char === "!" || char === "\n") break;
+    start--;
+  }
+
+  let end = index + selected.length;
+  while (end < sourceText.length) {
+    const char = sourceText[end];
+    if (char === "." || char === "?" || char === "!" || char === "\n") {
+      end++;
+      break;
+    }
+    end++;
+  }
+
+  return sourceText.slice(start, end).replace(/\s+/g, " ").trim();
+}
+
+function getSelectionWordPayload(): { word: string; rect: DOMRect; sentence: string } | null {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const text = selection.toString().trim();
+  if (!/^[a-zA-Z]+(?:'[a-zA-Z]+)?$/.test(text) || text.length < 2 || text.length > 30) return null;
+  if (isIgnoredSelectionTarget(range.startContainer) || isIgnoredSelectionTarget(range.endContainer)) return null;
+  const rect = range.getBoundingClientRect();
+  if (!rect || (!rect.width && !rect.height)) return null;
+  return {
+    word: text,
+    rect,
+    sentence: extractSentenceFromRange(range)
+  };
+}
+
+function registerGlobalDomSelectionFeatures(plugin: any) {
+  let selectionTimer: number | null = null;
+
+  const clearTimer = () => {
+    if (selectionTimer != null) {
+      window.clearTimeout(selectionTimer);
+      selectionTimer = null;
+    }
+  };
+
+  const handlePointerDown = (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest(".jarvis-reader-word-card, .jarvis-reader-word-translate")) {
+      plugin.globalTranslationManager.closeCard();
+    }
+  };
+
+  const handleMouseUp = (event: MouseEvent) => {
+    if (plugin.settings.enableGlobalMarkdownTranslation === false) return;
+    if (isEditableTarget(event.target)) return;
+    clearTimer();
+    selectionTimer = window.setTimeout(() => {
+      const payload = getSelectionWordPayload();
+      if (!payload) return;
+      plugin.globalTranslationManager.showSelectionCard(payload.rect, payload.word, payload.sentence);
+    }, 20);
+  };
+
+  document.addEventListener("mousedown", handlePointerDown, true);
+  document.addEventListener("mouseup", handleMouseUp, true);
+
+  plugin.register(() => {
+    clearTimer();
+    document.removeEventListener("mousedown", handlePointerDown, true);
+    document.removeEventListener("mouseup", handleMouseUp, true);
+  });
+}
+
 // CodeMirror 6 Editor Extension
 export function createWordHighlighterExtension(plugin: any): any {
   const cm = getJarvisReaderCodeMirrorModules();
@@ -698,6 +800,7 @@ export function registerGlobalMarkdownFeatures(plugin: any) {
   
   // Register the highlighter extension globally
   plugin.registerEditorExtension(createWordHighlighterExtension(plugin));
+  registerGlobalDomSelectionFeatures(plugin);
   
   // Clean up on unload
   plugin.register(() => {
