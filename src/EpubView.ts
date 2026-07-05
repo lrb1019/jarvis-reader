@@ -585,7 +585,10 @@ export class EpubView extends FileView {
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
-      onInteraction: () => { this.lastInteractionTime = Date.now(); }
+      onInteraction: () => { this.lastInteractionTime = Date.now(); },
+      app: this.app,
+      smartCommands: this.plugin.settings.smartCommands || [],
+      bookTitle: file.basename
     }));
   }
 

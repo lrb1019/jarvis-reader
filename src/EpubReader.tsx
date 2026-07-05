@@ -10,6 +10,8 @@ import { findChapterTitle, getReaderProgressLabel, ensureReaderLocations, getRea
 import { dedupeHighlightsByCfi } from "./highlight-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
+import { triggerClaudianPrompt, buildPromptFromTemplate } from "./claudianBridge";
+import type { SmartCommand } from "./claudianBridge";
 
 export interface EpubReaderProps {
   contents: ArrayBuffer;
@@ -56,6 +58,9 @@ export interface EpubReaderProps {
   getWikiLinkCandidates: () => any[];
   openWikiLink: (target: string) => void;
   onInteraction?: () => void;
+  app?: any;
+  smartCommands?: SmartCommand[];
+  bookTitle?: string;
 }
 
 const ReactReaderStyle = (ReactReaderModule as typeof ReactReaderModule & {
@@ -195,7 +200,7 @@ const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) =
   });
 };
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction, app, smartCommands, bookTitle }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -225,6 +230,12 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const pendingWordLookupRef = useRef<any>(0);
   const [theme, setTheme] = useState(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
   const [currentColors, setCurrentColors] = useState<any>(highlightColors);
+  // Smart command submenu: "selection" | "note" | null
+  const [smartCmdMenuScope, setSmartCmdMenuScope] = useState<"selection" | "note" | null>(null);
+  const smartCmdMenuRef = useRef<HTMLButtonElement | null>(null);
+  const [activeSelectionInfo, setActiveSelectionInfo] = useState<any>(null);
+  const activeSelectionInfoRef = useRef<any>(null);
+  const [hoveredMenuItem, setHoveredMenuItem] = useState<string | null>(null);
 
   useEffect(() => {
     setCurrentColors(highlightColors);
@@ -1530,32 +1541,33 @@ const showWordHoverCard = (asset, element) => {
     var _a, _b;
     const rawSelectedText = (_b = (_a = contents2 == null ? void 0 : contents2.window) == null ? void 0 : _a.getSelection()) == null ? void 0 : _b.toString();
     const selectedText = normalizeHighlightQuote(String(rawSelectedText || "").replace(/[\u00ad\u200b-\u200d\ufeff]/g, ""));
-    if (!selectedText)
+    if (!selectedText) {
+      setActiveSelectionInfo(null);
+      activeSelectionInfoRef.current = null;
       return;
+    }
     const selectionItem = {
       cfiRange,
       quote: selectedText,
       sentence: getSelectionContextSentence(contents2, selectedText),
       chapterTitle: readerTitleRef.current,
-      rect: getSelectionHighlightMenuRect(contents2)
+      rect: getSelectionHighlightMenuRect(contents2),
+      contents2
     };
+    setActiveSelectionInfo(selectionItem);
+    activeSelectionInfoRef.current = selectionItem;
+
     const existingHighlight = (highlightListRef.current || []).find((highlight) => highlight.cfiRange === cfiRange);
     clearWordLookup();
     setPendingSelection(null);
     if (existingHighlight) {
-      setPendingHighlightMenu({
-        ...existingHighlight,
-        rect: selectionItem.rect
-      });
-      setHighlightComment("");
-      setWikiSuggest(null);
-      setWikiEditRange(null);
+      // Defer existing highlights from auto-popover on selection overlap
       return;
     }
     Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
       if (!opened) {
         clearWordLookup();
-        setPendingHighlightMenu(selectionItem);
+        // Do not auto-show pending highlight menu on text selection
       }
     });
     setHighlightComment("");
@@ -1740,6 +1752,42 @@ const showWordHoverCard = (asset, element) => {
     setHighlightCommentMode("edit");
     clearWordLookup();
   };
+
+  const fireSmartCommand = (cmd: SmartCommand, scope: "selection" | "note") => {
+    setSmartCmdMenuScope(null);
+    const effectiveApp = app || (window as any).app;
+    if (!effectiveApp) {
+      new Notice("无法获取 Obsidian App 实例。");
+      return;
+    }
+    let selectionText = "";
+    let noteContent = "";
+    const currentBookName = bookTitle || title || "";
+    const bookPrefix = currentBookName ? `《${currentBookName}》` : "";
+
+    if (scope === "selection" && pendingHighlightMenu) {
+      const quoteText = pendingHighlightMenu.quote || "";
+      selectionText = `${bookPrefix}原文：${quoteText}`;
+    } else if (scope === "note" && pendingSelection) {
+      const entries = Array.isArray(pendingSelection.commentEntries)
+        ? pendingSelection.commentEntries
+        : [];
+      noteContent = entries.map((e: any) => e.text || "").filter(Boolean).join("\n\n")
+        || (pendingSelection.comment || "");
+      const quoteText = pendingSelection.quote || "";
+      const quoteFormatted = `${bookPrefix}原文：${quoteText}`;
+      selectionText = noteContent ? `${quoteFormatted}\n想法：${noteContent}` : quoteFormatted;
+    }
+    const finalPrompt = buildPromptFromTemplate(cmd.prompt, {
+      selection: selectionText || noteContent,
+      content: noteContent || selectionText,
+      book_title: bookTitle || title || "",
+      chapter: readerTitleRef.current || ""
+    });
+    triggerClaudianPrompt(effectiveApp, finalPrompt);
+    new Notice(`已发送「${cmd.label}」指令到 Claudian`);
+  };
+
   const copyHighlightQuote = async (item) => {
     if (!item || !item.quote)
       return;
@@ -2054,7 +2102,6 @@ const showWordHoverCard = (asset, element) => {
       if (rendition && typeof rendition.on === "function" && !jarvisRendition.__awesomeReaderTitleBound) {
         jarvisRendition.__awesomeReaderTitleBound = true;
         
-        // Attach wheel event to iframe document to allow zooming when hovering book text
         rendition.hooks.content.register((contents: any) => {
           const doc = contents?.document;
           if (doc) {
@@ -2072,6 +2119,42 @@ const showWordHoverCard = (asset, element) => {
               event.preventDefault();
               setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
             }, { passive: false });
+
+            // Right-click contextmenu handler on selected text
+            doc.addEventListener("contextmenu", (event: MouseEvent) => {
+              const win = contents?.window;
+              const selection = win?.getSelection();
+              const selectionText = selection ? selection.toString().trim() : "";
+              if (selectionText) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const frame = win.frameElement;
+                const frameRect = frame ? frame.getBoundingClientRect() : null;
+                const containerRect = containerRef.current ? containerRef.current.getBoundingClientRect() : null;
+
+                let menuX = event.clientX;
+                let menuY = event.clientY;
+                if (frameRect && containerRect) {
+                  menuX = event.clientX + frameRect.left - containerRect.left;
+                  menuY = event.clientY + frameRect.top - containerRect.top;
+                }
+
+                const activeSel = activeSelectionInfoRef.current;
+                const cfiRange = (activeSel && activeSel.quote === selectionText) ? activeSel.cfiRange : "";
+
+                setPendingHighlightMenu({
+                  cfiRange,
+                  quote: selectionText,
+                  sentence: getSelectionContextSentence(contents, selectionText),
+                  chapterTitle: readerTitleRef.current,
+                  rect: {
+                    x: menuX,
+                    y: menuY
+                  }
+                });
+              }
+            });
           }
         });
 
@@ -2273,35 +2356,89 @@ const showWordHoverCard = (asset, element) => {
         margin: "-1px -27%"
       }
     } as any
-  }), pendingHighlightMenu ?  React.createElement("div", {
-    className: "jarvis-reader-highlight-menu",
-    style: pendingHighlightMenu.rect ? {
-      left: pendingHighlightMenu.rect.x,
-      top: pendingHighlightMenu.rect.y,
-      width: pendingHighlightMenu.rect.width
-    } : void 0,
-    onClick: (event) => event.stopPropagation()
-  },  React.createElement("button", {
-    className: "jarvis-reader-highlight-menu-button",
-    type: "button",
-    onClick: () => copyHighlightQuote(pendingHighlightMenu)
-  }, "\u590d\u5236"),  React.createElement("button", {
-    className: "jarvis-reader-highlight-menu-button",
-    type: "button",
-    onClick: () => openWordTranslator(pendingHighlightMenu)
-  }, "\u7ffb\u8bd1"), pendingHighlightMenu.id ? null :  React.createElement("button", {
-    className: "jarvis-reader-highlight-menu-button",
-    type: "button",
-    onClick: () => savePlainHighlight(pendingHighlightMenu)
-  }, "\u9ad8\u4eae"),  React.createElement("button", {
-    className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-primary",
-    type: "button",
-    onClick: () => openHighlightCommentEditor(pendingHighlightMenu)
-  }, "笔记"), pendingHighlightMenu.id ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-danger",
-    type: "button",
-    onClick: () => deleteExistingHighlight(pendingHighlightMenu)
-  }, "\u5220\u9664\u9ad8\u4eae") : null) : null, pendingWordSelection ?  React.createElement("div", {
+  }), pendingHighlightMenu ? (() => {
+    const containsEnglish = /[a-zA-Z]{2,}/.test(pendingHighlightMenu.quote || "");
+    const filteredSmartcmds = (smartCommands || []).filter(c => c.enabled !== false && (c.scope === "selection" || c.scope === "both"));
+    return React.createElement("div", {
+      className: "jarvis-reader-highlight-menu",
+      style: pendingHighlightMenu.rect ? {
+        left: pendingHighlightMenu.rect.x,
+        top: pendingHighlightMenu.rect.y
+      } : void 0,
+      onClick: (event) => event.stopPropagation()
+    },
+      React.createElement("div", {
+        className: "jarvis-reader-context-menu-item",
+        role: "button",
+        onClick: () => {
+          copyHighlightQuote(pendingHighlightMenu);
+          setPendingHighlightMenu(null);
+        }
+      }, renderObsidianIcon("copy"), React.createElement("span", null, "复制")),
+      containsEnglish ? React.createElement("div", {
+        className: "jarvis-reader-context-menu-item",
+        role: "button",
+        onClick: () => {
+          openWordTranslator(pendingHighlightMenu);
+          setPendingHighlightMenu(null);
+        }
+      }, renderObsidianIcon("languages"), React.createElement("span", null, "翻译")) : null,
+      pendingHighlightMenu.id ? null : React.createElement("div", {
+        className: "jarvis-reader-context-menu-item",
+        role: "button",
+        onClick: () => {
+          savePlainHighlight(pendingHighlightMenu);
+          setPendingHighlightMenu(null);
+        }
+      }, renderObsidianIcon("highlighter"), React.createElement("span", null, "高亮")),
+      React.createElement("div", {
+        className: "jarvis-reader-context-menu-item jarvis-reader-highlight-menu-button-primary",
+        role: "button",
+        onClick: () => {
+          openHighlightCommentEditor(pendingHighlightMenu);
+          setPendingHighlightMenu(null);
+        }
+      }, renderObsidianIcon("pencil"), React.createElement("span", null, "笔记")),
+      pendingHighlightMenu.id ? React.createElement("div", {
+        className: "jarvis-reader-context-menu-item jarvis-reader-context-menu-item-danger",
+        role: "button",
+        onClick: () => {
+          deleteExistingHighlight(pendingHighlightMenu);
+          setPendingHighlightMenu(null);
+        }
+      }, renderObsidianIcon("trash"), React.createElement("span", null, "删除高亮")) : null,
+      filteredSmartcmds.length > 0 ? React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "jarvis-reader-context-menu-divider" }),
+        React.createElement("div", {
+          className: "jarvis-reader-context-menu-item has-submenu",
+          onMouseEnter: () => setHoveredMenuItem("ai"),
+          onMouseLeave: () => setHoveredMenuItem(null),
+          style: { position: "relative" }
+        },
+          renderObsidianIcon("bot"),
+          React.createElement("span", null, "智能指令"),
+          renderObsidianIcon("chevron-right"),
+          hoveredMenuItem === "ai" ? React.createElement("div", {
+            className: "jarvis-reader-context-submenu",
+          },
+            filteredSmartcmds.map(cmd =>
+              React.createElement("div", {
+                key: cmd.id,
+                className: "jarvis-reader-context-menu-item",
+                role: "button",
+                onClick: (e) => {
+                  e.stopPropagation();
+                  fireSmartCommand(cmd, "selection");
+                  setPendingHighlightMenu(null);
+                  setHoveredMenuItem(null);
+                }
+              }, renderObsidianIcon(cmd.icon || "bot"), React.createElement("span", null, cmd.label))
+            )
+          ) : null
+        )
+      ) : null
+    );
+  })() : null, pendingWordSelection ?  React.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
     style: visibleWordPopoverRect ? {
       left: visibleWordPopoverRect.x,
@@ -2390,7 +2527,17 @@ const showWordHoverCard = (asset, element) => {
       setHighlightCommentMode("append");
       setHighlightContentTab("notes");
     }
-  }, renderObsidianIcon("file-pen-line")) : null, React.createElement("button", {
+  }, renderObsidianIcon("file-pen-line")) : null,
+  ...(smartCommands || []).filter(c => c.enabled !== false && (c.scope === "note" || c.scope === "both")).map(cmd =>
+    React.createElement("button", {
+      key: cmd.id,
+      className: "jarvis-reader-highlight-icon-button",
+      type: "button",
+      title: cmd.label,
+      onClick: () => fireSmartCommand(cmd, "note")
+    }, renderObsidianIcon(cmd.icon || "bot"))
+  ),
+  React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
     title: "\u5173\u95ed",

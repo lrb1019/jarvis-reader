@@ -1,8 +1,9 @@
-import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
+import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App, Modal, setIcon } from "obsidian";
 import { normalizeVaultPath } from "./utils";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
+import type { SmartCommand } from "./claudianBridge";
 
 export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -60,7 +61,27 @@ export const DEFAULT_SETTINGS = {
   sm2StartingEase: 2.5,
   sm2EasyBonus: 1.3,
   sm2LapseMultiplier: 0.5,
-  sm2MaxInterval: 365
+  sm2MaxInterval: 365,
+  smartCommands: [
+    {
+      id: "smart-1",
+      label: "发芽思考",
+      description: "对选中内容进行知识碰撞与发散延伸",
+      icon: "sprout",
+      prompt: "@skills/sprouting-thought 请对以下内容进行发芽思考，发散延伸：\n\n{{selection}}",
+      enabled: true,
+      scope: "both"
+    },
+    {
+      id: "smart-2",
+      label: "深度研究",
+      description: "围绕选中内容开展主题研究",
+      icon: "book-open",
+      prompt: "@skills/content-research 请围绕以下内容开展深度研究：\n\n{{selection}}",
+      enabled: true,
+      scope: "both"
+    }
+  ] as SmartCommand[]
 };
 export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
   onChoose: (path: string) => void;
@@ -136,6 +157,11 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         id: "review", 
         label: "记忆与复习",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
+      },
+      { 
+        id: "smartcmd", 
+        label: "智能指令",
+        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 8v4l3 3"></path><circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle></svg>`
       }
     ];
 
@@ -440,6 +466,10 @@ created: {{created}}
       createColorPicker("默认高亮颜色", "普通的文本划线颜色", "normal");
     }
     
+    if (this.activeTab === "smartcmd") {
+      this.renderSmartCommandsTab(contentDiv);
+    }
+
     if (this.activeTab === "review") {
       new Setting(contentDiv)
         .setName("起始难度 (Starting Ease)")
@@ -506,4 +536,218 @@ created: {{created}}
         });
     }
   }
-}
+  private renderSmartCommandsTab(containerEl: HTMLElement): void {
+    const header = containerEl.createDiv();
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
+    header.style.marginBottom = "12px";
+
+    const titleEl = header.createEl("h3", { text: "指令列表" });
+    titleEl.style.margin = "0";
+    titleEl.style.fontSize = "16px";
+    titleEl.style.fontWeight = "600";
+    
+    const addBtn = header.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "新增指令" } });
+    setIcon(addBtn, "plus");
+    
+    addBtn.addEventListener("click", () => {
+      const newCmd: SmartCommand = {
+        id: `smart-${Date.now()}`,
+        label: "新指令",
+        description: "",
+        icon: "bot",
+        prompt: "",
+        enabled: true,
+        scope: "both"
+      };
+      new SmartCommandEditModal(this.app, newCmd, async (saved) => {
+        const cmds: SmartCommand[] = Array.isArray(this.plugin.settings.smartCommands)
+          ? this.plugin.settings.smartCommands
+          : [];
+        cmds.push(saved);
+        this.plugin.settings.smartCommands = cmds;
+        await this.plugin.saveSettings();
+        this.display();
+      }).open();
+    });
+
+    const list = containerEl.createDiv({ cls: "vo-actions-compact-list" });
+    const cmds: SmartCommand[] = Array.isArray(this.plugin.settings.smartCommands)
+      ? this.plugin.settings.smartCommands
+      : [];
+
+    if (cmds.length === 0) {
+      containerEl.createEl("p", { text: "暂无指令，点击右上角加号新增。", cls: "setting-item-description" });
+      return;
+    }
+
+    cmds.forEach((cmd, index) => {
+      const row = list.createDiv({ cls: "vo-actions-compact-row" });
+
+      const left = row.createDiv({ cls: "vo-actions-compact-main" });
+      const iconWrap = left.createDiv({ cls: "vo-actions-compact-icon" });
+      setIcon(iconWrap, cmd.icon || "bot");
+
+      const textWrap = left.createDiv({ cls: "vo-actions-compact-text" });
+      textWrap.createDiv({ text: cmd.label || `指令 ${index + 1}`, cls: "vo-actions-compact-title" });
+      
+      const scopeLabel = cmd.scope === "selection" ? "仅划线菜单" : cmd.scope === "note" ? "仅感想窗口" : "两者都有";
+      textWrap.createDiv({
+        text: `${cmd.description || "暂无描述"} · 范围：${scopeLabel}`,
+        cls: "vo-actions-compact-desc"
+      });
+
+      const right = row.createDiv({ cls: "vo-actions-compact-controls" });
+      
+      // Edit button
+      const editBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "编辑指令" } });
+      setIcon(editBtn, "pencil");
+      editBtn.addEventListener("click", () => {
+        new SmartCommandEditModal(this.app, { ...cmd }, async (saved) => {
+          cmds[index] = saved;
+          this.plugin.settings.smartCommands = cmds;
+          await this.plugin.saveSettings();
+          this.display();
+        }, async () => {
+          cmds.splice(index, 1);
+          this.plugin.settings.smartCommands = cmds;
+          await this.plugin.saveSettings();
+          this.display();
+        }).open();
+      });
+
+      // Delete button
+      const deleteBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "删除指令" } });
+      setIcon(deleteBtn, "trash-2");
+      deleteBtn.addEventListener("click", async () => {
+        cmds.splice(index, 1);
+        this.plugin.settings.smartCommands = cmds;
+        await this.plugin.saveSettings();
+        this.display();
+      });
+
+      // Toggle enabled
+      const toggleBtn = right.createEl("button", {
+        cls: "clickable-icon",
+        attr: { "aria-label": cmd.enabled !== false ? "禁用指令" : "启用指令" }
+      });
+      setIcon(toggleBtn, cmd.enabled !== false ? "toggle-right" : "toggle-left");
+      toggleBtn.addEventListener("click", async () => {
+        cmds[index] = { ...cmd, enabled: cmd.enabled === false };
+        this.plugin.settings.smartCommands = cmds;
+        await this.plugin.saveSettings();
+        this.display();
+      });
+    });
+  }
+}
+
+class SmartCommandEditModal extends Modal {
+  private cmd: SmartCommand;
+  private onSave: (cmd: SmartCommand) => Promise<void>;
+  private onDelete?: () => Promise<void>;
+
+  constructor(
+    app: App,
+    cmd: SmartCommand,
+    onSave: (cmd: SmartCommand) => Promise<void>,
+    onDelete?: () => Promise<void>
+  ) {
+    super(app);
+    this.cmd = { ...cmd };
+    this.onSave = onSave;
+    this.onDelete = onDelete;
+  }
+
+  onOpen(): void {
+    const { contentEl } = this;
+    contentEl.empty();
+    let draft: SmartCommand = { ...this.cmd };
+
+    contentEl.createEl("h2", { text: "Edit Smart Action" });
+
+    new Setting(contentEl)
+      .setName("按钮名称")
+      .setDesc("面板中显示的按钮文字")
+      .addText(text => text
+        .setPlaceholder("例如：发芽思考")
+        .setValue(draft.label)
+        .onChange(value => { draft = { ...draft, label: value }; })
+      );
+
+    new Setting(contentEl)
+      .setName("列表描述")
+      .setDesc("显示在外层列表里的一句简短说明")
+      .addText(text => text
+        .setPlaceholder("例如：对选中内容发散延伸")
+        .setValue(draft.description || "")
+        .onChange(value => { draft = { ...draft, description: value }; })
+      );
+
+    new Setting(contentEl)
+      .setName("图标名称")
+      .setDesc("填写 Lucide 图标名称，例如 sprout、book-open、rss")
+      .addText(text => text
+        .setPlaceholder("bot")
+        .setValue(draft.icon)
+        .onChange(value => { draft = { ...draft, icon: value }; })
+      );
+
+    new Setting(contentEl)
+      .setName("出现位置")
+      .setDesc("划线菜单触发时目标为【选中文字】，感想窗口触发时目标为【原文 + 笔记内容】")
+      .addDropdown(dd => dd
+        .addOption("both", "两者都有")
+        .addOption("selection", "仅划线菜单（选中文字时）")
+        .addOption("note", "仅感想窗口")
+        .setValue(draft.scope || "both")
+        .onChange(value => { draft = { ...draft, scope: value as SmartCommand["scope"] }; })
+      );
+
+    new Setting(contentEl)
+      .setName("指令模板")
+      .setDesc("点击后发送给 Claudian 的完整内容，可使用 {{selection}}、{{content}}、{{book_title}}、{{chapter}}")
+      .addTextArea(text => {
+        text
+          .setPlaceholder("@skills/sprouting-thought 请对以下内容进行发芽思考：\n\n{{selection}}")
+          .setValue(draft.prompt)
+          .onChange(value => { draft = { ...draft, prompt: value }; });
+        text.inputEl.rows = 5;
+        text.inputEl.style.width = "100%";
+        text.inputEl.style.fontFamily = "var(--font-monospace)";
+        text.inputEl.style.fontSize = "12px";
+      });
+
+    const footer = contentEl.createDiv({ cls: "jarvis-smartcmd-modal-footer" });
+    const left = footer.createDiv();
+    const right = footer.createDiv();
+
+    if (this.onDelete) {
+      const deleteBtn = left.createEl("button", { text: "Delete", cls: "mod-warning" });
+      deleteBtn.addEventListener("click", () => {
+        void this.onDelete!().then(() => this.close());
+      });
+    }
+
+    right.createEl("button", { text: "Cancel" }).addEventListener("click", () => this.close());
+    const saveBtn = right.createEl("button", { text: "Save", cls: "mod-cta" });
+    saveBtn.style.marginLeft = "8px";
+    saveBtn.addEventListener("click", () => {
+      const toSave: SmartCommand = {
+        ...draft,
+        label: draft.label.trim() || "新指令",
+        description: (draft.description || "").trim(),
+        icon: draft.icon.trim() || "bot",
+        prompt: draft.prompt.trim(),
+        scope: draft.scope || "both",
+        enabled: draft.enabled !== false
+      };
+      void this.onSave(toSave).then(() => this.close());
+    });
+  }
+
+  onClose(): void {
+    this.contentEl.empty();
+  }
+}
