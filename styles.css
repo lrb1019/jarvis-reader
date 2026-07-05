@@ -160,7 +160,7 @@
   position: absolute;
   transform: translateX(-50%);
   width: min(520px, calc(100% - 120px));
-  z-index: 700;
+  z-index: 10005 !important;
   overflow: visible;
 }
 
@@ -369,11 +369,19 @@
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   box-sizing: border-box;
-  display: none;
+  display: block;
   min-height: 78px;
   overflow: visible;
   position: relative;
   width: 100%;
+}
+
+.jarvis-reader-cm-editor ~ .jarvis-reader-highlight-input-shell {
+  display: none !important;
+}
+
+textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell *) {
+  display: none !important;
 }
 
 .jarvis-reader-cm-editor:focus-within {
@@ -4880,6 +4888,11 @@ g.jarvis-reader-highlight-with-comment line {
   border-radius: 12px;
   margin-top: 2px;
   padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .jarvis-reader-highlight-content-frame .jarvis-reader-highlight-quote {
@@ -4898,4 +4911,28 @@ g.jarvis-reader-highlight-with-comment line {
 .jarvis-reader-highlight-content-frame .jarvis-reader-highlight-section {
   border-bottom: 0 !important;
   padding-bottom: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.jarvis-reader-highlight-note-card-text .markdown-preview-view {
+  font-size: var(--font-ui-small) !important;
+}
+
+.jarvis-reader-highlight-note-card-text .markdown-preview-view p,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view li,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h1,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h2,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h3,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h4,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h5,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view h6,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view span,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view pre,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view code {
+  font-size: var(--font-ui-small) !important;
+  line-height: 1.55 !important;
 }

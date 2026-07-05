@@ -304,14 +304,16 @@ export class EpubView extends FileView {
     this.renderHighlightsPane();
   }
 
-  jumpToHighlight(highlight: any): void {
+  jumpToHighlight(highlight: any, skipSidebarRender = false): void {
     if (!highlight || !highlight.cfiRange || !this.currentRendition)
       return;
     this.selectedHighlightId = highlight.id;
     try {
       this.currentRendition.display(highlight.cfiRange);
       this.refreshCurrentHighlightPanes();
-      this.renderHighlightsPane();
+      if (!skipSidebarRender) {
+        this.renderHighlightsPane();
+      }
     } catch (error) {
       console.warn("Jarvis Reader jump to highlight failed.", error);
     }
@@ -340,7 +342,9 @@ export class EpubView extends FileView {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
         try {
-          const views = rendition?.manager?.visible?.() || [];
+          if (!rendition || !rendition.manager || !rendition.manager.stage)
+            return;
+          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
           for (const view of views) {
             if (view && view.pane && typeof view.pane.render === "function") {
               view.pane.render();

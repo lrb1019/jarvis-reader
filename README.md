@@ -1,12 +1,19 @@
 # Jarvis Reader
 
-当前版本：v1.1.1
+当前版本：v1.1.2
 
 中文说明 | [English](./README.en.md)
 
 Jarvis Reader 是一个面向 Obsidian 的个人 EPUB 阅读插件。它把图书库、阅读进度、目录导航、划线、笔记、离线查词、AI 翻译、词汇卡片和单词本整合到同一条阅读工作流中。
 
 插件内置 ECDICT 离线词典。选中英文单词后可直接查询，无需额外导入词典或配置本地路径。词典数据按 26 个字母分片加载，来源与许可见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
+
+## v1.1.2
+
+- **原生 Markdown 预览与链接跳转**：感想展示区使用 Obsidian 原生 `MarkdownRenderer` 进行排版解析，支持加粗、列表、表格及双链跳转，点击 `[[双链链接]]` 可直接在 Obsidian 中打开。
+- **激活 CodeMirror 6 编辑器**：修复了输入层中 CM6 编辑器被 CSS 隐藏的 Bug，全面恢复了原生自动补全与高亮互动。
+- **解决侧栏联动与跳转回弹**：优化了 active leaf 聚焦参数，消除拖动/关闭窗体时侧边栏自动切回 TOC 的异常联动；彻底解决了跨章节跳转时的 CFI snapped-back 回弹缺陷。
+- **布局优化与容错**：感想窗体高度默认调升 30% 并加入自适应滚动限制；对 `word-assets.json` 空字节损坏加入了容错降级，避免插件启动崩溃。
 
 ## v1.1.1
 

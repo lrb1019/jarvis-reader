@@ -1,12 +1,19 @@
 # Jarvis Reader
 
-Current version: v1.1.1
+Current version: v1.1.2
 
 [中文说明](./README.md) | English
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a library dashboard, reading progress, table of contents navigation, highlights, notes, offline lookup, AI translation, vocabulary cards, and a word book into one reading workflow.
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+## v1.1.2
+
+- **Obsidian-Native Markdown Preview & Wikilink Navigation**: Used Obsidian's native `MarkdownRenderer` in the note display area to support rich formatting (bold, lists, tables) and allow clicking `[[wikilinks]]` directly to open target files.
+- **CodeMirror 6 Editor Activation**: Resolved a CSS display bug that kept the CodeMirror 6 editor hidden under fallback textareas, restoring the native autocomplete, syntax highlighting, and double-bracket suggestion experience.
+- **Sidebar Focus & CFI Snapback Fixes**: Prevented focus changes from resetting the active sidebar tab back to TOC. Resolved a critical race condition where stale `pendingInitLocationRef` values triggered snap-back loops when paginating to later chapters.
+- **Form Layout & Corrupted JSON Tolerance**: Increased default note window height by 30% with scroll helper. Added robust try-catch handling and fallback mechanisms to `word-assets.json` load workflow to protect the plugin against startup crashes on corrupted index files.
 
 ## v1.1.1
 

@@ -307,7 +307,6 @@ export class JarvisReaderHighlightsView extends ItemView {
       this.listScrollTop = body.scrollTop;
     });
     let revealCard = null;
-    let clickTimer = null;
     restoreScroll(body);
     for (const highlight of visibleList) {
       const isActive = highlight.id && highlight.id === this.reader.selectedHighlightId;
@@ -319,22 +318,12 @@ export class JarvisReaderHighlightsView extends ItemView {
       }
       card.setAttr("role", "button");
       card.setAttr("tabindex", "0");
-      card.onclick = () => {
-        if (clickTimer) {
-          window.clearTimeout(clickTimer);
-        }
-        clickTimer = window.setTimeout(() => {
-          clickTimer = null;
-          this.reader.jumpToHighlight(highlight);
-        }, 180);
-      };
-      card.ondblclick = (event) => {
+      card.onclick = (event) => {
         event.preventDefault();
-        if (clickTimer) {
-          window.clearTimeout(clickTimer);
-          clickTimer = null;
-        }
-        this.reader.editHighlight(highlight);
+        const activeCards = body.querySelectorAll(".jarvis-reader-highlights-card.is-active");
+        activeCards.forEach(c => c.classList.remove("is-active"));
+        card.classList.add("is-active");
+        this.reader.jumpToHighlight(highlight, true);
       };
       card.oncontextmenu = (event) => {
         event.preventDefault();
@@ -349,7 +338,10 @@ export class JarvisReaderHighlightsView extends ItemView {
       card.onkeydown = (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          this.reader.jumpToHighlight(highlight);
+          const activeCards = body.querySelectorAll(".jarvis-reader-highlights-card.is-active");
+          activeCards.forEach(c => c.classList.remove("is-active"));
+          card.classList.add("is-active");
+          this.reader.jumpToHighlight(highlight, true);
         }
       };
       card.createEl("div", { cls: "jarvis-reader-highlights-chapter", text: highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282" });

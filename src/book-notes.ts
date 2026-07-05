@@ -76,9 +76,19 @@ export async function openOrCreateNote(app: App, file: TFile, toc: string, setti
   const noteFile = await getOrCreateBookNote(app, file, toc, settings);
   if (!noteFile)
     return;
-  const leaf = app.workspace.getMostRecentLeaf();
-  if (leaf instanceof WorkspaceLeaf) {
-    const fileLeaf = app.workspace.createLeafBySplit(leaf);
+  const epubLeaves = app.workspace.getLeavesOfType("epub");
+  const baseLeaf = epubLeaves.find(l => {
+    var _a;
+    return ((_a = l.view) == null ? void 0 : (_a as any).file?.path) === file.path;
+  }) || app.workspace.getMostRecentLeaf();
+
+  const isSidebar = baseLeaf && (baseLeaf.getRoot() === app.workspace.leftSplit || baseLeaf.getRoot() === app.workspace.rightSplit);
+
+  if (baseLeaf && !isSidebar) {
+    const fileLeaf = app.workspace.createLeafBySplit(baseLeaf);
+    await fileLeaf.openFile(noteFile, { active: true });
+  } else {
+    const fileLeaf = app.workspace.getLeaf(true);
     await fileLeaf.openFile(noteFile, { active: true });
   }
 }

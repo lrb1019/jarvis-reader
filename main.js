@@ -23733,9 +23733,17 @@ async function openOrCreateNote(app, file, toc, settings = {}) {
   const noteFile = await getOrCreateBookNote(app, file, toc, settings);
   if (!noteFile)
     return;
-  const leaf = app.workspace.getMostRecentLeaf();
-  if (leaf instanceof import_obsidian2.WorkspaceLeaf) {
-    const fileLeaf = app.workspace.createLeafBySplit(leaf);
+  const epubLeaves = app.workspace.getLeavesOfType("epub");
+  const baseLeaf = epubLeaves.find((l) => {
+    var _a;
+    return ((_a = l.view) == null ? void 0 : _a.file?.path) === file.path;
+  }) || app.workspace.getMostRecentLeaf();
+  const isSidebar = baseLeaf && (baseLeaf.getRoot() === app.workspace.leftSplit || baseLeaf.getRoot() === app.workspace.rightSplit);
+  if (baseLeaf && !isSidebar) {
+    const fileLeaf = app.workspace.createLeafBySplit(baseLeaf);
+    await fileLeaf.openFile(noteFile, { active: true });
+  } else {
+    const fileLeaf = app.workspace.getLeaf(true);
     await fileLeaf.openFile(noteFile, { active: true });
   }
 }
@@ -55579,6 +55587,43 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
     top: Math.min(boundsHeight - height - 16, Math.max(16, top))
   };
 }
+var ObsidianMarkdown = ({ text, onOpenLink }) => {
+  const containerRef = (0, import_react2.useRef)(null);
+  (0, import_react2.useEffect)(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.empty();
+    const globalApp = window.app;
+    if (globalApp) {
+      import_obsidian5.MarkdownRenderer.render(
+        globalApp,
+        text || "",
+        el,
+        "",
+        globalApp.plugins?.plugins?.["jarvis-reader"] || null
+      ).catch(console.error);
+    } else {
+      el.textContent = text || "";
+    }
+  }, [text]);
+  const handleClick = (e) => {
+    const target = e.target;
+    const anchor = target.closest("a");
+    if (anchor && anchor.classList.contains("internal-link")) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = anchor.getAttribute("data-href") || anchor.getAttribute("href");
+      if (href && typeof onOpenLink === "function") {
+        onOpenLink(href);
+      }
+    }
+  };
+  return import_react2.default.createElement("div", {
+    ref: containerRef,
+    onClick: handleClick,
+    className: "markdown-preview-view clean-markdown-view"
+  });
+};
 var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
@@ -55690,7 +55735,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const getDefaultHighlightPopoverRect = () => {
     const bounds = getHighlightPopoverBounds();
     const width = Math.min(560, Math.max(360, bounds.width - 120));
-    const height = Math.min(320, Math.max(280, bounds.height - 180));
+    const height = Math.min(420, Math.max(360, bounds.height - 100));
     return clampHighlightPopoverRect({
       x: bounds.width - width - 32,
       y: Math.max(16, (bounds.height - height) / 2),
@@ -55858,20 +55903,31 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!targetCfi || !rendition || typeof rendition.display !== "function") {
       return;
     }
+    pendingInitLocationRef.current = null;
     let attempts = 0;
     const maxAttempts = 8;
+    let keepRetrying = true;
     const run = () => {
-      const latestTarget = pendingInitLocationRef.current;
-      if (!latestTarget) {
-        return;
-      }
+      if (!keepRetrying) return;
       attempts += 1;
-      Promise.resolve(rendition.display(latestTarget)).catch(() => void 0).finally(() => {
-        if (pendingInitLocationRef.current === latestTarget && attempts < maxAttempts) {
+      Promise.resolve(rendition.display(targetCfi)).catch(() => void 0).finally(() => {
+        if (keepRetrying && attempts < maxAttempts) {
           window.setTimeout(run, 180);
         }
       });
     };
+    const stopRetry = (relocated) => {
+      const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
+      if (relocatedCfi === targetCfi) {
+        keepRetrying = false;
+        rendition.off("relocated", stopRetry);
+      }
+    };
+    rendition.on("relocated", stopRetry);
+    window.setTimeout(() => {
+      keepRetrying = false;
+      rendition.off("relocated", stopRetry);
+    }, 3e3);
     window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
@@ -55879,7 +55935,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       window.requestAnimationFrame(() => {
         var _a, _b;
         try {
-          const views = ((_b = (_a = rendition == null ? void 0 : rendition.manager) == null ? void 0 : _a.visible) == null ? void 0 : _b.call(_a)) || [];
+          if (!rendition || !rendition.manager || !rendition.manager.stage)
+            return;
+          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
           for (const view of views) {
             if (view && view.pane && typeof view.pane.render === "function") {
               view.pane.render();
@@ -55897,7 +55955,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     try {
       rendition.annotations?.remove(cfiRange, "highlight");
       rendition.annotations?.remove(cfiRange, "underline");
-      const views = typeof rendition.views === "function" ? rendition.views() || [] : [];
+      const viewsCollection = typeof rendition.views === "function" ? rendition.views() : null;
+      const views = viewsCollection ? typeof viewsCollection.all === "function" ? viewsCollection.all() : viewsCollection : [];
       for (const view of views) {
         const pane = view?.pane;
         if (!pane || !Array.isArray(pane.marks) || typeof pane.removeMark !== "function")
@@ -56814,7 +56873,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
       return;
     const rendition = renditionRef.current;
-    const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : [];
+    const views = rendition && rendition.manager && rendition.manager.stage && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : [];
     const docs = views.map((view) => {
       var _a;
       return ((_a = view == null ? void 0 : view.contents) == null ? void 0 : _a.document) || null;
@@ -57253,7 +57312,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     key: `${entry.label || "note"}-${index}`
   }, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-note-card-text"
-  }, entry.text), import_react2.default.createElement("div", {
+  }, import_react2.default.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })), import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-note-card-time"
   }, formatHighlightNoteTime(entry.created))))) : import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-empty"
@@ -58270,14 +58329,16 @@ var EpubView = class extends import_obsidian6.FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
   }
-  jumpToHighlight(highlight) {
+  jumpToHighlight(highlight, skipSidebarRender = false) {
     if (!highlight || !highlight.cfiRange || !this.currentRendition)
       return;
     this.selectedHighlightId = highlight.id;
     try {
       this.currentRendition.display(highlight.cfiRange);
       this.refreshCurrentHighlightPanes();
-      this.renderHighlightsPane();
+      if (!skipSidebarRender) {
+        this.renderHighlightsPane();
+      }
     } catch (error) {
       console.warn("Jarvis Reader jump to highlight failed.", error);
     }
@@ -58301,7 +58362,9 @@ var EpubView = class extends import_obsidian6.FileView {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
         try {
-          const views = rendition?.manager?.visible?.() || [];
+          if (!rendition || !rendition.manager || !rendition.manager.stage)
+            return;
+          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
           for (const view of views) {
             if (view && view.pane && typeof view.pane.render === "function") {
               view.pane.render();
@@ -59114,7 +59177,6 @@ var JarvisReaderHighlightsView = class extends import_obsidian8.ItemView {
       this.listScrollTop = body.scrollTop;
     });
     let revealCard = null;
-    let clickTimer = null;
     restoreScroll(body);
     for (const highlight of visibleList) {
       const isActive = highlight.id && highlight.id === this.reader.selectedHighlightId;
@@ -59126,22 +59188,12 @@ var JarvisReaderHighlightsView = class extends import_obsidian8.ItemView {
       }
       card.setAttr("role", "button");
       card.setAttr("tabindex", "0");
-      card.onclick = () => {
-        if (clickTimer) {
-          window.clearTimeout(clickTimer);
-        }
-        clickTimer = window.setTimeout(() => {
-          clickTimer = null;
-          this.reader.jumpToHighlight(highlight);
-        }, 180);
-      };
-      card.ondblclick = (event) => {
+      card.onclick = (event) => {
         event.preventDefault();
-        if (clickTimer) {
-          window.clearTimeout(clickTimer);
-          clickTimer = null;
-        }
-        this.reader.editHighlight(highlight);
+        const activeCards = body.querySelectorAll(".jarvis-reader-highlights-card.is-active");
+        activeCards.forEach((c) => c.classList.remove("is-active"));
+        card.classList.add("is-active");
+        this.reader.jumpToHighlight(highlight, true);
       };
       card.oncontextmenu = (event) => {
         event.preventDefault();
@@ -59156,7 +59208,10 @@ var JarvisReaderHighlightsView = class extends import_obsidian8.ItemView {
       card.onkeydown = (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          this.reader.jumpToHighlight(highlight);
+          const activeCards = body.querySelectorAll(".jarvis-reader-highlights-card.is-active");
+          activeCards.forEach((c) => c.classList.remove("is-active"));
+          card.classList.add("is-active");
+          this.reader.jumpToHighlight(highlight, true);
         }
       };
       card.createEl("div", { cls: "jarvis-reader-highlights-chapter", text: highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282" });
@@ -65790,7 +65845,7 @@ var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
         const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
         bookshelfLeaves.forEach((l) => {
           if (l.view && typeof l.view.setActiveReader === "function") {
-            l.view.setActiveReader(view);
+            l.view.setActiveReader(view, null);
           }
         });
         const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
@@ -66116,12 +66171,13 @@ var JarvisReaderPlugin = class extends import_obsidian20.Plugin {
       const adapter = this.app.vault.adapter;
       const hasWordAssetSidecar = adapter && typeof adapter.exists === "function" && await adapter.exists(paths.wordAssets);
       if (hasWordAssetSidecar) {
-        const raw = await adapter.read(paths.wordAssets);
-        const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.wordAssets || typeof parsed.wordAssets !== "object") {
-          throw new Error("word-assets.json does not contain a wordAssets object.");
+        const parsed = await this.readJsonSidecar(paths.wordAssets);
+        if (parsed && parsed.wordAssets && typeof parsed.wordAssets === "object") {
+          this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
+        } else {
+          this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets || {});
+          new import_obsidian20.Notice("\u751F\u8BCD\u672C\u4E3B\u6570\u636E (word-assets.json) \u635F\u574F\u6216\u4E3A\u7A7A\uFF0C\u5DF2\u4ECE\u4E3B\u914D\u7F6E\u6216\u7A7A\u767D\u6062\u590D\u3002", 6e3);
         }
-        this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
       } else {
         this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets);
         await this.persistWordAssetSidecar("migrate-from-data");

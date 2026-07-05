@@ -113,7 +113,7 @@ export default class JarvisReaderPlugin extends Plugin {
         const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
         bookshelfLeaves.forEach(l => {
           if (l.view && typeof (l.view as any).setActiveReader === "function") {
-             (l.view as any).setActiveReader(view);
+             (l.view as any).setActiveReader(view, null);
           }
         });
         const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
@@ -444,12 +444,13 @@ export default class JarvisReaderPlugin extends Plugin {
       const adapter = this.app.vault.adapter;
       const hasWordAssetSidecar = adapter && typeof adapter.exists === "function" && await adapter.exists(paths.wordAssets);
       if (hasWordAssetSidecar) {
-        const raw = await adapter.read(paths.wordAssets);
-        const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.wordAssets || typeof parsed.wordAssets !== "object") {
-          throw new Error("word-assets.json does not contain a wordAssets object.");
+        const parsed = await this.readJsonSidecar(paths.wordAssets);
+        if (parsed && parsed.wordAssets && typeof parsed.wordAssets === "object") {
+          this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
+        } else {
+          this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets || {});
+          new Notice("生词本主数据 (word-assets.json) 损坏或为空，已从主配置或空白恢复。", 6000);
         }
-        this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
       } else {
         this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets);
         await this.persistWordAssetSidecar("migrate-from-data");

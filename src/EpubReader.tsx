@@ -1,6 +1,6 @@
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
-import { Notice, setIcon } from "obsidian";
+import { Notice, setIcon, MarkdownRenderer } from "obsidian";
 import { ReactReader } from "react-reader";
 import * as ReactReaderModule from "react-reader";
 import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, formatLocalDate } from "./utils";
@@ -155,7 +155,45 @@ export function clampFloatingCardPosition(container, rect, width = 320, height =
   };
 }
 
-// src/EpubView.tsx
+const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) => void }> = ({ text, onOpenLink }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.empty();
+    const globalApp = (window as any).app;
+    if (globalApp) {
+      MarkdownRenderer.render(
+        globalApp,
+        text || "",
+        el,
+        "",
+        globalApp.plugins?.plugins?.["jarvis-reader"] || null
+      ).catch(console.error);
+    } else {
+      el.textContent = text || "";
+    }
+  }, [text]);
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest("a");
+    if (anchor && anchor.classList.contains("internal-link")) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = anchor.getAttribute("data-href") || anchor.getAttribute("href");
+      if (href && typeof onOpenLink === "function") {
+        onOpenLink(href);
+      }
+    }
+  };
+
+  return React.createElement("div", {
+    ref: containerRef,
+    onClick: handleClick,
+    className: "markdown-preview-view clean-markdown-view"
+  });
+};
 
 export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction }) => {
   const [location, setLocation] = useState<any>(initLocation);
@@ -275,7 +313,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const getDefaultHighlightPopoverRect = () => {
     const bounds = getHighlightPopoverBounds();
     const width = Math.min(560, Math.max(360, bounds.width - 120));
-    const height = Math.min(320, Math.max(280, bounds.height - 180));
+    const height = Math.min(420, Math.max(360, bounds.height - 100));
     return clampHighlightPopoverRect({
       x: bounds.width - width - 32,
       y: Math.max(16, (bounds.height - height) / 2),
@@ -443,20 +481,31 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     if (!targetCfi || !rendition || typeof rendition.display !== "function") {
       return;
     }
+    pendingInitLocationRef.current = null;
     let attempts = 0;
     const maxAttempts = 8;
+    let keepRetrying = true;
     const run = () => {
-      const latestTarget = pendingInitLocationRef.current;
-      if (!latestTarget) {
-        return;
-      }
+      if (!keepRetrying) return;
       attempts += 1;
-      Promise.resolve(rendition.display(latestTarget)).catch(() => void 0).finally(() => {
-        if (pendingInitLocationRef.current === latestTarget && attempts < maxAttempts) {
+      Promise.resolve(rendition.display(targetCfi)).catch(() => void 0).finally(() => {
+        if (keepRetrying && attempts < maxAttempts) {
           window.setTimeout(run, 180);
         }
       });
     };
+    const stopRetry = (relocated: any) => {
+      const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
+      if (relocatedCfi === targetCfi) {
+        keepRetrying = false;
+        rendition.off("relocated", stopRetry);
+      }
+    };
+    rendition.on("relocated", stopRetry);
+    window.setTimeout(() => {
+      keepRetrying = false;
+      rendition.off("relocated", stopRetry);
+    }, 3000);
     window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
@@ -464,7 +513,9 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       window.requestAnimationFrame(() => {
         var _a, _b;
         try {
-          const views = ((_b = (_a = rendition == null ? void 0 : rendition.manager) == null ? void 0 : _a.visible) == null ? void 0 : _b.call(_a)) || [];
+          if (!rendition || !rendition.manager || !rendition.manager.stage)
+            return;
+          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
           for (const view of views) {
             if (view && view.pane && typeof view.pane.render === "function") {
               view.pane.render();
@@ -482,7 +533,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     try {
       rendition.annotations?.remove(cfiRange, "highlight");
       rendition.annotations?.remove(cfiRange, "underline");
-      const views = typeof rendition.views === "function" ? rendition.views() || [] : [];
+      const viewsCollection = typeof rendition.views === "function" ? rendition.views() : null;
+      const views = viewsCollection ? (typeof viewsCollection.all === "function" ? viewsCollection.all() : viewsCollection) : [];
       for (const view of views) {
         const pane = view?.pane;
         if (!pane || !Array.isArray(pane.marks) || typeof pane.removeMark !== "function")
@@ -1401,7 +1453,7 @@ const showWordHoverCard = (asset, element) => {
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
       return;
     const rendition = renditionRef.current;
-    const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : [];
+    const views = rendition && rendition.manager && rendition.manager.stage && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : [];
     const docs = views.map((view) => {
       var _a;
       return ((_a = view == null ? void 0 : view.contents) == null ? void 0 : _a.document) || null;
@@ -1840,7 +1892,7 @@ const showWordHoverCard = (asset, element) => {
     key: `${entry.label || "note"}-${index}`
   }, React.createElement("div", {
     className: "jarvis-reader-highlight-note-card-text"
-  }, entry.text), React.createElement("div", {
+  }, React.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })), React.createElement("div", {
     className: "jarvis-reader-highlight-note-card-time"
   }, formatHighlightNoteTime(entry.created))))) : React.createElement("div", {
     className: "jarvis-reader-highlight-empty"
