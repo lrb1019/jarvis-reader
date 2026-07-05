@@ -55874,101 +55874,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     };
     window.setTimeout(run, 80);
   };
-  const clearHighlightCommentBubbles = (rendition) => {
-    try {
-      const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : typeof rendition?.views === "function" ? rendition.views() || [] : [];
-      for (const view of views) {
-        const doc = view?.contents?.document;
-        if (!doc)
-          continue;
-        doc.querySelectorAll(".jarvis-reader-highlight-comment-bubble").forEach((node) => node.remove());
-      }
-    } catch (error) {
-      console.warn("Jarvis Reader comment bubble cleanup failed.", error);
-    }
-  };
-  const getHighlightRangeInView = (view, cfiRange) => {
-    try {
-      const contents2 = view?.contents;
-      if (contents2 && typeof contents2.range === "function") {
-        return contents2.range(cfiRange);
-      }
-      if (contents2 && typeof contents2.getRange === "function") {
-        return contents2.getRange(cfiRange);
-      }
-      if (view && typeof view.range === "function") {
-        return view.range(cfiRange);
-      }
-    } catch (error) {
-    }
-    return null;
-  };
-  const renderHighlightCommentBubbles = (rendition) => {
-    try {
-      const visibleHighlights = (highlightListRef.current || []).filter((highlight) => highlight?.cfiRange && (highlight.comment || "").trim());
-      const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : typeof rendition?.views === "function" ? rendition.views() || [] : [];
-      for (const view of views) {
-        const contents2 = view?.contents;
-        const doc = contents2?.document;
-        const win = contents2?.window || doc?.defaultView;
-        if (!doc || !doc.body || !win)
-          continue;
-        doc.querySelectorAll(".jarvis-reader-highlight-comment-bubble").forEach((node) => node.remove());
-        for (const highlight of visibleHighlights) {
-          const range = getHighlightRangeInView(view, highlight.cfiRange);
-          if (!range || typeof range.getClientRects !== "function")
-            continue;
-          const rects = Array.from(range.getClientRects()).filter((rect2) => rect2 && (rect2.width || rect2.height));
-          const rect = rects.length ? rects[rects.length - 1] : range.getBoundingClientRect && range.getBoundingClientRect();
-          if (!rect || !rect.width && !rect.height)
-            continue;
-          const bubble = doc.createElement("button");
-          bubble.className = "jarvis-reader-highlight-comment-bubble";
-          bubble.type = "button";
-          bubble.title = "\u6253\u5F00\u7B14\u8BB0";
-          bubble.setAttribute("aria-label", "\u6253\u5F00\u7B14\u8BB0");
-          bubble.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>';
-          bubble.style.position = "absolute";
-          bubble.style.left = `${Math.max(0, rect.right + win.scrollX - 4)}px`;
-          bubble.style.top = `${Math.max(0, rect.bottom + win.scrollY - 10)}px`;
-          bubble.style.width = "18px";
-          bubble.style.height = "18px";
-          bubble.style.padding = "2px";
-          bubble.style.border = "1px solid rgba(249, 115, 22, 0.72)";
-          bubble.style.borderRadius = "999px";
-          bubble.style.background = "rgba(255, 251, 235, 0.96)";
-          bubble.style.color = "#c2410c";
-          bubble.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.14)";
-          bubble.style.cursor = "pointer";
-          bubble.style.zIndex = "2147483647";
-          bubble.style.display = "flex";
-          bubble.style.alignItems = "center";
-          bubble.style.justifyContent = "center";
-          bubble.style.pointerEvents = "auto";
-          bubble.style.lineHeight = "1";
-          const svg = bubble.querySelector("svg");
-          if (svg) {
-            svg.setAttribute("fill", "none");
-            svg.setAttribute("stroke", "currentColor");
-            svg.setAttribute("stroke-width", "2");
-            svg.setAttribute("stroke-linecap", "round");
-            svg.setAttribute("stroke-linejoin", "round");
-            svg.setAttribute("width", "12");
-            svg.setAttribute("height", "12");
-          }
-          bubble.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
-            openHighlightCommentEditor(liveHighlight);
-          });
-          doc.body.appendChild(bubble);
-        }
-      }
-    } catch (error) {
-      console.warn("Jarvis Reader comment bubble render failed.", error);
-    }
-  };
   const refreshHighlightPanes = (rendition) => {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
@@ -55980,7 +55885,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
               view.pane.render();
             }
           }
-          renderHighlightCommentBubbles(rendition);
         } catch (error) {
           console.warn("Jarvis Reader highlight refresh failed.", error);
         }
@@ -55993,7 +55897,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     try {
       rendition.annotations?.remove(cfiRange, "highlight");
       rendition.annotations?.remove(cfiRange, "underline");
-      clearHighlightCommentBubbles(rendition);
       const views = typeof rendition.views === "function" ? rendition.views() || [] : [];
       for (const view of views) {
         const pane = view?.pane;
@@ -56028,6 +55931,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
         if ((liveHighlight.comment || "").trim()) {
+          openHighlightCommentEditor(liveHighlight);
           return;
         }
         setPendingSelection(null);
@@ -56042,12 +55946,12 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       };
       if (highlight.comment) {
         const commentColor = currentColors?.comment || "#f97316";
-        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
           fill: commentColor,
           "fill-opacity": "0.15",
           "mix-blend-mode": "multiply"
         });
-        rendition.annotations.underline(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight-with-comment", {
+        rendition.annotations.underline(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment", {
           stroke: commentColor,
           "stroke-opacity": "0.98",
           "stroke-width": "2.0",
@@ -56055,7 +55959,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         });
       } else {
         const normalColor = currentColors?.normal || "#ffeb3b";
-        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id }, eventHandler, "jarvis-reader-highlight", {
+        rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight", {
           fill: normalColor,
           "fill-opacity": "0.24",
           "mix-blend-mode": "multiply"
@@ -57449,8 +57353,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     dangerouslySetInnerHTML: { __html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>' }
   }), import_react2.default.createElement("button", {
     className: "jarvis-reader-side-button",
-    title: "\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0",
-    "aria-label": "\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0",
+    title: "\u521B\u5EFA\u6216\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6",
+    "aria-label": "\u521B\u5EFA\u6216\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6",
     onClick: createBookNote,
     dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>' }
   }), import_react2.default.createElement("button", {
@@ -57837,7 +57741,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }, isExistingHighlightComment && pendingSelection.notePath ? import_react2.default.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
-    title: "\u6253\u5F00\u7B14\u8BB0",
+    title: "\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6",
     onClick: openHighlightNoteBlock
   }, renderObsidianIcon("pencil")) : null, isReadingHighlightComment ? import_react2.default.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
@@ -57854,6 +57758,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     title: "\u5173\u95ED",
     onClick: clearHighlightUi
   }, renderObsidianIcon("x")))), import_react2.default.createElement("div", {
+    className: "jarvis-reader-highlight-content-frame"
+  }, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-quote"
   }, pendingSelection.quote), isReadingHighlightComment ? import_react2.default.createElement(import_react2.default.Fragment, null, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-subtabs"
@@ -58006,7 +57912,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
-  }))) : null, activeWordHover ? import_react2.default.createElement(
+  })))) : null, activeWordHover ? import_react2.default.createElement(
     "div",
     {
       className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),

@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-Current version: v1.1.0
+Current version: v1.1.1
 
 [中文说明](./README.md) | English
 
@@ -8,9 +8,14 @@ Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a library 
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
+## v1.1.1
+
+- Removed the floating note bubble in EPUB body text to avoid random drift or disappearance across pagination and multi-paragraph highlights.
+- Highlights with notes now open the read-only note window by clicking the underline itself; top-right actions still open the Markdown block or append a new note.
+
 ## v1.1.0
 
-- Reworked the EPUB highlight note window: highlights with notes open from an inline bubble, display as read-only by default, and require the top-right action to append a new note.
+- Reworked the EPUB highlight note window: highlights with notes open from the underline itself, display as read-only by default, and require the top-right action to append a new note.
 - Added an action to open the corresponding Markdown note block through Obsidian block links: `notePath#^blockId`.
 - Added `Notes / AI` sections in the note window: notes show all entries from the same highlight block; AI shows agent output and wiki links.
 - New note entries are written with the `笔记` label while still reading older `想法` blocks.
@@ -59,7 +64,7 @@ THIRD_PARTY_NOTICES.md
 - Open an EPUB from the library.
 - Select text while reading, then choose `Highlight`, `Note`, `Copy`, or `Translate`.
 - Plain highlights save only the selected text; notes save both the selected text and your content into the corresponding Markdown book note.
-- Highlights with notes show a bubble near the source text; click it to open the read-only note window.
+- Click a highlight with notes to open the read-only note window.
 - In the note window, `pencil` opens the corresponding Markdown block, `file-pen-line` appends a note, and `x` closes the window.
 - Selecting an English word first shows the bundled ECDICT result.
 - Selecting a phrase or sentence and clicking `Translate` can call AI translation.
@@ -122,6 +127,11 @@ THIRD_PARTY_NOTICES.md  Third-party notices
 ```
 
 ## Recent Releases
+
+### v1.1.1
+
+- Removed the floating EPUB note bubble and changed note highlights to open the read-only note window by clicking the underline itself.
+- Kept the note-window actions for opening the Markdown block, appending notes, and closing the window.
 
 ### v1.1.0
 

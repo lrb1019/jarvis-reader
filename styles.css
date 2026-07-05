@@ -4875,3 +4875,27 @@ g.jarvis-reader-highlight-with-comment line {
   color: var(--text-faint);
   min-height: 54px;
 }
+.jarvis-reader-highlight-content-frame {
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 82%, transparent);
+  border-radius: 12px;
+  margin-top: 2px;
+  padding: 10px 12px 12px;
+}
+
+.jarvis-reader-highlight-content-frame .jarvis-reader-highlight-quote {
+  background: transparent;
+  border-radius: 0;
+  max-height: 96px;
+  padding: 0 0 10px;
+}
+
+.jarvis-reader-highlight-content-frame .jarvis-reader-highlight-quote + .jarvis-reader-highlight-subtabs {
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.jarvis-reader-highlight-content-frame .jarvis-reader-highlight-section {
+  border-bottom: 0 !important;
+  padding-bottom: 4px;
+}
