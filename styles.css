@@ -242,6 +242,30 @@
 .jarvis-reader-highlight-title:active {
   cursor: grabbing;
 }
+.jarvis-reader-highlight-title-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.jarvis-reader-highlight-title-action {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+}
+
+.jarvis-reader-highlight-comment-readonly {
+  background: color-mix(in srgb, var(--background-secondary) 58%, transparent);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 55%, transparent);
+  border-radius: 12px;
+  color: var(--text-normal);
+  flex: 1 1 auto;
+  font: 500 var(--font-ui-small) / 1.65 var(--font-text);
+  min-height: 84px;
+  overflow-y: auto;
+  padding: 12px 13px;
+  word-break: break-word;
+}
 
 .jarvis-reader-highlight-quote {
   background: color-mix(in srgb, var(--background-secondary) 78%, transparent);
@@ -4502,3 +4526,352 @@ g.jarvis-reader-highlight-with-comment line {
   overflow-y: auto;
 }
 
+
+.jarvis-reader-highlight-title-row {
+  cursor: grab;
+  flex: 0 0 auto;
+  min-height: 28px;
+  user-select: none;
+}
+
+.jarvis-reader-highlight-title-row:active {
+  cursor: grabbing;
+}
+
+.jarvis-reader-highlight-header-actions {
+  align-items: center;
+  cursor: default;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.jarvis-reader-highlight-icon-button {
+  align-items: center;
+  appearance: none !important;
+  background: var(--background-secondary) !important;
+  border: 1px solid var(--background-modifier-border) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  color: var(--text-normal);
+  cursor: pointer;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  padding: 0 !important;
+  width: 28px;
+}
+
+.jarvis-reader-highlight-icon-button:hover {
+  background: var(--interactive-hover) !important;
+  transform: translateY(-1px);
+}
+
+.jarvis-reader-highlight-icon-button svg,
+.jarvis-reader-highlight-subtab svg {
+  display: block;
+  height: 15px;
+  width: 15px;
+}
+
+.jarvis-reader-highlight-section {
+  background: color-mix(in srgb, var(--background-secondary) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 58%, transparent);
+  border-radius: 13px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
+}
+
+.jarvis-reader-highlight-subtabs {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.jarvis-reader-highlight-subtab {
+  align-items: center;
+  appearance: none !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: 700 var(--font-ui-small) / 1 var(--font-interface);
+  gap: 6px;
+  padding: 7px 12px !important;
+}
+
+.jarvis-reader-highlight-subtab:hover {
+  background: var(--background-modifier-hover) !important;
+  color: var(--text-normal);
+}
+
+.jarvis-reader-highlight-subtab.is-active {
+  background: var(--background-primary) !important;
+  border-color: var(--background-modifier-border) !important;
+  color: var(--text-normal);
+}
+
+.jarvis-reader-highlight-note-list,
+.jarvis-reader-highlight-ai-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.jarvis-reader-highlight-note-list.is-compact {
+  flex: 0 0 auto;
+  max-height: 112px;
+  overflow: auto;
+}
+
+.jarvis-reader-highlight-note-card {
+  background: var(--background-primary);
+  border: 1px dashed color-mix(in srgb, var(--text-muted) 48%, transparent);
+  border-radius: 10px;
+  color: var(--text-normal);
+  padding: 10px 11px 8px;
+}
+
+.jarvis-reader-highlight-note-card-text,
+.jarvis-reader-highlight-ai-text {
+  font: 500 var(--font-ui-small) / 1.65 var(--font-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.jarvis-reader-highlight-note-card-time {
+  color: var(--text-faint);
+  font: 600 var(--font-ui-smaller) / 1.2 var(--font-interface);
+  margin-top: 8px;
+  text-align: right;
+}
+
+.jarvis-reader-highlight-ai-section {
+  background: var(--background-primary);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  border-radius: 10px;
+  padding: 10px 11px;
+}
+
+.jarvis-reader-highlight-ai-title {
+  color: var(--text-normal);
+  font: 800 var(--font-ui-small) / 1.25 var(--font-interface);
+  margin-bottom: 7px;
+}
+
+.jarvis-reader-highlight-ai-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.jarvis-reader-highlight-ai-link {
+  appearance: none !important;
+  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 24%, transparent) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  color: var(--text-accent);
+  cursor: pointer;
+  font: 600 var(--font-ui-smaller) / 1 var(--font-interface);
+  padding: 5px 9px !important;
+}
+
+.jarvis-reader-highlight-empty {
+  align-items: center;
+  color: var(--text-faint);
+  display: flex;
+  font: 600 var(--font-ui-small) / 1.4 var(--font-interface);
+  justify-content: center;
+  min-height: 90px;
+  text-align: center;
+}
+/* Stronger separation for the note reading area. */
+.jarvis-reader-highlight-popover .jarvis-reader-highlight-quote + .jarvis-reader-highlight-subtabs {
+  border-top: 1px solid color-mix(in srgb, var(--background-modifier-border) 86%, var(--text-muted));
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.jarvis-reader-highlight-section {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--background-primary) 94%, var(--background-secondary)) 0%,
+    color-mix(in srgb, var(--background-secondary) 52%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 82%, var(--text-muted));
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    0 -1px 0 color-mix(in srgb, var(--background-modifier-border) 70%, transparent),
+    0 1px 0 color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+  margin-top: 2px;
+  padding: 12px;
+}
+
+.jarvis-reader-highlight-section::before {
+  background: color-mix(in srgb, var(--background-modifier-border) 76%, transparent);
+  content: "";
+  display: block;
+  height: 1px;
+  margin: -3px 0 10px;
+}
+
+.jarvis-reader-highlight-note-card {
+  border-color: color-mix(in srgb, var(--text-muted) 58%, transparent);
+}
+
+.jarvis-reader-highlight-note-card-time {
+  color: color-mix(in srgb, var(--text-muted) 88%, var(--text-normal));
+  font: 400 12px / 1.35 var(--font-interface);
+  letter-spacing: 0.01em;
+}
+/* Align highlight note window actions with word-card action buttons. */
+.jarvis-reader-highlight-header-actions {
+  gap: 4px;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.jarvis-reader-highlight-icon-button {
+  align-items: center;
+  appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: var(--radius-s) !important;
+  box-shadow: none !important;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 14px;
+  height: 22px;
+  justify-content: center;
+  margin: 0;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0 !important;
+  width: 22px;
+}
+
+.jarvis-reader-highlight-icon-button:hover {
+  background: var(--background-modifier-hover) !important;
+  color: var(--text-normal);
+  transform: scale(1.12);
+  transition: transform 100ms ease, background 120ms ease, color 120ms ease;
+}
+
+.jarvis-reader-highlight-icon-button:focus,
+.jarvis-reader-highlight-icon-button:focus-visible,
+.jarvis-reader-highlight-icon-button:active {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: var(--radius-s) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 28%, transparent) !important;
+  outline: none;
+}
+
+.jarvis-reader-highlight-icon-button .jarvis-reader-word-card-action-icon,
+.jarvis-reader-highlight-icon-button .jarvis-reader-word-card-action-icon svg {
+  display: block;
+  height: 15px;
+  width: 15px;
+}
+/* Obsidian-native simplification for highlight note window. */
+.jarvis-reader-highlight-popover .jarvis-reader-highlight-quote + .jarvis-reader-highlight-subtabs {
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+.jarvis-reader-highlight-subtabs {
+  gap: 4px;
+  padding-top: 0;
+}
+
+.jarvis-reader-highlight-subtab {
+  border: 0 !important;
+  border-radius: var(--radius-s) !important;
+  color: var(--text-muted);
+  font: 600 var(--font-ui-small) / 1 var(--font-interface);
+  gap: 6px;
+  padding: 5px 8px !important;
+}
+
+.jarvis-reader-highlight-subtab:hover {
+  background: var(--background-modifier-hover) !important;
+  color: var(--text-normal);
+}
+
+.jarvis-reader-highlight-subtab.is-active {
+  background: var(--background-modifier-hover) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--text-normal);
+}
+
+.jarvis-reader-highlight-section {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--background-modifier-border);
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-top: 4px;
+  padding: 8px 0 12px;
+}
+
+.jarvis-reader-highlight-section::before {
+  display: none !important;
+}
+
+.jarvis-reader-highlight-note-list,
+.jarvis-reader-highlight-ai-list {
+  gap: 6px;
+}
+
+.jarvis-reader-highlight-note-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-left: 2px solid var(--background-modifier-border-hover) !important;
+  border-radius: 0 !important;
+  padding: 8px 10px 7px 12px !important;
+}
+
+.jarvis-reader-highlight-note-card-text,
+.jarvis-reader-highlight-ai-text {
+  font: 400 var(--font-ui-small) / 1.65 var(--font-text);
+}
+
+.jarvis-reader-highlight-note-card-time {
+  color: var(--text-muted);
+  font: 400 var(--font-ui-smaller) / 1.3 var(--font-interface);
+  letter-spacing: 0;
+  margin-top: 6px;
+  opacity: 0.9;
+  text-align: right;
+}
+
+.jarvis-reader-highlight-ai-section {
+  background: transparent !important;
+  border: 0 !important;
+  border-left: 2px solid var(--background-modifier-border-hover) !important;
+  border-radius: 0 !important;
+  padding: 8px 10px 7px 12px !important;
+}
+
+.jarvis-reader-highlight-ai-title {
+  color: var(--text-muted);
+  font: 600 var(--font-ui-small) / 1.25 var(--font-interface);
+  margin-bottom: 6px;
+}
+
+.jarvis-reader-highlight-empty {
+  color: var(--text-faint);
+  min-height: 54px;
+}

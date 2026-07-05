@@ -164,6 +164,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const [highlightList, setHighlightList] = useState<any[]>(highlights || []);
   const [pendingSelection, setPendingSelection] = useState<any>(null);
   const [highlightComment, setHighlightComment] = useState<any>("");
+  const [highlightCommentMode, setHighlightCommentMode] = useState<any>("edit");
+  const [highlightContentTab, setHighlightContentTab] = useState<any>("notes");
   const [currentWordAssets, setCurrentWordAssets] = useState<any>(wordAssets || {});
   const [pendingWordSelection, setPendingWordSelection] = useState<any>(null);
   const [wordLookupState, setWordLookupState] = useState<any>({ status: "idle", result: null, error: "", savedLemma: "" });
@@ -358,6 +360,9 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const beginHighlightPopoverMove = (event) => {
     if (event.button != null && event.button !== 0)
       return;
+    const interactiveTarget = event.target && typeof event.target.closest === "function" ? event.target.closest("button, textarea, input, .cm-editor") : null;
+    if (interactiveTarget)
+      return;
     event.preventDefault();
     const target = event.currentTarget;
     target.setPointerCapture(event.pointerId);
@@ -454,6 +459,101 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     };
     window.setTimeout(run, 80);
   };
+  const clearHighlightCommentBubbles = (rendition) => {
+    try {
+      const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : typeof rendition?.views === "function" ? rendition.views() || [] : [];
+      for (const view of views) {
+        const doc = view?.contents?.document;
+        if (!doc)
+          continue;
+        doc.querySelectorAll(".jarvis-reader-highlight-comment-bubble").forEach((node) => node.remove());
+      }
+    } catch (error) {
+      console.warn("Jarvis Reader comment bubble cleanup failed.", error);
+    }
+  };
+  const getHighlightRangeInView = (view, cfiRange) => {
+    try {
+      const contents2 = view?.contents;
+      if (contents2 && typeof contents2.range === "function") {
+        return contents2.range(cfiRange);
+      }
+      if (contents2 && typeof contents2.getRange === "function") {
+        return contents2.getRange(cfiRange);
+      }
+      if (view && typeof view.range === "function") {
+        return view.range(cfiRange);
+      }
+    } catch (error) {
+    }
+    return null;
+  };
+  const renderHighlightCommentBubbles = (rendition) => {
+    try {
+      const visibleHighlights = (highlightListRef.current || []).filter((highlight) => highlight?.cfiRange && (highlight.comment || "").trim());
+      const views = rendition && rendition.manager && typeof rendition.manager.visible === "function" ? rendition.manager.visible() || [] : typeof rendition?.views === "function" ? rendition.views() || [] : [];
+      for (const view of views) {
+        const contents2 = view?.contents;
+        const doc = contents2?.document;
+        const win = contents2?.window || doc?.defaultView;
+        if (!doc || !doc.body || !win)
+          continue;
+        doc.querySelectorAll(".jarvis-reader-highlight-comment-bubble").forEach((node) => node.remove());
+        for (const highlight of visibleHighlights) {
+          const range = getHighlightRangeInView(view, highlight.cfiRange);
+          if (!range || typeof range.getClientRects !== "function")
+            continue;
+          const rects = Array.from(range.getClientRects()).filter((rect: any) => rect && (rect.width || rect.height));
+          const rect: any = rects.length ? rects[rects.length - 1] : range.getBoundingClientRect && range.getBoundingClientRect();
+          if (!rect || (!rect.width && !rect.height))
+            continue;
+          const bubble = doc.createElement("button");
+          bubble.className = "jarvis-reader-highlight-comment-bubble";
+          bubble.type = "button";
+          bubble.title = "打开笔记";
+          bubble.setAttribute("aria-label", "打开笔记");
+          bubble.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>';
+          bubble.style.position = "absolute";
+          bubble.style.left = `${Math.max(0, rect.right + win.scrollX - 4)}px`;
+          bubble.style.top = `${Math.max(0, rect.bottom + win.scrollY - 10)}px`;
+          bubble.style.width = "18px";
+          bubble.style.height = "18px";
+          bubble.style.padding = "2px";
+          bubble.style.border = "1px solid rgba(249, 115, 22, 0.72)";
+          bubble.style.borderRadius = "999px";
+          bubble.style.background = "rgba(255, 251, 235, 0.96)";
+          bubble.style.color = "#c2410c";
+          bubble.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.14)";
+          bubble.style.cursor = "pointer";
+          bubble.style.zIndex = "2147483647";
+          bubble.style.display = "flex";
+          bubble.style.alignItems = "center";
+          bubble.style.justifyContent = "center";
+          bubble.style.pointerEvents = "auto";
+          bubble.style.lineHeight = "1";
+          const svg = bubble.querySelector("svg");
+          if (svg) {
+            svg.setAttribute("fill", "none");
+            svg.setAttribute("stroke", "currentColor");
+            svg.setAttribute("stroke-width", "2");
+            svg.setAttribute("stroke-linecap", "round");
+            svg.setAttribute("stroke-linejoin", "round");
+            svg.setAttribute("width", "12");
+            svg.setAttribute("height", "12");
+          }
+          bubble.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
+            openHighlightCommentEditor(liveHighlight);
+          });
+          doc.body.appendChild(bubble);
+        }
+      }
+    } catch (error) {
+      console.warn("Jarvis Reader comment bubble render failed.", error);
+    }
+  };
   const refreshHighlightPanes = (rendition) => {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
@@ -465,6 +565,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
               view.pane.render();
             }
           }
+          renderHighlightCommentBubbles(rendition);
         } catch (error) {
           console.warn("Jarvis Reader highlight refresh failed.", error);
         }
@@ -477,6 +578,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     try {
       rendition.annotations?.remove(cfiRange, "highlight");
       rendition.annotations?.remove(cfiRange, "underline");
+      clearHighlightCommentBubbles(rendition);
       const views = typeof rendition.views === "function" ? rendition.views() || [] : [];
       for (const view of views) {
         const pane = view?.pane;
@@ -511,7 +613,6 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
         const liveHighlight = (highlightListRef.current || []).find((item) => item.id === highlight.id || item.cfiRange === highlight.cfiRange) || highlight;
         selectHighlight(liveHighlight);
         if ((liveHighlight.comment || "").trim()) {
-          openHighlightCommentEditor(liveHighlight);
           return;
         }
         setPendingSelection(null);
@@ -1680,6 +1781,7 @@ const showWordHoverCard = (asset, element) => {
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
+    setHighlightCommentMode("edit");
     clearWordLookup();
   };
   const copyHighlightQuote = async (item) => {
@@ -1706,7 +1808,8 @@ const showWordHoverCard = (asset, element) => {
       ...item,
       chapterTitle: item.chapterTitle || readerTitleRef.current
     });
-    setHighlightComment(item.comment || "");
+    setHighlightComment("");
+    setHighlightCommentMode(item.id && (item.comment || "").trim() ? "view" : "edit");
     setWikiSuggest(null);
     setWikiEditRange(null);
   };
@@ -1737,20 +1840,37 @@ const showWordHoverCard = (asset, element) => {
     if (!pendingSelection)
       return;
     setWikiSuggest(null);
+    const nextComment = highlightComment.trim();
     if (pendingSelection.id) {
+      if (!nextComment) {
+        if (highlightCommentMode === "append") {
+          setHighlightCommentMode("view");
+          return;
+        }
+        clearHighlightUi();
+        return;
+      }
       const updated = await updateHighlight({
         ...pendingSelection,
-        comment: highlightComment.trim()
+        comment: nextComment,
+        appendComment: true
       });
       if (updated) {
         removeHighlightMark(renditionRef.current, pendingSelection);
         applyHighlight(renditionRef.current, updated);
         setHighlightList((current) => current.map((item) => item.id === updated.id ? updated : item));
+        setPendingSelection({
+          ...updated,
+          chapterTitle: updated.chapterTitle || readerTitleRef.current
+        });
+        setHighlightComment("");
+        setHighlightCommentMode("view");
+        return;
       }
     } else {
       const created = await createHighlight({
         ...pendingSelection,
-        comment: highlightComment.trim()
+        comment: nextComment
       });
       if (created) {
         setHighlightList((current) => [...current.filter((item) => item.id !== created.id && item.cfiRange !== created.cfiRange), created]);
@@ -1765,6 +1885,87 @@ const showWordHoverCard = (asset, element) => {
     ...activeHighlightPopoverRect,
     height: Math.max(activeHighlightPopoverRect.height || 0, 480)
   }) : activeHighlightPopoverRect;
+  const isExistingHighlightComment = !!(pendingSelection && pendingSelection.id);
+  const isReadingHighlightComment = !!(isExistingHighlightComment && highlightCommentMode !== "append");
+  const isAppendingHighlightComment = !isExistingHighlightComment || highlightCommentMode === "append";
+  const highlightCommentPlaceholder = isExistingHighlightComment ? "写下新的笔记，保存后会追加到原块" : "写下你的笔记";
+  const formatHighlightNoteTime = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw)
+      return "\u672a\u8bb0\u5f55\u65f6\u95f4";
+    const normalized = raw.includes("T") ? raw : raw.replace(" ", "T");
+    const date = new Date(normalized);
+    if (!Number.isNaN(date.getTime())) {
+      const parts = new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(date).reduce((acc, part) => {
+        if (part.type !== "literal") {
+          acc[part.type] = part.value;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+      return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
+    }
+    return raw.replace("T", " ").replace(/\.\d+Z?$/, "").replace(/Z$/, "");
+  };
+  const getHighlightNoteEntries = (item) => {
+    const entries = Array.isArray(item?.commentEntries) ? item.commentEntries.filter((entry) => (entry?.text || "").trim()) : [];
+    if (entries.length)
+      return entries;
+    const fallback = String(item?.comment || "").trim();
+    if (!fallback)
+      return [];
+    return fallback.split(/\n{2,}/).map((text, index) => ({
+      label: index === 0 ? "\u7b14\u8bb0" : `\u7b14\u8bb0 ${index + 1}`,
+      created: item?.updated || item?.created || "",
+      text: text.trim()
+    })).filter((entry) => entry.text);
+  };
+  const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries(pendingSelection) : [];
+  const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
+  const renderHighlightNotes = () => highlightNoteEntries.length ? React.createElement("div", {
+    className: "jarvis-reader-highlight-note-list"
+  }, highlightNoteEntries.map((entry, index) => React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card",
+    key: `${entry.label || "note"}-${index}`
+  }, React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card-text"
+  }, entry.text), React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card-time"
+  }, formatHighlightNoteTime(entry.created))))) : React.createElement("div", {
+    className: "jarvis-reader-highlight-empty"
+  }, "\u6682\u65e0\u7b14\u8bb0");
+  const renderHighlightAiSections = () => highlightAiSections.length ? React.createElement("div", {
+    className: "jarvis-reader-highlight-ai-list"
+  }, highlightAiSections.map((section, index) => React.createElement("div", {
+    className: "jarvis-reader-highlight-ai-section",
+    key: `${section.title || "ai"}-${index}`
+  }, React.createElement("div", {
+    className: "jarvis-reader-highlight-ai-title"
+  }, section.title || "AI \u8f93\u51fa"), section.links && section.links.length ? React.createElement("div", {
+    className: "jarvis-reader-highlight-ai-links"
+  }, section.links.map((link, linkIndex) => React.createElement("button", {
+    className: "jarvis-reader-highlight-ai-link",
+    key: `${link}-${linkIndex}`,
+    type: "button",
+    onClick: () => openWikiLink(link)
+  }, `[[${link}]]`))) : null, section.text ? React.createElement("div", {
+    className: "jarvis-reader-highlight-ai-text"
+  }, section.text) : null))) : React.createElement("div", {
+    className: "jarvis-reader-highlight-empty"
+  }, "\u6682\u65e0 AI \u667a\u80fd\u4f53\u8f93\u51fa");
+  const openHighlightNoteBlock = () => {
+    if (!pendingSelection || !pendingSelection.notePath || typeof openWikiLink !== "function")
+      return;
+    const blockId = pendingSelection.blockId || pendingSelection.id || "";
+    openWikiLink(blockId ? `${pendingSelection.notePath}#^${blockId}` : pendingSelection.notePath);
+  };
   const activeWordPopoverRect = pendingWordSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
   const visibleWordPopoverRect = activeWordPopoverRect ? clampHighlightPopoverRect({
     ...activeWordPopoverRect,
@@ -2140,7 +2341,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-primary",
     type: "button",
     onClick: () => openHighlightCommentEditor(pendingHighlightMenu)
-  }, "写笔记"), pendingHighlightMenu.id ?  React.createElement("button", {
+  }, "笔记"), pendingHighlightMenu.id ?  React.createElement("button", {
     className: "jarvis-reader-highlight-menu-button jarvis-reader-highlight-menu-button-danger",
     type: "button",
     onClick: () => deleteExistingHighlight(pendingHighlightMenu)
@@ -2211,17 +2412,62 @@ const showWordHoverCard = (asset, element) => {
       height: visibleHighlightPopoverRect.height
     } : void 0
   },  React.createElement("div", {
-    className: "jarvis-reader-highlight-title",
+    className: "jarvis-reader-highlight-title-row",
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
-  }, "写笔记"),  React.createElement("div", {
+  },  React.createElement("div", {
+    className: "jarvis-reader-highlight-title"
+  }, "笔记"),  React.createElement("div", {
+    className: "jarvis-reader-highlight-header-actions",
+    onPointerDown: (event) => event.stopPropagation()
+  }, isExistingHighlightComment && pendingSelection.notePath ? React.createElement("button", {
+    className: "jarvis-reader-highlight-icon-button",
+    type: "button",
+    title: "\u6253\u5f00\u7b14\u8bb0",
+    onClick: openHighlightNoteBlock
+  }, renderObsidianIcon("pencil")) : null, isReadingHighlightComment ? React.createElement("button", {
+    className: "jarvis-reader-highlight-icon-button",
+    type: "button",
+    title: "\u8ffd\u52a0\u7b14\u8bb0",
+    onClick: () => {
+      setHighlightComment("");
+      setHighlightCommentMode("append");
+      setHighlightContentTab("notes");
+    }
+  }, renderObsidianIcon("file-pen-line")) : null, React.createElement("button", {
+    className: "jarvis-reader-highlight-icon-button",
+    type: "button",
+    title: "\u5173\u95ed",
+    onClick: clearHighlightUi
+  }, renderObsidianIcon("x")))),  React.createElement("div", {
     className: "jarvis-reader-highlight-quote"
-  }, pendingSelection.quote),  React.createElement(WikiLinkCodeMirrorEditor, {
+  }, pendingSelection.quote), isReadingHighlightComment ? React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "jarvis-reader-highlight-subtabs"
+  }, React.createElement("button", {
+    className: highlightContentTab === "notes" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
+    type: "button",
+    onClick: () => setHighlightContentTab("notes")
+  }, renderObsidianIcon("pencil"), "笔记"), React.createElement("button", {
+    className: highlightContentTab === "ai" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
+    type: "button",
+    onClick: () => setHighlightContentTab("ai")
+  }, renderObsidianIcon("bot"), "AI")), React.createElement("div", {
+    className: "jarvis-reader-highlight-section"
+  }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : React.createElement(React.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? React.createElement("div", {
+    className: "jarvis-reader-highlight-note-list is-compact"
+  }, highlightNoteEntries.map((entry, index) => React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card",
+    key: `${entry.label || "note"}-${index}`
+  }, React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card-text"
+  }, entry.text), React.createElement("div", {
+    className: "jarvis-reader-highlight-note-card-time"
+  }, formatHighlightNoteTime(entry.created))))) : null, React.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
     onChange: (value) => setHighlightComment(value),
     candidates: currentWikiLinkCandidates,
     onOpenLink: openWikiLink,
-    placeholder: "写下你的笔记与思考"
+    placeholder: highlightCommentPlaceholder
   }),  React.createElement("div", {
     className: "jarvis-reader-highlight-input-shell"
   },  React.createElement("div", {
@@ -2230,7 +2476,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-input",
     ref: highlightInputRef,
     value: highlightComment,
-    placeholder: "写下你的笔记与思考",
+    placeholder: highlightCommentPlaceholder,
     autoFocus: true,
     onChange: (event) => {
       const value = event.currentTarget.value;
@@ -2283,6 +2529,14 @@ const showWordHoverCard = (asset, element) => {
       }
       if (event.key === "Escape") {
         event.preventDefault();
+        if (isExistingHighlightComment) {
+          setHighlightComment("");
+          setHighlightCommentMode("view");
+          setHighlightContentTab("notes");
+          setWikiSuggest(null);
+          setWikiEditRange(null);
+          return;
+        }
         setPendingSelection(null);
         setHighlightComment("");
         setWikiSuggest(null);
@@ -2299,7 +2553,7 @@ const showWordHoverCard = (asset, element) => {
         updateWikiEditRange(event.currentTarget.value, event.currentTarget.selectionStart || 0);
       }
     }
-  })), wikiSuggest && wikiSuggest.items && wikiSuggest.items.length ?  React.createElement("div", {
+  }))), wikiSuggest && wikiSuggest.items && wikiSuggest.items.length ?  React.createElement("div", {
     className: "jarvis-reader-wikilink-suggest"
   }, wikiSuggest.items.map((item, index) =>  React.createElement("button", {
     key: `${item.path}-${index}`,
@@ -2313,20 +2567,28 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-wikilink-suggest-title"
   }, item.title),  React.createElement("span", {
     className: "jarvis-reader-wikilink-suggest-path"
-  }, item.path)))) : null,  React.createElement("div", {
+  }, item.path)))) : null, isReadingHighlightComment ? null : React.createElement("div", {
     className: "jarvis-reader-highlight-actions"
   },  React.createElement("button", {
     className: "jarvis-reader-highlight-button",
     onClick: () => {
+      if (isExistingHighlightComment) {
+        setHighlightComment("");
+        setHighlightCommentMode("view");
+        setHighlightContentTab("notes");
+        setWikiSuggest(null);
+        setWikiEditRange(null);
+        return;
+      }
       setPendingSelection(null);
       setHighlightComment("");
       setWikiSuggest(null);
       setWikiEditRange(null);
     }
-  }, "\u53d6\u6d88"),  React.createElement("button", {
+  }, "取消"),  React.createElement("button", {
     className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
     onClick: confirmHighlight
-  }, "\u4fdd\u5b58"),  React.createElement("div", {
+  }, isExistingHighlightComment ? "保存笔记" : "保存"),  React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"

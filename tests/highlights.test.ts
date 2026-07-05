@@ -40,7 +40,7 @@ test("formats highlight note blocks without leaking template placeholders", () =
 
   assert.match(block, /> \[!note\] Chapter 1/);
   assert.match(block, /> First line/);
-  assert.match(block, /> \*\*想法\*\*/);
+  assert.match(block, /> \*\*笔记\*\*/);
   assert.match(block, /\^ar-test$/);
   assert.doesNotMatch(block, /\{highlight\./);
 });

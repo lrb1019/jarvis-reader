@@ -5,7 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
 import { openOrCreateNote, getOrCreateBookNote } from "./book-notes";
-import { getEpubTocMd, createHighlightId, getHighlightsForBook, appendHighlightToBookNote, replaceHighlightInBookNote, deleteHighlightFromBookNote } from "./highlights";
+import { getEpubTocMd, createHighlightId, getHighlightsForBook, appendHighlightToBookNote, appendReflectionToBookNote, readHighlightNoteDetailsFromBookNote, replaceHighlightInBookNote, deleteHighlightFromBookNote } from "./highlights";
 import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
@@ -153,6 +153,29 @@ export class EpubView extends FileView {
     return getHighlightsForBook(this.plugin.settings, this.file!.path);
   }
 
+  async getBookHighlightsForReader(): Promise<BookHighlight[]> {
+    const list = this.getBookHighlights();
+    const enriched: BookHighlight[] = [];
+    for (const highlight of list) {
+      if (!highlight || !highlight.notePath || !highlight.blockId) {
+        enriched.push(highlight);
+        continue;
+      }
+      const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
+      if (!(noteFile instanceof TFile)) {
+        enriched.push(highlight);
+        continue;
+      }
+      try {
+        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, highlight);
+        enriched.push(details.comment || details.commentEntries.length || details.aiSections.length ? { ...highlight, comment: details.comment, commentEntries: details.commentEntries, aiSections: details.aiSections } as any : highlight);
+      } catch (error) {
+        console.warn("Jarvis Reader read highlight comments failed.", error);
+        enriched.push(highlight);
+      }
+    }
+    return enriched;
+  }
   renderHighlightsPane(): void {
     this.plugin.refreshReaderSidebar(this);
   }
@@ -213,14 +236,25 @@ export class EpubView extends FileView {
     const index = list.findIndex((item) => item.id === highlight.id);
     if (index < 0)
       return null;
-    const updated: BookHighlight = {
+    const updatedAt = new Date().toISOString();
+    const nextComment = (highlight.comment || "").trim();
+    const shouldAppendComment = !!highlight.appendComment && !!nextComment;
+    let updated: BookHighlight = {
       ...list[index],
-      comment: highlight.comment || "",
-      updated: new Date().toISOString(),
+      comment: shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
+      updated: updatedAt,
     };
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath!);
     if (noteFile instanceof TFile) {
-      await replaceHighlightInBookNote(this.app, noteFile, updated);
+      if (shouldAppendComment) {
+        await appendReflectionToBookNote(this.app, noteFile, updated, nextComment);
+        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, updated);
+        updated = { ...updated, comment: details.comment } as BookHighlight;
+        (updated as any).commentEntries = details.commentEntries;
+        (updated as any).aiSections = details.aiSections;
+      } else {
+        await replaceHighlightInBookNote(this.app, noteFile, updated);
+      }
     }
     this.plugin.settings.bookHighlights[this.file!.path] = list.map((item) => item.id === updated.id ? updated : item);
     await this.plugin.saveSettings();
@@ -517,7 +551,7 @@ export class EpubView extends FileView {
       saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { this.setBookProgress(relocated, chapterTitle, rendition); },
       tocMemo: (toc: any) => { this.fileToc = toc; this.plugin.refreshReaderSidebar(this); },
       createBookNote: () => { this.createBookNote(); },
-      highlights: this.getBookHighlights(),
+      highlights: await this.getBookHighlightsForReader(),
       createHighlight: (selection: any) => this.createHighlight(selection),
       updateHighlight: (highlight: any) => this.updateHighlight(highlight),
       deleteHighlight: (highlight: any) => this.deleteHighlight(highlight),

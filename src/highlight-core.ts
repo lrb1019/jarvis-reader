@@ -1,7 +1,7 @@
 import { formatLocalDateTime } from "./utils-core.ts";
 import type { BookHighlight } from "./types";
 
-function formatBlockquote(text: string): string {
+export function formatBlockquote(text: string): string {
   return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
 }
 
@@ -10,7 +10,9 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
   const quote = formatBlockquote(highlight.quote);
   const comment = (highlight.comment || "").trim();
   const commentBlock = comment ? `>
-> **\u60f3\u6cd5**
+> **\u7b14\u8bb0**
+> created: ${formatLocalDateTime(highlight.created)}
+>
 ${formatBlockquote(comment)}
 ` : ">";
   const timestamp = formatBlockquote(`**\u65f6\u95f4**\n${formatLocalDateTime(highlight.updated || highlight.created)}`);
