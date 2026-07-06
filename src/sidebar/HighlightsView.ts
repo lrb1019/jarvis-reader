@@ -34,7 +34,7 @@ export class JarvisReaderHighlightsView extends ItemView {
     return "Jarvis Reader 笔记";
   }
   getIcon() {
-    return "highlighter";
+    return "sticky-note";
   }
   setReader(reader) {
     this.reader = reader;

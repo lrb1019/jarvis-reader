@@ -244,6 +244,12 @@ export class EpubView extends FileView {
       comment: shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
       updated: updatedAt,
     };
+    if (highlight.aiSections !== undefined) {
+      (updated as any).aiSections = highlight.aiSections;
+    }
+    if (highlight.commentEntries !== undefined) {
+      (updated as any).commentEntries = highlight.commentEntries;
+    }
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath!);
     if (noteFile instanceof TFile) {
       if (shouldAppendComment) {

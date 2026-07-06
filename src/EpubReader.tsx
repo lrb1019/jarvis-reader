@@ -8,6 +8,7 @@ import { normalizeWordSelection, findWordAssetBySurface, getWordAssetSurfaceForm
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { findChapterTitle, getReaderProgressLabel, ensureReaderLocations, getReaderProgress } from "./progress";
 import { dedupeHighlightsByCfi } from "./highlight-core";
+import { formatLocalDateTime } from "./utils-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
 import { triggerClaudianPrompt, buildPromptFromTemplate } from "./claudianBridge";
@@ -208,7 +209,12 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const [pendingSelection, setPendingSelection] = useState<any>(null);
   const [highlightComment, setHighlightComment] = useState<any>("");
   const [highlightCommentMode, setHighlightCommentMode] = useState<any>("edit");
+  const [editingNoteIndex, setEditingNoteIndex] = useState<number | null>(null);
   const [highlightContentTab, setHighlightContentTab] = useState<any>("notes");
+  const [showAssocDropdown, setShowAssocDropdown] = useState<boolean>(false);
+  const [assocSearchQuery, setAssocSearchQuery] = useState<string>("");
+  const [activeFileContent, setActiveFileContent] = useState<string>("");
+  const [activeFileCachePath, setActiveFileCachePath] = useState<string>("");
   const [currentWordAssets, setCurrentWordAssets] = useState<any>(wordAssets || {});
   const [pendingWordSelection, setPendingWordSelection] = useState<any>(null);
   const [wordLookupState, setWordLookupState] = useState<any>({ status: "idle", result: null, error: "", savedLemma: "" });
@@ -1750,6 +1756,7 @@ const showWordHoverCard = (asset, element) => {
     setWikiSuggest(null);
     setWikiEditRange(null);
     setHighlightCommentMode("edit");
+    setEditingNoteIndex(null);
     clearWordLookup();
   };
 
@@ -1840,6 +1847,28 @@ const showWordHoverCard = (asset, element) => {
     }
     clearHighlightUi();
   };
+
+  const deleteNoteEntry = async (indexToDelete: number) => {
+    if (!pendingSelection) return;
+    const currentEntries = Array.isArray(pendingSelection.commentEntries) ? [...pendingSelection.commentEntries] : [];
+    const nextEntries = currentEntries.filter((_, idx) => idx !== indexToDelete);
+    
+    // If no comments left, do we delete the entire highlight? 
+    // Usually no, we just clear comments, leaving a plain highlight.
+    const updated = await updateHighlight({
+      ...pendingSelection,
+      commentEntries: nextEntries,
+      comment: nextEntries.map((e: any) => e.text).join("\n\n")
+    });
+    if (updated) {
+      setHighlightList((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setPendingSelection({
+        ...updated,
+        chapterTitle: updated.chapterTitle || readerTitleRef.current
+      });
+      new Notice("已删除该条笔记。");
+    }
+  };
   const confirmHighlight = async () => {
     if (!pendingSelection)
       return;
@@ -1847,18 +1876,35 @@ const showWordHoverCard = (asset, element) => {
     const nextComment = highlightComment.trim();
     if (pendingSelection.id) {
       if (!nextComment) {
-        if (highlightCommentMode === "append") {
+        if (highlightCommentMode === "append" || editingNoteIndex !== null) {
           setHighlightCommentMode("view");
+          setEditingNoteIndex(null);
           return;
         }
         clearHighlightUi();
         return;
       }
-      const updated = await updateHighlight({
-        ...pendingSelection,
-        comment: nextComment,
-        appendComment: true
-      });
+      let updated;
+      if (editingNoteIndex !== null) {
+        const currentEntries = Array.isArray(pendingSelection.commentEntries) ? [...pendingSelection.commentEntries] : [];
+        if (currentEntries[editingNoteIndex]) {
+          currentEntries[editingNoteIndex] = {
+            ...currentEntries[editingNoteIndex],
+            text: nextComment
+          };
+        }
+        updated = await updateHighlight({
+          ...pendingSelection,
+          commentEntries: currentEntries,
+          comment: currentEntries.map((e: any) => e.text).join("\n\n")
+        });
+      } else {
+        updated = await updateHighlight({
+          ...pendingSelection,
+          comment: nextComment,
+          appendComment: true
+        });
+      }
       if (updated) {
         removeHighlightMark(renditionRef.current, pendingSelection);
         applyHighlight(renditionRef.current, updated);
@@ -1869,6 +1915,7 @@ const showWordHoverCard = (asset, element) => {
         });
         setHighlightComment("");
         setHighlightCommentMode("view");
+        setEditingNoteIndex(null);
         return;
       }
     } else {
@@ -1890,8 +1937,8 @@ const showWordHoverCard = (asset, element) => {
     height: Math.max(activeHighlightPopoverRect.height || 0, 480)
   }) : activeHighlightPopoverRect;
   const isExistingHighlightComment = !!(pendingSelection && pendingSelection.id);
-  const isReadingHighlightComment = !!(isExistingHighlightComment && highlightCommentMode !== "append");
-  const isAppendingHighlightComment = !isExistingHighlightComment || highlightCommentMode === "append";
+  const isReadingHighlightComment = !!(isExistingHighlightComment && highlightCommentMode !== "append" && editingNoteIndex === null);
+  const isAppendingHighlightComment = !isExistingHighlightComment || highlightCommentMode === "append" || editingNoteIndex !== null;
   const highlightCommentPlaceholder = isExistingHighlightComment ? "写下新的笔记，保存后会追加到原块" : "写下你的笔记";
   const formatHighlightNoteTime = (value) => {
     const raw = String(value || "").trim();
@@ -1937,33 +1984,362 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-highlight-note-list"
   }, highlightNoteEntries.map((entry, index) => React.createElement("div", {
     className: "jarvis-reader-highlight-note-card",
-    key: `${entry.label || "note"}-${index}`
-  }, React.createElement("div", {
-    className: "jarvis-reader-highlight-note-card-text"
-  }, React.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })), React.createElement("div", {
-    className: "jarvis-reader-highlight-note-card-time"
-  }, formatHighlightNoteTime(entry.created))))) : React.createElement("div", {
+    key: `${entry.label || "note"}-${index}`,
+    style: { display: "flex", flexDirection: "column", gap: "4px" }
+  },
+    React.createElement("div", {
+      style: { display: "flex", alignItems: "center", justifyContent: "space-between" }
+    },
+      React.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "笔记"),
+      React.createElement("div", {
+        style: { display: "flex", gap: "6px" }
+      },
+        React.createElement("button", {
+          className: "jarvis-reader-highlight-icon-button",
+          type: "button",
+          title: "编辑笔记",
+          onClick: () => {
+            setEditingNoteIndex(index);
+            setHighlightComment(entry.text);
+            setHighlightCommentMode("edit");
+          }
+        }, renderObsidianIcon("pencil")),
+        React.createElement("button", {
+          className: "jarvis-reader-highlight-icon-button",
+          type: "button",
+          title: "删除笔记",
+          onClick: () => {
+            if (confirm("确定要删除这条笔记吗？")) {
+              deleteNoteEntry(index);
+            }
+          }
+        }, renderObsidianIcon("trash-2"))
+      )
+    ),
+    React.createElement("div", {
+      className: "jarvis-reader-highlight-note-card-text",
+      style: { marginTop: "2px" }
+    }, React.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
+    React.createElement("div", {
+      className: "jarvis-reader-highlight-note-card-time",
+      style: { marginTop: "2px" }
+    }, formatHighlightNoteTime(entry.created))
+  ))) : React.createElement("div", {
     className: "jarvis-reader-highlight-empty"
   }, "\u6682\u65e0\u7b14\u8bb0");
-  const renderHighlightAiSections = () => highlightAiSections.length ? React.createElement("div", {
-    className: "jarvis-reader-highlight-ai-list"
-  }, highlightAiSections.map((section, index) => React.createElement("div", {
-    className: "jarvis-reader-highlight-ai-section",
-    key: `${section.title || "ai"}-${index}`
-  }, React.createElement("div", {
-    className: "jarvis-reader-highlight-ai-title"
-  }, section.title || "AI \u8f93\u51fa"), section.links && section.links.length ? React.createElement("div", {
-    className: "jarvis-reader-highlight-ai-links"
-  }, section.links.map((link, linkIndex) => React.createElement("button", {
-    className: "jarvis-reader-highlight-ai-link",
-    key: `${link}-${linkIndex}`,
-    type: "button",
-    onClick: () => openWikiLink(link)
-  }, `[[${link}]]`))) : null, section.text ? React.createElement("div", {
-    className: "jarvis-reader-highlight-ai-text"
-  }, section.text) : null))) : React.createElement("div", {
-    className: "jarvis-reader-highlight-empty"
-  }, "\u6682\u65e0 AI \u667a\u80fd\u4f53\u8f93\u51fa");
+  const addAssociatedLink = async (fileName: string) => {
+    if (!pendingSelection) return;
+    const currentSections = Array.isArray(pendingSelection.aiSections)
+      ? [...pendingSelection.aiSections.map((s: any) => ({ ...s, links: s.links ? [...s.links] : [] }))]
+      : [];
+    let assocSec = currentSections.find((s: any) => s.title === "关联文章");
+    if (!assocSec) {
+      assocSec = { title: "关联文章", text: "", links: [] };
+      currentSections.push(assocSec);
+    }
+    const currentLinks = assocSec.links || [];
+    const linkNames = currentLinks.map((l: string) => l.split("|")[0]);
+    if (linkNames.includes(fileName)) {
+      new Notice("已经关联了该文件。");
+      return;
+    }
+    const nowStr = formatLocalDateTime(new Date());
+    assocSec.links = [...currentLinks, `${fileName}|${nowStr}`];
+    
+    const updated = await updateHighlight({
+      ...pendingSelection,
+      aiSections: currentSections
+    });
+    if (updated) {
+      setHighlightList((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setPendingSelection({
+        ...updated,
+        chapterTitle: updated.chapterTitle || readerTitleRef.current
+      });
+      new Notice("已关联文章。");
+    }
+    setShowAssocDropdown(false);
+  };
+
+  const removeAssociatedLink = async (fileName: string) => {
+    if (!pendingSelection) return;
+    const currentSections = Array.isArray(pendingSelection.aiSections)
+      ? pendingSelection.aiSections.map((s: any) => ({ ...s, links: s.links ? [...s.links] : [] }))
+      : [];
+    let assocSec = currentSections.find((s: any) => s.title === "关联文章");
+    if (!assocSec || !assocSec.links) return;
+    
+    assocSec.links = assocSec.links.filter((l: string) => l.split("|")[0] !== fileName);
+    
+    const updated = await updateHighlight({
+      ...pendingSelection,
+      aiSections: currentSections
+    });
+    if (updated) {
+      setHighlightList((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setPendingSelection({
+        ...updated,
+        chapterTitle: updated.chapterTitle || readerTitleRef.current
+      });
+      new Notice("已取消关联。");
+    }
+  };
+
+  const renderHighlightAiSections = () => {
+    const currentSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections : [];
+    const assocSec = currentSections.find((s: any) => s.title === "关联文章");
+    const assocLinks = assocSec ? [...new Set(assocSec.links || [])] : [];
+
+    const recentFiles: string[] = [];
+    if (app && app.workspace) {
+      const paths = app.workspace.getLastOpenFiles() || [];
+      paths.forEach((p: string) => {
+        if (p.endsWith(".md")) {
+          const name = p.split("/").pop()?.replace(/\.md$/, "") || "";
+          if (name && !recentFiles.includes(name)) {
+            recentFiles.push(name);
+          }
+        }
+      });
+    }
+    const displayRecent = recentFiles.slice(0, 15);
+
+    interface SuggestionItem {
+      displayName: string;
+      subtext?: string;
+      insertValue: string;
+      icon: string;
+    }
+
+    let suggestions: SuggestionItem[] = [];
+
+    if (app && app.vault) {
+      const allFiles = app.vault.getFiles() || [];
+      const query = assocSearchQuery.trim();
+
+      const hashIdx = query.indexOf("#");
+      const caretIdx = query.indexOf("^");
+
+      const getFileDisplayName = (f: any) => f.extension === "md" ? f.basename : f.name;
+
+      if (hashIdx !== -1) {
+        const filePart = query.substring(0, hashIdx).toLowerCase();
+        const searchPart = query.substring(hashIdx + 1).toLowerCase();
+        const targetFile = allFiles.find(f => {
+          const name = getFileDisplayName(f);
+          return name.toLowerCase() === filePart || (filePart === "" && f.path === activeFileCachePath);
+        });
+
+        if (targetFile && targetFile.extension === "md") {
+          const cache = app.metadataCache.getFileCache(targetFile);
+          const headings = cache?.headings || [];
+          suggestions = headings
+            .filter(h => h.heading.toLowerCase().includes(searchPart))
+            .map(h => ({
+              displayName: h.heading,
+              subtext: `H${h.level}`,
+              insertValue: `${targetFile.basename}#${h.heading}`,
+              icon: "hash"
+            }))
+            .slice(0, 50);
+        }
+      } else if (caretIdx !== -1) {
+        const filePart = query.substring(0, caretIdx).toLowerCase();
+        const searchPart = query.substring(caretIdx + 1).toLowerCase();
+        const targetFile = allFiles.find(f => {
+          const name = getFileDisplayName(f);
+          return name.toLowerCase() === filePart || (filePart === "" && f.path === activeFileCachePath);
+        });
+
+        if (targetFile && targetFile.extension === "md") {
+          if (targetFile.path !== activeFileCachePath) {
+            setActiveFileCachePath(targetFile.path);
+            app.vault.read(targetFile).then(content => {
+              setActiveFileContent(content);
+            });
+          }
+
+          const cache = app.metadataCache.getFileCache(targetFile);
+          const blocks = cache?.blocks || {};
+          const lines = activeFileContent ? activeFileContent.split(/\r?\n/) : [];
+
+          suggestions = Object.entries(blocks)
+            .map(([id, blockInfo]) => {
+              const startLine = (blockInfo as any).position?.start?.line;
+              const lineText = lines[startLine] || "";
+              const cleanText = lineText.replace(/\s*\^[a-zA-Z0-9-]+$/, "").trim();
+              return {
+                id,
+                text: cleanText || `块 ID: ${id}`
+              };
+            })
+            .filter(b => b.text.toLowerCase().includes(searchPart) || b.id.toLowerCase().includes(searchPart))
+            .map(b => ({
+              displayName: b.text,
+              subtext: `^${b.id}`,
+              insertValue: `${targetFile.basename}#^${b.id}`,
+              icon: "align-left"
+            }))
+            .slice(0, 50);
+        }
+      } else {
+        if (query) {
+          suggestions = allFiles
+            .filter(f => getFileDisplayName(f).toLowerCase().includes(query.toLowerCase()))
+            .map(f => ({
+              displayName: getFileDisplayName(f),
+              subtext: f.parent?.path && f.parent.path !== "/" ? f.parent.path + "/" : "",
+              insertValue: getFileDisplayName(f),
+              icon: f.extension === "md" ? "file-text" : "file"
+            }))
+            .slice(0, 50);
+        } else {
+          const recentSet = new Set(recentFiles);
+          const recentItems = recentFiles
+            .map(name => allFiles.find(f => getFileDisplayName(f) === name))
+            .filter(Boolean) as any[];
+          
+          const otherItems = allFiles.filter(f => !recentSet.has(getFileDisplayName(f)));
+          
+          suggestions = [...recentItems, ...otherItems]
+            .map(f => ({
+              displayName: getFileDisplayName(f),
+              subtext: f.parent?.path && f.parent.path !== "/" ? f.parent.path + "/" : "",
+              insertValue: getFileDisplayName(f),
+              icon: f.extension === "md" ? "file-text" : "file"
+            }))
+            .slice(0, 50);
+        }
+        
+        if (suggestions.length === 1 && suggestions[0].icon === "file-text") {
+          const matchedFile = allFiles.find(f => f.basename === suggestions[0].displayName);
+          if (matchedFile && matchedFile.path !== activeFileCachePath) {
+            setActiveFileCachePath(matchedFile.path);
+            app.vault.read(matchedFile).then(content => {
+              setActiveFileContent(content);
+            });
+          }
+        }
+      }
+    }
+
+    return React.createElement("div", {
+      className: "jarvis-reader-highlight-ai-list",
+      style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }
+    }, 
+      React.createElement("div", {
+        style: { flex: "0 0 auto", position: "relative", zIndex: 10008, width: "80%", maxWidth: "360px", margin: "0 auto 12px auto" }
+      },
+        React.createElement("input", {
+          className: "jarvis-reader-assoc-search-input",
+          type: "text",
+          placeholder: "搜索并关联文章...",
+          value: assocSearchQuery,
+          onChange: (e) => {
+            setAssocSearchQuery(e.target.value);
+            setShowAssocDropdown(true);
+          },
+          onFocus: () => setShowAssocDropdown(true),
+          onBlur: () => setShowAssocDropdown(false),
+          style: {
+            width: "100%",
+            padding: "6px 12px",
+            background: "var(--background-modifier-form-field)",
+            border: "1px solid var(--background-modifier-border)",
+            borderRadius: "6px",
+            color: "var(--text-normal)",
+            fontSize: "13px"
+          }
+        }),
+        showAssocDropdown ? React.createElement("div", {
+          className: "jarvis-reader-highlight-menu jarvis-reader-assoc-recent-menu",
+          style: { position: "absolute", left: 0, right: 0, top: "34px", zIndex: 10008, maxHeight: "250px", overflowY: "auto", display: "flex", flexDirection: "column", background: "var(--background-primary)", border: "1px solid var(--background-modifier-border)", borderRadius: "6px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", padding: 0 },
+          onMouseDown: (e) => e.preventDefault()
+        },
+          React.createElement("div", { style: { flex: "1 1 auto", overflowY: "auto", padding: "6px" } },
+            suggestions.length > 0 ? suggestions.map(item =>
+              React.createElement("div", {
+                key: item.insertValue,
+                className: "jarvis-reader-assoc-suggest-item",
+                role: "button",
+                onClick: () => {
+                  addAssociatedLink(item.insertValue);
+                  setAssocSearchQuery("");
+                  setShowAssocDropdown(false);
+                },
+                style: { display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "6px 12px", gap: "2px" }
+              },
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", width: "100%" } },
+                  renderObsidianIcon(item.icon),
+                  React.createElement("span", { style: { fontWeight: "500", fontSize: "13px", color: "var(--text-normal)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, item.displayName)
+                ),
+                item.subtext ? React.createElement("span", { style: { fontSize: "11px", color: "var(--text-muted)", paddingLeft: "20px" } }, item.subtext) : null
+              )
+            ) : React.createElement("div", { className: "jarvis-reader-context-menu-item-disabled", style: { padding: "6px 12px", color: "var(--text-muted)", fontSize: "12px" } }, "未找到匹配内容")
+          ),
+          React.createElement("div", {
+            className: "jarvis-reader-assoc-dropdown-footer",
+            style: {
+              padding: "6px 12px",
+              borderTop: "1px solid var(--background-modifier-border)",
+              color: "var(--text-muted)",
+              fontSize: "11px",
+              textAlign: "center",
+              background: "var(--background-secondary)",
+              borderBottomLeftRadius: "6px",
+              borderBottomRightRadius: "6px",
+              flex: "0 0 auto"
+            }
+          }, "输入 # 可以链接到标题   输入 ^ 链接文本块   输入 | 指定显示的文本")
+        ) : null
+      ),
+      React.createElement("div", {
+        className: "jarvis-reader-highlight-ai-section",
+        style: { flex: "1 1 auto", overflowY: "auto", minHeight: 0 }
+      },
+        assocLinks.length > 0 ? React.createElement("div", {
+          className: "jarvis-reader-highlight-note-list is-compact",
+          style: { display: "flex", flexDirection: "column", gap: "8px" }
+        }, assocLinks.map((link: string, linkIndex: number) => {
+          const [linkPath, linkTime] = link.split("|");
+          let displayText = linkPath;
+          if (linkPath.includes("#^")) {
+            const parts = linkPath.split("#^");
+            displayText = `${parts[0]} > ^${parts[1]}`;
+          } else if (linkPath.includes("#")) {
+            const parts = linkPath.split("#");
+            displayText = `${parts[0]} > ${parts[1]}`;
+          }
+          return React.createElement("div", {
+            className: "jarvis-reader-highlight-note-card is-assoc",
+            key: `${linkPath}-${linkIndex}`,
+            style: { display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", height: "28px", minHeight: "28px" }
+          },
+            React.createElement("span", { style: { color: "var(--text-muted)", fontSize: "14px", display: "inline-flex", alignItems: "center", userSelect: "none" } }, "•"),
+            React.createElement("a", {
+              className: "internal-link",
+              style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+              onClick: () => openWikiLink(linkPath)
+            }, displayText),
+            linkTime ? React.createElement("span", {
+              className: "jarvis-reader-highlight-note-card-time",
+              style: { margin: "0 12px 0 auto", fontSize: "11px", color: "var(--text-muted)", opacity: 0.8, flexShrink: 0 }
+            }, formatHighlightNoteTime(linkTime)) : null,
+            React.createElement("button", {
+              className: "jarvis-reader-highlight-icon-button",
+              type: "button",
+              title: "取消关联",
+              onClick: () => removeAssociatedLink(linkPath),
+              style: { flexShrink: 0 }
+            }, renderObsidianIcon("trash-2"))
+          );
+        })) : React.createElement("div", {
+          className: "jarvis-reader-highlight-empty",
+          style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "13px" }
+        }, "暂无关联文章")
+      )
+    );
+  };
   const openHighlightNoteBlock = () => {
     if (!pendingSelection || !pendingSelection.notePath || typeof openWikiLink !== "function")
       return;
@@ -2043,7 +2419,7 @@ const showWordHoverCard = (asset, element) => {
     title: "\u521b\u5efa\u6216\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
     "aria-label": "\u521b\u5efa\u6216\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
     onClick: createBookNote,
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>' }
+    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>' }
   }),  React.createElement("button", {
     className: "jarvis-reader-side-button",
     title: "\u653e\u5927",
@@ -2518,7 +2894,7 @@ const showWordHoverCard = (asset, element) => {
     type: "button",
     title: "\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
     onClick: openHighlightNoteBlock
-  }, renderObsidianIcon("pencil")) : null, isReadingHighlightComment ? React.createElement("button", {
+  }, renderObsidianIcon("file-text")) : null, isReadingHighlightComment ? React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
     title: "\u8ffd\u52a0\u7b14\u8bb0",
@@ -2552,11 +2928,11 @@ const showWordHoverCard = (asset, element) => {
     className: highlightContentTab === "notes" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("notes")
-  }, renderObsidianIcon("pencil"), "笔记"), React.createElement("button", {
+  }, renderObsidianIcon("sticky-note"), "笔记"), React.createElement("button", {
     className: highlightContentTab === "ai" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("ai")
-  }, renderObsidianIcon("bot"), "AI")), React.createElement("div", {
+  }, renderObsidianIcon("link"), "关联")), React.createElement("div", {
     className: "jarvis-reader-highlight-section"
   }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : React.createElement(React.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? React.createElement("div", {
     className: "jarvis-reader-highlight-note-list is-compact"
@@ -2680,6 +3056,7 @@ const showWordHoverCard = (asset, element) => {
       if (isExistingHighlightComment) {
         setHighlightComment("");
         setHighlightCommentMode("view");
+        setEditingNoteIndex(null);
         setHighlightContentTab("notes");
         setWikiSuggest(null);
         setWikiEditRange(null);
@@ -2693,11 +3070,11 @@ const showWordHoverCard = (asset, element) => {
   }, "取消"),  React.createElement("button", {
     className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
     onClick: confirmHighlight
-  }, isExistingHighlightComment ? "保存笔记" : "保存"),  React.createElement("div", {
+  }, isExistingHighlightComment ? "保存笔记" : "保存")), React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "Resize"
-  })))) : null, activeWordHover ?  React.createElement("div", {
+  }))) : null, activeWordHover ?  React.createElement("div", {
     className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
     style: {
       left: activeWordHover.left,

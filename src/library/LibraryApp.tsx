@@ -47,6 +47,60 @@ function formatDate(dateStr?: string | number): string {
   }
 }
 
+function formatDateTime(dateStr?: string | number): string {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (!Number.isNaN(d.getTime())) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+  } catch (err) {}
+  return String(dateStr);
+}
+
+function getHighlightNoteEntries(item: any) {
+  const entries = Array.isArray(item?.commentEntries) ? item.commentEntries.filter((entry: any) => (entry?.text || "").trim()) : [];
+  if (entries.length)
+    return entries;
+  const fallback = String(item?.comment || "").trim();
+  if (!fallback)
+    return [];
+  return fallback.split(/\n{2,}/).map((text: string, index: number) => ({
+    label: index === 0 ? "笔记" : `笔记 ${index + 1}`,
+    created: item?.updated || item?.created || "",
+    text: text.trim()
+  })).filter((entry: any) => entry.text);
+}
+
+interface ObsidianIconProps {
+  name: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const ObsidianIcon: React.FC<ObsidianIconProps> = ({ name, className = "", style }) => {
+  const ref = React.useRef<HTMLSpanElement>(null);
+  
+  React.useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+    const { setIcon } = require("obsidian");
+    if (typeof setIcon === "function") {
+      setIcon(element, name);
+    }
+  }, [name]);
+  
+  return <span ref={ref} className={className} style={{ display: "inline-flex", alignItems: "center", ...style }} />;
+};
+
 // Strip HTML tags
 function stripHtml(text: string): string {
   return text.replace(/<[^>]*>/g, "").trim();
@@ -982,6 +1036,39 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           if (percentage >= 100) status = "finished";
           else if (percentage > 0) status = "reading";
         }
+
+        // Asynchronously enrich memory highlights with full note details
+        const list = getHighlightsForBook(plugin.settings, activeBook.path);
+        const { readHighlightNoteDetailsFromBookNote } = require("../highlights");
+        (async () => {
+          let hasUpdates = false;
+          const updatedList = await Promise.all(list.map(async (highlight) => {
+            try {
+              const details = await readHighlightNoteDetailsFromBookNote(plugin.app, noteFile, highlight);
+              if (details.commentEntries?.length || details.aiSections?.length) {
+                if (
+                  !(highlight as any).commentEntries || 
+                  !(highlight as any).aiSections ||
+                  (highlight as any).commentEntries.length !== details.commentEntries.length ||
+                  (highlight as any).aiSections.length !== details.aiSections.length
+                ) {
+                  hasUpdates = true;
+                }
+                return {
+                  ...highlight,
+                  comment: details.comment,
+                  commentEntries: details.commentEntries,
+                  aiSections: details.aiSections
+                };
+              }
+            } catch (err) {}
+            return highlight;
+          }));
+          if (hasUpdates) {
+            plugin.settings.bookHighlights[activeBook.path] = updatedList;
+            setBookMetadata(prev => ({ ...prev }));
+          }
+        })();
       } else {
         // Sync default status if no file
         if (percentage >= 100) status = "finished";
@@ -1439,7 +1526,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 </div>
                 <div className="jarvis-stats-mini-card">
                   <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"></path><polyline points="15 3 15 9 21 9"></polyline></svg>
                     {newHighlightsCount}条
                   </span>
                   <span className="jarvis-stats-mini-label">笔记</span>
@@ -2649,7 +2736,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 {percentage > 0 ? "继续阅读" : "开始阅读"}
               </button>
               <button className="jarvis-library-btn btn-secondary" onClick={() => openOrCreateNote(plugin.app, activeBook, "", plugin.settings)} style={{ flex: 1, minWidth: '120px' }}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
                 打开笔记文件
               </button>
               {wordAssets.length > 0 && (
@@ -2763,11 +2850,10 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         </div>
 
         {/* Tab switcher */}
-        {/* Tab switcher */}
         <div className="jarvis-library-detail-tabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="detail-tab-group">
             <button className={`detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`} onClick={() => setActiveTab("highlights")}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"></path><polyline points="15 3 15 9 21 9"></polyline></svg>
               笔记 ({highlights.length})
             </button>
             <button className={`detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`} onClick={() => setActiveTab("words")}>
@@ -2792,7 +2878,28 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             ) : (
               <div className="jarvis-library-highlights-list">
                 {highlights.map((h: BookHighlight) => {
-                  const hasComment = h.comment && h.comment.trim();
+                  const noteEntries = getHighlightNoteEntries(h);
+                  const assocSec = Array.isArray((h as any).aiSections) ? (h as any).aiSections.find((s: any) => s.title === "关联文章") : null;
+                  const assocLinks = assocSec ? [...new Set(assocSec.links || [])] : [];
+                  const colors = plugin.settings.highlightColors || {};
+                  const normalColor = colors.normal || "#ffeb3b";
+                  const isNote = noteEntries.length > 0 || assocLinks.length > 0;
+                  const quoteStyle: React.CSSProperties = isNote 
+                    ? {
+                        borderLeftColor: "var(--interactive-accent)",
+                        background: "none",
+                        padding: "0 0 0 12px",
+                        borderLeftWidth: "3px",
+                        borderLeftStyle: "solid"
+                      }
+                    : {
+                        borderLeftColor: normalColor,
+                        background: `color-mix(in srgb, ${normalColor} 12%, transparent)`,
+                        padding: "6px 10px 6px 12px",
+                        borderRadius: "0 6px 6px 0",
+                        borderLeftWidth: "3px",
+                        borderLeftStyle: "solid"
+                      };
                   return (
                     <div key={h.id || h.blockId} className="jarvis-library-highlight-card">
                       <div className="hl-card-header">
@@ -2800,19 +2907,78 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                         <span className="hl-card-date">{formatDate(h.updated || h.created)}</span>
                       </div>
                       <div className="hl-card-body">
-                        <blockquote className="hl-card-quote">
+                        <blockquote 
+                          className="hl-card-quote" 
+                          style={quoteStyle}
+                        >
                           <p>{h.quote}</p>
                         </blockquote>
-                        {hasComment && (
-                          <div className="hl-card-comment-bubble">
-                            <span className="comment-label">💡 我的笔记：</span>
-                            <MarkdownText content={h.comment} plugin={plugin} />
+                        
+                        {noteEntries.length > 0 && (
+                          <div className="hl-card-notes-container" style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {noteEntries.map((entry: any, idx: number) => (
+                              <div key={idx} className="jarvis-reader-highlight-note-card" style={{ padding: '8px 10px', marginTop: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: 'var(--text-normal)', marginBottom: '4px' }}>
+                                  <ObsidianIcon name="sticky-note" style={{ width: '13px', height: '13px' }} />
+                                  <span>{entry.label}</span>
+                                  <span style={{ marginLeft: 'auto', fontWeight: 'normal', fontSize: '11px', color: 'var(--text-muted)' }}>{formatDateTime(entry.created)}</span>
+                                </div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-normal)' }}>
+                                  <MarkdownText content={entry.text} plugin={plugin} />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {assocLinks.length > 0 && (
+                          <div className="hl-card-assoc-container" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px solid var(--background-modifier-border)', paddingTop: '8px' }}>
+                            {assocLinks.map((link: string, idx: number) => {
+                              const [linkPath, linkTime] = link.split("|");
+                              let displayText = linkPath;
+                              if (linkPath.includes("#^")) {
+                                const parts = linkPath.split("#^");
+                                displayText = `${parts[0]} > ^${parts[1]}`;
+                              } else if (linkPath.includes("#")) {
+                                const parts = linkPath.split("#");
+                                displayText = `${parts[0]} > ${parts[1]}`;
+                              }
+                              return (
+                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '2px 0', height: '28px', minHeight: '28px' }}>
+                                  <span style={{ color: 'var(--text-muted)', fontSize: '14px', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}>•</span>
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-normal)' }}>
+                                    <ObsidianIcon name="link" style={{ width: '13px', height: '13px' }} />
+                                  </span>
+                                  <a 
+                                    className="internal-link" 
+                                    style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--link-color)', fontSize: '13px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                    onClick={() => {
+                                      const { TFile } = require("obsidian");
+                                      const file = plugin.app.metadataCache.getFirstLinkpathDest(linkPath, "");
+                                      if (file instanceof TFile) {
+                                        plugin.app.workspace.getLeaf(false).openFile(file);
+                                      } else {
+                                        new Notice(`未找到文件: ${linkPath}`);
+                                      }
+                                    }}
+                                  >
+                                    {displayText}
+                                  </a>
+                                  {linkTime && (
+                                    <span style={{ margin: '0 0 0 auto', fontSize: '11px', color: 'var(--text-muted)', opacity: 0.8 }}>
+                                      {formatDateTime(linkTime)}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
                       <div className="hl-card-actions">
                         <button className="hl-card-action-btn" onClick={() => {
-                          navigator.clipboard.writeText(`《${title}》：「${h.quote}」${h.comment ? `（感想：${h.comment}）` : ""}`);
+                          const commentText = h.comment ? `（感想：${h.comment}）` : "";
+                          navigator.clipboard.writeText(`《${title}》：「${h.quote}」${commentText}`);
                           new Notice("高亮已复制到剪贴板");
                         }}>
                           复制内容

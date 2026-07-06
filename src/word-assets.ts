@@ -75,7 +75,11 @@ export function normalizeWordSelection(value: string | null | undefined): {
   isSingleWord: boolean;
   isPhrase: boolean;
 } | null {
-  const cleaned = (value || "").replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
+  if (!value)
+    return null;
+  if (/[\u4e00-\u9fa5]/.test(value))
+    return null;
+  const cleaned = value.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
   if (!cleaned)
     return null;
   const stripped = cleaned.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, "").replace(/\s+/g, " ").trim();

@@ -291,7 +291,8 @@
   box-sizing: border-box;
   display: block;
   flex: 1 1 auto;
-  min-height: 78px;
+  margin-top: 14px;
+  min-height: 120px;
   position: relative;
   width: 100%;
 }
@@ -305,7 +306,7 @@
 .jarvis-reader-highlight-input-preview {
   box-sizing: border-box;
   font: var(--font-ui-small) / 1.5 var(--font-interface);
-  min-height: 78px;
+  min-height: 120px;
   padding: 10px 11px;
   white-space: pre-wrap;
   width: 100%;
@@ -348,7 +349,7 @@
   font: var(--font-ui-small) / 1.5 var(--font-interface);
   caret-color: var(--text-normal);
   color: var(--text-normal);
-  min-height: 78px;
+  min-height: 120px;
   outline: none;
   position: relative;
   resize: vertical;
@@ -377,7 +378,8 @@
   border-radius: 12px;
   box-sizing: border-box;
   display: block;
-  min-height: 78px;
+  margin-top: 14px;
+  min-height: 120px;
   overflow: visible;
   position: relative;
   width: 100%;
@@ -399,7 +401,7 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 .jarvis-reader-cm-editor .cm-editor {
   background: transparent;
   color: var(--text-normal);
-  min-height: 78px;
+  min-height: 120px;
   outline: none;
 }
 
@@ -408,7 +410,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 }
 
 .jarvis-reader-cm-editor .cm-scroller {
-  max-height: 132px;
+  min-height: 120px;
+  max-height: 240px;
   overflow: auto;
 }
 
@@ -621,6 +624,7 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   flex: 0 0 auto;
   gap: 8px;
   justify-content: flex-end;
+  margin-top: 16px;
   position: relative;
   z-index: 2;
 }
@@ -655,10 +659,12 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   appearance: none;
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 999px;
+  border-radius: 4px;
   color: var(--text-normal);
   cursor: pointer;
-  font: 600 var(--font-ui-small) var(--font-interface);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-small);
+  font-weight: normal;
   padding: 6px 14px;
 }
 
@@ -3230,8 +3236,10 @@ g.jarvis-reader-highlight-with-comment line {
 
 .hl-card-quote {
   margin: 0;
-  padding: 0 0 0 12px;
+  padding: 6px 10px 6px 12px;
   border-left: 3px solid var(--interactive-accent);
+  background: var(--text-highlight-bg, rgba(255, 235, 59, 0.15));
+  border-radius: 0 6px 6px 0;
   color: var(--text-normal);
   font-size: 13.5px;
   line-height: 1.55;
@@ -4850,12 +4858,12 @@ g.jarvis-reader-highlight-with-comment line {
   gap: 6px;
 }
 
-.jarvis-reader-highlight-note-card {
+.jarvis-reader-highlight-note-card.is-assoc {
   background: transparent !important;
   border: 0 !important;
-  border-left: 2px solid var(--background-modifier-border-hover) !important;
+  border-left: none !important;
   border-radius: 0 !important;
-  padding: 8px 10px 7px 12px !important;
+  padding: 8px 0 !important;
 }
 
 .jarvis-reader-highlight-note-card-text,
@@ -4875,9 +4883,9 @@ g.jarvis-reader-highlight-with-comment line {
 .jarvis-reader-highlight-ai-section {
   background: transparent !important;
   border: 0 !important;
-  border-left: 2px solid var(--background-modifier-border-hover) !important;
+  border-left: none !important;
   border-radius: 0 !important;
-  padding: 8px 10px 7px 12px !important;
+  padding: 8px 0 !important;
 }
 
 .jarvis-reader-highlight-ai-title {
@@ -4927,6 +4935,30 @@ g.jarvis-reader-highlight-with-comment line {
 
 .jarvis-reader-highlight-note-card-text .markdown-preview-view {
   font-size: var(--font-ui-small) !important;
+  min-height: unset !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+.jarvis-reader-highlight-note-card-text .markdown-preview-sizer {
+  min-height: unset !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.jarvis-reader-highlight-note-card-text .markdown-preview-view,
+.jarvis-reader-highlight-note-card-text .markdown-preview-view * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.jarvis-reader-highlight-note-card-text .markdown-preview-view ul {
+  padding-inline-start: 12px !important;
 }
 
 .jarvis-reader-highlight-note-card-text .markdown-preview-view p,
@@ -5179,4 +5211,59 @@ g.jarvis-reader-highlight-with-comment line {
 	.vo-actions-compact-list {
 		grid-template-columns: minmax(0, 1fr);
 	}
+}
+
+.jarvis-reader-assoc-add-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  background: var(--background-secondary) !important;
+  border: 1px solid var(--background-modifier-border) !important;
+  border-radius: 4px !important;
+  color: var(--text-normal) !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  height: 28px !important;
+  width: auto !important;
+}
+
+.jarvis-reader-assoc-add-btn:hover {
+  background: var(--background-modifier-hover) !important;
+}
+
+.jarvis-reader-assoc-search-input {
+  border: 1px solid var(--background-modifier-border) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.jarvis-reader-assoc-search-input:focus {
+  border-color: var(--interactive-accent) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.jarvis-reader-assoc-suggest-item {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-normal);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-interface);
+  padding: 6px 12px;
+  text-align: left;
+  position: relative;
+  margin: 0;
+  gap: 2px;
+}
+
+.jarvis-reader-assoc-suggest-item:hover {
+  background: var(--background-modifier-hover);
 }

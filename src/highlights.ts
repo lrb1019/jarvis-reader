@@ -237,9 +237,19 @@ export async function readHighlightNoteDetailsFromBookNote(app: App, noteFile: T
       continue;
     }
     if (inAiSection && currentSection) {
-      const links = [...line.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1].trim()).filter(Boolean);
-      currentSection.links.push(...links);
-      currentSection.text += `${line}\n`;
+      if (currentSection.title === "关联文章") {
+        const match = line.match(/\[\[([^\]]+)\]\]/);
+        if (match) {
+          const linkName = match[1].trim();
+          const timeMatch = line.match(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/);
+          const time = timeMatch ? timeMatch[0] : "";
+          currentSection.links.push(time ? `${linkName}|${time}` : linkName);
+        }
+      } else {
+        const links = [...line.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1].trim()).filter(Boolean);
+        currentSection.links.push(...links);
+        currentSection.text += `${line}\n`;
+      }
     }
   }
 
