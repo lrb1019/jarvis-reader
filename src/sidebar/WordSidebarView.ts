@@ -2,7 +2,7 @@ import { ItemView, WorkspaceLeaf, Menu, setIcon, MarkdownRenderer } from "obsidi
 import * as React from "react";
 import { createRoot, type Root } from "react-dom/client";
 import type JarvisReaderPlugin from "../main";
-import { buildWordAudioUrl } from "../word-assets";
+import { buildWordAudioUrl, getTranslationAssetStorageKey } from "../word-assets";
 import { WordCard } from "../word-book/WordCard";
 
 export const WORD_SIDEBAR_VIEW_TYPE = "jarvis-reader-word-sidebar";
@@ -47,9 +47,10 @@ export class WordSidebarView extends ItemView {
   }
 
   focusAsset(asset: any) {
-    if (asset && asset.lemma) {
-      this.expandedAssets.add(asset.lemma);
-      this.searchQuery = asset.lemma;
+    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+    if (assetKey) {
+      this.expandedAssets.add(assetKey);
+      this.searchQuery = assetKey;
       this.filterKind = "all";
       this.filterStatus = "all";
       this.render();
@@ -66,11 +67,12 @@ export class WordSidebarView extends ItemView {
     
     // Filter by current book
     if (currentBookPath) {
-      assets = assets.filter((asset: any) => {
+      const filteredForBook = assets.filter((asset: any) => {
         return asset.sources && asset.sources.some((s: any) => s.bookPath === currentBookPath);
       });
-    } else {
-      assets = []; // Or show all? Let's show none if no book is active, or empty state.
+      if (filteredForBook.length > 0) {
+        assets = filteredForBook;
+      }
     }
 
     // Filter by kind
@@ -96,9 +98,9 @@ export class WordSidebarView extends ItemView {
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
       assets = assets.filter((asset: any) => {
-        const lemma = (asset.lemma || "").toLowerCase();
+        const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma || "";
         const translation = (asset.translation || "").toLowerCase();
-        return lemma.includes(q) || translation.includes(q);
+        return assetKey.toLowerCase().includes(q) || translation.includes(q);
       });
     }
 
@@ -248,13 +250,13 @@ export class WordSidebarView extends ItemView {
        }
     };
 
-    const handleDelete = async (lemma: string) => {
-       const asset = this.plugin.settings.wordAssets[lemma];
+    const handleDelete = async (assetKey: string) => {
+       const asset = this.plugin.settings.wordAssets[assetKey];
        if (asset) {
           if (this.reader && typeof this.reader.deleteWordAsset === "function") {
              await this.reader.deleteWordAsset(asset);
           } else {
-             delete this.plugin.settings.wordAssets[lemma];
+             delete this.plugin.settings.wordAssets[assetKey];
              await this.plugin.persistWordAssetSidecar("delete");
              await this.plugin.saveSettings();
              this.render();
@@ -283,18 +285,19 @@ export class WordSidebarView extends ItemView {
 
     this.reactRoot.render(
       React.createElement(React.Fragment, null, 
-        assets.map((asset: any) => 
-          React.createElement(WordCard, {
-            key: asset.lemma,
+        assets.map((asset: any) => {
+          const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
+          return React.createElement(WordCard, {
+            key: assetKey,
             plugin: this.plugin,
             asset: asset,
-            isExpanded: this.expandedAssets.has(asset.lemma),
+            isExpanded: this.expandedAssets.has(assetKey),
             onToggleExpand: handleToggleExpand,
             onToggleMastery: handleToggleMastery,
             onDelete: handleDelete,
             onDoubleClick: handleDoubleClick
-          })
-        )
+          });
+        })
       )
     );
   }
@@ -309,6 +312,11 @@ export class WordSidebarView extends ItemView {
   render() {
     const container = this.contentEl;
     if (!container) return;
+
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
 
     container.empty();
     container.className = "view-content jarvis-reader-sidebar-view jarvis-reader-word-sidebar";

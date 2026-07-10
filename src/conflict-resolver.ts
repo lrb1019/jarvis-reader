@@ -17,7 +17,7 @@ export async function resolveSyncConflicts(plugin: any): Promise<void> {
     if (await adapter.exists(indexFolder)) {
       const indexFiles = await adapter.list(indexFolder);
       
-      const wordAssetConflicts = indexFiles.files.filter((f: string) => 
+      const wordAssetConflicts = plugin.wordAssetSidecarUnavailable ? [] : indexFiles.files.filter((f: string) =>
         f.match(/word-assets[- (].*\.json$/) && !f.endsWith("word-assets.json")
       );
       

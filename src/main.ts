@@ -9,7 +9,7 @@ import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarVi
 import { WordBookView, WORD_BOOK_VIEW_TYPE } from "./word-book/WordBookView";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
-import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
+import { getTranslationAssetStorageKey, buildWordAssetMetadata, parseWordAssetSidecar } from "./word-assets";
 import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
@@ -25,12 +25,12 @@ export default class JarvisReaderPlugin extends Plugin {
   activeReaderView: any;
   wordSidebarView: any;
   lastIndexCounts: any;
+  wordAssetSidecarUnavailable = false;
 
   async onload() {
     addIcon("jarvis-logo", JARVIS_LOGO_SVG);
     addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
-    await this.restoreValueHighlightsIfNeeded();
     await this.restoreIndexesFromSidecars();
     await resolveSyncConflicts(this);
     await this.persistIndexSidecars("startup");
@@ -297,28 +297,6 @@ export default class JarvisReaderPlugin extends Plugin {
         }
     }, 50);
   }
-  async restoreValueHighlightsIfNeeded() {
-    const bookPath = "09 Books/\u4ef7\u503c\u5fc3\u6cd5 (\u59dc\u80e1\u8bf4).epub";
-    const restorePath = ".obsidian/plugins/jarvis-reader/value-highlights-restore.json";
-    try {
-      const current = Array.isArray(this.settings.bookHighlights && this.settings.bookHighlights[bookPath]) ? this.settings.bookHighlights[bookPath] : [];
-      if (current.length >= 99)
-        return;
-      const adapter = this.app.vault.adapter;
-      if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
-        return;
-      if (!await adapter.exists(restorePath))
-        return;
-      const restored = JSON.parse(await adapter.read(restorePath));
-      if (!Array.isArray(restored) || restored.length < 99)
-        return;
-      this.settings.bookHighlights = this.settings.bookHighlights || {};
-      this.settings.bookHighlights[bookPath] = restored;
-      await this.saveSettings();
-    } catch (error) {
-      console.warn("Jarvis Reader value highlights restore failed.", error);
-    }
-  }
   getIndexSidecarPaths() {
     return {
       highlights: ".obsidian/plugins/jarvis-reader/index/highlights.json",
@@ -350,6 +328,22 @@ export default class JarvisReaderPlugin extends Plugin {
     } catch (error) {
       console.warn(`Jarvis Reader failed to read sidecar ${path}.`, error);
       return null;
+    }
+  }
+  async readWordAssetSidecar(path) {
+    const adapter = this.app.vault.adapter;
+    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function") {
+      throw new Error("Vault adapter is not available.");
+    }
+    if (!await adapter.exists(path)) {
+      return { status: "missing" };
+    }
+    try {
+      const wordAssets = parseWordAssetSidecar(JSON.parse(await adapter.read(path)));
+      return wordAssets ? { status: "ready", wordAssets } : { status: "invalid" };
+    } catch (error) {
+      console.error(`Jarvis Reader failed to read word asset sidecar ${path}.`, error);
+      return { status: "invalid" };
     }
   }
   getIndexSnapshot() {
@@ -441,19 +435,19 @@ export default class JarvisReaderPlugin extends Plugin {
       if (highlightsSidecar && highlightsSidecar.bookHighlights) {
         changed = this.mergeHighlightSidecar(highlightsSidecar.bookHighlights) || changed;
       }
-      const adapter = this.app.vault.adapter;
-      const hasWordAssetSidecar = adapter && typeof adapter.exists === "function" && await adapter.exists(paths.wordAssets);
-      if (hasWordAssetSidecar) {
-        const parsed = await this.readJsonSidecar(paths.wordAssets);
-        if (parsed && parsed.wordAssets && typeof parsed.wordAssets === "object") {
-          this.settings.wordAssets = this.normalizeWordAssetSidecar(parsed.wordAssets);
-        } else {
-          this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets || {});
-          new Notice("生词本主数据 (word-assets.json) 损坏或为空，已从主配置或空白恢复。", 6000);
-        }
+      const wordAssetSidecar = await this.readWordAssetSidecar(paths.wordAssets);
+      if (wordAssetSidecar.status === "ready") {
+        this.wordAssetSidecarUnavailable = false;
+        this.settings.wordAssets = this.normalizeWordAssetSidecar(wordAssetSidecar.wordAssets);
+      } else if (wordAssetSidecar.status === "missing") {
+        this.wordAssetSidecarUnavailable = false;
+        this.settings.wordAssets = {};
+        await this.persistWordAssetSidecar("initialize-empty");
       } else {
-        this.settings.wordAssets = this.normalizeWordAssetSidecar(this.settings.wordAssets);
-        await this.persistWordAssetSidecar("migrate-from-data");
+        this.wordAssetSidecarUnavailable = true;
+        this.settings.wordAssets = {};
+        console.error("Jarvis Reader word asset sidecar is invalid. The original file was left unchanged.");
+        new Notice("词条主数据 word-assets.json 损坏或结构非法，原文件未被改写；词条功能已停止，请先恢复该文件。", 0);
       }
       if (changed) {
         await this.logIndexChange("restore-from-sidecar");
@@ -466,6 +460,12 @@ export default class JarvisReaderPlugin extends Plugin {
     }
   }
   async persistWordAssetSidecar(reason = "save") {
+    if (this.wordAssetSidecarUnavailable) {
+      const message = "词条主数据不可用，已停止词条保存以保护损坏文件。请先恢复 word-assets.json。";
+      console.error(`Jarvis Reader ${message}`);
+      new Notice(message, 0);
+      throw new Error(message);
+    }
     const paths = this.getIndexSidecarPaths();
     const adapter = this.app.vault.adapter;
     if (!adapter || typeof adapter.write !== "function") {
@@ -500,8 +500,10 @@ export default class JarvisReaderPlugin extends Plugin {
         updated: new Date().toISOString(),
         bookHighlights: snapshot.bookHighlights
       }, null, 2));
-      await this.persistWordAssetSidecar(reason);
-      await this.logIndexChange(reason, snapshot);
+      if (!this.wordAssetSidecarUnavailable) {
+        await this.persistWordAssetSidecar(reason);
+        await this.logIndexChange(reason, snapshot);
+      }
     } catch (error) {
       console.error("Jarvis Reader sidecar persist failed.", error);
       throw error;

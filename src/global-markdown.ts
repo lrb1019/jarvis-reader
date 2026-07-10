@@ -5,6 +5,7 @@ import { getJarvisReaderCodeMirrorModules } from "./wiki-editor";
 import { lookupLocalDictionary } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
 import { getTranslationAssetKey, buildWordAssetFromSelection } from "./word-assets";
+import { confirmDestructiveAction } from "./utils";
 
 export function truncateWordDisplay(value: string): string {
   const raw = String(value || "");
@@ -268,6 +269,12 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
 
   // Delete Word (Hover Mode)
   const handleDeleteWord = async () => {
+    const confirmed = await confirmDestructiveAction(
+      plugin.app,
+      "删除词条",
+      `确定要彻底删除词条“${word}”吗？此操作不可恢复。`
+    );
+    if (!confirmed) return;
     try {
       delete plugin.settings.wordAssets[word.toLowerCase()];
       await plugin.persistWordAssetSidecar("delete");

@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, Menu } from "obsidian";
 import { HIGHLIGHTS_VIEW_TYPE } from "./BookshelfView";
 import type JarvisReaderPlugin from "../main";
+import { confirmDestructiveAction } from "../utils";
 
 export class JarvisReaderHighlightsView extends ItemView {
   plugin: JarvisReaderPlugin;
@@ -330,6 +331,13 @@ export class JarvisReaderHighlightsView extends ItemView {
         const menu = new Menu();
         menu.addItem((item) => {
           item.setTitle("删除笔记").setIcon("trash").onClick(async () => {
+            const confirmed = await confirmDestructiveAction(
+              this.app,
+              "删除划线与笔记",
+              "确定要删除这条划线及其所有笔记吗？这会清除阅读器中的原文标记和书籍笔记中的对应内容，此操作不可恢复。"
+            );
+            if (!confirmed)
+              return;
             await this.reader.deleteHighlight(highlight);
           });
         });

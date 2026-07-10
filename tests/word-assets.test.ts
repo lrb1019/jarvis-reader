@@ -9,6 +9,7 @@ import {
   getTranslationSelectionType,
   normalizeDictionaryEntry,
   normalizeWordSelection,
+  parseWordAssetSidecar,
 } from "../src/word-assets.ts";
 
 const file = { path: "Books/Atomic.epub", basename: "Atomic" } as any;
@@ -84,4 +85,37 @@ test("finds saved word assets by inflected surface", () => {
   };
 
   assert.equal(findWordAssetBySurface(assets, "fractures")?.lemma, "fracture");
+});
+
+const validSidecarAsset = {
+  lemma: "fracture",
+  title: "Fracture",
+  kind: "word",
+  isWord: true,
+  surfaceForms: ["fracture"],
+  translation: "破裂",
+  display: "**中文释义**：破裂",
+  phonetic: "",
+  partOfSpeech: "",
+  example: "",
+  mastered: false,
+  sources: [{
+    bookPath: "Books/Atomic.epub",
+    bookTitle: "Atomic",
+    chapterTitle: "Chapter",
+    cfiRange: "cfi-1",
+    quote: "fracture",
+    created: "2026-07-10T00:00:00.000Z",
+  }],
+  created: "2026-07-10T00:00:00.000Z",
+  updated: "2026-07-10T00:00:00.000Z",
+};
+
+test("accepts only complete version 2 word asset sidecars", () => {
+  const parsed = parseWordAssetSidecar({ version: 2, wordAssets: { fracture: validSidecarAsset } });
+
+  assert.equal(parsed?.fracture?.lemma, "fracture");
+  assert.equal(parseWordAssetSidecar({ version: 1, wordAssets: {} }), null);
+  assert.equal(parseWordAssetSidecar({ version: 2, wordAssets: [] }), null);
+  assert.equal(parseWordAssetSidecar({ version: 2, wordAssets: { fracture: { lemma: "fracture" } } }), null);
 });

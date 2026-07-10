@@ -180,6 +180,12 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
         item.setTitle("彻底删除")
             .setIcon("trash")
             .onClick(async () => {
+                const confirmed = await confirmDestructiveAction(
+                    plugin.app,
+                    "删除词条",
+                    `确定要彻底删除词条“${lemma}”吗？此操作不可恢复。`
+                );
+                if (!confirmed) return;
                 const asset = plugin.settings.wordAssets[lemma];
                 if (asset) {
                     if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {

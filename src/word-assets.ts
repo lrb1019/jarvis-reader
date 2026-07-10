@@ -16,6 +16,7 @@ import type {
   WordAssetSource,
   TranslationAssetKind,
   JarvisReaderSettings,
+  WordAssetMap,
 } from "./types";
 
 // Re-export from utils for modules that import from word-assets
@@ -458,4 +459,51 @@ export function buildWordAssetMetadata(asset: any): WordAsset {
     created: asset.created || "",
     updated: asset.updated || "",
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function isWordAssetSource(value: unknown): boolean {
+  return isRecord(value)
+    && typeof value.bookPath === "string"
+    && typeof value.bookTitle === "string"
+    && typeof value.chapterTitle === "string"
+    && typeof value.cfiRange === "string"
+    && typeof value.quote === "string"
+    && typeof value.created === "string";
+}
+
+function isWordAssetRecord(value: unknown): boolean {
+  if (!isRecord(value))
+    return false;
+  return typeof value.lemma === "string"
+    && typeof value.title === "string"
+    && ["word", "phrase", "sentence"].includes(String(value.kind || ""))
+    && typeof value.isWord === "boolean"
+    && Array.isArray(value.surfaceForms) && value.surfaceForms.every((form) => typeof form === "string")
+    && typeof value.translation === "string"
+    && typeof value.display === "string"
+    && typeof value.phonetic === "string"
+    && typeof value.partOfSpeech === "string"
+    && typeof value.example === "string"
+    && typeof value.mastered === "boolean"
+    && Array.isArray(value.sources) && value.sources.every(isWordAssetSource)
+    && typeof value.created === "string"
+    && typeof value.updated === "string";
+}
+
+/**
+ * Only version 2 sidecars with complete core records are safe to load.
+ * Invalid data must remain untouched so users can recover it manually.
+ */
+export function parseWordAssetSidecar(payload: unknown): WordAssetMap | null {
+  if (!isRecord(payload) || payload.version !== 2 || !isRecord(payload.wordAssets))
+    return null;
+  for (const asset of Object.values(payload.wordAssets)) {
+    if (!isWordAssetRecord(asset))
+      return null;
+  }
+  return payload.wordAssets as WordAssetMap;
 }

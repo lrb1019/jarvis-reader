@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffe
 import { Notice, setIcon, MarkdownRenderer } from "obsidian";
 import { ReactReader } from "react-reader";
 import * as ReactReaderModule from "react-reader";
-import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, formatLocalDate } from "./utils";
+import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, formatLocalDate, confirmDestructiveAction } from "./utils";
 import { normalizeWordSelection, findWordAssetBySurface, getWordAssetSurfaceForms, getTranslationAssetKind, getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAudioUrl } from "./word-assets";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { findChapterTitle, getReaderProgressLabel, ensureReaderLocations, getReaderProgress } from "./progress";
@@ -1115,6 +1115,18 @@ const showWordHoverCard = (asset, element) => {
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!asset || !assetKey || typeof deleteWordAsset !== "function")
       return;
+    const effectiveApp = app || (window as any).app;
+    if (!effectiveApp) {
+      new Notice("无法获取 Obsidian App 实例。");
+      return;
+    }
+    const confirmed = await confirmDestructiveAction(
+      effectiveApp,
+      "删除词条",
+      `确定要彻底删除词条“${asset.title || asset.lemma}”吗？此操作不可恢复。`
+    );
+    if (!confirmed)
+      return;
     try {
       const deleted = await deleteWordAsset(asset);
       if (!deleted)
@@ -1840,6 +1852,18 @@ const showWordHoverCard = (asset, element) => {
   const deleteExistingHighlight = async (item) => {
     if (!item || !item.id)
       return;
+    const effectiveApp = app || (window as any).app;
+    if (!effectiveApp) {
+      new Notice("无法获取 Obsidian App 实例。");
+      return;
+    }
+    const confirmed = await confirmDestructiveAction(
+      effectiveApp,
+      "删除划线与笔记",
+      "确定要删除这条划线及其所有笔记吗？这会清除阅读器中的原文标记和书籍笔记中的对应内容，此操作不可恢复。"
+    );
+    if (!confirmed)
+      return;
     const deleted = await deleteHighlight(item);
     if (deleted) {
       removeHighlightMark(renditionRef.current, item);
@@ -2008,9 +2032,19 @@ const showWordHoverCard = (asset, element) => {
           className: "jarvis-reader-highlight-icon-button",
           type: "button",
           title: "删除笔记",
-          onClick: () => {
-            if (confirm("确定要删除这条笔记吗？")) {
-              deleteNoteEntry(index);
+          onClick: async () => {
+            const effectiveApp = app || (window as any).app;
+            if (!effectiveApp) {
+              new Notice("无法获取 Obsidian App 实例。");
+              return;
+            }
+            const confirmed = await confirmDestructiveAction(
+              effectiveApp,
+              "删除笔记",
+              "确定要删除这条笔记吗？此操作不可恢复。"
+            );
+            if (confirmed) {
+              await deleteNoteEntry(index);
             }
           }
         }, renderObsidianIcon("trash-2"))

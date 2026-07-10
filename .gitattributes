@@ -1,0 +1,12 @@
+# 统一文本文件换行，避免不同设备产生整文件伪 diff。
+* text=auto eol=lf
+
+# 二进制与归档文件不参与文本换行转换。
+*.epub binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.zip binary
+*.gz binary

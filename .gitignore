@@ -11,25 +11,17 @@ Thumbs.db
 index/
 logs/
 
-# Local project management files (Do not upload to GitHub)
+# 本地项目管理文件（不上传 GitHub）
 00 项目总览.md
-01 PROJECT_RULES.md
+01 项目规则.md
 02 后续想法.md
 03 改动日志.md
 04 接续说明.md
 05 审查流程.md
-06 GITHUB_SYNC.md
-07 感想与单词卡片架构设计.md
-08 源码复刻与拆分讨论记录.md
-09 已放弃的 Codex TypeScript 源码迁移.md
+06 发布与同步流程.md
 AGENTS.md
 GEMINI.md
-Implementation Plan-main.js 逆向拆分为 TypeScript 源码.md
-Jarvis Reader 源码 ↔ main.js 逆向映射.md
-Jarvis Reader.md
-RELEASE_WORKFLOW.md
 extract_transcript.js
-jarvis reader 感想窗口的后续想法.md
 skill/
 书架参考/
 *.zip

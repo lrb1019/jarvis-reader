@@ -3,6 +3,7 @@ import type JarvisReaderPlugin from "../main";
 import { buildWordAudioUrl, getTranslationAssetStorageKey } from "../word-assets";
 import { Notice, MarkdownRenderer, Menu } from "obsidian";
 import type { WordAsset } from "../types";
+import { confirmDestructiveAction } from "../utils";
 
 export const MarkdownPreview = ({ content, plugin }: { content: string, plugin: JarvisReaderPlugin }) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -28,7 +29,7 @@ export interface WordCardProps {
   onToggleExpand?: (lemma: string) => void;
   onToggleSelect?: (lemma: string) => void;
   onToggleMastery?: (lemma: string, mastered: boolean) => void;
-  onDelete?: (lemma: string) => void;
+  onDelete?: (lemma: string) => void | Promise<void>;
   onDoubleClick?: (asset: WordAsset) => void;
   contextMenuAdditionalItems?: (menu: Menu) => void;
 }
@@ -106,7 +107,16 @@ export const WordCard: React.FC<WordCardProps> = ({
       menu.addItem((item) => {
           item.setTitle("彻底删除")
               .setIcon("trash")
-              .onClick(() => onDelete(assetKey));
+              .onClick(async () => {
+                const confirmed = await confirmDestructiveAction(
+                  plugin.app,
+                  "删除词条",
+                  `确定要彻底删除词条“${displayWord}”吗？此操作不可恢复。`
+                );
+                if (confirmed) {
+                  await onDelete(assetKey);
+                }
+              });
       });
     }
     
