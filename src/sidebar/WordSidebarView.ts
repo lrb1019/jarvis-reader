@@ -242,9 +242,7 @@ export class WordSidebarView extends ItemView {
           if (this.reader && typeof this.reader.setWordMastered === "function") {
              await this.reader.setWordMastered(asset, mastered);
           } else {
-             asset.mastered = mastered;
-             await this.plugin.persistWordAssetSidecar("save");
-             await this.plugin.saveSettings();
+             await this.plugin.wordAssetService.setMastered(lemma, mastered);
              this.render();
           }
        }
@@ -256,9 +254,7 @@ export class WordSidebarView extends ItemView {
           if (this.reader && typeof this.reader.deleteWordAsset === "function") {
              await this.reader.deleteWordAsset(asset);
           } else {
-             delete this.plugin.settings.wordAssets[assetKey];
-             await this.plugin.persistWordAssetSidecar("delete");
-             await this.plugin.saveSettings();
+             await this.plugin.wordAssetService.delete(assetKey);
              this.render();
           }
        }

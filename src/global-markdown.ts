@@ -206,10 +206,7 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
         new Notice("Failed to build word asset.");
         return;
       }
-      plugin.settings.wordAssets = plugin.settings.wordAssets || {};
-      plugin.settings.wordAssets[asset.lemma] = asset;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.save(asset);
       setIsSaved(true);
       new Notice("已保存到全局词库");
       
@@ -251,9 +248,7 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
         mastered: nextMastered,
         updated: new Date().toISOString()
       };
-      plugin.settings.wordAssets[word.toLowerCase()] = updated;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.save(updated);
       setIsMastered(nextMastered);
       new Notice(nextMastered ? "已标记掌握" : "已重新加入词库");
       
@@ -276,9 +271,7 @@ export const GlobalTranslationCard: React.FC<GlobalTranslationCardProps> = ({
     );
     if (!confirmed) return;
     try {
-      delete plugin.settings.wordAssets[word.toLowerCase()];
-      await plugin.persistWordAssetSidecar("delete");
-      await plugin.saveSettingsData();
+      await plugin.wordAssetService.delete(word.toLowerCase());
       new Notice("词条已彻底删除。");
       onClose();
       

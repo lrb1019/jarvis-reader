@@ -18,7 +18,7 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
     }).join("\n") + "\n";
   } else {
     const comment = (highlight.comment || "").trim();
-    commentBlock = comment ? `>\n> **\u7b14\u8bb0**\n> created: ${formatLocalDateTime(highlight.created)}\n>\n${formatBlockquote(comment)}\n` : ">";
+    commentBlock = comment ? `>\n> **\u7b14\u8bb0**\n> created: ${formatLocalDateTime(highlight.created)}\n>\n${formatBlockquote(comment)}\n` : ">\n";
   }
   const timestamp = formatBlockquote(`**\u65f6\u95f4**\n${formatLocalDateTime(highlight.updated || highlight.created)}`);
   
@@ -77,18 +77,28 @@ export function buildHighlightMetadata(highlight: any): any {
     bookTitle: highlight.bookTitle || "",
     chapterTitle: highlight.chapterTitle || "",
     cfiRange: highlight.cfiRange || "",
-    quote: highlight.quote || "",
-    comment: highlight.comment || "",
     notePath: highlight.notePath || "",
     blockId: highlight.blockId || highlight.id || "",
     created: highlight.created || "",
     updated: highlight.updated || "",
   };
-  if (highlight.aiSections) {
-    meta.aiSections = highlight.aiSections;
-  }
-  if (highlight.commentEntries) {
-    meta.commentEntries = highlight.commentEntries;
+  if (highlight.markColor) {
+    meta.markColor = highlight.markColor;
   }
   return meta;
+}
+
+export function buildHighlightNoteUpdate(
+  current: BookHighlight,
+  incoming: Partial<BookHighlight>,
+  comment: string,
+  updated: string,
+): BookHighlight {
+  return {
+    ...current,
+    // The index intentionally omits Markdown-owned quote text after reload.
+    quote: incoming.quote || current.quote,
+    comment,
+    updated,
+  };
 }

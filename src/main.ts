@@ -9,12 +9,25 @@ import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarVi
 import { WordBookView, WORD_BOOK_VIEW_TYPE } from "./word-book/WordBookView";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
-import { getTranslationAssetStorageKey, buildWordAssetMetadata, parseWordAssetSidecar } from "./word-assets";
+import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
 import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
 import { registerGlobalMarkdownFeatures } from "./global-markdown";
+import { WordAssetService } from "./word-asset-service";
+import { HighlightService } from "./highlight-service";
+import { BookNoteService } from "./book-note-service";
+import { createBookNoteOperations } from "./book-note-operations";
+import { KnowledgeNoteService } from "./knowledge-note-service";
+import { createKnowledgeNoteStorage } from "./knowledge-note-store";
+import {
+  readHighlightSidecar,
+  readWordAssetSidecar,
+  writeHighlightSidecar,
+  writeWordAssetSidecar,
+  type SidecarFileAdapter,
+} from "./index-sidecars";
 const JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 const LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 
@@ -26,14 +39,21 @@ export default class JarvisReaderPlugin extends Plugin {
   wordSidebarView: any;
   lastIndexCounts: any;
   wordAssetSidecarUnavailable = false;
+  wordAssetService = new WordAssetService(this);
+  highlightService = new HighlightService(this);
+  bookNoteService = new BookNoteService(createBookNoteOperations(this.app));
+  knowledgeNoteService = new KnowledgeNoteService(createKnowledgeNoteStorage(this.app.vault));
+  highlightSidecarUnavailable = false;
 
   async onload() {
     addIcon("jarvis-logo", JARVIS_LOGO_SVG);
     addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
-    await this.restoreIndexesFromSidecars();
+    const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
     await resolveSyncConflicts(this);
-    await this.persistIndexSidecars("startup");
+    if (needsStartupIndexPersistence) {
+      await this.persistIndexSidecars("startup");
+    }
     await this.saveSettingsData();
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
@@ -317,35 +337,6 @@ export default class JarvisReaderPlugin extends Plugin {
       }
     }
   }
-  async readJsonSidecar(path) {
-    const adapter = this.app.vault.adapter;
-    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
-      return null;
-    if (!await adapter.exists(path))
-      return null;
-    try {
-      return JSON.parse(await adapter.read(path));
-    } catch (error) {
-      console.warn(`Jarvis Reader failed to read sidecar ${path}.`, error);
-      return null;
-    }
-  }
-  async readWordAssetSidecar(path) {
-    const adapter = this.app.vault.adapter;
-    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function") {
-      throw new Error("Vault adapter is not available.");
-    }
-    if (!await adapter.exists(path)) {
-      return { status: "missing" };
-    }
-    try {
-      const wordAssets = parseWordAssetSidecar(JSON.parse(await adapter.read(path)));
-      return wordAssets ? { status: "ready", wordAssets } : { status: "invalid" };
-    } catch (error) {
-      console.error(`Jarvis Reader failed to read word asset sidecar ${path}.`, error);
-      return { status: "invalid" };
-    }
-  }
   getIndexSnapshot() {
     const bookHighlights = {};
     for (const [bookPath, list] of Object.entries(this.settings.bookHighlights || {})) {
@@ -427,18 +418,29 @@ export default class JarvisReaderPlugin extends Plugin {
     }
     return normalized;
   }
-  async restoreIndexesFromSidecars() {
+  async restoreIndexesFromSidecars(): Promise<boolean> {
     try {
       const paths = this.getIndexSidecarPaths();
-      const highlightsSidecar = await this.readJsonSidecar(paths.highlights);
+      const adapter = this.app.vault.adapter as SidecarFileAdapter;
+      const highlightsSidecar = await readHighlightSidecar(adapter, paths.highlights);
       let changed = false;
-      if (highlightsSidecar && highlightsSidecar.bookHighlights) {
-        changed = this.mergeHighlightSidecar(highlightsSidecar.bookHighlights) || changed;
+      if (highlightsSidecar.status === "ready") {
+        this.highlightSidecarUnavailable = false;
+        changed = this.mergeHighlightSidecar(highlightsSidecar.value) || changed;
+      } else if (highlightsSidecar.status === "missing") {
+        this.highlightSidecarUnavailable = false;
+        // Preserve a one-time migration path for pre-sidecar highlight data.
+        changed = true;
+      } else {
+        this.highlightSidecarUnavailable = true;
+        this.settings.bookHighlights = {};
+        console.error("Jarvis Reader highlight sidecar is invalid. The original file was left unchanged.");
+        new Notice("高亮主数据 highlights.json 损坏或结构非法，原文件未被改写；高亮保存已停止，请先恢复该文件。", 0);
       }
-      const wordAssetSidecar = await this.readWordAssetSidecar(paths.wordAssets);
+      const wordAssetSidecar = await readWordAssetSidecar(adapter, paths.wordAssets);
       if (wordAssetSidecar.status === "ready") {
         this.wordAssetSidecarUnavailable = false;
-        this.settings.wordAssets = this.normalizeWordAssetSidecar(wordAssetSidecar.wordAssets);
+        this.settings.wordAssets = this.normalizeWordAssetSidecar(wordAssetSidecar.value);
       } else if (wordAssetSidecar.status === "missing") {
         this.wordAssetSidecarUnavailable = false;
         this.settings.wordAssets = {};
@@ -452,6 +454,7 @@ export default class JarvisReaderPlugin extends Plugin {
       if (changed) {
         await this.logIndexChange("restore-from-sidecar");
       }
+      return changed;
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
@@ -467,39 +470,62 @@ export default class JarvisReaderPlugin extends Plugin {
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
-    const adapter = this.app.vault.adapter;
+    const adapter = this.app.vault.adapter as SidecarFileAdapter;
     if (!adapter || typeof adapter.write !== "function") {
       throw new Error("Vault adapter is not available.");
     }
-    await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
     const wordAssets = {};
     for (const [key, asset] of Object.entries(this.settings.wordAssets || {})) {
       if (asset) {
         wordAssets[key] = buildWordAssetMetadata(asset);
       }
     }
-    await adapter.write(paths.wordAssets, JSON.stringify({
-      version: 2,
-      updated: new Date().toISOString(),
-      wordAssets
-    }, null, 2));
+    await writeWordAssetSidecar(adapter, paths.wordAssets, wordAssets);
     await this.logIndexChange(reason);
+  }
+  onWordAssetsChanged() {
+    this.refreshWordSidebar(this.activeReaderView);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    }
+  }
+  onHighlightsChanged() {
+    this.refreshReaderSidebar(this.activeReaderView);
+    if (this.highlightsView && typeof this.highlightsView.render === "function") {
+      this.highlightsView.render();
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("jarvis-reader-highlights-changed"));
+    }
+  }
+  async persistHighlightSidecar(reason = "save") {
+    if (this.highlightSidecarUnavailable) {
+      const message = "高亮主数据不可用，已停止高亮索引保存以保护损坏文件。请先恢复 highlights.json。";
+      console.error(`Jarvis Reader ${message}`);
+      new Notice(message, 0);
+      throw new Error(message);
+    }
+    const paths = this.getIndexSidecarPaths();
+    const adapter = this.app.vault.adapter as SidecarFileAdapter;
+    if (!adapter || typeof adapter.write !== "function") {
+      throw new Error("Vault adapter is not available.");
+    }
+    const snapshot = this.getIndexSnapshot();
+    await writeHighlightSidecar(adapter, paths.highlights, snapshot.bookHighlights);
+    await this.logIndexChange(reason, snapshot);
   }
   async persistIndexSidecars(reason = "save") {
     try {
       const paths = this.getIndexSidecarPaths();
-      const adapter = this.app.vault.adapter;
+      const adapter = this.app.vault.adapter as SidecarFileAdapter;
       if (!adapter || typeof adapter.write !== "function") {
         throw new Error("Jarvis Reader sidecar persist failed: vault adapter not available.");
       }
-      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
       const snapshot = this.getIndexSnapshot();
-      await adapter.write(paths.highlights, JSON.stringify({
-        version: 1,
-        updated: new Date().toISOString(),
-        bookHighlights: snapshot.bookHighlights
-      }, null, 2));
+      if (!this.highlightSidecarUnavailable) {
+        await this.persistHighlightSidecar(reason);
+      }
       if (!this.wordAssetSidecarUnavailable) {
         await this.persistWordAssetSidecar(reason);
         await this.logIndexChange(reason, snapshot);
@@ -562,7 +588,7 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
   }
   async saveSettings() {
-    await this.persistIndexSidecars("save");
+    // Index sidecars have dedicated services; ordinary settings must not rewrite them.
     await this.saveSettingsData();
   }
   async saveSettingsData() {

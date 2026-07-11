@@ -80,21 +80,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     if (!confirmed)
       return;
 
-    let count = 0;
-    for (const lemma of selected) {
-      const asset = plugin.settings.wordAssets[lemma];
-      if (asset) {
-        if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-          await plugin.activeReaderView.deleteWordAsset(asset);
-        } else {
-          delete plugin.settings.wordAssets[lemma];
-        }
-        count++;
-      }
-    }
-    await plugin.persistWordAssetSidecar("delete");
-    await plugin.saveSettings();
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    const count = await plugin.wordAssetService.deleteMany(selected);
     new Notice(`已彻底删除 ${count} 个词条`);
     setSelected(new Set());
     loadAssets();
@@ -107,19 +93,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     if (!confirmed)
       return;
 
-    let count = 0;
-    for (const asset of filteredAssets) {
-      const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-      if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-        await plugin.activeReaderView.deleteWordAsset(asset);
-      } else {
-        delete plugin.settings.wordAssets[assetKey];
-      }
-      count++;
-    }
-    await plugin.persistWordAssetSidecar("delete");
-    await plugin.saveSettings();
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    const count = await plugin.wordAssetService.deleteMany(filteredAssets.map((asset) => getTranslationAssetStorageKey(asset) || asset.lemma));
     new Notice(`已彻底删除此书的 ${count} 个词条`);
     const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
     leaves.forEach((leaf: any) => {
@@ -132,15 +106,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
 
   const handleMarkMastered = async (mastered: boolean) => {
     if (selected.size === 0) return;
-    let count = 0;
-    for (const lemma of selected) {
-      if (plugin.settings.wordAssets[lemma]) {
-        plugin.settings.wordAssets[lemma].mastered = mastered;
-        count++;
-      }
-    }
-    await plugin.persistWordAssetSidecar("save");
-    await plugin.saveSettings();
+    const count = await plugin.wordAssetService.setMasteredMany(selected, mastered);
     new Notice(`已将 ${count} 个词条标记为${mastered ? "已掌握" : "未掌握"}`);
     loadAssets();
   };
@@ -149,9 +115,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     e.stopPropagation();
     if (plugin.settings.wordAssets[lemma]) {
       const current = plugin.settings.wordAssets[lemma].mastered;
-      plugin.settings.wordAssets[lemma].mastered = !current;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !current);
       loadAssets();
     }
   };
@@ -166,9 +130,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             .setIcon(isMastered ? "cross" : "checkmark")
             .onClick(async () => {
                 if (plugin.settings.wordAssets[lemma]) {
-                    plugin.settings.wordAssets[lemma].mastered = !isMastered;
-                    await plugin.persistWordAssetSidecar("save");
-                    await plugin.saveSettings();
+                    await plugin.wordAssetService.setMastered(lemma, !isMastered);
                     loadAssets();
                 }
             });
@@ -186,16 +148,8 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                     `确定要彻底删除词条“${lemma}”吗？此操作不可恢复。`
                 );
                 if (!confirmed) return;
-                const asset = plugin.settings.wordAssets[lemma];
-                if (asset) {
-                    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-                        await plugin.activeReaderView.deleteWordAsset(asset);
-                    } else {
-                        delete plugin.settings.wordAssets[lemma];
-                        await plugin.persistWordAssetSidecar("delete");
-                    }
-                    await plugin.saveSettings();
-                    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+                if (plugin.settings.wordAssets[lemma]) {
+                    await plugin.wordAssetService.delete(lemma);
                     loadAssets();
                     new Notice(`已彻底删除词条：${lemma}`);
                     if (selected.has(lemma)) {
@@ -449,10 +403,7 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             }}
             onToggleSelect={toggleSelect}
             onToggleMastery={(lemma, mastered) => {
-                if (plugin.settings.wordAssets[lemma]) {
-                    plugin.settings.wordAssets[lemma].mastered = mastered;
-                    plugin.persistWordAssetSidecar("save").then(() => plugin.saveSettings()).then(() => loadAssets());
-                }
+                plugin.wordAssetService.setMastered(lemma, mastered).then(() => loadAssets());
             }}
             onDoubleClick={() => {}}
             contextMenuAdditionalItems={(menu) => {
@@ -464,21 +415,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
     );
   };
 
-  const formatDays = (dateStr: string | undefined) => {
-    if (!dateStr) return "新词";
-    const diff = new Date(dateStr).getTime() - new Date().getTime();
-    const days = Math.ceil(diff / (1000 * 3600 * 24));
-    if (days < 0) return "已超期";
-    if (days === 0) return "今日";
-    return `${days}天后`;
-  };
-
-  const renderTableRow = (asset: any, showTagsColumn: boolean = false) => {
+  const renderTableRow = (asset: any) => {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence ? quote || asset.lemma : asset.title || asset.lemma;
     const assetKey = isSentence ? getTranslationAssetStorageKey(asset) : asset.lemma;
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle || "未知书籍" : "手动添加";
     const isExpanded = expandedItems.has(assetKey);
     const isSelected = selected.has(assetKey);
 
@@ -528,23 +469,6 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
             {!isSentence && asset.phonetic && <div style={{ fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }}>{asset.phonetic}</div>}
           </div>
         </td>
-        {showTagsColumn && (
-          <td style={{ padding: "12px 8px" }}>
-            {asset.isWord && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
-                {asset.oxford === 1 && (
-                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>牛津核心</span>
-                )}
-                {asset.collins && asset.collins > 0 && (
-                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>{'★'.repeat(asset.collins)}</span>
-                )}
-                {asset.tags?.map((tag: string) => (
-                  <span key={tag} className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }}>{tag.toUpperCase()}</span>
-                ))}
-              </div>
-            )}
-          </td>
-        )}
         <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
           {asset.translation && (
             <div 
@@ -564,11 +488,14 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
               )}
             </div>
           )}
+          {isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }}>
+              {asset.oxford === 1 && <span className="jarvis-tag">牛津核心</span>}
+              {asset.collins > 0 && <span className="jarvis-tag">{'★'.repeat(asset.collins)}</span>}
+              {asset.tags?.map((tag: string) => <span key={tag} className="jarvis-tag">{tag.toUpperCase()}</span>)}
+            </div>
+          )}
         </td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", cursor: isSelectionMode ? "pointer" : "default" }} onClick={() => isSelectionMode && toggleSelect(assetKey)}>{bookTitle}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }}>{asset.reviews || 0}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }}>{asset.ease?.toFixed(2) || "2.50"}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }}>{formatDays(asset.nextReviewDate)}</td>
         <td style={{ padding: "12px 8px", cursor: isSelectionMode ? "pointer" : "default" }}>
           <span 
               style={{ 
@@ -847,16 +774,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                       <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                         {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>标签</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }}>释义</th>
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                       </tr>
                     </thead>
-                    <tbody>{words.map(a => renderTableRow(a, true))}</tbody>
+                    <tbody>{words.map(renderTableRow)}</tbody>
                   </table>
                 </div>
               )}
@@ -868,15 +790,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                       <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                         {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }}>释义</th>
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                       </tr>
                     </thead>
-                    <tbody>{phrases.map(a => renderTableRow(a, false))}</tbody>
+                    <tbody>{phrases.map(renderTableRow)}</tbody>
                   </table>
                 </div>
               )}
@@ -888,15 +806,11 @@ export function WordBookApp({ plugin }: WordBookAppProps) {
                       <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                         {isSelectionMode && <th style={{ padding: "12px 8px", width: "40px" }}></th>}
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
-                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                        <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }}>释义</th>
                         <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                       </tr>
                     </thead>
-                    <tbody>{sentences.map(a => renderTableRow(a, false))}</tbody>
+                    <tbody>{sentences.map(renderTableRow)}</tbody>
                   </table>
                 </div>
               )}

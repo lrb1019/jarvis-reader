@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-Current version: v1.1.4
+Current version: 1.2.0
 
 [中文说明](./README.md) | English
 
@@ -14,6 +14,11 @@ Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works w
 - **Resize Handle Visibility**: Moved the resize handle outside of the conditional actions block to make it visible and draggable across all popover states (view, append, edit).
 - **Asynchronous Detail Page Loading**: Implemented an async parse workflow when entering the book details view to read the Markdown note file directly, extracting and merging `commentEntries` and `aiSections` to ensure the details view is perfectly in sync with the reader.
 - **Style Decoupling & Rename**: Notes cards (with thoughts/links) now display clean quotes without highlight backgrounds, while plain highlight lines show a soft highlight background matching the user's color palette. Renamed detail tab and stat counts back to "笔记" per user request.
+
+## v1.2.0
+
+- The library now keeps Grid and List views only; the low-value 3D Coverflow view was removed.
+- A highlight with a reflection can be promoted directly into an independent knowledge note. Its target folder is configurable, and the new note links to the original book block rather than copying the source text.
 
 ## v1.1.2
 
@@ -37,7 +42,7 @@ Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works w
 
 ## Highlights
 
-- **Library App**: Browse books with Grid, List, and 3D Coverflow views.
+- **Library App**: Browse books with Grid and List views.
 - **Frontmatter status sync**: Reading status, rating, and tags align with the corresponding Markdown book note.
 - **Immersive EPUB reading**: Supports paginated or scrolling reading, single or dual-page modes, font size, line height, table of contents, and reading-location recovery.
 - **Highlights and notes**: Create plain highlights, write notes, append notes, open the corresponding Markdown block, filter in the sidebar, and jump back to the source text.
@@ -80,6 +85,7 @@ THIRD_PARTY_NOTICES.md
 - Plain highlights save only the selected text; notes save both the selected text and your content into the corresponding Markdown book note.
 - Click a highlight with notes to open the read-only note window.
 - In the note window, `pencil` opens the corresponding Markdown block, `file-pen-line` appends a note, and `x` closes the window.
+- A highlight with a reflection can create an independent Markdown knowledge note from the note window; configure its destination folder in plugin settings.
 - Selecting an English word first shows the bundled ECDICT result.
 - Selecting a phrase or sentence and clicking `Translate` can call AI translation.
 - Saved translation results enter the vocabulary system as words, phrases, or sentences.

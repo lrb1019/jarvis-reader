@@ -35,19 +35,18 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
       
       const result = await translateSelectionWithApi(plugin.settings, quote, sentence, plugin.app, { forceAi: true });
       if (result) {
-        const currentAsset = plugin.settings.wordAssets[lemmaKey];
-        currentAsset.translation = result.translation || currentAsset.translation;
-        if (result.display) currentAsset.display = result.display;
-        if (result.phonetic) currentAsset.phonetic = result.phonetic;
-        if (result.partOfSpeech) currentAsset.partOfSpeech = result.partOfSpeech;
-        if (result.example) currentAsset.example = result.example;
-        if (result.tags) currentAsset.tags = result.tags;
-        if (result.collins !== undefined) currentAsset.collins = result.collins;
-        if (result.oxford !== undefined) currentAsset.oxford = result.oxford;
-        currentAsset.updated = new Date().toISOString();
-
-        await plugin.persistWordAssetSidecar("save");
-        await plugin.saveSettings();
+        await plugin.wordAssetService.update(lemmaKey, (currentAsset: WordAsset) => ({
+          ...currentAsset,
+          translation: result.translation || currentAsset.translation,
+          display: result.display || currentAsset.display,
+          phonetic: result.phonetic || currentAsset.phonetic,
+          partOfSpeech: result.partOfSpeech || currentAsset.partOfSpeech,
+          example: result.example || currentAsset.example,
+          tags: result.tags || currentAsset.tags,
+          collins: result.collins ?? currentAsset.collins,
+          oxford: result.oxford ?? currentAsset.oxford,
+          updated: new Date().toISOString(),
+        }));
         
         new Notice("AI翻译完成并已更新词卡");
         onAssetUpdate();
@@ -123,11 +122,15 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
     // Update global memory
     const lemmaKey = asset.lemma;
     if (plugin.settings.wordAssets[lemmaKey]) {
-      plugin.settings.wordAssets[lemmaKey].nextReviewDate = nextReviewDate;
-      plugin.settings.wordAssets[lemmaKey].interval = interval;
-      plugin.settings.wordAssets[lemmaKey].ease = ease;
-      plugin.settings.wordAssets[lemmaKey].reviews = reviews;
-      plugin.settings.wordAssets[lemmaKey].reviewTimeMs = (plugin.settings.wordAssets[lemmaKey].reviewTimeMs || 0) + timeSpent;
+      await plugin.wordAssetService.update(lemmaKey, (currentAsset: WordAsset) => ({
+        ...currentAsset,
+        nextReviewDate,
+        interval,
+        ease,
+        reviews,
+        reviewTimeMs: (currentAsset.reviewTimeMs || 0) + timeSpent,
+        updated: new Date().toISOString(),
+      }));
 
       // Update daily word review statistics
       const today = new Date().toLocaleDateString("en-CA");
@@ -140,8 +143,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
       plugin.settings.wordReviewStats[today].reviewCount += 1;
       plugin.settings.wordReviewStats[today].reviewTimeMs += timeSpent;
 
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.saveSettingsData();
     }
 
     setShowAnswer(false);
@@ -214,9 +216,7 @@ export function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }: 
                     e.stopPropagation();
                     const current = asset.mastered;
                     if (plugin.settings.wordAssets[asset.lemma]) {
-                      plugin.settings.wordAssets[asset.lemma].mastered = !current;
-                      await plugin.persistWordAssetSidecar("save");
-                      await plugin.saveSettings();
+                      await plugin.wordAssetService.setMastered(asset.lemma, !current);
                       onAssetUpdate();
                     }
                   }} 

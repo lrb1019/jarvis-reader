@@ -23755,448 +23755,6 @@ var init_book_notes = __esm({
   }
 });
 
-// src/highlight-core.ts
-function formatBlockquote(text) {
-  return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
-}
-function formatHighlightNoteBlock(highlight) {
-  const title = highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282";
-  const quote = formatBlockquote(highlight.quote);
-  const entries = highlight.commentEntries;
-  let commentBlock = "";
-  if (Array.isArray(entries) && entries.length > 0) {
-    commentBlock = entries.map((entry) => {
-      const lbl = entry.label || "\u60F3\u6CD5";
-      const createdTime = entry.created || formatLocalDateTime(highlight.created);
-      return `>
-> **${lbl}**
-> created: ${createdTime}
->
-${formatBlockquote(entry.text)}`;
-    }).join("\n") + "\n";
-  } else {
-    const comment = (highlight.comment || "").trim();
-    commentBlock = comment ? `>
-> **\u7B14\u8BB0**
-> created: ${formatLocalDateTime(highlight.created)}
->
-${formatBlockquote(comment)}
-` : ">";
-  }
-  const timestamp = formatBlockquote(`**\u65F6\u95F4**
-${formatLocalDateTime(highlight.updated || highlight.created)}`);
-  let aiBlock = "";
-  const aiSections = highlight.aiSections;
-  if (Array.isArray(aiSections) && aiSections.length > 0) {
-    aiBlock = aiSections.map((sec) => {
-      const parts = [];
-      if (sec.links && sec.links.length) {
-        if (sec.title === "\u5173\u8054\u6587\u7AE0") {
-          const formatted = sec.links.map((lnk) => {
-            const [path, time] = lnk.split("|");
-            return time ? `[[${path}]] | ${time}` : `[[${path}]]`;
-          });
-          parts.push(formatted.join("\n"));
-        } else {
-          parts.push(sec.links.map((lnk) => `[[${lnk}]]`).join(" "));
-        }
-      }
-      if (sec.title !== "\u5173\u8054\u6587\u7AE0" && sec.text && sec.text.trim()) {
-        parts.push(sec.text.trim());
-      }
-      const secContent = parts.join("\n");
-      return `>
-> ### ${sec.title || "AI \u8F93\u51FA"}
-${formatBlockquote(secContent)}`;
-    }).join("\n");
-  }
-  return `> [!note] ${title}
-${quote}
-${commentBlock}${aiBlock ? aiBlock + "\n" : ""}${timestamp}
-^${highlight.blockId}`;
-}
-function isHighlightNoteBlockStart(line) {
-  return /^> \[!(?:quote|note)\]/i.test(line || "");
-}
-function dedupeHighlightsByCfi(list) {
-  const unique = /* @__PURE__ */ new Map();
-  const withoutCfi = [];
-  for (const item of list || []) {
-    const cfiRange = String(item?.cfiRange || "").trim();
-    if (!cfiRange) {
-      withoutCfi.push(item);
-      continue;
-    }
-    unique.set(cfiRange, item);
-  }
-  return [...withoutCfi, ...unique.values()];
-}
-function buildHighlightMetadata(highlight) {
-  const meta = {
-    id: highlight.id || highlight.blockId || "",
-    bookPath: highlight.bookPath || "",
-    bookTitle: highlight.bookTitle || "",
-    chapterTitle: highlight.chapterTitle || "",
-    cfiRange: highlight.cfiRange || "",
-    quote: highlight.quote || "",
-    comment: highlight.comment || "",
-    notePath: highlight.notePath || "",
-    blockId: highlight.blockId || highlight.id || "",
-    created: highlight.created || "",
-    updated: highlight.updated || ""
-  };
-  if (highlight.aiSections) {
-    meta.aiSections = highlight.aiSections;
-  }
-  if (highlight.commentEntries) {
-    meta.commentEntries = highlight.commentEntries;
-  }
-  return meta;
-}
-var init_highlight_core = __esm({
-  "src/highlight-core.ts"() {
-    init_utils_core();
-  }
-});
-
-// src/highlights.ts
-var highlights_exports = {};
-__export(highlights_exports, {
-  appendHighlightToBookNote: () => appendHighlightToBookNote,
-  appendReflectionToBookNote: () => appendReflectionToBookNote,
-  buildHighlightMetadata: () => buildHighlightMetadata,
-  createHighlightId: () => createHighlightId,
-  dedupeHighlightsByCfi: () => dedupeHighlightsByCfi,
-  deleteHighlightFromBookNote: () => deleteHighlightFromBookNote,
-  formatBlockquote: () => formatBlockquote,
-  formatHighlightNoteBlock: () => formatHighlightNoteBlock,
-  getEpubTocMd: () => getEpubTocMd,
-  getHighlightsForBook: () => getHighlightsForBook,
-  getPdfTocMd: () => getPdfTocMd,
-  isHighlightNoteBlockStart: () => isHighlightNoteBlockStart,
-  readHighlightCommentsFromBookNote: () => readHighlightCommentsFromBookNote,
-  readHighlightNoteDetailsFromBookNote: () => readHighlightNoteDetailsFromBookNote,
-  replaceHighlightInBookNote: () => replaceHighlightInBookNote
-});
-function createHighlightId() {
-  return `ar-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
-function normalizeHeadingText(text) {
-  return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
-}
-function getHighlightChapterHeadingText(highlight) {
-  return normalizeHeadingText(highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282") || "\u672A\u547D\u540D\u7AE0\u8282";
-}
-function getFallbackHighlightChapterHeading(highlight) {
-  const title = (highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282").replace(/\s+/g, " ").trim() || "\u672A\u547D\u540D\u7AE0\u8282";
-  return `## ${title}`;
-}
-function insertHighlightInChapter(content, highlight) {
-  const lines = content.trimEnd().split(/\r?\n/);
-  const targetTitle = getHighlightChapterHeadingText(highlight);
-  const headingPattern = /^(#{1,6})\s+(.+?)\s*$/;
-  let chapterIndex = -1;
-  let chapterDepth = 0;
-  for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(headingPattern);
-    if (!match)
-      continue;
-    const headingText = normalizeHeadingText(match[2]);
-    if (headingText === targetTitle) {
-      chapterIndex = i;
-      chapterDepth = match[1].length;
-      break;
-    }
-  }
-  const blockLines = formatHighlightNoteBlock(highlight).split("\n");
-  if (chapterIndex < 0) {
-    const insertLines2 = [getFallbackHighlightChapterHeading(highlight), "", ...blockLines];
-    if (lines.length && lines[lines.length - 1].trim() !== "")
-      insertLines2.unshift("");
-    lines.push(...insertLines2);
-    return `${lines.join("\n").trimEnd()}
-`;
-  }
-  let chapterEnd = lines.length;
-  for (let i = chapterIndex + 1; i < lines.length; i++) {
-    const match = lines[i].match(headingPattern);
-    if (match && match[1].length <= chapterDepth) {
-      chapterEnd = i;
-      break;
-    }
-  }
-  const insertLines = [...blockLines];
-  if (chapterEnd > 0 && lines[chapterEnd - 1].trim() !== "") {
-    insertLines.unshift("");
-  }
-  lines.splice(chapterEnd, 0, ...insertLines);
-  return `${lines.join("\n").trimEnd()}
-`;
-}
-async function appendHighlightToBookNote(app, noteFile, highlight) {
-  const content = await app.vault.read(noteFile);
-  const nextContent = insertHighlightInChapter(content, highlight);
-  await app.vault.modify(noteFile, nextContent);
-}
-function getHighlightNoteBlockRange(lines, blockId) {
-  const blockIndex = lines.findIndex((line) => line.trim() === `^${blockId}`);
-  if (blockIndex < 0)
-    return null;
-  let startIndex = blockIndex;
-  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
-    startIndex--;
-  }
-  if (!isHighlightNoteBlockStart(lines[startIndex]))
-    return null;
-  return { startIndex, blockIndex };
-}
-function isHighlightTimestampLine(line) {
-  return /^>\s*\*\*\u65f6\u95f4\*\*/.test(line || "");
-}
-function getReflectionCount(lines, startIndex, blockIndex) {
-  let count = 0;
-  for (let i = startIndex; i <= blockIndex; i++) {
-    if (/^>\s*\*\*(?:\u60f3\u6cd5|笔记)(?:\s+\d+)?\*\*/.test(lines[i] || ""))
-      count++;
-  }
-  return count;
-}
-async function appendReflectionToBookNote(app, noteFile, highlight, reflection) {
-  const text = (reflection || "").trim();
-  if (!text)
-    return;
-  const content = await app.vault.read(noteFile);
-  const lines = content.split(/\r?\n/);
-  const range = getHighlightNoteBlockRange(lines, highlight.blockId);
-  if (!range) {
-    await appendHighlightToBookNote(app, noteFile, { ...highlight, comment: text });
-    return;
-  }
-  const currentCount = getReflectionCount(lines, range.startIndex, range.blockIndex);
-  const nextNumber = currentCount + 1;
-  let insertIndex = range.blockIndex;
-  for (let i = range.blockIndex - 1; i > range.startIndex; i--) {
-    if (isHighlightTimestampLine(lines[i])) {
-      insertIndex = i;
-      break;
-    }
-  }
-  const label = nextNumber <= 1 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${nextNumber}`;
-  const created = highlight.updated || (/* @__PURE__ */ new Date()).toISOString();
-  const insertLines = [
-    ">",
-    `> **${label}**`,
-    `> created: ${formatLocalDateTime(created)}`,
-    ">",
-    ...formatBlockquote(text).split("\n")
-  ];
-  lines.splice(insertIndex, 0, ...insertLines);
-  await app.vault.modify(noteFile, lines.join("\n"));
-}
-function normalizeBlockquoteLine(line) {
-  return (line || "").replace(/^> ?/, "").trimEnd();
-}
-function pushCommentEntry(entries, entry) {
-  if (!entry)
-    return;
-  const text = entry.text.trim();
-  if (!text)
-    return;
-  entries.push({ ...entry, text });
-}
-function pushAiSection(sections, section) {
-  if (!section)
-    return;
-  const text = section.text.trim();
-  const links = section.links.filter(Boolean);
-  if (!text && !links.length)
-    return;
-  sections.push({ ...section, text, links });
-}
-function getFallbackCommentEntries(comment) {
-  return (comment || "").trim().split(/\n{2,}/).map((text, index) => ({
-    label: index === 0 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${index + 1}`,
-    created: "",
-    text: text.trim()
-  })).filter((entry) => entry.text);
-}
-async function readHighlightNoteDetailsFromBookNote(app, noteFile, highlight) {
-  const fallbackComment = (highlight.comment || "").trim();
-  const fallbackEntries = getFallbackCommentEntries(fallbackComment);
-  const content = await app.vault.read(noteFile);
-  const lines = content.split(/\r?\n/);
-  const range = getHighlightNoteBlockRange(lines, highlight.blockId);
-  if (!range)
-    return { comment: fallbackComment, commentEntries: fallbackEntries, aiSections: [] };
-  const entries = [];
-  const aiSections = [];
-  let currentEntry = null;
-  let currentSection = null;
-  let inAiSection = false;
-  for (let i = range.startIndex + 1; i < range.blockIndex; i++) {
-    const rawLine = lines[i] || "";
-    const line = normalizeBlockquoteLine(rawLine);
-    const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
-    const aiHeadingMatch = line.match(/^#{3}\s+(.+?)\s*$/);
-    if (/^\*\*时间\*\*/.test(line)) {
-      pushCommentEntry(entries, currentEntry);
-      currentEntry = null;
-      inAiSection = true;
-      continue;
-    }
-    if (noteMatch) {
-      pushCommentEntry(entries, currentEntry);
-      currentEntry = {
-        label: noteMatch[1] ? `\u7B14\u8BB0 ${noteMatch[1]}` : "\u7B14\u8BB0",
-        created: "",
-        text: ""
-      };
-      inAiSection = false;
-      continue;
-    }
-    if (aiHeadingMatch) {
-      pushCommentEntry(entries, currentEntry);
-      currentEntry = null;
-      pushAiSection(aiSections, currentSection);
-      currentSection = {
-        title: aiHeadingMatch[1].trim(),
-        text: "",
-        links: []
-      };
-      inAiSection = true;
-      continue;
-    }
-    if (currentEntry) {
-      if (/^created:\s*/i.test(line)) {
-        currentEntry.created = line.replace(/^created:\s*/i, "").trim();
-        continue;
-      }
-      currentEntry.text += `${line}
-`;
-      continue;
-    }
-    if (inAiSection && currentSection) {
-      if (currentSection.title === "\u5173\u8054\u6587\u7AE0") {
-        const match = line.match(/\[\[([^\]]+)\]\]/);
-        if (match) {
-          const linkName = match[1].trim();
-          const timeMatch = line.match(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/);
-          const time = timeMatch ? timeMatch[0] : "";
-          currentSection.links.push(time ? `${linkName}|${time}` : linkName);
-        }
-      } else {
-        const links = [...line.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1].trim()).filter(Boolean);
-        currentSection.links.push(...links);
-        currentSection.text += `${line}
-`;
-      }
-    }
-  }
-  pushCommentEntry(entries, currentEntry);
-  pushAiSection(aiSections, currentSection);
-  const commentEntries = entries.length ? entries : fallbackEntries;
-  return {
-    comment: commentEntries.map((entry) => entry.text).filter(Boolean).join("\n\n"),
-    commentEntries,
-    aiSections
-  };
-}
-async function readHighlightCommentsFromBookNote(app, noteFile, highlight) {
-  return (await readHighlightNoteDetailsFromBookNote(app, noteFile, highlight)).comment;
-}
-async function replaceHighlightInBookNote(app, noteFile, highlight) {
-  const content = await app.vault.read(noteFile);
-  const lines = content.split(/\r?\n/);
-  const blockIndex = lines.findIndex((line) => line.trim() === `^${highlight.blockId}`);
-  if (blockIndex < 0) {
-    await appendHighlightToBookNote(app, noteFile, highlight);
-    return;
-  }
-  let startIndex = blockIndex;
-  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
-    startIndex--;
-  }
-  if (!isHighlightNoteBlockStart(lines[startIndex])) {
-    await appendHighlightToBookNote(app, noteFile, highlight);
-    return;
-  }
-  const replacement = formatHighlightNoteBlock(highlight).split("\n");
-  lines.splice(startIndex, blockIndex - startIndex + 1, ...replacement);
-  await app.vault.modify(noteFile, lines.join("\n"));
-}
-async function deleteHighlightFromBookNote(app, noteFile, highlight) {
-  const content = await app.vault.read(noteFile);
-  const lines = content.split(/\r?\n/);
-  const blockIndex = lines.findIndex((line) => line.trim() === `^${highlight.blockId}`);
-  if (blockIndex < 0)
-    return;
-  let startIndex = blockIndex;
-  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
-    startIndex--;
-  }
-  if (!isHighlightNoteBlockStart(lines[startIndex]))
-    return;
-  let deleteEnd = blockIndex + 1;
-  while (deleteEnd < lines.length && lines[deleteEnd].trim() === "") {
-    deleteEnd++;
-  }
-  lines.splice(startIndex, deleteEnd - startIndex);
-  await app.vault.modify(noteFile, lines.join("\n").trimEnd() + "\n");
-}
-function getHighlightsForBook(settings, filePath) {
-  const allHighlights = settings.bookHighlights || {};
-  const list = allHighlights[filePath];
-  return Array.isArray(list) ? list : [];
-}
-function getEpubTocMd(rawToc) {
-  function dfs(node, output2, depth) {
-    if (!node)
-      return;
-    const cleanedLabel = node.label.replace(/\u0000/g, "").trim();
-    output2.push("#".repeat(depth) + " " + cleanedLabel);
-    for (let sub of node.subitems) {
-      dfs(sub, output2, depth + 1);
-    }
-  }
-  if (!rawToc)
-    return "";
-  const output = [];
-  for (let sub of rawToc) {
-    dfs(sub, output, 1);
-  }
-  return output.join("\n\n");
-}
-async function getPdfTocMd(file) {
-  const pdfjsLib = await (0, import_obsidian3.loadPdfJs)();
-  const content = await this.app.vault.readBinary(file.path);
-  const pdf = await pdfjsLib.getDocument(new Uint8Array(content)).promise;
-  const rawToc = await pdf.getOutline();
-  function dfs(node, output2, depth) {
-    if (!node)
-      return;
-    const cleanedLabel = node.title.replace(/\u0000/g, "").trim();
-    output2.push("#".repeat(depth) + " " + cleanedLabel);
-    for (let sub of node.items) {
-      dfs(sub, output2, depth + 1);
-    }
-  }
-  if (!rawToc)
-    return "";
-  const output = [];
-  for (let sub of rawToc) {
-    dfs(sub, output, 1);
-  }
-  return output.join("\n\n");
-}
-var import_obsidian3;
-var init_highlights = __esm({
-  "src/highlights.ts"() {
-    import_obsidian3 = require("obsidian");
-    init_utils_core();
-    init_highlight_core();
-  }
-});
-
 // node_modules/react-is/cjs/react-is.development.js
 var require_react_is_development = __commonJS({
   "node_modules/react-is/cjs/react-is.development.js"(exports) {
@@ -54022,7 +53580,435 @@ var import_client = __toESM(require_client(), 1);
 var import_obsidian7 = require("obsidian");
 init_utils();
 init_book_notes();
-init_highlights();
+
+// src/highlights.ts
+var import_obsidian3 = require("obsidian");
+init_utils_core();
+
+// src/highlight-core.ts
+init_utils_core();
+function formatBlockquote(text) {
+  return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
+}
+function formatHighlightNoteBlock(highlight) {
+  const title = highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282";
+  const quote = formatBlockquote(highlight.quote);
+  const entries = highlight.commentEntries;
+  let commentBlock = "";
+  if (Array.isArray(entries) && entries.length > 0) {
+    commentBlock = entries.map((entry) => {
+      const lbl = entry.label || "\u60F3\u6CD5";
+      const createdTime = entry.created || formatLocalDateTime(highlight.created);
+      return `>
+> **${lbl}**
+> created: ${createdTime}
+>
+${formatBlockquote(entry.text)}`;
+    }).join("\n") + "\n";
+  } else {
+    const comment = (highlight.comment || "").trim();
+    commentBlock = comment ? `>
+> **\u7B14\u8BB0**
+> created: ${formatLocalDateTime(highlight.created)}
+>
+${formatBlockquote(comment)}
+` : ">\n";
+  }
+  const timestamp = formatBlockquote(`**\u65F6\u95F4**
+${formatLocalDateTime(highlight.updated || highlight.created)}`);
+  let aiBlock = "";
+  const aiSections = highlight.aiSections;
+  if (Array.isArray(aiSections) && aiSections.length > 0) {
+    aiBlock = aiSections.map((sec) => {
+      const parts = [];
+      if (sec.links && sec.links.length) {
+        if (sec.title === "\u5173\u8054\u6587\u7AE0") {
+          const formatted = sec.links.map((lnk) => {
+            const [path, time] = lnk.split("|");
+            return time ? `[[${path}]] | ${time}` : `[[${path}]]`;
+          });
+          parts.push(formatted.join("\n"));
+        } else {
+          parts.push(sec.links.map((lnk) => `[[${lnk}]]`).join(" "));
+        }
+      }
+      if (sec.title !== "\u5173\u8054\u6587\u7AE0" && sec.text && sec.text.trim()) {
+        parts.push(sec.text.trim());
+      }
+      const secContent = parts.join("\n");
+      return `>
+> ### ${sec.title || "AI \u8F93\u51FA"}
+${formatBlockquote(secContent)}`;
+    }).join("\n");
+  }
+  return `> [!note] ${title}
+${quote}
+${commentBlock}${aiBlock ? aiBlock + "\n" : ""}${timestamp}
+^${highlight.blockId}`;
+}
+function isHighlightNoteBlockStart(line) {
+  return /^> \[!(?:quote|note)\]/i.test(line || "");
+}
+function dedupeHighlightsByCfi(list) {
+  const unique = /* @__PURE__ */ new Map();
+  const withoutCfi = [];
+  for (const item of list || []) {
+    const cfiRange = String(item?.cfiRange || "").trim();
+    if (!cfiRange) {
+      withoutCfi.push(item);
+      continue;
+    }
+    unique.set(cfiRange, item);
+  }
+  return [...withoutCfi, ...unique.values()];
+}
+function buildHighlightMetadata(highlight) {
+  const meta = {
+    id: highlight.id || highlight.blockId || "",
+    bookPath: highlight.bookPath || "",
+    bookTitle: highlight.bookTitle || "",
+    chapterTitle: highlight.chapterTitle || "",
+    cfiRange: highlight.cfiRange || "",
+    notePath: highlight.notePath || "",
+    blockId: highlight.blockId || highlight.id || "",
+    created: highlight.created || "",
+    updated: highlight.updated || ""
+  };
+  if (highlight.markColor) {
+    meta.markColor = highlight.markColor;
+  }
+  return meta;
+}
+function buildHighlightNoteUpdate(current, incoming, comment, updated) {
+  return {
+    ...current,
+    // The index intentionally omits Markdown-owned quote text after reload.
+    quote: incoming.quote || current.quote,
+    comment,
+    updated
+  };
+}
+
+// src/highlights.ts
+function createHighlightId() {
+  return `ar-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+function normalizeHeadingText(text) {
+  return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
+}
+function getHighlightChapterHeadingText(highlight) {
+  return normalizeHeadingText(highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282") || "\u672A\u547D\u540D\u7AE0\u8282";
+}
+function getFallbackHighlightChapterHeading(highlight) {
+  const title = (highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282").replace(/\s+/g, " ").trim() || "\u672A\u547D\u540D\u7AE0\u8282";
+  return `## ${title}`;
+}
+function insertHighlightInChapter(content, highlight) {
+  const lines = content.trimEnd().split(/\r?\n/);
+  const targetTitle = getHighlightChapterHeadingText(highlight);
+  const headingPattern = /^(#{1,6})\s+(.+?)\s*$/;
+  let chapterIndex = -1;
+  let chapterDepth = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(headingPattern);
+    if (!match)
+      continue;
+    const headingText = normalizeHeadingText(match[2]);
+    if (headingText === targetTitle) {
+      chapterIndex = i;
+      chapterDepth = match[1].length;
+      break;
+    }
+  }
+  const blockLines = formatHighlightNoteBlock(highlight).split("\n");
+  if (chapterIndex < 0) {
+    const insertLines2 = [getFallbackHighlightChapterHeading(highlight), "", ...blockLines];
+    if (lines.length && lines[lines.length - 1].trim() !== "")
+      insertLines2.unshift("");
+    lines.push(...insertLines2);
+    return `${lines.join("\n").trimEnd()}
+`;
+  }
+  let chapterEnd = lines.length;
+  for (let i = chapterIndex + 1; i < lines.length; i++) {
+    const match = lines[i].match(headingPattern);
+    if (match && match[1].length <= chapterDepth) {
+      chapterEnd = i;
+      break;
+    }
+  }
+  const insertLines = [...blockLines];
+  if (chapterEnd > 0 && lines[chapterEnd - 1].trim() !== "") {
+    insertLines.unshift("");
+  }
+  lines.splice(chapterEnd, 0, ...insertLines);
+  return `${lines.join("\n").trimEnd()}
+`;
+}
+async function appendHighlightToBookNote(app, noteFile, highlight) {
+  const content = await app.vault.read(noteFile);
+  const nextContent = insertHighlightInChapter(content, highlight);
+  await app.vault.modify(noteFile, nextContent);
+}
+function getHighlightNoteBlockRange(lines, blockId) {
+  const blockIndex = lines.findIndex((line) => line.trim() === `^${blockId}`);
+  if (blockIndex < 0)
+    return null;
+  let startIndex = blockIndex;
+  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
+    startIndex--;
+  }
+  if (!isHighlightNoteBlockStart(lines[startIndex]))
+    return null;
+  return { startIndex, blockIndex };
+}
+function isHighlightTimestampLine(line) {
+  return /^>\s*\*\*\u65f6\u95f4\*\*/.test(line || "");
+}
+function getReflectionCount(lines, startIndex, blockIndex) {
+  let count = 0;
+  for (let i = startIndex; i <= blockIndex; i++) {
+    if (/^>\s*\*\*(?:\u60f3\u6cd5|笔记)(?:\s+\d+)?\*\*/.test(lines[i] || ""))
+      count++;
+  }
+  return count;
+}
+async function appendReflectionToBookNote(app, noteFile, highlight, reflection) {
+  const text = (reflection || "").trim();
+  if (!text)
+    return;
+  const content = await app.vault.read(noteFile);
+  const lines = content.split(/\r?\n/);
+  const range = getHighlightNoteBlockRange(lines, highlight.blockId);
+  if (!range) {
+    await appendHighlightToBookNote(app, noteFile, { ...highlight, comment: text });
+    return;
+  }
+  const currentCount = getReflectionCount(lines, range.startIndex, range.blockIndex);
+  const nextNumber = currentCount + 1;
+  let insertIndex = range.blockIndex;
+  for (let i = range.blockIndex - 1; i > range.startIndex; i--) {
+    if (isHighlightTimestampLine(lines[i])) {
+      insertIndex = i;
+      break;
+    }
+  }
+  const label = nextNumber <= 1 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${nextNumber}`;
+  const created = highlight.updated || (/* @__PURE__ */ new Date()).toISOString();
+  const insertLines = [
+    ">",
+    `> **${label}**`,
+    `> created: ${formatLocalDateTime(created)}`,
+    ">",
+    ...formatBlockquote(text).split("\n")
+  ];
+  lines.splice(insertIndex, 0, ...insertLines);
+  await app.vault.modify(noteFile, lines.join("\n"));
+}
+function normalizeBlockquoteLine(line) {
+  return (line || "").replace(/^(?:>\s*)+/, "").trimEnd();
+}
+function pushCommentEntry(entries, entry) {
+  if (!entry)
+    return;
+  const text = entry.text.trim();
+  if (!text)
+    return;
+  entries.push({ ...entry, text });
+}
+function pushAiSection(sections, section) {
+  if (!section)
+    return;
+  const text = section.text.trim();
+  const links = section.links.filter(Boolean);
+  if (!text && !links.length)
+    return;
+  sections.push({ ...section, text, links });
+}
+function getFallbackCommentEntries(comment) {
+  return (comment || "").trim().split(/\n{2,}/).map((text, index) => ({
+    label: index === 0 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${index + 1}`,
+    created: "",
+    text: text.trim()
+  })).filter((entry) => entry.text);
+}
+async function readHighlightNoteDetailsFromBookNote(app, noteFile, highlight) {
+  const fallbackQuote = (highlight.quote || "").trim();
+  const fallbackComment = (highlight.comment || "").trim();
+  const fallbackEntries = getFallbackCommentEntries(fallbackComment);
+  const content = await app.vault.read(noteFile);
+  const lines = content.split(/\r?\n/);
+  const range = getHighlightNoteBlockRange(lines, highlight.blockId);
+  if (!range)
+    return { quote: fallbackQuote, comment: fallbackComment, commentEntries: fallbackEntries, aiSections: [] };
+  const quoteLines = [];
+  const entries = [];
+  const aiSections = [];
+  let currentEntry = null;
+  let currentSection = null;
+  let inAiSection = false;
+  let readingQuote = true;
+  for (let i = range.startIndex + 1; i < range.blockIndex; i++) {
+    const rawLine = lines[i] || "";
+    const line = normalizeBlockquoteLine(rawLine);
+    const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
+    const aiHeadingMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    if (readingQuote) {
+      if (!line || noteMatch || aiHeadingMatch || /^\*\*时间\*\*/.test(line)) {
+        readingQuote = false;
+      } else {
+        quoteLines.push(line);
+        continue;
+      }
+    }
+    if (/^\*\*时间\*\*/.test(line)) {
+      pushCommentEntry(entries, currentEntry);
+      currentEntry = null;
+      inAiSection = true;
+      continue;
+    }
+    if (noteMatch) {
+      pushCommentEntry(entries, currentEntry);
+      currentEntry = {
+        label: noteMatch[1] ? `\u7B14\u8BB0 ${noteMatch[1]}` : "\u7B14\u8BB0",
+        created: "",
+        text: ""
+      };
+      inAiSection = false;
+      continue;
+    }
+    if (aiHeadingMatch) {
+      pushCommentEntry(entries, currentEntry);
+      currentEntry = null;
+      pushAiSection(aiSections, currentSection);
+      currentSection = {
+        title: aiHeadingMatch[1].trim(),
+        text: "",
+        links: []
+      };
+      inAiSection = true;
+      continue;
+    }
+    if (currentEntry) {
+      if (/^created:\s*/i.test(line)) {
+        currentEntry.created = line.replace(/^created:\s*/i, "").trim();
+        continue;
+      }
+      currentEntry.text += `${line}
+`;
+      continue;
+    }
+    if (inAiSection && currentSection) {
+      if (currentSection.title === "\u5173\u8054\u6587\u7AE0") {
+        const match = line.match(/\[\[([^\]]+)\]\]/);
+        if (match) {
+          const linkName = match[1].trim();
+          const timeMatch = line.match(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/);
+          const time = timeMatch ? timeMatch[0] : "";
+          currentSection.links.push(time ? `${linkName}|${time}` : linkName);
+        }
+      } else {
+        const links = [...line.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1].trim()).filter(Boolean);
+        currentSection.links.push(...links);
+        currentSection.text += `${line}
+`;
+      }
+    }
+  }
+  pushCommentEntry(entries, currentEntry);
+  pushAiSection(aiSections, currentSection);
+  const commentEntries = entries.length ? entries : fallbackEntries;
+  return {
+    quote: quoteLines.join("\n").trim() || fallbackQuote,
+    comment: commentEntries.map((entry) => entry.text).filter(Boolean).join("\n\n"),
+    commentEntries,
+    aiSections
+  };
+}
+async function replaceHighlightInBookNote(app, noteFile, highlight) {
+  const content = await app.vault.read(noteFile);
+  const lines = content.split(/\r?\n/);
+  const blockIndex = lines.findIndex((line) => line.trim() === `^${highlight.blockId}`);
+  if (blockIndex < 0) {
+    await appendHighlightToBookNote(app, noteFile, highlight);
+    return;
+  }
+  let startIndex = blockIndex;
+  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
+    startIndex--;
+  }
+  if (!isHighlightNoteBlockStart(lines[startIndex])) {
+    await appendHighlightToBookNote(app, noteFile, highlight);
+    return;
+  }
+  const replacement = formatHighlightNoteBlock(highlight).split("\n");
+  lines.splice(startIndex, blockIndex - startIndex + 1, ...replacement);
+  await app.vault.modify(noteFile, lines.join("\n"));
+}
+async function deleteHighlightFromBookNote(app, noteFile, highlight) {
+  const content = await app.vault.read(noteFile);
+  const lines = content.split(/\r?\n/);
+  const blockIndex = lines.findIndex((line) => line.trim() === `^${highlight.blockId}`);
+  if (blockIndex < 0)
+    return;
+  let startIndex = blockIndex;
+  while (startIndex > 0 && !isHighlightNoteBlockStart(lines[startIndex])) {
+    startIndex--;
+  }
+  if (!isHighlightNoteBlockStart(lines[startIndex]))
+    return;
+  let deleteEnd = blockIndex + 1;
+  while (deleteEnd < lines.length && lines[deleteEnd].trim() === "") {
+    deleteEnd++;
+  }
+  lines.splice(startIndex, deleteEnd - startIndex);
+  await app.vault.modify(noteFile, lines.join("\n").trimEnd() + "\n");
+}
+function getHighlightsForBook(settings, filePath) {
+  const allHighlights = settings.bookHighlights || {};
+  const list = allHighlights[filePath];
+  return Array.isArray(list) ? list : [];
+}
+function getEpubTocMd(rawToc) {
+  function dfs(node, output2, depth) {
+    if (!node)
+      return;
+    const cleanedLabel = node.label.replace(/\u0000/g, "").trim();
+    output2.push("#".repeat(depth) + " " + cleanedLabel);
+    for (let sub of node.subitems) {
+      dfs(sub, output2, depth + 1);
+    }
+  }
+  if (!rawToc)
+    return "";
+  const output = [];
+  for (let sub of rawToc) {
+    dfs(sub, output, 1);
+  }
+  return output.join("\n\n");
+}
+async function getPdfTocMd(file) {
+  const pdfjsLib = await (0, import_obsidian3.loadPdfJs)();
+  const content = await this.app.vault.readBinary(file.path);
+  const pdf = await pdfjsLib.getDocument(new Uint8Array(content)).promise;
+  const rawToc = await pdf.getOutline();
+  function dfs(node, output2, depth) {
+    if (!node)
+      return;
+    const cleanedLabel = node.title.replace(/\u0000/g, "").trim();
+    output2.push("#".repeat(depth) + " " + cleanedLabel);
+    for (let sub of node.items) {
+      dfs(sub, output2, depth + 1);
+    }
+  }
+  if (!rawToc)
+    return "";
+  const output = [];
+  for (let sub of rawToc) {
+    dfs(sub, output, 1);
+  }
+  return output.join("\n\n");
+}
 
 // src/word-assets.ts
 init_utils_core();
@@ -55592,7 +55578,13 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
   return import_react.default.createElement("div", {
     className: "jarvis-reader-cm-editor",
     ref: hostRef,
-    "data-placeholder": placeholder || ""
+    "data-placeholder": placeholder || "",
+    onMouseDown: (event) => {
+      const target = event.target;
+      if (target.closest(".cm-content")) return;
+      event.preventDefault();
+      viewRef.current?.focus();
+    }
   });
 };
 
@@ -55602,7 +55594,6 @@ var import_obsidian6 = require("obsidian");
 var import_react_reader = __toESM(require_lib3(), 1);
 var ReactReaderModule = __toESM(require_lib3(), 1);
 init_utils();
-init_highlight_core();
 init_utils_core();
 
 // src/claudianBridge.ts
@@ -55780,7 +55771,7 @@ var ObsidianMarkdown = ({ text, onOpenLink }) => {
     className: "markdown-preview-view clean-markdown-view"
   });
 };
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction, app, smartCommands, bookTitle }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app, smartCommands, bookTitle }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
@@ -57048,6 +57039,39 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     };
   }, [setReaderZoom]);
   (0, import_react2.useEffect)(() => {
+    const container = containerRef.current;
+    if (!container)
+      return;
+    const decoratePageButtons = () => {
+      const buttons = Array.from(container.querySelectorAll("button"));
+      for (const button of buttons) {
+        const isPrevious = button.classList.contains("jarvis-reader-page-button-prev") || button.textContent?.trim() === "\u2039";
+        const isNext = button.classList.contains("jarvis-reader-page-button-next") || button.textContent?.trim() === "\u203A";
+        if (!isPrevious && !isNext)
+          continue;
+        const direction = isPrevious ? "prev" : "next";
+        const iconClass = `jarvis-reader-page-button-${direction}`;
+        if (button.classList.contains(iconClass) && button.querySelector("svg"))
+          continue;
+        button.classList.add("jarvis-reader-page-button", iconClass);
+        button.setAttribute("aria-label", direction === "prev" ? "\u4E0A\u4E00\u9875" : "\u4E0B\u4E00\u9875");
+        button.setAttribute("title", direction === "prev" ? "\u4E0A\u4E00\u9875" : "\u4E0B\u4E00\u9875");
+        button.replaceChildren();
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("aria-hidden", "true");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", direction === "prev" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6");
+        svg.appendChild(path);
+        button.appendChild(svg);
+      }
+    };
+    decoratePageButtons();
+    const observer = new MutationObserver(decoratePageButtons);
+    observer.observe(container, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+  (0, import_react2.useEffect)(() => {
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
       return;
     const rendition = renditionRef.current;
@@ -57560,6 +57584,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     })).filter((entry) => entry.text);
   };
   const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries2(pendingSelection) : [];
+  const promotableHighlightNote = highlightNoteEntries[highlightNoteEntries.length - 1]?.text || highlightComment.trim();
   const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
   const renderHighlightNotes = () => highlightNoteEntries.length ? import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
@@ -57927,6 +57952,20 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
   const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
   const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4FDD\u5B58\u957F\u53E5" : pendingTranslationKind === "phrase" ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
+  const pendingWordTags = (() => {
+    const result = wordLookupState.result;
+    if (!result || !result.isWord)
+      return [];
+    const tags = [];
+    if (result.oxford === 1)
+      tags.push({ label: "\u725B\u6D25\u6838\u5FC3", tone: "core" });
+    if (result.collins > 0)
+      tags.push({ label: "\u2605".repeat(result.collins), tone: "rank" });
+    for (const tag of result.tags || []) {
+      tags.push({ label: String(tag).toUpperCase(), tone: "exam" });
+    }
+    return tags;
+  })();
   const renderObsidianIcon = (name) => import_react2.default.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
@@ -58396,8 +58435,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
   }, "\u7FFB\u8BD1"), import_react2.default.createElement("div", {
-    className: "jarvis-reader-highlight-quote"
-  }, pendingWordSelection.quote), import_react2.default.createElement("div", {
     className: "jarvis-reader-word-panel"
   }, wordLookupState.status === "loading" ? import_react2.default.createElement("div", {
     className: "jarvis-reader-word-muted"
@@ -58409,42 +58446,45 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     wordLookupState.result.isWord ? import_react2.default.createElement("div", {
       className: "jarvis-reader-word-head"
     }, import_react2.default.createElement("button", {
-      className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
+      className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button jarvis-reader-word-translate-lemma",
       title: "\u70B9\u51FB\u53D1\u97F3",
       onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
       disabled: !enableWordAudio
     }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? import_react2.default.createElement("div", {}, wordLookupState.result.phonetic) : null) : null,
-    wordLookupState.result.isWord && (wordLookupState.result.tags || wordLookupState.result.collins || wordLookupState.result.oxford) ? import_react2.default.createElement(
+    pendingWordTags.length ? import_react2.default.createElement(
       "div",
-      { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
-      wordLookupState.result.oxford === 1 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
-      wordLookupState.result.collins && wordLookupState.result.collins > 0 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(wordLookupState.result.collins)) : null,
-      wordLookupState.result.tags ? wordLookupState.result.tags.map((tag) => import_react2.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+      { className: "jarvis-reader-word-tags" },
+      pendingWordTags.slice(0, 3).map((tag) => import_react2.default.createElement("span", { key: tag.label, className: `jarvis-reader-word-tag is-${tag.tone}` }, tag.label)),
+      pendingWordTags.length > 3 ? import_react2.default.createElement("span", { className: "jarvis-reader-word-tag is-more" }, `+${pendingWordTags.length - 3}`) : null
     ) : null,
-    wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react2.default.createElement("div", {
+    import_react2.default.createElement("div", { className: "jarvis-reader-word-definition-card" }, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react2.default.createElement("div", {
       className: "jarvis-reader-word-translation"
-    }, wordLookupState.result.translation)
+    }, wordLookupState.result.translation))
   ) : null), import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-actions"
   }, import_react2.default.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "\u53D6\u6D88",
     onClick: clearHighlightUi
-  }, "\u53D6\u6D88"), savedWordAsset ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+  }, renderObsidianIcon("x")), savedWordAsset ? import_react2.default.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "\u6253\u5F00\u8BCD\u6761",
     onClick: () => openWordNote(savedWordAsset)
-  }, "\u6253\u5F00\u8BCD\u6761") : null, canSwitchPendingWordToAi ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+  }, renderObsidianIcon("book-open")) : null, canSwitchPendingWordToAi ? import_react2.default.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "AI \u7FFB\u8BD1",
     onClick: translatePendingWordWithAi
-  }, "AI\u7FFB\u8BD1") : null, savedWordAsset && savedWordAsset.mastered ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+  }, renderObsidianIcon("bot")) : null, savedWordAsset && savedWordAsset.mastered ? import_react2.default.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
+    "aria-label": "\u91CD\u65B0\u52A0\u5165",
     onClick: restorePendingWordAsset
-  }, "\u91CD\u65B0\u52A0\u5165") : null, canPersistPendingWord && !savedWordAsset ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+  }, renderObsidianIcon("rotate-ccw")) : null, canPersistPendingWord && !savedWordAsset ? import_react2.default.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
+    "aria-label": persistPendingLabel,
     onClick: persistPendingWordAsset
-  }, persistPendingLabel) : null, import_react2.default.createElement("div", {
+  }, renderObsidianIcon("bookmark-plus")) : null, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
-    onPointerDown: beginHighlightPopoverResize,
-    title: "Resize"
+    onPointerDown: beginHighlightPopoverResize
   }))) : null, pendingSelection ? import_react2.default.createElement("div", {
     className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
     style: visibleHighlightPopoverRect ? {
@@ -58481,6 +58521,12 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         setHighlightContentTab("notes");
       }
     }, renderObsidianIcon("file-pen-line")) : null,
+    isExistingHighlightComment && promotableHighlightNote && typeof promoteHighlight === "function" ? import_react2.default.createElement("button", {
+      className: "jarvis-reader-highlight-icon-button",
+      type: "button",
+      title: "\u63D0\u5347\u4E3A\u77E5\u8BC6\u7B14\u8BB0",
+      onClick: () => promoteHighlight(pendingSelection, promotableHighlightNote)
+    }, renderObsidianIcon("file-plus-2")) : null,
     ...(smartCommands || []).filter((c) => c.enabled !== false && (c.scope === "note" || c.scope === "both")).map(
       (cmd) => import_react2.default.createElement("button", {
         key: cmd.id,
@@ -58528,7 +58574,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     onOpenLink: openWikiLink,
     placeholder: highlightCommentPlaceholder
   }), import_react2.default.createElement("div", {
-    className: "jarvis-reader-highlight-input-shell"
+    className: "jarvis-reader-highlight-input-shell",
+    onMouseDown: (event) => {
+      const target = event.target;
+      if (target.closest("textarea, .jarvis-reader-highlight-input-wikilink")) return;
+      event.preventDefault();
+      highlightInputRef.current?.focus();
+    }
   }, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-input-preview"
   }, renderWikiInputPreview(highlightComment)), import_react2.default.createElement("textarea", {
@@ -58801,15 +58853,7 @@ var EpubView = class extends import_obsidian7.FileView {
       new import_obsidian7.Notice("Failed to build word asset.");
       return null;
     }
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
-    await this.plugin.persistWordAssetSidecar("save");
-    await this.plugin.saveSettings();
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
+    await this.plugin.wordAssetService.save(getLightWordAsset(asset));
     new import_obsidian7.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u5B57\u5178");
     return asset;
   }
@@ -58830,30 +58874,13 @@ var EpubView = class extends import_obsidian7.FileView {
       mastered: !!mastered,
       updated: (/* @__PURE__ */ new Date()).toISOString()
     };
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(updated);
-    await this.plugin.persistWordAssetSidecar("save");
-    await this.plugin.saveSettings();
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
-    return updated;
+    return await this.plugin.wordAssetService.save(getLightWordAsset(updated));
   }
   async deleteWordAsset(asset) {
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!assetKey)
       return false;
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    delete this.plugin.settings.wordAssets[assetKey];
-    await this.plugin.persistWordAssetSidecar("delete");
-    await this.plugin.saveSettingsData();
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
+    await this.plugin.wordAssetService.delete(assetKey);
     new import_obsidian7.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
     return true;
   }
@@ -58865,6 +58892,37 @@ var EpubView = class extends import_obsidian7.FileView {
   }
   getBookHighlights() {
     return getHighlightsForBook(this.plugin.settings, this.file.path);
+  }
+  async promoteHighlight(highlight, reflection) {
+    if (!highlight.notePath || !reflection.trim()) return;
+    const title = reflection.trim().split(/\r?\n/)[0].slice(0, 48) || "\u672A\u547D\u540D\u60F3\u6CD5";
+    try {
+      const file = await this.plugin.knowledgeNoteService.create({
+        folder: this.plugin.settings.knowledgeNoteFolder || "",
+        title,
+        body: reflection,
+        sourceNotePath: highlight.notePath,
+        sourceBlockId: highlight.blockId || highlight.id,
+        sourceBookTitle: highlight.bookTitle,
+        createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
+      });
+      await this.app.workspace.getLeaf(true).openFile(file);
+      new import_obsidian7.Notice("\u5DF2\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u3002");
+    } catch (error) {
+      console.error("Jarvis Reader knowledge note creation failed.", error);
+      new import_obsidian7.Notice(`\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u5931\u8D25\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+    }
+  }
+  async commitHighlightIndex(nextHighlights, reason) {
+    const bookPath = this.file.path;
+    try {
+      await this.plugin.highlightService.replaceBookHighlights(bookPath, nextHighlights, reason);
+      return true;
+    } catch (error) {
+      console.error("Jarvis Reader highlight index save failed after Markdown write.", error);
+      new import_obsidian7.Notice("\u4E66\u7C4D\u7B14\u8BB0\u5DF2\u4FDD\u5B58\uFF0C\u4F46\u9AD8\u4EAE\u7D22\u5F15\u672A\u4FDD\u5B58\u3002\u8BF7\u5148\u6062\u590D highlights.json\uFF1BMarkdown \u6B63\u6587\u4E0D\u4F1A\u4E22\u5931\uFF0C\u4F46\u8FD9\u6761 EPUB \u6807\u8BB0\u9700\u8981\u624B\u52A8\u91CD\u65B0\u521B\u5EFA\u3002", 0);
+      return false;
+    }
   }
   async getBookHighlightsForReader() {
     const list = this.getBookHighlights();
@@ -58880,8 +58938,14 @@ var EpubView = class extends import_obsidian7.FileView {
         continue;
       }
       try {
-        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, highlight);
-        enriched.push(details.comment || details.commentEntries.length || details.aiSections.length ? { ...highlight, comment: details.comment, commentEntries: details.commentEntries, aiSections: details.aiSections } : highlight);
+        const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
+        enriched.push({
+          ...highlight,
+          quote: details.quote || highlight.quote,
+          comment: details.comment,
+          commentEntries: details.commentEntries,
+          aiSections: details.aiSections
+        });
       } catch (error) {
         console.warn("Jarvis Reader read highlight comments failed.", error);
         enriched.push(highlight);
@@ -58925,13 +58989,11 @@ var EpubView = class extends import_obsidian7.FileView {
       blockId: id,
       created: (/* @__PURE__ */ new Date()).toISOString()
     };
-    await appendHighlightToBookNote(this.app, noteFile, highlight);
-    if (!this.plugin.settings.bookHighlights) {
-      this.plugin.settings.bookHighlights = {};
-    }
+    await this.plugin.bookNoteService.appendHighlight(noteFile, highlight);
     const list = getHighlightsForBook(this.plugin.settings, this.file.path);
-    this.plugin.settings.bookHighlights[this.file.path] = [...list, highlight];
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex([...list, highlight], "create-highlight")) {
+      return null;
+    }
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id);
@@ -58948,11 +59010,12 @@ var EpubView = class extends import_obsidian7.FileView {
     const updatedAt = (/* @__PURE__ */ new Date()).toISOString();
     const nextComment = (highlight.comment || "").trim();
     const shouldAppendComment = !!highlight.appendComment && !!nextComment;
-    let updated = {
-      ...list[index],
-      comment: shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
-      updated: updatedAt
-    };
+    let updated = buildHighlightNoteUpdate(
+      list[index],
+      highlight,
+      shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
+      updatedAt
+    );
     if (highlight.aiSections !== void 0) {
       updated.aiSections = highlight.aiSections;
     }
@@ -58962,17 +59025,18 @@ var EpubView = class extends import_obsidian7.FileView {
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath);
     if (noteFile instanceof import_obsidian7.TFile) {
       if (shouldAppendComment) {
-        await appendReflectionToBookNote(this.app, noteFile, updated, nextComment);
-        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, updated);
+        await this.plugin.bookNoteService.appendReflection(noteFile, updated, nextComment);
+        const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, updated);
         updated = { ...updated, comment: details.comment };
         updated.commentEntries = details.commentEntries;
         updated.aiSections = details.aiSections;
       } else {
-        await replaceHighlightInBookNote(this.app, noteFile, updated);
+        await this.plugin.bookNoteService.replaceHighlight(noteFile, updated);
       }
     }
-    this.plugin.settings.bookHighlights[this.file.path] = list.map((item) => item.id === updated.id ? updated : item);
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex(list.map((item) => item.id === updated.id ? updated : item), "update-highlight")) {
+      return null;
+    }
     this.selectedHighlightId = updated.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id);
@@ -58988,10 +59052,11 @@ var EpubView = class extends import_obsidian7.FileView {
       return false;
     const noteFile = this.app.vault.getAbstractFileByPath(existing.notePath);
     if (noteFile instanceof import_obsidian7.TFile) {
-      await deleteHighlightFromBookNote(this.app, noteFile, existing);
+      await this.plugin.bookNoteService.deleteHighlight(noteFile, existing);
     }
-    this.plugin.settings.bookHighlights[this.file.path] = list.filter((item) => item.id !== existing.id);
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex(list.filter((item) => item.id !== existing.id), "delete-highlight")) {
+      return false;
+    }
     if (this.selectedHighlightId === existing.id) {
       this.selectedHighlightId = null;
     }
@@ -59308,6 +59373,7 @@ var EpubView = class extends import_obsidian7.FileView {
       openWikiLink: (linkText) => {
         this.openWikiLink(linkText);
       },
+      promoteHighlight: (highlight, reflection) => this.promoteHighlight(highlight, reflection),
       onInteraction: () => {
         this.lastInteractionTime = Date.now();
       },
@@ -59380,6 +59446,24 @@ async function resolveSyncConflicts(plugin) {
     return;
   }
   let conflictsFound = 0;
+  let wordAssetsChanged = false;
+  let highlightsChanged = false;
+  let dataChanged = false;
+  const wordConflictFilesToTrash = [];
+  const highlightConflictFilesToTrash = [];
+  const dataConflictFilesToTrash = [];
+  const mergedWordAssets = { ...plugin.settings.wordAssets || {} };
+  const mergedHighlights = Object.fromEntries(
+    Object.entries(plugin.settings.bookHighlights || {}).map(([bookPath, highlights]) => [
+      bookPath,
+      Array.isArray(highlights) ? highlights.map((highlight) => ({ ...highlight })) : []
+    ])
+  );
+  const previousData = {
+    readingStats: plugin.settings.readingStats,
+    wordReviewStats: plugin.settings.wordReviewStats,
+    bookProgress: plugin.settings.bookProgress
+  };
   try {
     const indexFolder = ".obsidian/plugins/jarvis-reader/index";
     if (await adapter.exists(indexFolder)) {
@@ -59387,16 +59471,22 @@ async function resolveSyncConflicts(plugin) {
       const wordAssetConflicts = plugin.wordAssetSidecarUnavailable ? [] : indexFiles.files.filter(
         (f) => f.match(/word-assets[- (].*\.json$/) && !f.endsWith("word-assets.json")
       );
-      const highlightConflicts = indexFiles.files.filter(
+      const highlightConflicts = plugin.highlightSidecarUnavailable ? [] : indexFiles.files.filter(
         (f) => f.match(/highlights[- (].*\.json$/) && !f.endsWith("highlights.json")
       );
       for (const file of wordAssetConflicts) {
-        await mergeWordAssetConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeWordAssetConflict(adapter, mergedWordAssets, file)) {
+          wordAssetsChanged = true;
+          wordConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
       for (const file of highlightConflicts) {
-        await mergeHighlightConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeHighlightConflict(adapter, mergedHighlights, file)) {
+          highlightsChanged = true;
+          highlightConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
     }
     const rootFolder = ".obsidian/plugins/jarvis-reader";
@@ -59405,40 +59495,57 @@ async function resolveSyncConflicts(plugin) {
       const dataConflicts = rootFiles.files.filter(
         (f) => f.match(/data[- (].*\.json$/) && !f.endsWith("data.json")
       );
+      if (dataConflicts.length) prepareDataConflictMerge(plugin);
       for (const file of dataConflicts) {
-        await mergeDataConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeDataConflict(plugin, file)) {
+          dataChanged = true;
+          dataConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
     }
-    if (conflictsFound > 0) {
-      await plugin.saveSettings();
-      if (typeof plugin.persistIndexSidecars === "function") {
-        await plugin.persistIndexSidecars("auto-conflict-resolve");
+    if (wordAssetsChanged) {
+      await plugin.wordAssetService.replaceAll(mergedWordAssets, "auto-conflict-resolve");
+      for (const file of wordConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+    if (highlightsChanged) {
+      await plugin.highlightService.replaceAll(mergedHighlights, "auto-conflict-resolve");
+      for (const file of highlightConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+    if (dataChanged) {
+      try {
+        await plugin.saveSettingsData();
+      } catch (error) {
+        plugin.settings.readingStats = previousData.readingStats;
+        plugin.settings.wordReviewStats = previousData.wordReviewStats;
+        plugin.settings.bookProgress = previousData.bookProgress;
+        throw error;
       }
+      for (const file of dataConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+    if (conflictsFound > 0) {
       new import_obsidian8.Notice(`Jarvis Reader \u81EA\u52A8\u5408\u5E76\u4E86 ${conflictsFound} \u4E2A\u7F51\u76D8\u6570\u636E\u51B2\u7A81\u6587\u4EF6\u3002`);
     }
   } catch (err) {
     console.warn("Jarvis Reader auto conflict resolution failed", err);
   }
 }
-async function mergeWordAssetConflict(plugin, conflictPath) {
-  const adapter = plugin.app.vault.adapter;
+async function mergeWordAssetConflict(adapter, currentAssets, conflictPath) {
   const raw = await adapter.read(conflictPath);
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
     console.error("Invalid word asset conflict file:", conflictPath);
-    return;
+    return false;
   }
   const conflictAssets = parsed.wordAssets || {};
-  const currentAssets = plugin.settings.wordAssets || {};
   for (const [key, asset2] of Object.entries(conflictAssets)) {
     const asset2Typed = asset2;
     if (!currentAssets[key]) {
-      currentAssets[key] = asset2;
+      currentAssets[key] = { ...asset2Typed, sources: [...asset2Typed.sources || []] };
     } else {
-      const asset1 = currentAssets[key];
+      const asset1 = { ...currentAssets[key], sources: [...currentAssets[key].sources || []] };
       const mergedSources = [...asset1.sources || []];
       for (const src2 of asset2Typed.sources || []) {
         const exists = mergedSources.find((s) => s.bookPath === src2.bookPath && s.cfiRange === src2.cfiRange);
@@ -59462,44 +59569,53 @@ async function mergeWordAssetConflict(plugin, conflictPath) {
         }
       }
       asset1.sources = mergedSources;
+      currentAssets[key] = asset1;
     }
   }
-  plugin.settings.wordAssets = currentAssets;
-  await adapter.trashSystem(conflictPath);
+  return true;
 }
-async function mergeHighlightConflict(plugin, conflictPath) {
-  const adapter = plugin.app.vault.adapter;
+async function mergeHighlightConflict(adapter, currentHighlights, conflictPath) {
   const raw = await adapter.read(conflictPath);
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
-    return;
+    console.error("Invalid highlight conflict file:", conflictPath);
+    return false;
   }
   const conflictHighlights = parsed.bookHighlights || {};
-  plugin.settings.bookHighlights = plugin.settings.bookHighlights || {};
-  const currentHighlights = plugin.settings.bookHighlights;
   for (const [bookPath, list2] of Object.entries(conflictHighlights)) {
     const list2Typed = list2;
     if (!currentHighlights[bookPath]) {
-      currentHighlights[bookPath] = list2Typed;
+      currentHighlights[bookPath] = list2Typed.map(toHighlightIndexEntry);
     } else {
       const existingHl = currentHighlights[bookPath];
       for (const h2 of list2Typed) {
         const exists = existingHl.find((h1) => h1.id === h2.id || h1.cfiRange === h2.cfiRange);
         if (!exists) {
-          existingHl.push(h2);
+          existingHl.push(toHighlightIndexEntry(h2));
         } else {
           const d1 = new Date(exists.updated || exists.created).getTime();
           const d2 = new Date(h2.updated || h2.created).getTime();
           if (d2 > d1) {
-            Object.assign(exists, h2);
+            for (const field of ["bookPath", "bookTitle", "chapterTitle", "cfiRange", "notePath", "markColor", "updated"]) {
+              if (h2[field] !== void 0) {
+                exists[field] = h2[field];
+              }
+            }
           }
         }
       }
     }
   }
-  await adapter.trashSystem(conflictPath);
+  return true;
+}
+function toHighlightIndexEntry(highlight) {
+  const indexEntry = {};
+  for (const field of ["id", "blockId", "bookPath", "bookTitle", "chapterTitle", "cfiRange", "notePath", "markColor", "created", "updated"]) {
+    if (highlight[field] !== void 0) indexEntry[field] = highlight[field];
+  }
+  return indexEntry;
 }
 async function mergeDataConflict(plugin, conflictPath) {
   const adapter = plugin.app.vault.adapter;
@@ -59508,7 +59624,8 @@ async function mergeDataConflict(plugin, conflictPath) {
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
-    return;
+    console.error("Invalid data conflict file:", conflictPath);
+    return false;
   }
   if (parsed.readingStats) {
     plugin.settings.readingStats = plugin.settings.readingStats || {};
@@ -59555,7 +59672,18 @@ async function mergeDataConflict(plugin, conflictPath) {
       }
     }
   }
-  await adapter.trashSystem(conflictPath);
+  return true;
+}
+function prepareDataConflictMerge(plugin) {
+  plugin.settings.readingStats = Object.fromEntries(
+    Object.entries(plugin.settings.readingStats || {}).map(([dateKey, books]) => [dateKey, { ...books }])
+  );
+  plugin.settings.wordReviewStats = Object.fromEntries(
+    Object.entries(plugin.settings.wordReviewStats || {}).map(([dateKey, stat]) => [dateKey, { ...stat }])
+  );
+  plugin.settings.bookProgress = Object.fromEntries(
+    Object.entries(plugin.settings.bookProgress || {}).map(([bookPath, progress]) => [bookPath, { ...progress }])
+  );
 }
 
 // src/sidebar/BookshelfView.ts
@@ -59683,6 +59811,14 @@ var JarvisReaderHighlightsView = class extends import_obsidian9.ItemView {
       highlight.comment || "",
       ...this.getWikiLinks(highlight.comment).map((link) => `${link.target} ${link.label}`)
     ].join(" ").toLowerCase();
+  }
+  getCommentEntries(highlight) {
+    const entries = Array.isArray(highlight.commentEntries) ? highlight.commentEntries.filter((entry) => (entry?.text || "").trim()) : [];
+    if (entries.length) return entries;
+    return String(highlight.comment || "").trim().split(/\n{2,}/).map((text, index) => ({
+      label: index === 0 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${index + 1}`,
+      text: text.trim()
+    })).filter((entry) => entry.text);
   }
   getCurrentChapterTitle() {
     var _a, _b;
@@ -59826,7 +59962,7 @@ var JarvisReaderHighlightsView = class extends import_obsidian9.ItemView {
       };
     }
   }
-  render() {
+  async render() {
     const container = this.contentEl;
     if (!container)
       return;
@@ -59845,14 +59981,16 @@ var JarvisReaderHighlightsView = class extends import_obsidian9.ItemView {
     };
     container.empty();
     container.addClass("jarvis-reader-highlights-view");
-    if (!this.reader) {
+    const reader = this.reader;
+    if (!reader) {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5F00\u4E00\u672C EPUB \u540E\u663E\u793A\u7B14\u8BB0" });
       return;
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
     header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u7B14\u8BB0" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
-    const list = this.reader.getBookHighlights();
+    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: reader.file ? reader.file.basename : "" });
+    const list = await reader.getBookHighlightsForReader();
+    if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6682\u65E0\u7B14\u8BB0\u3002\u9009\u4E2D\u6B63\u6587\u540E\u9AD8\u4EAE\u6216\u5199\u7B14\u8BB0\u5373\u53EF\u751F\u6210\u3002" });
       return;
@@ -59912,20 +60050,19 @@ var JarvisReaderHighlightsView = class extends import_obsidian9.ItemView {
           this.reader.jumpToHighlight(highlight, true);
         }
       };
-      card.createEl("div", { cls: "jarvis-reader-highlights-chapter", text: highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282" });
-      const bubble = card.createDiv({ cls: "jarvis-reader-highlights-bubble" });
-      if (highlight.comment) {
+      card.createEl("div", { cls: "jarvis-reader-highlights-quote", text: this.previewText(highlight.quote, 160) });
+      const noteEntries = this.getCommentEntries(highlight);
+      if (noteEntries.length) {
+        const latestNote = noteEntries[noteEntries.length - 1];
+        const bubble = card.createDiv({ cls: "jarvis-reader-highlights-bubble" });
+        bubble.createEl("div", {
+          cls: "jarvis-reader-highlights-note-meta",
+          text: noteEntries.length > 1 ? `${noteEntries.length} \u6761\u7B14\u8BB0` : "\u7B14\u8BB0"
+        });
         const commentEl = bubble.createEl("div", { cls: "jarvis-reader-highlights-comment" });
-        this.renderLinkedPreview(commentEl, highlight.comment, 96);
-      } else {
-        bubble.createEl("div", { cls: "jarvis-reader-highlights-comment is-empty", text: "\u672A\u5199\u611F\u60F3" });
+        this.renderLinkedPreview(commentEl, latestNote.text, 96);
       }
       this.renderWikiLinks(card, this.getWikiLinks(highlight.comment));
-      card.createEl("div", { cls: "jarvis-reader-highlights-quote", text: this.previewText(highlight.quote, 72) });
-      const time = this.formatTime(highlight.updated || highlight.created);
-      if (time) {
-        card.createEl("div", { cls: "jarvis-reader-highlights-time", text: time });
-      }
     }
     if (revealCard) {
       window.requestAnimationFrame(() => {
@@ -60341,7 +60478,6 @@ var ReactDOM = __toESM(require_client(), 1);
 var React4 = __toESM(require_react(), 1);
 var import_obsidian11 = require("obsidian");
 init_book_notes();
-init_highlights();
 init_utils();
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 function formatDate(dateStr) {
@@ -60439,11 +60575,11 @@ var MarkdownText = ({ content, plugin }) => {
 function LibraryApp({ plugin }) {
   const [currentView, setCurrentView] = React4.useState("home");
   const [activeBook, setActiveBook] = React4.useState(null);
+  const [detailHighlights, setDetailHighlights] = React4.useState([]);
   const [searchQuery, setSearchQuery] = React4.useState("");
   const [filterStatus, setFilterStatus] = React4.useState("all");
   const [sortBy, setSortBy] = React4.useState("recent");
   const [viewLayout, setViewLayout] = React4.useState("grid");
-  const [coverFlowIndex, setCoverFlowIndex] = React4.useState(0);
   const [activeTab, setActiveTab] = React4.useState("highlights");
   const [descExpanded, setDescExpanded] = React4.useState(false);
   const [showFilters, setShowFilters] = React4.useState(false);
@@ -60453,10 +60589,8 @@ function LibraryApp({ plugin }) {
   const [isEditingIntro, setIsEditingIntro] = React4.useState(false);
   const [gridCols, setGridCols] = React4.useState(6);
   const [selectedGridBook, setSelectedGridBook] = React4.useState(null);
-  const [isSpinning, setIsSpinning] = React4.useState(false);
   const [bookNotesMap, setBookNotesMap] = React4.useState({});
   const homeRef = React4.useRef(null);
-  const wheelTimeoutRef = React4.useRef(null);
   const [books, setBooks] = React4.useState([]);
   const [coverCache, setCoverCache] = React4.useState(plugin.settings.bookCoverCache || {});
   const [statsTab, setStatsTab] = React4.useState("week");
@@ -60465,47 +60599,27 @@ function LibraryApp({ plugin }) {
   const [debugImages, setDebugImages] = React4.useState(null);
   const [refreshTrigger, setRefreshTrigger] = React4.useState(0);
   const [expandedItems, setExpandedItems] = React4.useState(/* @__PURE__ */ new Set());
-  const formatDays = (dateStr) => {
-    if (!dateStr) return "\u672A\u8BBE\u7F6E";
-    const today = (0, import_obsidian11.moment)().startOf("day");
-    const target = (0, import_obsidian11.moment)(dateStr, "YYYY-MM-DD").startOf("day");
-    const diff = target.diff(today, "days");
-    if (diff === 0) return "\u4ECA\u5929";
-    if (diff < 0) return `\u903E\u671F ${Math.abs(diff)} \u5929`;
-    return `${diff} \u5929\u540E`;
-  };
   const handleToggleSingleMastery = async (e, lemma) => {
     e.stopPropagation();
     if (plugin.settings.wordAssets[lemma]) {
       const current = plugin.settings.wordAssets[lemma].mastered;
-      plugin.settings.wordAssets[lemma].mastered = !current;
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !current);
       setRefreshTrigger((p) => p + 1);
-      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     }
   };
   const handleDeleteWord = async (lemma) => {
     const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761 "${lemma}" \u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
     if (!confirmed) return;
-    const asset = plugin.settings.wordAssets[lemma];
-    if (!asset) return;
-    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-      await plugin.activeReaderView.deleteWordAsset(asset);
-    } else {
-      delete plugin.settings.wordAssets[lemma];
-      await plugin.persistWordAssetSidecar("delete");
-      await plugin.saveSettings();
-    }
+    if (!plugin.settings.wordAssets[lemma]) return;
+    await plugin.wordAssetService.delete(lemma);
     setRefreshTrigger((p) => p + 1);
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     new import_obsidian11.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
   };
-  const renderTableRow = (asset, showTagsColumn = false) => {
+  const renderTableRow = (asset) => {
     const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence && quote ? quote : asset.lemma;
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
     const isExpanded = expandedItems.has(assetKey);
     const handleRowClick = (e) => {
       if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
@@ -60529,10 +60643,8 @@ function LibraryApp({ plugin }) {
           menu.addItem((item) => {
             item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
               if (plugin.settings.wordAssets[assetKey]) {
-                plugin.settings.wordAssets[assetKey].mastered = !isMastered;
-                await plugin.saveSettings();
+                await plugin.wordAssetService.setMastered(assetKey, !isMastered);
                 setRefreshTrigger((p) => p + 1);
-                window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
               }
             });
           });
@@ -60563,26 +60675,24 @@ function LibraryApp({ plugin }) {
             ),
             !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
           ] }) }),
-          showTagsColumn && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px" }, children: asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }, children: [
-            asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u725B\u6D25\u6838\u5FC3" }),
-            asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u2605".repeat(asset.collins) }),
-            asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }, children: tag.toUpperCase() }, tag))
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: asset.translation && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-            "div",
-            {
-              style: {
-                color: "var(--text-normal)",
-                marginBottom: "4px",
-                whiteSpace: isExpanded ? "normal" : "pre-wrap"
-              },
-              children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownText, { content: asset.display, plugin }) }) : asset.translation
-            }
-          ) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: bookTitle }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }, children: asset.reviews || 0 }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }, children: asset.ease?.toFixed(2) || "2.50" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }, children: formatDays(asset.nextReviewDate) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: [
+            asset.translation && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+              "div",
+              {
+                style: {
+                  color: "var(--text-normal)",
+                  marginBottom: "4px",
+                  whiteSpace: isExpanded ? "normal" : "pre-wrap"
+                },
+                children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownText, { content: asset.display, plugin }) }) : asset.translation
+              }
+            ),
+            isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
+              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", children: "\u725B\u6D25\u6838\u5FC3" }),
+              asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", children: "\u2605".repeat(asset.collins) }),
+              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-tag", children: tag.toUpperCase() }, tag))
+            ] })
+          ] }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "span",
             {
@@ -60637,6 +60747,47 @@ function LibraryApp({ plugin }) {
     return () => window.removeEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
   }, [books]);
   React4.useEffect(() => {
+    const handleAssetOrHighlightChange = () => setRefreshTrigger((value) => value + 1);
+    window.addEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
+    window.addEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
+    return () => {
+      window.removeEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
+      window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
+    };
+  }, []);
+  React4.useEffect(() => {
+    if (!activeBook || currentView !== "detail") {
+      setDetailHighlights([]);
+      return;
+    }
+    let cancelled = false;
+    const loadHighlightDetails = async () => {
+      const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
+      const highlights = await Promise.all(indexHighlights.map(async (highlight) => {
+        const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
+        if (!(noteFile instanceof import_obsidian11.TFile)) return highlight;
+        try {
+          const details = await plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
+          return {
+            ...highlight,
+            quote: details.quote || highlight.quote,
+            comment: details.comment,
+            commentEntries: details.commentEntries,
+            aiSections: details.aiSections
+          };
+        } catch (error) {
+          console.warn("Jarvis Reader failed to load library highlight details.", error);
+          return highlight;
+        }
+      }));
+      if (!cancelled) setDetailHighlights(highlights);
+    };
+    void loadHighlightDetails();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeBook, currentView, plugin, refreshTrigger]);
+  React4.useEffect(() => {
     setCoverCache(plugin.settings.bookCoverCache || {});
   }, [plugin.settings.bookCoverCache]);
   React4.useEffect(() => {
@@ -60672,7 +60823,7 @@ function LibraryApp({ plugin }) {
     };
     home.addEventListener("wheel", onWheel, { passive: false });
     return () => home.removeEventListener("wheel", onWheel);
-  }, [viewLayout]);
+  }, []);
   React4.useEffect(() => {
     if (books.length === 0) return;
     let cancelled = false;
@@ -61174,33 +61325,6 @@ function LibraryApp({ plugin }) {
           if (percentage >= 100) status = "finished";
           else if (percentage > 0) status = "reading";
         }
-        const list = getHighlightsForBook(plugin.settings, activeBook.path);
-        const { readHighlightNoteDetailsFromBookNote: readHighlightNoteDetailsFromBookNote2 } = (init_highlights(), __toCommonJS(highlights_exports));
-        (async () => {
-          let hasUpdates = false;
-          const updatedList = await Promise.all(list.map(async (highlight) => {
-            try {
-              const details = await readHighlightNoteDetailsFromBookNote2(plugin.app, noteFile, highlight);
-              if (details.commentEntries?.length || details.aiSections?.length) {
-                if (!highlight.commentEntries || !highlight.aiSections || highlight.commentEntries.length !== details.commentEntries.length || highlight.aiSections.length !== details.aiSections.length) {
-                  hasUpdates = true;
-                }
-                return {
-                  ...highlight,
-                  comment: details.comment,
-                  commentEntries: details.commentEntries,
-                  aiSections: details.aiSections
-                };
-              }
-            } catch (err) {
-            }
-            return highlight;
-          }));
-          if (hasUpdates) {
-            plugin.settings.bookHighlights[activeBook.path] = updatedList;
-            setBookMetadata((prev) => ({ ...prev }));
-          }
-        })();
       } else {
         if (percentage >= 100) status = "finished";
         else if (percentage > 0) status = "reading";
@@ -61227,18 +61351,6 @@ function LibraryApp({ plugin }) {
       new import_obsidian11.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
     }
   };
-  React4.useEffect(() => {
-    if (viewLayout !== "coverflow" || filteredBooks.length === 0) return;
-    const handleKeyDown = (e) => {
-      if (e.key === "ArrowLeft") {
-        setCoverFlowIndex((prev) => Math.max(0, prev - 1));
-      } else if (e.key === "ArrowRight") {
-        setCoverFlowIndex((prev) => Math.min(filteredBooks.length - 1, prev + 1));
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [viewLayout, filteredBooks.length]);
   const openBook = async (file) => {
     const leaf = plugin.app.workspace.getLeaf(true);
     await leaf.openFile(file, { active: true });
@@ -61267,21 +61379,6 @@ function LibraryApp({ plugin }) {
       }
     }
   };
-  const handleRandomSelect = () => {
-    if (filteredBooks.length === 0 || isSpinning) return;
-    setIsSpinning(true);
-    let spins = 0;
-    const maxSpins = 20;
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * filteredBooks.length);
-      setCoverFlowIndex(randomIndex);
-      spins++;
-      if (spins >= maxSpins) {
-        clearInterval(interval);
-        setIsSpinning(false);
-      }
-    }, 60);
-  };
   const playAudio = (word) => {
     const template = plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE;
     const accent = plugin.settings.wordAudioAccent || "us";
@@ -61295,9 +61392,7 @@ function LibraryApp({ plugin }) {
   };
   const toggleWordMastery = async (lemma, currentVal) => {
     if (plugin.settings.wordAssets[lemma]) {
-      plugin.settings.wordAssets[lemma].mastered = !currentVal;
-      plugin.settings.wordAssets[lemma].updated = (/* @__PURE__ */ new Date()).toISOString();
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !currentVal);
       loadBooks();
     }
   };
@@ -62044,7 +62139,6 @@ function LibraryApp({ plugin }) {
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
-            viewLayout === "coverflow" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-filter-btn`, onClick: handleRandomSelect, title: "\u968F\u673A\u9009\u4E66", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: isSpinning ? "jarvis-spin-anim" : "", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" }) }) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }) }),
             showFilters && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
@@ -62076,13 +62170,6 @@ function LibraryApp({ plugin }) {
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "3", y1: "18", x2: "3.01", y2: "18" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "coverflow" ? "is-active" : ""}`, onClick: () => {
-              setViewLayout("coverflow");
-              setCoverFlowIndex(0);
-            }, title: "3D \u5C01\u9762\u6D41", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { x: "2", y: "7", width: "20", height: "10", rx: "2", ry: "2" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("line", { x1: "12", y1: "7", x2: "12", y2: "17" })
             ] }) })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
@@ -62145,135 +62232,7 @@ function LibraryApp({ plugin }) {
           }
         )
       ] }),
-      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "coverflow" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-library-coverflow-wrapper", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-coverflow-scene", onWheel: (e) => {
-          if (wheelTimeoutRef.current) return;
-          if (e.deltaY > 0) {
-            setCoverFlowIndex((p) => p + 1);
-          } else if (e.deltaY < 0) {
-            setCoverFlowIndex((p) => p - 1);
-          }
-          wheelTimeoutRef.current = setTimeout(() => {
-            wheelTimeoutRef.current = null;
-          }, 80);
-        }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-cf-stage", children: Array.from({ length: 31 }).map((_, idx) => {
-          const offset = idx - 15;
-          const virtualPos = coverFlowIndex + offset;
-          let actualIndex = virtualPos % filteredBooks.length;
-          if (actualIndex < 0) actualIndex += filteredBooks.length;
-          const book = filteredBooks[actualIndex];
-          if (!book) return null;
-          const cover = getCover(book);
-          const { title } = parseBookInfo(book);
-          const absOffset = Math.abs(offset);
-          const sign = Math.sign(offset);
-          const translateX = sign * (140 + absOffset * 35);
-          const translateZ = -absOffset * 40;
-          const rotateY = sign * -75;
-          const transform = offset === 0 ? `translate(-50%, -50%) translateZ(40px) scale(1.02)` : `translate(-50%, -50%) translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`;
-          let gradientBg = "";
-          if (!cover?.dataUrl) {
-            let hash = 0;
-            for (let j = 0; j < title.length; j++) hash = title.charCodeAt(j) + ((hash << 5) - hash);
-            const hue = Math.abs(hash) % 360;
-            gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-          }
-          return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-            "div",
-            {
-              className: `jarvis-library-cf-card ${offset === 0 ? "is-active" : ""}`,
-              style: { transform, zIndex: 100 - absOffset },
-              onClick: () => {
-                if (offset !== 0) setCoverFlowIndex(virtualPos);
-                else {
-                  setActiveBook(book);
-                  setCurrentView("detail");
-                }
-              },
-              children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-card-inner", children: cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: cover.dataUrl, alt: title }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: title }) }) })
-            },
-            virtualPos
-          );
-        }) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-cf-info", children: (() => {
-          let actualIndex = coverFlowIndex % filteredBooks.length;
-          if (actualIndex < 0) actualIndex += filteredBooks.length;
-          const activeB = filteredBooks[actualIndex];
-          if (!activeB) return null;
-          const { title, author } = parseBookInfo(activeB);
-          const progress = getProgress(activeB);
-          const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-          const cover = getCover(activeB);
-          const highlightsCount = getHighlightsForBook(plugin.settings, activeB.path).length;
-          const wordsCount = Object.values(plugin.settings.wordAssets || {}).filter((a) => a.sources?.some((s) => s.bookPath === activeB.path)).length;
-          const rawDesc = cover?.description || "";
-          const description = rawDesc ? stripHtml(rawDesc) : "\u6682\u65E0\u4E66\u7C4D\u7B80\u4ECB\u3002";
-          const creator = cover?.creator || author;
-          const noteFile = bookNotesMap[activeB.path];
-          let fm = {};
-          if (noteFile) {
-            const cache = plugin.app.metadataCache.getFileCache(noteFile);
-            fm = cache?.frontmatter || {};
-          }
-          const bookStatus = formatBookStatus(resolveBookStatus(fm, percentage));
-          const rating = fm.rating ? `\u8BC4\u5206 ${fm.rating}` : "\u6682\u65E0\u8BC4\u5206";
-          const tags = Array.isArray(fm.tags) ? fm.tags.slice(0, 3) : [];
-          const startDate = fm.start_date || "";
-          const finishDate = fm.finish_date || "";
-          const displayDate = finishDate ? `\u8BFB\u5B8C ${finishDate}` : startDate ? `\u5F00\u59CB ${startDate}` : `\u52A0\u5165 ${formatDate(activeB.stat.ctime).split(" ")[0]}`;
-          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-content", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "cf-info-title", children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "cf-info-author", children: creator }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-stats", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "cf-stat-val", children: [
-                  percentage,
-                  "%"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u8FDB\u5EA6" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-val", children: highlightsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u7B14\u8BB0" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-stat", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-val", children: wordsCount }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "cf-stat-lbl", children: "\u8BCD\u6761" })
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                "\u72B6\u6001\uFF1A",
-                bookStatus
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                "\u8BC4\u5206\uFF1A",
-                rating
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "text-ellipsis", style: { minHeight: "19px" }, children: [
-                "\u6807\u7B7E\uFF1A",
-                tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "\u65E0"
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                "\u65F6\u957F\uFF1A",
-                formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeB.path))
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-                "\u65F6\u95F4\uFF1A",
-                displayDate
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "cf-info-desc", style: { marginTop: "16px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: description }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "cf-info-actions", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeB), children: percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => {
-                setActiveBook(activeB);
-                setCurrentView("detail");
-              }, children: "\u67E5\u770B\u8BE6\u60C5" })
-            ] })
-          ] });
-        })() })
-      ] }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
+      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
         const { title, author } = parseBookInfo(book);
         const progress = getProgress(book);
         const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
@@ -62535,7 +62494,7 @@ function LibraryApp({ plugin }) {
     const progress = getProgress(activeBook);
     const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
     const cover = getCover(activeBook);
-    const highlights = getHighlightsForBook(plugin.settings, activeBook.path);
+    const highlights = detailHighlights;
     const bookmarks = plugin.settings.bookBookmarks?.[activeBook.path] || [];
     const wordAssets = Object.values(plugin.settings.wordAssets || {}).filter(
       (asset) => asset.sources && asset.sources.some((src) => src.bookPath === activeBook.path)
@@ -62889,15 +62848,10 @@ function LibraryApp({ plugin }) {
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u6807\u7B7E" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
                 ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: wordsAndPhrases.map((a) => renderTableRow(a, true)) })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: wordsAndPhrases.map(renderTableRow) })
               ] })
             ] }),
             sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
@@ -62905,14 +62859,10 @@ function LibraryApp({ plugin }) {
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
                 ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: sentences.map((a) => renderTableRow(a, false)) })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", { children: sentences.map(renderTableRow) })
               ] })
             ] })
           ] });
@@ -63019,6 +62969,7 @@ var DEFAULT_SETTINGS = {
   readerZoom: 1,
   readerLineHeight: 1.6,
   bookNoteFolder: "",
+  knowledgeNoteFolder: "\u77E5\u8BC6\u5E93/\u60F3\u6CD5",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
   customCoverFolder: "00-Attachment",
   wordBookExportFolder: "",
@@ -63238,6 +63189,20 @@ var JarvisReaderSettingTab = class extends import_obsidian13.PluginSettingTab {
         if (exportFolderText) {
           exportFolderText.setValue("");
         }
+      }));
+      let knowledgeFolderText = null;
+      new import_obsidian13.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u4ECE\u9605\u8BFB\u611F\u60F3\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
+        knowledgeFolderText = text;
+        text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.knowledgeNoteFolder = path;
+          await this.plugin.saveSettings();
+          knowledgeFolderText?.setValue(path);
+        }).open();
       }));
       new import_obsidian13.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
         text.setPlaceholder(`---
@@ -64009,9 +63974,7 @@ var WordSidebarView = class extends import_obsidian15.ItemView {
         if (this.reader && typeof this.reader.setWordMastered === "function") {
           await this.reader.setWordMastered(asset, mastered);
         } else {
-          asset.mastered = mastered;
-          await this.plugin.persistWordAssetSidecar("save");
-          await this.plugin.saveSettings();
+          await this.plugin.wordAssetService.setMastered(lemma, mastered);
           this.render();
         }
       }
@@ -64022,9 +63985,7 @@ var WordSidebarView = class extends import_obsidian15.ItemView {
         if (this.reader && typeof this.reader.deleteWordAsset === "function") {
           await this.reader.deleteWordAsset(asset);
         } else {
-          delete this.plugin.settings.wordAssets[assetKey];
-          await this.plugin.persistWordAssetSidecar("delete");
-          await this.plugin.saveSettings();
+          await this.plugin.wordAssetService.delete(assetKey);
           this.render();
         }
       }
@@ -64181,18 +64142,18 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
       const sentence = asset2.sources && asset2.sources[0] && asset2.sources[0].sentence || asset2.sources && asset2.sources[0] && asset2.sources[0].quote || "";
       const result = await translateSelectionWithApi(plugin.settings, quote, sentence, plugin.app, { forceAi: true });
       if (result) {
-        const currentAsset = plugin.settings.wordAssets[lemmaKey];
-        currentAsset.translation = result.translation || currentAsset.translation;
-        if (result.display) currentAsset.display = result.display;
-        if (result.phonetic) currentAsset.phonetic = result.phonetic;
-        if (result.partOfSpeech) currentAsset.partOfSpeech = result.partOfSpeech;
-        if (result.example) currentAsset.example = result.example;
-        if (result.tags) currentAsset.tags = result.tags;
-        if (result.collins !== void 0) currentAsset.collins = result.collins;
-        if (result.oxford !== void 0) currentAsset.oxford = result.oxford;
-        currentAsset.updated = (/* @__PURE__ */ new Date()).toISOString();
-        await plugin.persistWordAssetSidecar("save");
-        await plugin.saveSettings();
+        await plugin.wordAssetService.update(lemmaKey, (currentAsset) => ({
+          ...currentAsset,
+          translation: result.translation || currentAsset.translation,
+          display: result.display || currentAsset.display,
+          phonetic: result.phonetic || currentAsset.phonetic,
+          partOfSpeech: result.partOfSpeech || currentAsset.partOfSpeech,
+          example: result.example || currentAsset.example,
+          tags: result.tags || currentAsset.tags,
+          collins: result.collins ?? currentAsset.collins,
+          oxford: result.oxford ?? currentAsset.oxford,
+          updated: (/* @__PURE__ */ new Date()).toISOString()
+        }));
         new import_obsidian16.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
         onAssetUpdate();
       } else {
@@ -64259,11 +64220,15 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
     );
     const lemmaKey = asset.lemma;
     if (plugin.settings.wordAssets[lemmaKey]) {
-      plugin.settings.wordAssets[lemmaKey].nextReviewDate = nextReviewDate;
-      plugin.settings.wordAssets[lemmaKey].interval = interval;
-      plugin.settings.wordAssets[lemmaKey].ease = ease;
-      plugin.settings.wordAssets[lemmaKey].reviews = reviews;
-      plugin.settings.wordAssets[lemmaKey].reviewTimeMs = (plugin.settings.wordAssets[lemmaKey].reviewTimeMs || 0) + timeSpent;
+      await plugin.wordAssetService.update(lemmaKey, (currentAsset) => ({
+        ...currentAsset,
+        nextReviewDate,
+        interval,
+        ease,
+        reviews,
+        reviewTimeMs: (currentAsset.reviewTimeMs || 0) + timeSpent,
+        updated: (/* @__PURE__ */ new Date()).toISOString()
+      }));
       const today = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
       if (!plugin.settings.wordReviewStats) {
         plugin.settings.wordReviewStats = {};
@@ -64273,8 +64238,7 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
       }
       plugin.settings.wordReviewStats[today].reviewCount += 1;
       plugin.settings.wordReviewStats[today].reviewTimeMs += timeSpent;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.saveSettingsData();
     }
     setShowAnswer(false);
     setCurrentIndex(currentIndex + 1);
@@ -64330,9 +64294,7 @@ function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
                 e.stopPropagation();
                 const current = asset.mastered;
                 if (plugin.settings.wordAssets[asset.lemma]) {
-                  plugin.settings.wordAssets[asset.lemma].mastered = !current;
-                  await plugin.persistWordAssetSidecar("save");
-                  await plugin.saveSettings();
+                  await plugin.wordAssetService.setMastered(asset.lemma, !current);
                   onAssetUpdate();
                 }
               },
@@ -65303,21 +65265,7 @@ function WordBookApp({ plugin }) {
     const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u9009\u4E2D\u7684 ${selected.size} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
     if (!confirmed)
       return;
-    let count = 0;
-    for (const lemma of selected) {
-      const asset = plugin.settings.wordAssets[lemma];
-      if (asset) {
-        if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-          await plugin.activeReaderView.deleteWordAsset(asset);
-        } else {
-          delete plugin.settings.wordAssets[lemma];
-        }
-        count++;
-      }
-    }
-    await plugin.persistWordAssetSidecar("delete");
-    await plugin.saveSettings();
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    const count = await plugin.wordAssetService.deleteMany(selected);
     new import_obsidian18.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
     setSelected(/* @__PURE__ */ new Set());
     loadAssets();
@@ -65327,19 +65275,7 @@ function WordBookApp({ plugin }) {
     const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u672C\u4E66\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u6B63\u5728\u663E\u793A\u7684\u8FD9\u672C\u4E66\u7684 ${filteredAssets.length} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
     if (!confirmed)
       return;
-    let count = 0;
-    for (const asset of filteredAssets) {
-      const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-      if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-        await plugin.activeReaderView.deleteWordAsset(asset);
-      } else {
-        delete plugin.settings.wordAssets[assetKey];
-      }
-      count++;
-    }
-    await plugin.persistWordAssetSidecar("delete");
-    await plugin.saveSettings();
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    const count = await plugin.wordAssetService.deleteMany(filteredAssets.map((asset) => getTranslationAssetStorageKey(asset) || asset.lemma));
     new import_obsidian18.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
     const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
     leaves.forEach((leaf) => {
@@ -65351,15 +65287,7 @@ function WordBookApp({ plugin }) {
   };
   const handleMarkMastered = async (mastered) => {
     if (selected.size === 0) return;
-    let count = 0;
-    for (const lemma of selected) {
-      if (plugin.settings.wordAssets[lemma]) {
-        plugin.settings.wordAssets[lemma].mastered = mastered;
-        count++;
-      }
-    }
-    await plugin.persistWordAssetSidecar("save");
-    await plugin.saveSettings();
+    const count = await plugin.wordAssetService.setMasteredMany(selected, mastered);
     new import_obsidian18.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
     loadAssets();
   };
@@ -65367,9 +65295,7 @@ function WordBookApp({ plugin }) {
     e.stopPropagation();
     if (plugin.settings.wordAssets[lemma]) {
       const current = plugin.settings.wordAssets[lemma].mastered;
-      plugin.settings.wordAssets[lemma].mastered = !current;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !current);
       loadAssets();
     }
   };
@@ -65380,9 +65306,7 @@ function WordBookApp({ plugin }) {
     menu.addItem((item) => {
       item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
         if (plugin.settings.wordAssets[lemma]) {
-          plugin.settings.wordAssets[lemma].mastered = !isMastered;
-          await plugin.persistWordAssetSidecar("save");
-          await plugin.saveSettings();
+          await plugin.wordAssetService.setMastered(lemma, !isMastered);
           loadAssets();
         }
       });
@@ -65396,16 +65320,8 @@ function WordBookApp({ plugin }) {
           `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\u201C${lemma}\u201D\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`
         );
         if (!confirmed) return;
-        const asset = plugin.settings.wordAssets[lemma];
-        if (asset) {
-          if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-            await plugin.activeReaderView.deleteWordAsset(asset);
-          } else {
-            delete plugin.settings.wordAssets[lemma];
-            await plugin.persistWordAssetSidecar("delete");
-          }
-          await plugin.saveSettings();
-          window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+        if (plugin.settings.wordAssets[lemma]) {
+          await plugin.wordAssetService.delete(lemma);
           loadAssets();
           new import_obsidian18.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
           if (selected.has(lemma)) {
@@ -65619,10 +65535,7 @@ function WordBookApp({ plugin }) {
         },
         onToggleSelect: toggleSelect,
         onToggleMastery: (lemma, mastered) => {
-          if (plugin.settings.wordAssets[lemma]) {
-            plugin.settings.wordAssets[lemma].mastered = mastered;
-            plugin.persistWordAssetSidecar("save").then(() => plugin.saveSettings()).then(() => loadAssets());
-          }
+          plugin.wordAssetService.setMastered(lemma, mastered).then(() => loadAssets());
         },
         onDoubleClick: () => {
         },
@@ -65631,20 +65544,11 @@ function WordBookApp({ plugin }) {
       }
     );
   };
-  const formatDays = (dateStr) => {
-    if (!dateStr) return "\u65B0\u8BCD";
-    const diff = new Date(dateStr).getTime() - (/* @__PURE__ */ new Date()).getTime();
-    const days = Math.ceil(diff / (1e3 * 3600 * 24));
-    if (days < 0) return "\u5DF2\u8D85\u671F";
-    if (days === 0) return "\u4ECA\u65E5";
-    return `${days}\u5929\u540E`;
-  };
-  const renderTableRow = (asset, showTagsColumn = false) => {
+  const renderTableRow = (asset) => {
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence ? quote || asset.lemma : asset.title || asset.lemma;
     const assetKey = isSentence ? getTranslationAssetStorageKey(asset) : asset.lemma;
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle || "\u672A\u77E5\u4E66\u7C4D" : "\u624B\u52A8\u6DFB\u52A0";
     const isExpanded = expandedItems.has(assetKey);
     const isSelected = selected.has(assetKey);
     const handleRowClick = (e) => {
@@ -65690,27 +65594,25 @@ function WordBookApp({ plugin }) {
             ),
             !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
           ] }) }),
-          showTagsColumn && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px" }, children: asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }, children: [
-            asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u725B\u6D25\u6838\u5FC3" }),
-            asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }, children: "\u2605".repeat(asset.collins) }),
-            asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }, children: tag.toUpperCase() }, tag))
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: asset.translation && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-            "div",
-            {
-              className: blurMode === "translation" ? "jarvis-blur-test" : "",
-              style: {
-                color: "var(--text-normal)",
-                marginBottom: "4px",
-                whiteSpace: isExpanded ? "normal" : "pre-wrap"
-              },
-              children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
-            }
-          ) }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", cursor: isSelectionMode ? "pointer" : "default" }, onClick: () => isSelectionMode && toggleSelect(assetKey), children: bookTitle }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }, children: asset.reviews || 0 }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }, children: asset.ease?.toFixed(2) || "2.50" }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }, children: formatDays(asset.nextReviewDate) }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: [
+            asset.translation && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+              "div",
+              {
+                className: blurMode === "translation" ? "jarvis-blur-test" : "",
+                style: {
+                  color: "var(--text-normal)",
+                  marginBottom: "4px",
+                  whiteSpace: isExpanded ? "normal" : "pre-wrap"
+                },
+                children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
+              }
+            ),
+            isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
+              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", children: "\u725B\u6D25\u6838\u5FC3" }),
+              asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", children: "\u2605".repeat(asset.collins) }),
+              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", children: tag.toUpperCase() }, tag))
+            ] })
+          ] }),
           /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", cursor: isSelectionMode ? "pointer" : "default" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "span",
             {
@@ -65973,15 +65875,10 @@ function WordBookApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
               isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u6807\u7B7E" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: words.map((a) => renderTableRow(a, true)) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: words.map(renderTableRow) })
           ] })
         ] }),
         phrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
@@ -65990,14 +65887,10 @@ function WordBookApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
               isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: phrases.map((a) => renderTableRow(a, false)) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: phrases.map(renderTableRow) })
           ] })
         ] }),
         sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
@@ -66006,14 +65899,10 @@ function WordBookApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
               isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }, children: "\u4E66\u7C4D" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }, children: "\u4E0B\u6B21\u590D\u4E60" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
               /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: sentences.map((a) => renderTableRow(a, false)) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: sentences.map(renderTableRow) })
           ] })
         ] })
       ] }) })
@@ -66058,7 +65947,6 @@ var WordBookView = class extends import_obsidian19.ItemView {
 // src/main.ts
 init_book_notes();
 init_utils();
-init_highlights();
 
 // src/global-markdown.ts
 var import_react4 = __toESM(require_react(), 1);
@@ -66232,10 +66120,7 @@ var GlobalTranslationCard = ({
         new import_obsidian20.Notice("Failed to build word asset.");
         return;
       }
-      plugin.settings.wordAssets = plugin.settings.wordAssets || {};
-      plugin.settings.wordAssets[asset.lemma] = asset;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.save(asset);
       setIsSaved(true);
       new import_obsidian20.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
@@ -66272,9 +66157,7 @@ var GlobalTranslationCard = ({
         mastered: nextMastered,
         updated: (/* @__PURE__ */ new Date()).toISOString()
       };
-      plugin.settings.wordAssets[word.toLowerCase()] = updated;
-      await plugin.persistWordAssetSidecar("save");
-      await plugin.saveSettings();
+      await plugin.wordAssetService.save(updated);
       setIsMastered(nextMastered);
       new import_obsidian20.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
@@ -66294,9 +66177,7 @@ var GlobalTranslationCard = ({
     );
     if (!confirmed) return;
     try {
-      delete plugin.settings.wordAssets[word.toLowerCase()];
-      await plugin.persistWordAssetSidecar("delete");
-      await plugin.saveSettingsData();
+      await plugin.wordAssetService.delete(word.toLowerCase());
       new import_obsidian20.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
       onClose();
       plugin.app.workspace.iterateAllLeaves((leaf) => {
@@ -66798,6 +66679,291 @@ function registerGlobalMarkdownFeatures(plugin) {
   });
 }
 
+// src/word-asset-service.ts
+var WordAssetService = class {
+  host;
+  constructor(host) {
+    this.host = host;
+  }
+  get(key) {
+    return this.assets()[key] || null;
+  }
+  list() {
+    return Object.values(this.assets());
+  }
+  async save(asset, reason = "save") {
+    const key = getTranslationAssetStorageKey(asset) || asset.lemma;
+    if (!key) throw new Error("\u8BCD\u6761\u7F3A\u5C11\u53EF\u4FDD\u5B58\u7684\u6807\u8BC6\u3002");
+    await this.commit({ ...this.assets(), [key]: asset }, reason);
+    return asset;
+  }
+  async update(key, transform, reason = "save") {
+    const current = this.get(key);
+    if (!current) return null;
+    const updated = transform(current);
+    return this.save(updated, reason);
+  }
+  async setMastered(key, mastered) {
+    return this.update(key, (asset) => ({ ...asset, mastered, updated: (/* @__PURE__ */ new Date()).toISOString() }));
+  }
+  async setMasteredMany(keys, mastered) {
+    const next = { ...this.assets() };
+    let count = 0;
+    for (const key of keys) {
+      const asset = next[key];
+      if (asset) {
+        next[key] = { ...asset, mastered, updated: (/* @__PURE__ */ new Date()).toISOString() };
+        count += 1;
+      }
+    }
+    if (count) await this.commit(next, "save");
+    return count;
+  }
+  async delete(key) {
+    if (!this.get(key)) return false;
+    const next = { ...this.assets() };
+    delete next[key];
+    await this.commit(next, "delete");
+    return true;
+  }
+  async deleteMany(keys) {
+    const next = { ...this.assets() };
+    let count = 0;
+    for (const key of keys) {
+      if (next[key]) {
+        delete next[key];
+        count += 1;
+      }
+    }
+    if (count) await this.commit(next, "delete");
+    return count;
+  }
+  async replaceAll(assets, reason = "save") {
+    await this.commit({ ...assets }, reason);
+  }
+  assets() {
+    if (!this.host.settings.wordAssets || typeof this.host.settings.wordAssets !== "object") {
+      this.host.settings.wordAssets = {};
+    }
+    return this.host.settings.wordAssets;
+  }
+  async commit(next, reason) {
+    const previous = this.assets();
+    this.host.settings.wordAssets = next;
+    try {
+      await this.host.persistWordAssetSidecar(reason);
+    } catch (error) {
+      this.host.settings.wordAssets = previous;
+      throw error;
+    }
+    this.host.onWordAssetsChanged?.();
+  }
+};
+
+// src/highlight-service.ts
+var HighlightService = class {
+  host;
+  constructor(host) {
+    this.host = host;
+  }
+  async replaceBookHighlights(bookPath, highlights, reason) {
+    const map = this.highlights();
+    const hadPrevious = Object.prototype.hasOwnProperty.call(map, bookPath);
+    const previous = map[bookPath];
+    map[bookPath] = highlights;
+    try {
+      await this.host.persistHighlightSidecar(reason);
+    } catch (error) {
+      if (hadPrevious) map[bookPath] = previous;
+      else delete map[bookPath];
+      throw error;
+    }
+    this.host.onHighlightsChanged?.();
+  }
+  async replaceAll(highlights, reason) {
+    const previous = this.highlights();
+    this.host.settings.bookHighlights = { ...highlights };
+    try {
+      await this.host.persistHighlightSidecar(reason);
+    } catch (error) {
+      this.host.settings.bookHighlights = previous;
+      throw error;
+    }
+    this.host.onHighlightsChanged?.();
+  }
+  highlights() {
+    if (!this.host.settings.bookHighlights || typeof this.host.settings.bookHighlights !== "object") {
+      this.host.settings.bookHighlights = {};
+    }
+    return this.host.settings.bookHighlights;
+  }
+};
+
+// src/book-note-service.ts
+var BookNoteService = class {
+  operations;
+  constructor(operations) {
+    this.operations = operations;
+  }
+  appendHighlight(noteFile, highlight) {
+    return this.operations.appendHighlight(noteFile, highlight);
+  }
+  appendReflection(noteFile, highlight, reflection) {
+    return this.operations.appendReflection(noteFile, highlight, reflection);
+  }
+  replaceHighlight(noteFile, highlight) {
+    return this.operations.replaceHighlight(noteFile, highlight);
+  }
+  deleteHighlight(noteFile, highlight) {
+    return this.operations.deleteHighlight(noteFile, highlight);
+  }
+  readHighlightDetails(noteFile, highlight) {
+    return this.operations.readHighlightDetails(noteFile, highlight);
+  }
+};
+
+// src/book-note-operations.ts
+function createBookNoteOperations(app) {
+  return {
+    appendHighlight: (noteFile, highlight) => appendHighlightToBookNote(app, noteFile, highlight),
+    appendReflection: (noteFile, highlight, reflection) => appendReflectionToBookNote(app, noteFile, highlight, reflection),
+    replaceHighlight: (noteFile, highlight) => replaceHighlightInBookNote(app, noteFile, highlight),
+    deleteHighlight: (noteFile, highlight) => deleteHighlightFromBookNote(app, noteFile, highlight),
+    readHighlightDetails: (noteFile, highlight) => readHighlightNoteDetailsFromBookNote(app, noteFile, highlight)
+  };
+}
+
+// src/knowledge-note.ts
+function buildKnowledgeNoteContent(draft, createdAt) {
+  const source = draft.sourceBlockId ? `[[${draft.sourceNotePath}#^${draft.sourceBlockId}]]` : `[[${draft.sourceNotePath}]]`;
+  return `---
+created: ${createdAt}
+author: "[[Jarvis]]"
+source_book: "${draft.sourceBookTitle.replace(/"/g, '\\"')}"
+---
+
+# ${draft.title}
+
+${draft.body.trim()}
+
+## \u6765\u6E90
+
+${source}
+`;
+}
+function buildKnowledgeNotePath(folder, title) {
+  const cleanFolder = folder.trim().replace(/^\/+|\/+$/g, "");
+  const cleanTitle = title.trim().replace(/[\\/:*?"<>|]/g, "-");
+  return `${cleanFolder ? `${cleanFolder}/` : ""}${cleanTitle}.md`;
+}
+
+// src/knowledge-note-service.ts
+var KnowledgeNoteService = class {
+  storage;
+  constructor(storage) {
+    this.storage = storage;
+  }
+  async create(request) {
+    const folder = request.folder.trim().replace(/^\/+|\/+$/g, "");
+    await this.ensureFolders(folder);
+    const path = this.nextAvailablePath(folder, request.title);
+    const content = buildKnowledgeNoteContent(request, request.createdAt);
+    return this.storage.createFile(path, content);
+  }
+  async ensureFolders(folder) {
+    let currentFolder = "";
+    for (const part of folder.split("/").filter(Boolean)) {
+      currentFolder = currentFolder ? `${currentFolder}/${part}` : part;
+      if (!this.storage.exists(currentFolder)) {
+        await this.storage.createFolder(currentFolder);
+      }
+    }
+  }
+  nextAvailablePath(folder, title) {
+    let path = buildKnowledgeNotePath(folder, title);
+    let suffix = 2;
+    while (this.storage.exists(path)) {
+      path = buildKnowledgeNotePath(folder, `${title} ${suffix++}`);
+    }
+    return path;
+  }
+};
+
+// src/knowledge-note-store.ts
+function createKnowledgeNoteStorage(vault) {
+  return {
+    exists: (path) => vault.getAbstractFileByPath(path) !== null,
+    createFolder: async (path) => {
+      await vault.createFolder(path);
+    },
+    createFile: (path, content) => vault.create(path, content)
+  };
+}
+
+// src/index-sidecars.ts
+function isRecord2(value) {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+function isHighlightRecord(value) {
+  if (!isRecord2(value)) return false;
+  const requiredFields = [
+    "id",
+    "bookPath",
+    "bookTitle",
+    "chapterTitle",
+    "cfiRange",
+    "notePath",
+    "blockId",
+    "created",
+    "updated"
+  ];
+  return requiredFields.every((field) => typeof value[field] === "string");
+}
+function parseHighlightSidecar(payload) {
+  if (!isRecord2(payload) || payload.version !== 1 || !isRecord2(payload.bookHighlights)) {
+    return null;
+  }
+  for (const highlights of Object.values(payload.bookHighlights)) {
+    if (!Array.isArray(highlights) || !highlights.every(isHighlightRecord)) {
+      return null;
+    }
+  }
+  return payload.bookHighlights;
+}
+async function ensureSidecarFolder(adapter, folderPath) {
+  if (typeof adapter.mkdir !== "function") return;
+  let current = "";
+  for (const segment of folderPath.split("/").filter(Boolean)) {
+    current = current ? `${current}/${segment}` : segment;
+    if (!await adapter.exists(current)) {
+      await adapter.mkdir(current);
+    }
+  }
+}
+async function readValidatedSidecar(adapter, path, parse) {
+  if (!await adapter.exists(path)) return { status: "missing" };
+  try {
+    const value = parse(JSON.parse(await adapter.read(path)));
+    return value ? { status: "ready", value } : { status: "invalid" };
+  } catch {
+    return { status: "invalid" };
+  }
+}
+function readHighlightSidecar(adapter, path) {
+  return readValidatedSidecar(adapter, path, parseHighlightSidecar);
+}
+function readWordAssetSidecar(adapter, path) {
+  return readValidatedSidecar(adapter, path, parseWordAssetSidecar);
+}
+async function writeHighlightSidecar(adapter, path, bookHighlights, updated = (/* @__PURE__ */ new Date()).toISOString()) {
+  await ensureSidecarFolder(adapter, path.split("/").slice(0, -1).join("/"));
+  await adapter.write(path, JSON.stringify({ version: 1, updated, bookHighlights }, null, 2));
+}
+async function writeWordAssetSidecar(adapter, path, wordAssets, updated = (/* @__PURE__ */ new Date()).toISOString()) {
+  await ensureSidecarFolder(adapter, path.split("/").slice(0, -1).join("/"));
+  await adapter.write(path, JSON.stringify({ version: 2, updated, wordAssets }, null, 2));
+}
+
 // src/main.ts
 var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 var LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
@@ -66808,13 +66974,20 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
   wordSidebarView;
   lastIndexCounts;
   wordAssetSidecarUnavailable = false;
+  wordAssetService = new WordAssetService(this);
+  highlightService = new HighlightService(this);
+  bookNoteService = new BookNoteService(createBookNoteOperations(this.app));
+  knowledgeNoteService = new KnowledgeNoteService(createKnowledgeNoteStorage(this.app.vault));
+  highlightSidecarUnavailable = false;
   async onload() {
     (0, import_obsidian21.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
     (0, import_obsidian21.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
-    await this.restoreIndexesFromSidecars();
+    const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
     await resolveSyncConflicts(this);
-    await this.persistIndexSidecars("startup");
+    if (needsStartupIndexPersistence) {
+      await this.persistIndexSidecars("startup");
+    }
     await this.saveSettingsData();
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
@@ -67090,35 +67263,6 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
       }
     }
   }
-  async readJsonSidecar(path) {
-    const adapter = this.app.vault.adapter;
-    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
-      return null;
-    if (!await adapter.exists(path))
-      return null;
-    try {
-      return JSON.parse(await adapter.read(path));
-    } catch (error) {
-      console.warn(`Jarvis Reader failed to read sidecar ${path}.`, error);
-      return null;
-    }
-  }
-  async readWordAssetSidecar(path) {
-    const adapter = this.app.vault.adapter;
-    if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function") {
-      throw new Error("Vault adapter is not available.");
-    }
-    if (!await adapter.exists(path)) {
-      return { status: "missing" };
-    }
-    try {
-      const wordAssets = parseWordAssetSidecar(JSON.parse(await adapter.read(path)));
-      return wordAssets ? { status: "ready", wordAssets } : { status: "invalid" };
-    } catch (error) {
-      console.error(`Jarvis Reader failed to read word asset sidecar ${path}.`, error);
-      return { status: "invalid" };
-    }
-  }
   getIndexSnapshot() {
     const bookHighlights = {};
     for (const [bookPath, list] of Object.entries(this.settings.bookHighlights || {})) {
@@ -67204,15 +67348,25 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
   async restoreIndexesFromSidecars() {
     try {
       const paths = this.getIndexSidecarPaths();
-      const highlightsSidecar = await this.readJsonSidecar(paths.highlights);
+      const adapter = this.app.vault.adapter;
+      const highlightsSidecar = await readHighlightSidecar(adapter, paths.highlights);
       let changed = false;
-      if (highlightsSidecar && highlightsSidecar.bookHighlights) {
-        changed = this.mergeHighlightSidecar(highlightsSidecar.bookHighlights) || changed;
+      if (highlightsSidecar.status === "ready") {
+        this.highlightSidecarUnavailable = false;
+        changed = this.mergeHighlightSidecar(highlightsSidecar.value) || changed;
+      } else if (highlightsSidecar.status === "missing") {
+        this.highlightSidecarUnavailable = false;
+        changed = true;
+      } else {
+        this.highlightSidecarUnavailable = true;
+        this.settings.bookHighlights = {};
+        console.error("Jarvis Reader highlight sidecar is invalid. The original file was left unchanged.");
+        new import_obsidian21.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
-      const wordAssetSidecar = await this.readWordAssetSidecar(paths.wordAssets);
+      const wordAssetSidecar = await readWordAssetSidecar(adapter, paths.wordAssets);
       if (wordAssetSidecar.status === "ready") {
         this.wordAssetSidecarUnavailable = false;
-        this.settings.wordAssets = this.normalizeWordAssetSidecar(wordAssetSidecar.wordAssets);
+        this.settings.wordAssets = this.normalizeWordAssetSidecar(wordAssetSidecar.value);
       } else if (wordAssetSidecar.status === "missing") {
         this.wordAssetSidecarUnavailable = false;
         this.settings.wordAssets = {};
@@ -67226,6 +67380,7 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
       if (changed) {
         await this.logIndexChange("restore-from-sidecar");
       }
+      return changed;
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
@@ -67245,19 +67400,45 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
     if (!adapter || typeof adapter.write !== "function") {
       throw new Error("Vault adapter is not available.");
     }
-    await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
     const wordAssets = {};
     for (const [key, asset] of Object.entries(this.settings.wordAssets || {})) {
       if (asset) {
         wordAssets[key] = buildWordAssetMetadata(asset);
       }
     }
-    await adapter.write(paths.wordAssets, JSON.stringify({
-      version: 2,
-      updated: (/* @__PURE__ */ new Date()).toISOString(),
-      wordAssets
-    }, null, 2));
+    await writeWordAssetSidecar(adapter, paths.wordAssets, wordAssets);
     await this.logIndexChange(reason);
+  }
+  onWordAssetsChanged() {
+    this.refreshWordSidebar(this.activeReaderView);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
+    }
+  }
+  onHighlightsChanged() {
+    this.refreshReaderSidebar(this.activeReaderView);
+    if (this.highlightsView && typeof this.highlightsView.render === "function") {
+      this.highlightsView.render();
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("jarvis-reader-highlights-changed"));
+    }
+  }
+  async persistHighlightSidecar(reason = "save") {
+    if (this.highlightSidecarUnavailable) {
+      const message = "\u9AD8\u4EAE\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u9AD8\u4EAE\u7D22\u5F15\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D highlights.json\u3002";
+      console.error(`Jarvis Reader ${message}`);
+      new import_obsidian21.Notice(message, 0);
+      throw new Error(message);
+    }
+    const paths = this.getIndexSidecarPaths();
+    const adapter = this.app.vault.adapter;
+    if (!adapter || typeof adapter.write !== "function") {
+      throw new Error("Vault adapter is not available.");
+    }
+    const snapshot = this.getIndexSnapshot();
+    await writeHighlightSidecar(adapter, paths.highlights, snapshot.bookHighlights);
+    await this.logIndexChange(reason, snapshot);
   }
   async persistIndexSidecars(reason = "save") {
     try {
@@ -67266,14 +67447,11 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
       if (!adapter || typeof adapter.write !== "function") {
         throw new Error("Jarvis Reader sidecar persist failed: vault adapter not available.");
       }
-      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/index");
       await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
       const snapshot = this.getIndexSnapshot();
-      await adapter.write(paths.highlights, JSON.stringify({
-        version: 1,
-        updated: (/* @__PURE__ */ new Date()).toISOString(),
-        bookHighlights: snapshot.bookHighlights
-      }, null, 2));
+      if (!this.highlightSidecarUnavailable) {
+        await this.persistHighlightSidecar(reason);
+      }
       if (!this.wordAssetSidecarUnavailable) {
         await this.persistWordAssetSidecar(reason);
         await this.logIndexChange(reason, snapshot);
@@ -67335,7 +67513,6 @@ var JarvisReaderPlugin = class extends import_obsidian21.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
   }
   async saveSettings() {
-    await this.persistIndexSidecars("save");
     await this.saveSettingsData();
   }
   async saveSettingsData() {

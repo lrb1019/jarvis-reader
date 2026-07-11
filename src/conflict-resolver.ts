@@ -10,6 +10,24 @@ export async function resolveSyncConflicts(plugin: any): Promise<void> {
   }
 
   let conflictsFound = 0;
+  let wordAssetsChanged = false;
+  let highlightsChanged = false;
+  let dataChanged = false;
+  const wordConflictFilesToTrash: string[] = [];
+  const highlightConflictFilesToTrash: string[] = [];
+  const dataConflictFilesToTrash: string[] = [];
+  const mergedWordAssets = { ...(plugin.settings.wordAssets || {}) };
+  const mergedHighlights = Object.fromEntries(
+    Object.entries(plugin.settings.bookHighlights || {}).map(([bookPath, highlights]) => [
+      bookPath,
+      Array.isArray(highlights) ? highlights.map((highlight) => ({ ...highlight })) : [],
+    ]),
+  );
+  const previousData = {
+    readingStats: plugin.settings.readingStats,
+    wordReviewStats: plugin.settings.wordReviewStats,
+    bookProgress: plugin.settings.bookProgress,
+  };
 
   try {
     // 1. Resolve index sidecars (word-assets, highlights)
@@ -21,17 +39,23 @@ export async function resolveSyncConflicts(plugin: any): Promise<void> {
         f.match(/word-assets[- (].*\.json$/) && !f.endsWith("word-assets.json")
       );
       
-      const highlightConflicts = indexFiles.files.filter((f: string) => 
+      const highlightConflicts = plugin.highlightSidecarUnavailable ? [] : indexFiles.files.filter((f: string) =>
         f.match(/highlights[- (].*\.json$/) && !f.endsWith("highlights.json")
       );
 
       for (const file of wordAssetConflicts) {
-        await mergeWordAssetConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeWordAssetConflict(adapter, mergedWordAssets, file)) {
+          wordAssetsChanged = true;
+          wordConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
       for (const file of highlightConflicts) {
-        await mergeHighlightConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeHighlightConflict(adapter, mergedHighlights, file)) {
+          highlightsChanged = true;
+          highlightConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
     }
 
@@ -43,18 +67,37 @@ export async function resolveSyncConflicts(plugin: any): Promise<void> {
         f.match(/data[- (].*\.json$/) && !f.endsWith("data.json")
       );
 
+      if (dataConflicts.length) prepareDataConflictMerge(plugin);
       for (const file of dataConflicts) {
-        await mergeDataConflict(plugin, file);
-        conflictsFound++;
+        if (await mergeDataConflict(plugin, file)) {
+          dataChanged = true;
+          dataConflictFilesToTrash.push(file);
+          conflictsFound++;
+        }
       }
     }
 
-    if (conflictsFound > 0) {
-      // 触发保存和写入
-      await plugin.saveSettings();
-      if (typeof plugin.persistIndexSidecars === "function") {
-        await plugin.persistIndexSidecars("auto-conflict-resolve");
+    if (wordAssetsChanged) {
+      await plugin.wordAssetService.replaceAll(mergedWordAssets, "auto-conflict-resolve");
+      for (const file of wordConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+    if (highlightsChanged) {
+      await plugin.highlightService.replaceAll(mergedHighlights, "auto-conflict-resolve");
+      for (const file of highlightConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+    if (dataChanged) {
+      try {
+        await plugin.saveSettingsData();
+      } catch (error) {
+        plugin.settings.readingStats = previousData.readingStats;
+        plugin.settings.wordReviewStats = previousData.wordReviewStats;
+        plugin.settings.bookProgress = previousData.bookProgress;
+        throw error;
       }
+      for (const file of dataConflictFilesToTrash) await adapter.trashSystem(file);
+    }
+
+    if (conflictsFound > 0) {
       new Notice(`Jarvis Reader 自动合并了 ${conflictsFound} 个网盘数据冲突文件。`);
     }
 
@@ -63,26 +106,24 @@ export async function resolveSyncConflicts(plugin: any): Promise<void> {
   }
 }
 
-async function mergeWordAssetConflict(plugin: any, conflictPath: string) {
-  const adapter = plugin.app.vault.adapter;
+async function mergeWordAssetConflict(adapter: any, currentAssets: Record<string, any>, conflictPath: string): Promise<boolean> {
   const raw = await adapter.read(conflictPath);
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
     console.error("Invalid word asset conflict file:", conflictPath);
-    return;
+    return false;
   }
   
   const conflictAssets = parsed.wordAssets || {};
-  const currentAssets = plugin.settings.wordAssets || {};
 
   for (const [key, asset2] of Object.entries(conflictAssets)) {
     const asset2Typed = asset2 as any;
     if (!currentAssets[key]) {
-      currentAssets[key] = asset2;
+      currentAssets[key] = { ...asset2Typed, sources: [...(asset2Typed.sources || [])] };
     } else {
-      const asset1 = currentAssets[key];
+      const asset1 = { ...currentAssets[key], sources: [...(currentAssets[key].sources || [])] };
       const mergedSources = [...(asset1.sources || [])];
       for (const src2 of (asset2Typed.sources || [])) {
         const exists = mergedSources.find(s => s.bookPath === src2.bookPath && s.cfiRange === src2.cfiRange);
@@ -111,58 +152,70 @@ async function mergeWordAssetConflict(plugin: any, conflictPath: string) {
         }
       }
       asset1.sources = mergedSources;
+      currentAssets[key] = asset1;
     }
   }
-  
-  plugin.settings.wordAssets = currentAssets;
-  await adapter.trashSystem(conflictPath);
+
+  return true;
 }
 
-async function mergeHighlightConflict(plugin: any, conflictPath: string) {
-  const adapter = plugin.app.vault.adapter;
+async function mergeHighlightConflict(adapter: any, currentHighlights: Record<string, any[]>, conflictPath: string): Promise<boolean> {
   const raw = await adapter.read(conflictPath);
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
-    return;
+    console.error("Invalid highlight conflict file:", conflictPath);
+    return false;
   }
 
   const conflictHighlights = parsed.bookHighlights || {};
-  plugin.settings.bookHighlights = plugin.settings.bookHighlights || {};
-  const currentHighlights = plugin.settings.bookHighlights;
 
   for (const [bookPath, list2] of Object.entries(conflictHighlights)) {
     const list2Typed = list2 as any[];
     if (!currentHighlights[bookPath]) {
-      currentHighlights[bookPath] = list2Typed;
+      currentHighlights[bookPath] = list2Typed.map(toHighlightIndexEntry);
     } else {
       const existingHl = currentHighlights[bookPath] as any[];
       for (const h2 of list2Typed) {
         const exists = existingHl.find(h1 => h1.id === h2.id || h1.cfiRange === h2.cfiRange);
         if (!exists) {
-          existingHl.push(h2);
+          existingHl.push(toHighlightIndexEntry(h2));
         } else {
           const d1 = new Date(exists.updated || exists.created).getTime();
           const d2 = new Date(h2.updated || h2.created).getTime();
           if (d2 > d1) {
-            Object.assign(exists, h2);
+            for (const field of ["bookPath", "bookTitle", "chapterTitle", "cfiRange", "notePath", "markColor", "updated"]) {
+              if ((h2 as any)[field] !== undefined) {
+                (exists as any)[field] = (h2 as any)[field];
+              }
+            }
           }
         }
       }
     }
   }
-  await adapter.trashSystem(conflictPath);
+
+  return true;
 }
 
-async function mergeDataConflict(plugin: any, conflictPath: string) {
+function toHighlightIndexEntry(highlight: any): any {
+  const indexEntry: Record<string, unknown> = {};
+  for (const field of ["id", "blockId", "bookPath", "bookTitle", "chapterTitle", "cfiRange", "notePath", "markColor", "created", "updated"]) {
+    if (highlight[field] !== undefined) indexEntry[field] = highlight[field];
+  }
+  return indexEntry;
+}
+
+async function mergeDataConflict(plugin: any, conflictPath: string): Promise<boolean> {
   const adapter = plugin.app.vault.adapter;
   const raw = await adapter.read(conflictPath);
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (e) {
-    return;
+    console.error("Invalid data conflict file:", conflictPath);
+    return false;
   }
 
   // merge readingStats
@@ -217,5 +270,17 @@ async function mergeDataConflict(plugin: any, conflictPath: string) {
     }
   }
 
-  await adapter.trashSystem(conflictPath);
+  return true;
+}
+
+function prepareDataConflictMerge(plugin: any): void {
+  plugin.settings.readingStats = Object.fromEntries(
+    Object.entries(plugin.settings.readingStats || {}).map(([dateKey, books]) => [dateKey, { ...(books as object) }]),
+  );
+  plugin.settings.wordReviewStats = Object.fromEntries(
+    Object.entries(plugin.settings.wordReviewStats || {}).map(([dateKey, stat]) => [dateKey, { ...(stat as object) }]),
+  );
+  plugin.settings.bookProgress = Object.fromEntries(
+    Object.entries(plugin.settings.bookProgress || {}).map(([bookPath, progress]) => [bookPath, { ...(progress as object) }]),
+  );
 }

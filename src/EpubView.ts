@@ -5,7 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
 import { openOrCreateNote, getOrCreateBookNote } from "./book-notes";
-import { getEpubTocMd, createHighlightId, getHighlightsForBook, appendHighlightToBookNote, appendReflectionToBookNote, readHighlightNoteDetailsFromBookNote, replaceHighlightInBookNote, deleteHighlightFromBookNote } from "./highlights";
+import { getEpubTocMd, createHighlightId, getHighlightsForBook, buildHighlightNoteUpdate } from "./highlights";
 import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
@@ -77,15 +77,7 @@ export class EpubView extends FileView {
     }
     
     // FILELESS: Note generation is fully removed
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    this.plugin.settings.wordAssets[asset.lemma] = getLightWordAsset(asset);
-    await this.plugin.persistWordAssetSidecar("save");
-    await this.plugin.saveSettings();
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
+    await this.plugin.wordAssetService.save(getLightWordAsset(asset));
     new Notice("已保存到全局字典");
     return asset;
   }
@@ -108,35 +100,14 @@ export class EpubView extends FileView {
       mastered: !!mastered,
       updated: new Date().toISOString(),
     };
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    this.plugin.settings.wordAssets[assetKey] = getLightWordAsset(updated);
-    
-    // FILELESS: No markdown modification
-    await this.plugin.persistWordAssetSidecar("save");
-    await this.plugin.saveSettings();
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
-    return updated;
+    return await this.plugin.wordAssetService.save(getLightWordAsset(updated));
   }
 
   async deleteWordAsset(asset: any): Promise<boolean> {
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!assetKey)
       return false;
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      this.plugin.settings.wordAssets = {};
-    }
-    delete this.plugin.settings.wordAssets[assetKey];
-    await this.plugin.persistWordAssetSidecar("delete");
-    await this.plugin.saveSettingsData();
-    
-    // FILELESS: No markdown modification
-    if (typeof this.plugin.refreshWordSidebar === "function") {
-      this.plugin.refreshWordSidebar(this);
-    }
+    await this.plugin.wordAssetService.delete(assetKey);
     new Notice("词条已彻底删除。");
     return true;
   }
@@ -153,6 +124,39 @@ export class EpubView extends FileView {
     return getHighlightsForBook(this.plugin.settings, this.file!.path);
   }
 
+  async promoteHighlight(highlight: BookHighlight, reflection: string): Promise<void> {
+    if (!highlight.notePath || !reflection.trim()) return;
+    const title = reflection.trim().split(/\r?\n/)[0].slice(0, 48) || "未命名想法";
+    try {
+      const file = await this.plugin.knowledgeNoteService.create({
+        folder: this.plugin.settings.knowledgeNoteFolder || "",
+        title,
+        body: reflection,
+        sourceNotePath: highlight.notePath,
+        sourceBlockId: highlight.blockId || highlight.id,
+        sourceBookTitle: highlight.bookTitle,
+        createdAt: new Date().toISOString().slice(0, 10),
+      });
+      await this.app.workspace.getLeaf(true).openFile(file);
+      new Notice("已创建知识笔记。");
+    } catch (error) {
+      console.error("Jarvis Reader knowledge note creation failed.", error);
+      new Notice(`创建知识笔记失败：${error instanceof Error ? error.message : "未知错误"}`);
+    }
+  }
+
+  async commitHighlightIndex(nextHighlights: BookHighlight[], reason: string): Promise<boolean> {
+    const bookPath = this.file!.path;
+    try {
+      await this.plugin.highlightService.replaceBookHighlights(bookPath, nextHighlights, reason);
+      return true;
+    } catch (error) {
+      console.error("Jarvis Reader highlight index save failed after Markdown write.", error);
+      new Notice("书籍笔记已保存，但高亮索引未保存。请先恢复 highlights.json；Markdown 正文不会丢失，但这条 EPUB 标记需要手动重新创建。", 0);
+      return false;
+    }
+  }
+
   async getBookHighlightsForReader(): Promise<BookHighlight[]> {
     const list = this.getBookHighlights();
     const enriched: BookHighlight[] = [];
@@ -167,8 +171,14 @@ export class EpubView extends FileView {
         continue;
       }
       try {
-        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, highlight);
-        enriched.push(details.comment || details.commentEntries.length || details.aiSections.length ? { ...highlight, comment: details.comment, commentEntries: details.commentEntries, aiSections: details.aiSections } as any : highlight);
+        const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
+        enriched.push({
+          ...highlight,
+          quote: details.quote || highlight.quote,
+          comment: details.comment,
+          commentEntries: details.commentEntries,
+          aiSections: details.aiSections,
+        } as any);
       } catch (error) {
         console.warn("Jarvis Reader read highlight comments failed.", error);
         enriched.push(highlight);
@@ -215,13 +225,11 @@ export class EpubView extends FileView {
       blockId: id,
       created: new Date().toISOString(),
     };
-    await appendHighlightToBookNote(this.app, noteFile, highlight);
-    if (!this.plugin.settings.bookHighlights) {
-      this.plugin.settings.bookHighlights = {};
-    }
+    await this.plugin.bookNoteService.appendHighlight(noteFile, highlight);
     const list = getHighlightsForBook(this.plugin.settings, this.file!.path);
-    this.plugin.settings.bookHighlights[this.file!.path] = [...list, highlight];
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex([...list, highlight], "create-highlight")) {
+      return null;
+    }
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id!);
@@ -239,11 +247,12 @@ export class EpubView extends FileView {
     const updatedAt = new Date().toISOString();
     const nextComment = (highlight.comment || "").trim();
     const shouldAppendComment = !!highlight.appendComment && !!nextComment;
-    let updated: BookHighlight = {
-      ...list[index],
-      comment: shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
-      updated: updatedAt,
-    };
+    let updated = buildHighlightNoteUpdate(
+      list[index],
+      highlight,
+      shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
+      updatedAt,
+    );
     if (highlight.aiSections !== undefined) {
       (updated as any).aiSections = highlight.aiSections;
     }
@@ -253,17 +262,18 @@ export class EpubView extends FileView {
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath!);
     if (noteFile instanceof TFile) {
       if (shouldAppendComment) {
-        await appendReflectionToBookNote(this.app, noteFile, updated, nextComment);
-        const details = await readHighlightNoteDetailsFromBookNote(this.app, noteFile, updated);
+        await this.plugin.bookNoteService.appendReflection(noteFile, updated, nextComment);
+        const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, updated);
         updated = { ...updated, comment: details.comment } as BookHighlight;
         (updated as any).commentEntries = details.commentEntries;
         (updated as any).aiSections = details.aiSections;
       } else {
-        await replaceHighlightInBookNote(this.app, noteFile, updated);
+        await this.plugin.bookNoteService.replaceHighlight(noteFile, updated);
       }
     }
-    this.plugin.settings.bookHighlights[this.file!.path] = list.map((item) => item.id === updated.id ? updated : item);
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex(list.map((item) => item.id === updated.id ? updated : item), "update-highlight")) {
+      return null;
+    }
     this.selectedHighlightId = updated.id!;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id!);
@@ -280,10 +290,11 @@ export class EpubView extends FileView {
       return false;
     const noteFile = this.app.vault.getAbstractFileByPath(existing.notePath!);
     if (noteFile instanceof TFile) {
-      await deleteHighlightFromBookNote(this.app, noteFile, existing);
+      await this.plugin.bookNoteService.deleteHighlight(noteFile, existing);
     }
-    this.plugin.settings.bookHighlights[this.file!.path] = list.filter((item) => item.id !== existing.id);
-    await this.plugin.saveSettings();
+    if (!await this.commitHighlightIndex(list.filter((item) => item.id !== existing.id), "delete-highlight")) {
+      return false;
+    }
     if (this.selectedHighlightId === existing.id) {
       this.selectedHighlightId = null;
     }
@@ -591,6 +602,7 @@ export class EpubView extends FileView {
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
+      promoteHighlight: (highlight: BookHighlight, reflection: string) => this.promoteHighlight(highlight, reflection),
       onInteraction: () => { this.lastInteractionTime = Date.now(); },
       app: this.app,
       smartCommands: this.plugin.settings.smartCommands || [],

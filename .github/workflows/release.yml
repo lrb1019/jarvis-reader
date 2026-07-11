@@ -1,0 +1,43 @@
+name: Release Obsidian plugin
+
+on:
+    push:
+        tags:
+            - '*.*.*'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: 'npm'
+
+            - name: Verify and package plugin
+              run: |
+                  npm ci
+                  npm run verify
+                  npm run package:release
+
+            - name: Check tag version
+              run: |
+                  tag="${GITHUB_REF#refs/tags/}"
+                  expected="$(node -p \"require('./package.json').version\")"
+                  test "$tag" = "$expected"
+
+            - name: Create release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  tag="${GITHUB_REF#refs/tags/}"
+
+                  gh release create "$tag" \
+                    --title="$tag" \
+                    --draft \
+                    main.js manifest.json styles.css "release/jarvis-reader-${tag}.zip"

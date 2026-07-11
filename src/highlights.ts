@@ -3,13 +3,13 @@
 import { loadPdfJs, App, TFile } from "obsidian";
 import { formatLocalDateTime } from "./utils-core.ts";
 import type { BookHighlight, JarvisReaderSettings } from "./types";
-import { buildHighlightMetadata, dedupeHighlightsByCfi, formatBlockquote, formatHighlightNoteBlock, isHighlightNoteBlockStart } from "./highlight-core";
+import { buildHighlightMetadata, buildHighlightNoteUpdate, dedupeHighlightsByCfi, formatBlockquote, formatHighlightNoteBlock, isHighlightNoteBlockStart } from "./highlight-core";
 
 export function createHighlightId(): string {
   return `ar-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export { buildHighlightMetadata, dedupeHighlightsByCfi, formatBlockquote, formatHighlightNoteBlock, isHighlightNoteBlockStart };
+export { buildHighlightMetadata, buildHighlightNoteUpdate, dedupeHighlightsByCfi, formatBlockquote, formatHighlightNoteBlock, isHighlightNoteBlockStart };
 
 function normalizeHeadingText(text: string): string {
   return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
@@ -144,13 +144,14 @@ export interface HighlightAiSection {
 }
 
 export interface HighlightNoteDetails {
+  quote: string;
   comment: string;
   commentEntries: HighlightCommentEntry[];
   aiSections: HighlightAiSection[];
 }
 
 function normalizeBlockquoteLine(line: string): string {
-  return (line || "").replace(/^> ?/, "").trimEnd();
+  return (line || "").replace(/^(?:>\s*)+/, "").trimEnd();
 }
 
 function pushCommentEntry(entries: HighlightCommentEntry[], entry: HighlightCommentEntry | null): void {
@@ -181,25 +182,36 @@ function getFallbackCommentEntries(comment: string): HighlightCommentEntry[] {
 }
 
 export async function readHighlightNoteDetailsFromBookNote(app: App, noteFile: TFile, highlight: BookHighlight): Promise<HighlightNoteDetails> {
+  const fallbackQuote = (highlight.quote || "").trim();
   const fallbackComment = (highlight.comment || "").trim();
   const fallbackEntries = getFallbackCommentEntries(fallbackComment);
   const content = await app.vault.read(noteFile);
   const lines = content.split(/\r?\n/);
   const range = getHighlightNoteBlockRange(lines, highlight.blockId);
   if (!range)
-    return { comment: fallbackComment, commentEntries: fallbackEntries, aiSections: [] };
+    return { quote: fallbackQuote, comment: fallbackComment, commentEntries: fallbackEntries, aiSections: [] };
 
+  const quoteLines: string[] = [];
   const entries: HighlightCommentEntry[] = [];
   const aiSections: HighlightAiSection[] = [];
   let currentEntry: HighlightCommentEntry | null = null;
   let currentSection: HighlightAiSection | null = null;
   let inAiSection = false;
+  let readingQuote = true;
 
   for (let i = range.startIndex + 1; i < range.blockIndex; i++) {
     const rawLine = lines[i] || "";
     const line = normalizeBlockquoteLine(rawLine);
     const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
     const aiHeadingMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    if (readingQuote) {
+      if (!line || noteMatch || aiHeadingMatch || /^\*\*时间\*\*/.test(line)) {
+        readingQuote = false;
+      } else {
+        quoteLines.push(line);
+        continue;
+      }
+    }
     if (/^\*\*时间\*\*/.test(line)) {
       pushCommentEntry(entries, currentEntry);
       currentEntry = null;
@@ -257,6 +269,7 @@ export async function readHighlightNoteDetailsFromBookNote(app: App, noteFile: T
   pushAiSection(aiSections, currentSection);
   const commentEntries = entries.length ? entries : fallbackEntries;
   return {
+    quote: quoteLines.join("\n").trim() || fallbackQuote,
     comment: commentEntries.map((entry) => entry.text).filter(Boolean).join("\n\n"),
     commentEntries,
     aiSections

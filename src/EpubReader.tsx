@@ -58,6 +58,7 @@ export interface EpubReaderProps {
   wikiLinkCandidates: any[];
   getWikiLinkCandidates: () => any[];
   openWikiLink: (target: string) => void;
+  promoteHighlight?: (highlight: BookHighlight, reflection: string) => Promise<void>;
   onInteraction?: () => void;
   app?: any;
   smartCommands?: SmartCommand[];
@@ -201,7 +202,7 @@ const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) =
   });
 };
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, onInteraction, app, smartCommands, bookTitle }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app, smartCommands, bookTitle }) => {
   const [location, setLocation] = useState<any>(initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -1479,6 +1480,39 @@ const showWordHoverCard = (asset, element) => {
     };
   }, [setReaderZoom]);
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container)
+      return;
+    const decoratePageButtons = () => {
+      const buttons = Array.from(container.querySelectorAll("button")) as HTMLButtonElement[];
+      for (const button of buttons) {
+        const isPrevious = button.classList.contains("jarvis-reader-page-button-prev") || button.textContent?.trim() === "‹";
+        const isNext = button.classList.contains("jarvis-reader-page-button-next") || button.textContent?.trim() === "›";
+        if (!isPrevious && !isNext)
+          continue;
+        const direction = isPrevious ? "prev" : "next";
+        const iconClass = `jarvis-reader-page-button-${direction}`;
+        if (button.classList.contains(iconClass) && button.querySelector("svg"))
+          continue;
+        button.classList.add("jarvis-reader-page-button", iconClass);
+        button.setAttribute("aria-label", direction === "prev" ? "上一页" : "下一页");
+        button.setAttribute("title", direction === "prev" ? "上一页" : "下一页");
+        button.replaceChildren();
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("aria-hidden", "true");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", direction === "prev" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6");
+        svg.appendChild(path);
+        button.appendChild(svg);
+      }
+    };
+    decoratePageButtons();
+    const observer = new MutationObserver(decoratePageButtons);
+    observer.observe(container, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
       return;
     const rendition = renditionRef.current;
@@ -2003,6 +2037,7 @@ const showWordHoverCard = (asset, element) => {
     })).filter((entry) => entry.text);
   };
   const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries(pendingSelection) : [];
+  const promotableHighlightNote = highlightNoteEntries[highlightNoteEntries.length - 1]?.text || highlightComment.trim();
   const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
   const renderHighlightNotes = () => highlightNoteEntries.length ? React.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
@@ -2392,6 +2427,20 @@ const showWordHoverCard = (asset, element) => {
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
   const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
   const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4fdd\u5b58\u957f\u53e5" : pendingTranslationKind === "phrase" ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
+  const pendingWordTags = (() => {
+    const result = wordLookupState.result;
+    if (!result || !result.isWord)
+      return [] as Array<{ label: string; tone: "core" | "rank" | "exam" }>;
+    const tags: Array<{ label: string; tone: "core" | "rank" | "exam" }> = [];
+    if (result.oxford === 1)
+      tags.push({ label: "牛津核心", tone: "core" });
+    if (result.collins > 0)
+      tags.push({ label: '★'.repeat(result.collins), tone: "rank" });
+    for (const tag of result.tags || []) {
+      tags.push({ label: String(tag).toUpperCase(), tone: "exam" });
+    }
+    return tags;
+  })();
   const renderObsidianIcon = (name) => React.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
@@ -2862,8 +2911,6 @@ const showWordHoverCard = (asset, element) => {
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
   }, "\u7ffb\u8bd1"),  React.createElement("div", {
-    className: "jarvis-reader-highlight-quote"
-  }, pendingWordSelection.quote),  React.createElement("div", {
     className: "jarvis-reader-word-panel"
   }, wordLookupState.status === "loading" ?  React.createElement("div", {
     className: "jarvis-reader-word-muted"
@@ -2872,40 +2919,43 @@ const showWordHoverCard = (asset, element) => {
   }, wordLookupState.error || "\u7ffb\u8bd1\u5931\u8d25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ?  React.createElement(React.Fragment, null, wordLookupState.result.isWord ?  React.createElement("div", {
     className: "jarvis-reader-word-head"
   },  React.createElement("button", {
-    className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
+    className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button jarvis-reader-word-translate-lemma",
     title: "\u70b9\u51fb\u53d1\u97f3",
     onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
     disabled: !enableWordAudio
   }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ?  React.createElement("div", {
   }, wordLookupState.result.phonetic) : null) : null, 
-  wordLookupState.result.isWord && (wordLookupState.result.tags || wordLookupState.result.collins || wordLookupState.result.oxford) ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
-    wordLookupState.result.oxford === 1 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "牛津核心") : null,
-    wordLookupState.result.collins && wordLookupState.result.collins > 0 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, '★'.repeat(wordLookupState.result.collins)) : null,
-    wordLookupState.result.tags ? wordLookupState.result.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+  pendingWordTags.length ? React.createElement("div", { className: "jarvis-reader-word-tags" },
+    pendingWordTags.slice(0, 3).map((tag) => React.createElement("span", { key: tag.label, className: `jarvis-reader-word-tag is-${tag.tone}` }, tag.label)),
+    pendingWordTags.length > 3 ? React.createElement("span", { className: "jarvis-reader-word-tag is-more" }, `+${pendingWordTags.length - 3}`) : null
   ) : null,
-  wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) :  React.createElement("div", {
+  React.createElement("div", { className: "jarvis-reader-word-definition-card" }, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) :  React.createElement("div", {
     className: "jarvis-reader-word-translation"
-  }, wordLookupState.result.translation)) : null),  React.createElement("div", {
+  }, wordLookupState.result.translation))) : null),  React.createElement("div", {
     className: "jarvis-reader-highlight-actions"
   },  React.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "取消",
     onClick: clearHighlightUi
-  }, "\u53d6\u6d88"), savedWordAsset ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+  }, renderObsidianIcon("x")), savedWordAsset ?  React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "打开词条",
     onClick: () => openWordNote(savedWordAsset)
-  }, "\u6253\u5f00\u8bcd\u6761") : null, canSwitchPendingWordToAi ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button",
+  }, renderObsidianIcon("book-open")) : null, canSwitchPendingWordToAi ?  React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
+    "aria-label": "AI 翻译",
     onClick: translatePendingWordWithAi
-  }, "AI\u7ffb\u8bd1") : null, savedWordAsset && savedWordAsset.mastered ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+  }, renderObsidianIcon("bot")) : null, savedWordAsset && savedWordAsset.mastered ?  React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
+    "aria-label": "重新加入",
     onClick: restorePendingWordAsset
-  }, "\u91cd\u65b0\u52a0\u5165") : null, canPersistPendingWord && !savedWordAsset ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
+  }, renderObsidianIcon("rotate-ccw")) : null, canPersistPendingWord && !savedWordAsset ?  React.createElement("button", {
+    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
+    "aria-label": persistPendingLabel,
     onClick: persistPendingWordAsset
-  }, persistPendingLabel) : null,  React.createElement("div", {
+  }, renderObsidianIcon("bookmark-plus")) : null,  React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
-    onPointerDown: beginHighlightPopoverResize,
-    title: "Resize"
+    onPointerDown: beginHighlightPopoverResize
   }))) : null, pendingSelection ?  React.createElement("div", {
     className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
     style: visibleHighlightPopoverRect ? {
@@ -2938,6 +2988,12 @@ const showWordHoverCard = (asset, element) => {
       setHighlightContentTab("notes");
     }
   }, renderObsidianIcon("file-pen-line")) : null,
+  isExistingHighlightComment && promotableHighlightNote && typeof promoteHighlight === "function" ? React.createElement("button", {
+    className: "jarvis-reader-highlight-icon-button",
+    type: "button",
+    title: "提升为知识笔记",
+    onClick: () => promoteHighlight(pendingSelection, promotableHighlightNote)
+  }, renderObsidianIcon("file-plus-2")) : null,
   ...(smartCommands || []).filter(c => c.enabled !== false && (c.scope === "note" || c.scope === "both")).map(cmd =>
     React.createElement("button", {
       key: cmd.id,
@@ -2984,7 +3040,13 @@ const showWordHoverCard = (asset, element) => {
     onOpenLink: openWikiLink,
     placeholder: highlightCommentPlaceholder
   }),  React.createElement("div", {
-    className: "jarvis-reader-highlight-input-shell"
+    className: "jarvis-reader-highlight-input-shell",
+    onMouseDown: (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest("textarea, .jarvis-reader-highlight-input-wikilink")) return;
+      event.preventDefault();
+      highlightInputRef.current?.focus();
+    }
   },  React.createElement("div", {
     className: "jarvis-reader-highlight-input-preview"
   }, renderWikiInputPreview(highlightComment)),  React.createElement("textarea", {

@@ -153,11 +153,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   // Navigation & UI States
   const [currentView, setCurrentView] = React.useState<"home" | "detail" | "stats">("home");
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
+  const [detailHighlights, setDetailHighlights] = React.useState<BookHighlight[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
-  const [viewLayout, setViewLayout] = React.useState<"grid" | "list" | "coverflow">("grid");
-  const [coverFlowIndex, setCoverFlowIndex] = React.useState(0);
+  const [viewLayout, setViewLayout] = React.useState<"grid" | "list">("grid");
   const [activeTab, setActiveTab] = React.useState<"highlights" | "words" | "bookmarks">("highlights");
   const [descExpanded, setDescExpanded] = React.useState(false);
   const [showFilters, setShowFilters] = React.useState(false);
@@ -176,10 +176,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [isEditingIntro, setIsEditingIntro] = React.useState(false);
   const [gridCols, setGridCols] = React.useState(6);
   const [selectedGridBook, setSelectedGridBook] = React.useState<string | null>(null);
-  const [isSpinning, setIsSpinning] = React.useState(false);
   const [bookNotesMap, setBookNotesMap] = React.useState<Record<string, TFile>>({});
   const homeRef = React.useRef<HTMLDivElement>(null);
-  const wheelTimeoutRef = React.useRef<any>(null);
 
   const [books, setBooks] = React.useState<TFile[]>([]);
   const [coverCache, setCoverCache] = React.useState<Record<string, any>>(plugin.settings.bookCoverCache || {});
@@ -191,50 +189,29 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
   const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
 
-  const formatDays = (dateStr?: string) => {
-    if (!dateStr) return "未设置";
-    const today = (moment as any)().startOf("day");
-    const target = (moment as any)(dateStr, "YYYY-MM-DD").startOf("day");
-    const diff = target.diff(today, "days");
-    if (diff === 0) return "今天";
-    if (diff < 0) return `逾期 ${Math.abs(diff)} 天`;
-    return `${diff} 天后`;
-  };
-
   const handleToggleSingleMastery = async (e: React.MouseEvent, lemma: string) => {
     e.stopPropagation();
     if (plugin.settings.wordAssets[lemma]) {
       const current = plugin.settings.wordAssets[lemma].mastered;
-      plugin.settings.wordAssets[lemma].mastered = !current;
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !current);
       setRefreshTrigger(p => p + 1);
-      window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     }
   };
 
   const handleDeleteWord = async (lemma: string) => {
     const confirmed = await confirmDestructiveAction(plugin.app, "删除词条", `确定要彻底删除词条 "${lemma}" 吗？此操作不可恢复。`);
     if (!confirmed) return;
-    const asset = plugin.settings.wordAssets[lemma];
-    if (!asset) return;
-    if (plugin.activeReaderView && typeof plugin.activeReaderView.deleteWordAsset === "function") {
-        await plugin.activeReaderView.deleteWordAsset(asset);
-    } else {
-        delete plugin.settings.wordAssets[lemma];
-        await plugin.persistWordAssetSidecar("delete");
-        await plugin.saveSettings();
-    }
+    if (!plugin.settings.wordAssets[lemma]) return;
+    await plugin.wordAssetService.delete(lemma);
     setRefreshTrigger(p => p + 1);
-    window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     new Notice(`已彻底删除词条：${lemma}`);
   };
 
-  const renderTableRow = (asset: any, showTagsColumn: boolean = false) => {
+  const renderTableRow = (asset: any) => {
     const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
     const isSentence = asset.kind === "sentence";
     const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
     const displayWord = isSentence && quote ? quote : asset.lemma;
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "未知";
     const isExpanded = expandedItems.has(assetKey);
     
     const handleRowClick = (e: React.MouseEvent) => {
@@ -264,10 +241,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   .setIcon(isMastered ? "cross" : "checkmark")
                   .onClick(async () => {
                       if (plugin.settings.wordAssets[assetKey]) {
-                          plugin.settings.wordAssets[assetKey].mastered = !isMastered;
-                          await plugin.saveSettings();
+                          await plugin.wordAssetService.setMastered(assetKey, !isMastered);
                           setRefreshTrigger(p => p + 1);
-                          window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
                       }
                   });
           });
@@ -299,23 +274,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             {!isSentence && asset.phonetic && <div style={{ fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }}>{asset.phonetic}</div>}
           </div>
         </td>
-        {showTagsColumn && (
-          <td style={{ padding: "12px 8px" }}>
-            {asset.isWord && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
-                {asset.oxford === 1 && (
-                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>牛津核心</span>
-                )}
-                {asset.collins && asset.collins > 0 && (
-                  <span className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", fontWeight: "normal" }}>{'★'.repeat(asset.collins)}</span>
-                )}
-                {asset.tags?.map((tag: string) => (
-                  <span key={tag} className="jarvis-tag" style={{ background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)", fontWeight: "normal" }}>{tag.toUpperCase()}</span>
-                ))}
-              </div>
-            )}
-          </td>
-        )}
         <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>
           {asset.translation && (
             <div 
@@ -334,11 +292,14 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               )}
             </div>
           )}
+          {isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }}>
+              {asset.oxford === 1 && <span className="jarvis-tag">牛津核心</span>}
+              {asset.collins > 0 && <span className="jarvis-tag">{'★'.repeat(asset.collins)}</span>}
+              {asset.tags?.map((tag: string) => <span key={tag} className="jarvis-tag">{tag.toUpperCase()}</span>)}
+            </div>
+          )}
         </td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }}>{bookTitle}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--color-orange)", textAlign: "center" }}>{asset.reviews || 0}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", textAlign: "center" }}>{asset.ease?.toFixed(2) || "2.50"}</td>
-        <td style={{ padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)", textAlign: "center" }}>{formatDays(asset.nextReviewDate)}</td>
         <td style={{ padding: "12px 8px" }}>
           <span 
               style={{ 
@@ -393,6 +354,49 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     return () => window.removeEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
   }, [books]);
 
+  React.useEffect(() => {
+    const handleAssetOrHighlightChange = () => setRefreshTrigger((value) => value + 1);
+    window.addEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
+    window.addEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
+    return () => {
+      window.removeEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
+      window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!activeBook || currentView !== "detail") {
+      setDetailHighlights([]);
+      return;
+    }
+    let cancelled = false;
+
+    const loadHighlightDetails = async () => {
+      const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
+      const highlights = await Promise.all(indexHighlights.map(async (highlight) => {
+        const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
+        if (!(noteFile instanceof TFile)) return highlight;
+        try {
+          const details = await plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
+          return {
+            ...highlight,
+            quote: details.quote || highlight.quote,
+            comment: details.comment,
+            commentEntries: details.commentEntries,
+            aiSections: details.aiSections,
+          } as BookHighlight;
+        } catch (error) {
+          console.warn("Jarvis Reader failed to load library highlight details.", error);
+          return highlight;
+        }
+      }));
+      if (!cancelled) setDetailHighlights(highlights);
+    };
+
+    void loadHighlightDetails();
+    return () => { cancelled = true; };
+  }, [activeBook, currentView, plugin, refreshTrigger]);
+
   // Handle active file syncinges
   React.useEffect(() => {
     setCoverCache(plugin.settings.bookCoverCache || {});
@@ -438,7 +442,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     };
     home.addEventListener("wheel", onWheel, { passive: false });
     return () => home.removeEventListener("wheel", onWheel);
-  }, [viewLayout]);
+  }, []);
 
   // Background cover queue worker
   React.useEffect(() => {
@@ -1037,38 +1041,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           else if (percentage > 0) status = "reading";
         }
 
-        // Asynchronously enrich memory highlights with full note details
-        const list = getHighlightsForBook(plugin.settings, activeBook.path);
-        const { readHighlightNoteDetailsFromBookNote } = require("../highlights");
-        (async () => {
-          let hasUpdates = false;
-          const updatedList = await Promise.all(list.map(async (highlight) => {
-            try {
-              const details = await readHighlightNoteDetailsFromBookNote(plugin.app, noteFile, highlight);
-              if (details.commentEntries?.length || details.aiSections?.length) {
-                if (
-                  !(highlight as any).commentEntries || 
-                  !(highlight as any).aiSections ||
-                  (highlight as any).commentEntries.length !== details.commentEntries.length ||
-                  (highlight as any).aiSections.length !== details.aiSections.length
-                ) {
-                  hasUpdates = true;
-                }
-                return {
-                  ...highlight,
-                  comment: details.comment,
-                  commentEntries: details.commentEntries,
-                  aiSections: details.aiSections
-                };
-              }
-            } catch (err) {}
-            return highlight;
-          }));
-          if (hasUpdates) {
-            plugin.settings.bookHighlights[activeBook.path] = updatedList;
-            setBookMetadata(prev => ({ ...prev }));
-          }
-        })();
       } else {
         // Sync default status if no file
         if (percentage >= 100) status = "finished";
@@ -1100,20 +1072,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       new Notice("保存元数据失败");
     }
   };
-
-  // Keyboard Navigation for CoverFlow
-  React.useEffect(() => {
-    if (viewLayout !== "coverflow" || filteredBooks.length === 0) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        setCoverFlowIndex((prev) => Math.max(0, prev - 1));
-      } else if (e.key === "ArrowRight") {
-        setCoverFlowIndex((prev) => Math.min(filteredBooks.length - 1, prev + 1));
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [viewLayout, filteredBooks.length]);
 
   // Actions
   const openBook = async (file: TFile) => {
@@ -1147,25 +1105,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     }
   };
 
-  const handleRandomSelect = () => {
-    if (filteredBooks.length === 0 || isSpinning) return;
-    setIsSpinning(true);
-    let spins = 0;
-    const maxSpins = 20;
-    
-    // Quick interval to simulate spinning
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * filteredBooks.length);
-      setCoverFlowIndex(randomIndex);
-      spins++;
-      
-      if (spins >= maxSpins) {
-        clearInterval(interval);
-        setIsSpinning(false);
-      }
-    }, 60);
-  };
-
   const playAudio = (word: string) => {
     const template = plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE;
     const accent = plugin.settings.wordAudioAccent || "us";
@@ -1180,9 +1119,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   const toggleWordMastery = async (lemma: string, currentVal: boolean) => {
     if (plugin.settings.wordAssets[lemma]) {
-      plugin.settings.wordAssets[lemma].mastered = !currentVal;
-      plugin.settings.wordAssets[lemma].updated = new Date().toISOString();
-      await plugin.saveSettings();
+      await plugin.wordAssetService.setMastered(lemma, !currentVal);
       // Force state reload
       loadBooks();
     }
@@ -2108,11 +2045,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           {/* Right side controls */}
           <div className="jarvis-library-header-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
             <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
-              {viewLayout === "coverflow" && (
-                <button className={`jarvis-library-filter-btn`} onClick={handleRandomSelect} title="随机选书">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isSpinning ? 'jarvis-spin-anim' : ''}><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-                </button>
-              )}
               <button className={`jarvis-library-filter-btn ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} title="筛选与排序">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               </button>
@@ -2142,9 +2074,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               </button>
               <button className={`jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} title="列表布局">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-              </button>
-              <button className={`jarvis-library-layout-btn ${viewLayout === "coverflow" ? "is-active" : ""}`} onClick={() => { setViewLayout("coverflow"); setCoverFlowIndex(0); }} title="3D 封面流">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect><line x1="12" y1="7" x2="12" y2="17"></line></svg>
               </button>
             </div>
 
@@ -2201,156 +2130,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         {filteredBooks.length === 0 ? (
           <div className="jarvis-library-empty-state">
             <p>没有找到符合筛选条件的书籍</p>
-          </div>
-        ) : viewLayout === "coverflow" ? (
-          <div className="jarvis-library-coverflow-wrapper">
-            {/* Left: 3D Scene */}
-            <div className="jarvis-library-coverflow-scene" onWheel={(e) => {
-              if (wheelTimeoutRef.current) return;
-              if (e.deltaY > 0) {
-                setCoverFlowIndex(p => p + 1);
-              } else if (e.deltaY < 0) {
-                setCoverFlowIndex(p => p - 1);
-              }
-              wheelTimeoutRef.current = setTimeout(() => {
-                wheelTimeoutRef.current = null;
-              }, 80);
-            }}>
-              <div className="jarvis-library-cf-stage">
-                {Array.from({ length: 31 }).map((_, idx) => {
-                  const offset = idx - 15;
-                  const virtualPos = coverFlowIndex + offset;
-                  
-                  let actualIndex = virtualPos % filteredBooks.length;
-                  if (actualIndex < 0) actualIndex += filteredBooks.length;
-                  
-                  const book = filteredBooks[actualIndex];
-                  if (!book) return null;
-
-                  const cover = getCover(book);
-                  const { title } = parseBookInfo(book);
-                  const absOffset = Math.abs(offset);
-                  const sign = Math.sign(offset);
-                  // Calibre-style gentle U-shape arc:
-                  // 1. push the stack further away from center (140) but keep tight spacing between cards (35)
-                  // 2. drastically reduce Z-axis dropoff (40 instead of 80) so cards don't shrink rapidly into a V-shape
-                  // 3. steepen the rotation (75deg) so side cards show mostly their spines/edges
-                  const translateX = sign * (140 + absOffset * 35);
-                  const translateZ = -absOffset * 40;
-                  const rotateY = sign * -75;
-                  
-                  const transform = offset === 0 
-                    ? `translate(-50%, -50%) translateZ(40px) scale(1.02)` 
-                    : `translate(-50%, -50%) translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`;
-
-                  let gradientBg = "";
-                  if (!cover?.dataUrl) {
-                    let hash = 0;
-                    for (let j = 0; j < title.length; j++) hash = title.charCodeAt(j) + ((hash << 5) - hash);
-                    const hue = Math.abs(hash) % 360;
-                    gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-                  }
-
-                  return (
-                    <div 
-                      key={virtualPos} 
-                      className={`jarvis-library-cf-card ${offset === 0 ? "is-active" : ""}`} 
-                      style={{ transform, zIndex: 100 - absOffset }} 
-                      onClick={() => {
-                        if (offset !== 0) setCoverFlowIndex(virtualPos);
-                        else { setActiveBook(book); setCurrentView("detail"); }
-                      }}
-                    >
-                      <div className="cf-card-inner">
-                        {cover?.dataUrl ? (
-                          <img src={cover.dataUrl} alt={title} />
-                        ) : (
-                          <div className="cf-placeholder" style={{ background: gradientBg }}>
-                            <span>{title}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right: Focused Book Info */}
-            <div className="jarvis-library-cf-info">
-              {(() => {
-                let actualIndex = coverFlowIndex % filteredBooks.length;
-                if (actualIndex < 0) actualIndex += filteredBooks.length;
-                const activeB = filteredBooks[actualIndex];
-                if (!activeB) return null;
-                const { title, author } = parseBookInfo(activeB);
-                const progress = getProgress(activeB);
-                const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-                const cover = getCover(activeB);
-                const highlightsCount = getHighlightsForBook(plugin.settings, activeB.path).length;
-                const wordsCount = Object.values(plugin.settings.wordAssets || {}).filter((a: any) => a.sources?.some((s: any) => s.bookPath === activeB.path)).length;
-                
-                const rawDesc = cover?.description || "";
-                const description = rawDesc ? stripHtml(rawDesc) : "暂无书籍简介。";
-                const creator = cover?.creator || author;
-
-                const noteFile = bookNotesMap[activeB.path];
-                let fm: any = {};
-                if (noteFile) {
-                  const cache = plugin.app.metadataCache.getFileCache(noteFile);
-                  fm = cache?.frontmatter || {};
-                }
-                const bookStatus = formatBookStatus(resolveBookStatus(fm, percentage));
-                const rating = fm.rating ? `评分 ${fm.rating}` : "暂无评分";
-                const tags = Array.isArray(fm.tags) ? fm.tags.slice(0, 3) : [];
-                const startDate = fm.start_date || "";
-                const finishDate = fm.finish_date || "";
-                const displayDate = finishDate ? `读完 ${finishDate}` : startDate ? `开始 ${startDate}` : `加入 ${formatDate(activeB.stat.ctime).split(' ')[0]}`;
-
-                return (
-                  <div className="cf-info-content">
-                    <h2 className="cf-info-title">{title}</h2>
-                    <p className="cf-info-author">{creator}</p>
-                    
-                    <div className="cf-info-stats">
-                      <div className="cf-stat">
-                        <span className="cf-stat-val">{percentage}%</span>
-                        <span className="cf-stat-lbl">进度</span>
-                      </div>
-                      <div className="cf-stat">
-                        <span className="cf-stat-val">{highlightsCount}</span>
-                        <span className="cf-stat-lbl">笔记</span>
-                      </div>
-                      <div className="cf-stat">
-                        <span className="cf-stat-val">{wordsCount}</span>
-                        <span className="cf-stat-lbl">词条</span>
-                      </div>
-                    </div>
-
-                    <div className="book-card-meta-list" style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div>状态：{bookStatus}</div>
-                      <div>评分：{rating}</div>
-                      <div className="text-ellipsis" style={{ minHeight: '19px' }}>标签：{tags.length > 0 ? tags.map((t: string) => `#${t}`).join(' ') : '无'}</div>
-                      <div>时长：{formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeB.path))}</div>
-                      <div>时间：{displayDate}</div>
-                    </div>
-
-                    <div className="cf-info-desc" style={{ marginTop: '16px' }}>
-                      <p>{description}</p>
-                    </div>
-
-                    <div className="cf-info-actions">
-                      <button className="jarvis-library-btn btn-primary" onClick={() => openBook(activeB)}>
-                        {percentage > 0 ? "继续阅读" : "开始阅读"}
-                      </button>
-                      <button className="jarvis-library-btn btn-secondary" onClick={() => { setActiveBook(activeB); setCurrentView("detail"); }}>
-                        查看详情
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
           </div>
         ) : viewLayout === "grid" ? (
           <div className="jarvis-library-grid" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
@@ -2633,7 +2412,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     const progress = getProgress(activeBook);
     const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
     const cover = getCover(activeBook);
-    const highlights = getHighlightsForBook(plugin.settings, activeBook.path);
+    const highlights = detailHighlights;
     const bookmarks = plugin.settings.bookBookmarks?.[activeBook.path] || [];
 
     // Filter word assets for this book
@@ -3013,16 +2792,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                               <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
                                 <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>标签</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }}>释义</th>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                                 </tr>
                               </thead>
-                              <tbody>{wordsAndPhrases.map(a => renderTableRow(a, true))}</tbody>
+                              <tbody>{wordsAndPhrases.map(renderTableRow)}</tbody>
                             </table>
                           </div>
                         )}
@@ -3033,15 +2807,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                               <thead style={{ position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }}>
                                 <tr style={{ borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }}>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }}>词条</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "30%" }}>释义</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "15%" }}>书籍</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>复习次数</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "80px", textAlign: "center" }}>难度(Ease)</th>
-                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "100px", textAlign: "center" }}>下次复习</th>
+                                  <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }}>释义</th>
                                   <th style={{ padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }}>状态</th>
                                 </tr>
                               </thead>
-                              <tbody>{sentences.map(a => renderTableRow(a, false))}</tbody>
+                              <tbody>{sentences.map(renderTableRow)}</tbody>
                             </table>
                           </div>
                         )}

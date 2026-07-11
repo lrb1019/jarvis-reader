@@ -407,6 +407,12 @@ export const WikiLinkCodeMirrorEditor: React.FC<WikiLinkCodeMirrorEditorProps> =
   return React.createElement("div", {
     className: "jarvis-reader-cm-editor",
     ref: hostRef,
-    "data-placeholder": placeholder || ""
+    "data-placeholder": placeholder || "",
+    onMouseDown: (event: React.MouseEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement;
+      if (target.closest(".cm-content")) return;
+      event.preventDefault();
+      viewRef.current?.focus();
+    }
   });
 };

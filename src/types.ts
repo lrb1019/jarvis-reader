@@ -22,8 +22,17 @@ export interface BookHighlight {
   updated?: string;
 }
 
-export interface PersistedBookHighlight extends BookHighlight {
+export interface PersistedBookHighlight {
+  id: string;
+  bookPath: string;
+  bookTitle: string;
+  chapterTitle: string;
+  cfiRange: string;
+  markColor?: HighlightColor;
+  notePath: string;
+  blockId: string;
   updated: string;
+  created: string;
 }
 
 export type BookHighlightsMap = Record<string, BookHighlight[]>;
@@ -167,6 +176,7 @@ export interface JarvisReaderSettings {
   readerZoom: number;
   readerLineHeight: number;
   bookNoteFolder: string;
+  knowledgeNoteFolder: string;
   bookNoteTemplate: string;
   customCoverFolder: string;
   wordAssets: WordAssetMap;

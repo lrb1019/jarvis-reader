@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS = {
   readerZoom: 1,
   readerLineHeight: 1.6,
   bookNoteFolder: "",
+  knowledgeNoteFolder: "知识库/想法",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
   customCoverFolder: "00-Attachment",
   wordBookExportFolder: "",
@@ -254,6 +255,21 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         if (exportFolderText) {
           exportFolderText.setValue("");
         }
+      }));
+
+      let knowledgeFolderText: any = null;
+      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("从阅读感想提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
+        knowledgeFolderText = text;
+        text.setPlaceholder("如: 知识库/想法").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("选择").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.knowledgeNoteFolder = path;
+          await this.plugin.saveSettings();
+          knowledgeFolderText?.setValue(path);
+        }).open();
       }));
 
       new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {

@@ -124,6 +124,16 @@ export class JarvisReaderHighlightsView extends ItemView {
       ...this.getWikiLinks(highlight.comment).map((link) => `${link.target} ${link.label}`)
     ].join(" ").toLowerCase();
   }
+  getCommentEntries(highlight) {
+    const entries = Array.isArray(highlight.commentEntries)
+      ? highlight.commentEntries.filter((entry) => (entry?.text || "").trim())
+      : [];
+    if (entries.length) return entries;
+    return String(highlight.comment || "").trim().split(/\n{2,}/).map((text, index) => ({
+      label: index === 0 ? "笔记" : `笔记 ${index + 1}`,
+      text: text.trim(),
+    })).filter((entry) => entry.text);
+  }
   getCurrentChapterTitle() {
     var _a, _b;
     if (!this.reader || !this.reader.file)
@@ -266,7 +276,7 @@ export class JarvisReaderHighlightsView extends ItemView {
       };
     }
   }
-  render() {
+  async render() {
     const container = this.contentEl;
     if (!container)
       return;
@@ -285,14 +295,16 @@ export class JarvisReaderHighlightsView extends ItemView {
     };
     container.empty();
     container.addClass("jarvis-reader-highlights-view");
-    if (!this.reader) {
+    const reader = this.reader;
+    if (!reader) {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "打开一本 EPUB 后显示笔记" });
       return;
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
     header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "笔记" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: this.reader.file ? this.reader.file.basename : "" });
-    const list = this.reader.getBookHighlights();
+    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: reader.file ? reader.file.basename : "" });
+    const list = await reader.getBookHighlightsForReader();
+    if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "暂无笔记。选中正文后高亮或写笔记即可生成。" });
       return;
@@ -352,20 +364,19 @@ export class JarvisReaderHighlightsView extends ItemView {
           this.reader.jumpToHighlight(highlight, true);
         }
       };
-      card.createEl("div", { cls: "jarvis-reader-highlights-chapter", text: highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282" });
-      const bubble = card.createDiv({ cls: "jarvis-reader-highlights-bubble" });
-      if (highlight.comment) {
+      card.createEl("div", { cls: "jarvis-reader-highlights-quote", text: this.previewText(highlight.quote, 160) });
+      const noteEntries = this.getCommentEntries(highlight);
+      if (noteEntries.length) {
+        const latestNote = noteEntries[noteEntries.length - 1];
+        const bubble = card.createDiv({ cls: "jarvis-reader-highlights-bubble" });
+        bubble.createEl("div", {
+          cls: "jarvis-reader-highlights-note-meta",
+          text: noteEntries.length > 1 ? `${noteEntries.length} 条笔记` : "笔记",
+        });
         const commentEl = bubble.createEl("div", { cls: "jarvis-reader-highlights-comment" });
-        this.renderLinkedPreview(commentEl, highlight.comment, 96);
-      } else {
-        bubble.createEl("div", { cls: "jarvis-reader-highlights-comment is-empty", text: "\u672a\u5199\u611f\u60f3" });
+        this.renderLinkedPreview(commentEl, latestNote.text, 96);
       }
       this.renderWikiLinks(card, this.getWikiLinks(highlight.comment));
-      card.createEl("div", { cls: "jarvis-reader-highlights-quote", text: this.previewText(highlight.quote, 72) });
-      const time = this.formatTime(highlight.updated || highlight.created);
-      if (time) {
-        card.createEl("div", { cls: "jarvis-reader-highlights-time", text: time });
-      }
     }
     if (revealCard) {
       window.requestAnimationFrame(() => {
