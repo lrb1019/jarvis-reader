@@ -28,7 +28,7 @@ jobs:
             - name: Check tag version
               run: |
                   tag="${GITHUB_REF#refs/tags/}"
-                  expected="$(node -p \"require('./package.json').version\")"
+                  expected="$(node -p "require('./package.json').version")"
                   test "$tag" = "$expected"
 
             - name: Create release
