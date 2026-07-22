@@ -11,6 +11,9 @@ release/
 Thumbs.db
 index/
 logs/
+backups/
+cache/
+pending/
 
 # 本地项目管理文件（不上传 GitHub）
 00 项目总览.md

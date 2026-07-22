@@ -713,11 +713,19 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 
 .jarvis-reader-word-panel {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   flex-direction: column;
   gap: 10px;
   min-height: 0;
   overflow: hidden;
+}
+
+.jarvis-reader-highlight-popover.is-floating.jarvis-reader-word-translate {
+  max-height: min(620px, calc(100% - 32px));
+  min-height: 0;
+  min-width: min(360px, calc(100% - 32px));
+  overflow: hidden;
+  padding: 14px 16px 12px;
 }
 
 .jarvis-reader-word-head {
@@ -806,7 +814,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   background: color-mix(in srgb, var(--background-primary) 88%, var(--background-secondary));
   border: 1px solid color-mix(in srgb, var(--background-modifier-border) 78%, transparent);
   border-radius: 12px;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  max-height: 430px;
   min-height: 0;
   overflow: auto;
   padding: 14px;
@@ -1701,6 +1710,41 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   font-size: var(--font-ui-smaller);
 }
 
+.jarvis-reader-navigation-tabs {
+  background: color-mix(in srgb, var(--background-secondary) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 58%, transparent);
+  border-radius: 9px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 10px 8px 0;
+  padding: 3px;
+}
+
+.jarvis-reader-navigation-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  font-weight: 560;
+  height: 28px;
+  padding: 0 8px;
+}
+
+.jarvis-reader-navigation-tab:hover {
+  background: color-mix(in srgb, var(--background-modifier-hover) 72%, transparent);
+  color: var(--text-normal);
+}
+
+.jarvis-reader-navigation-tab.is-active {
+  background: var(--background-primary);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--background-modifier-border) 62%, transparent);
+  color: var(--text-normal);
+}
+
 .jarvis-reader-toc-list {
   gap: 5px;
 }
@@ -1755,6 +1799,89 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   white-space: normal;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.jarvis-reader-bookmark-list {
+  gap: 7px;
+}
+
+.jarvis-reader-bookmark-item {
+  align-items: center;
+  background: color-mix(in srgb, var(--background-secondary) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 42%, transparent);
+  border-radius: 10px;
+  color: var(--text-normal);
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 9px 8px 9px 11px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.jarvis-reader-bookmark-item:hover,
+.jarvis-reader-bookmark-item:focus-visible {
+  background: color-mix(in srgb, var(--background-modifier-hover) 80%, transparent);
+  border-color: color-mix(in srgb, var(--interactive-accent) 34%, var(--background-modifier-border));
+  outline: none;
+}
+
+.jarvis-reader-bookmark-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.jarvis-reader-bookmark-title {
+  font-size: var(--font-ui-small);
+  font-weight: 590;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jarvis-reader-bookmark-meta {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.3;
+  margin-top: 3px;
+}
+
+.jarvis-reader-bookmark-delete {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 28px;
+  height: 28px;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  transition: background 0.12s, color 0.12s, opacity 0.12s;
+}
+
+.jarvis-reader-bookmark-item:hover .jarvis-reader-bookmark-delete,
+.jarvis-reader-bookmark-delete:focus-visible {
+  opacity: 1;
+}
+
+.jarvis-reader-bookmark-delete:hover {
+  background: color-mix(in srgb, var(--text-error) 10%, transparent);
+  color: var(--text-error);
+}
+
+.jarvis-reader-bookmark-delete svg {
+  fill: none;
+  height: 15px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 15px;
 }
 
 
@@ -2913,21 +3040,26 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .detail-header-cover-side {
+  align-self: flex-start;
+  aspect-ratio: 2 / 3;
+  background: var(--background-secondary-alt);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
   flex: 0 0 280px;
+  overflow: hidden;
 }
 
 .detail-cover {
-  width: 280px;
-  height: 395px;
-  border-radius: 12px;
+  display: block;
+  height: 100%;
   object-fit: cover;
-  box-shadow: 0 16px 36px rgb(0 0 0 / 22%), 0 4px 12px rgb(0 0 0 / 14%);
+  width: 100%;
 }
 
 .detail-cover-placeholder {
-  width: 280px;
-  height: 395px;
-  border-radius: 12px;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2941,6 +3073,7 @@ g.jarvis-reader-highlight-with-comment line {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  height: 420px;
 }
 
 .detail-header-intro-side {
@@ -3063,14 +3196,16 @@ g.jarvis-reader-highlight-with-comment line {
 
 /* Metadata Editor */
 .detail-metadata-editor {
+  box-sizing: border-box;
   display: grid;
+  flex: 1 1 auto;
   grid-template-columns: 1fr 1fr;
   gap: 16px 24px;
   background: var(--background-secondary-alt);
   border: 1px solid var(--background-modifier-border);
   border-radius: 8px;
-  padding: 20px;
-  margin-top: 16px;
+  padding: 16px 20px;
+  margin-top: 0;
 }
 
 .metadata-row {

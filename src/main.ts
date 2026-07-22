@@ -1,9 +1,8 @@
 import { Plugin, WorkspaceLeaf, Notice, TFile, addIcon } from "obsidian";
 import { EpubView } from "./EpubView";
 import { resolveSyncConflicts } from "./conflict-resolver";
-import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE, HIGHLIGHTS_VIEW_TYPE } from "./sidebar/BookshelfView";
+import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
-import { JarvisReaderHighlightsView } from "./sidebar/HighlightsView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarView";
 import { WordBookView, WORD_BOOK_VIEW_TYPE } from "./word-book/WordBookView";
@@ -21,6 +20,11 @@ import { BookNoteService } from "./book-note-service";
 import { createBookNoteOperations } from "./book-note-operations";
 import { KnowledgeNoteService } from "./knowledge-note-service";
 import { createKnowledgeNoteStorage } from "./knowledge-note-store";
+import { CoverCacheService } from "./cover-cache-service";
+import type { BookCoverCache, BookCoverCacheEntry } from "./types";
+import { HighlightTransactionService } from "./highlight-transaction-service";
+import { SettingsSaveQueue } from "./settings-save-queue";
+import { BookStateService } from "./book-state-service";
 import {
   readHighlightSidecar,
   readWordAssetSidecar,
@@ -34,7 +38,6 @@ const LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentCol
 export default class JarvisReaderPlugin extends Plugin {
   declare settings: any;
   bookshelfView: any;
-  highlightsView: any;
   activeReaderView: any;
   wordSidebarView: any;
   lastIndexCounts: any;
@@ -42,7 +45,29 @@ export default class JarvisReaderPlugin extends Plugin {
   wordAssetService = new WordAssetService(this);
   highlightService = new HighlightService(this);
   bookNoteService = new BookNoteService(createBookNoteOperations(this.app));
+  bookStateService = new BookStateService(this);
   knowledgeNoteService = new KnowledgeNoteService(createKnowledgeNoteStorage(this.app.vault));
+  coverCacheService = new CoverCacheService(this.app.vault.adapter);
+  coverCacheMigrationComplete = false;
+  highlightTransactionService = new HighlightTransactionService({
+    adapter: this.app.vault.adapter,
+    readNote: async (path) => {
+      const file = this.app.vault.getAbstractFileByPath(path);
+      if (!(file instanceof TFile)) throw new Error(`找不到书籍笔记：${path}`);
+      return this.app.vault.read(file);
+    },
+    writeNote: async (path, content) => {
+      const file = this.app.vault.getAbstractFileByPath(path);
+      if (!(file instanceof TFile)) throw new Error(`找不到书籍笔记：${path}`);
+      await this.app.vault.modify(file, content);
+    },
+    getBookHighlights: (bookPath) => this.settings?.bookHighlights?.[bookPath] || [],
+    replaceBookHighlights: (bookPath, highlights, reason) => this.highlightService.replaceBookHighlights(bookPath, highlights, reason),
+  });
+  settingsSaveQueue = new SettingsSaveQueue(
+    () => this.getSettingsDataSnapshot(),
+    (settingsData) => this.saveData(settingsData),
+  );
   highlightSidecarUnavailable = false;
 
   async onload() {
@@ -50,6 +75,14 @@ export default class JarvisReaderPlugin extends Plugin {
     addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
+    const highlightRecovery = await this.highlightTransactionService.recoverPending();
+    if (highlightRecovery.finalized || highlightRecovery.rolledBack) {
+      new Notice(`已恢复 ${highlightRecovery.finalized + highlightRecovery.rolledBack} 个未完成的高亮操作。`);
+    }
+    if (highlightRecovery.errors.length) {
+      console.error("Jarvis Reader highlight transaction recovery failed.", highlightRecovery.errors);
+      new Notice("存在无法自动恢复的高亮操作，恢复记录已保留。请检查开发者工具日志。", 0);
+    }
     await resolveSyncConflicts(this);
     if (needsStartupIndexPersistence) {
       await this.persistIndexSidecars("startup");
@@ -61,11 +94,6 @@ export default class JarvisReaderPlugin extends Plugin {
     this.registerView(BOOKSHELF_VIEW_TYPE, (leaf) => {
       const view = new JarvisReaderBookshelfView(leaf, this);
       this.bookshelfView = view;
-      return view;
-    });
-    this.registerView(HIGHLIGHTS_VIEW_TYPE, (leaf) => {
-      const view = new JarvisReaderHighlightsView(leaf, this);
-      this.highlightsView = view;
       return view;
     });
     this.registerView(WORD_SIDEBAR_VIEW_TYPE, (leaf) => {
@@ -161,11 +189,6 @@ export default class JarvisReaderPlugin extends Plugin {
         }
       }, 50);
     }));
-    this.app.workspace.onLayoutReady(() => {
-      for (const leaf of this.app.workspace.getLeavesOfType(HIGHLIGHTS_VIEW_TYPE)) {
-        leaf.detach();
-      }
-    });
     registerGlobalMarkdownFeatures(this);
     this.addSettingTab(new JarvisReaderSettingTab(this.app, this));
   }
@@ -290,10 +313,6 @@ export default class JarvisReaderPlugin extends Plugin {
     await this.setActiveReader(reader, "highlights");
   }
   closeHighlightsPane(reader) {
-    const leaves = this.app.workspace.getLeavesOfType(HIGHLIGHTS_VIEW_TYPE);
-    for (const leaf of leaves) {
-      leaf.detach();
-    }
     this.clearActiveReader(reader);
   }
   clearActiveReader(reader) {
@@ -423,14 +442,15 @@ export default class JarvisReaderPlugin extends Plugin {
       const paths = this.getIndexSidecarPaths();
       const adapter = this.app.vault.adapter as SidecarFileAdapter;
       const highlightsSidecar = await readHighlightSidecar(adapter, paths.highlights);
-      let changed = false;
+      let restoredToMemory = false;
+      let needsStartupPersistence = false;
       if (highlightsSidecar.status === "ready") {
         this.highlightSidecarUnavailable = false;
-        changed = this.mergeHighlightSidecar(highlightsSidecar.value) || changed;
+        restoredToMemory = this.mergeHighlightSidecar(highlightsSidecar.value);
       } else if (highlightsSidecar.status === "missing") {
         this.highlightSidecarUnavailable = false;
         // Preserve a one-time migration path for pre-sidecar highlight data.
-        changed = true;
+        needsStartupPersistence = true;
       } else {
         this.highlightSidecarUnavailable = true;
         this.settings.bookHighlights = {};
@@ -451,10 +471,10 @@ export default class JarvisReaderPlugin extends Plugin {
         console.error("Jarvis Reader word asset sidecar is invalid. The original file was left unchanged.");
         new Notice("词条主数据 word-assets.json 损坏或结构非法，原文件未被改写；词条功能已停止，请先恢复该文件。", 0);
       }
-      if (changed) {
+      if (restoredToMemory) {
         await this.logIndexChange("restore-from-sidecar");
       }
-      return changed;
+      return needsStartupPersistence;
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
@@ -491,9 +511,6 @@ export default class JarvisReaderPlugin extends Plugin {
   }
   onHighlightsChanged() {
     this.refreshReaderSidebar(this.activeReaderView);
-    if (this.highlightsView && typeof this.highlightsView.render === "function") {
-      this.highlightsView.render();
-    }
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("jarvis-reader-highlights-changed"));
     }
@@ -537,7 +554,11 @@ export default class JarvisReaderPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loadedSettings = await this.loadData() || {};
+    const legacyCoverCache: BookCoverCache = loadedSettings.bookCoverCache && typeof loadedSettings.bookCoverCache === "object"
+      ? loadedSettings.bookCoverCache as BookCoverCache
+      : {};
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
     if (!this.settings.bookInitLocations) {
       this.settings.bookInitLocations = {};
     }
@@ -577,8 +598,20 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.wordAudioAccent = String(this.settings.wordAudioAccent || "us").toLowerCase() === "uk" ? "uk" : "us";
     this.settings.blurWordCardBody = this.settings.blurWordCardBody !== false;
     this.settings.speechLang = String(this.settings.speechLang || "en-US");
-    if (!this.settings.bookCoverCache) {
-      this.settings.bookCoverCache = {};
+    try {
+      await this.coverCacheService.load();
+      const backupRoot = await this.coverCacheService.migrateLegacy(legacyCoverCache);
+      this.settings.bookCoverCache = this.coverCacheService.snapshot();
+      this.coverCacheMigrationComplete = true;
+      if (backupRoot) {
+        await this.saveSettingsData();
+        new Notice(`封面缓存已迁出 data.json，原配置备份位于：${backupRoot}`, 10000);
+      }
+    } catch (error) {
+      this.coverCacheMigrationComplete = false;
+      this.settings.bookCoverCache = legacyCoverCache;
+      console.error("Jarvis Reader cover cache migration failed.", error);
+      new Notice("封面缓存迁移失败，旧 data.json 数据已保留；请检查磁盘空间和插件目录权限。", 0);
     }
     if (!["single", "dual"].includes(this.settings.sidebarLayoutMode)) {
       this.settings.sidebarLayoutMode = "single";
@@ -592,11 +625,37 @@ export default class JarvisReaderPlugin extends Plugin {
     await this.saveSettingsData();
   }
   async saveSettingsData() {
+    await this.settingsSaveQueue.request();
+  }
+
+  getSettingsDataSnapshot() {
     const settingsData = {
       ...this.settings
     };
     delete settingsData.wordAssets;
     delete settingsData.bookHighlights;
-    await this.saveData(settingsData);
+    if (this.coverCacheMigrationComplete) {
+      delete settingsData.bookCoverCache;
+    }
+    return settingsData;
+  }
+
+  async flushSettingsData(): Promise<void> {
+    await this.settingsSaveQueue.flushNow();
+  }
+
+  async saveBookCoverCacheEntry(key: string, entry: BookCoverCacheEntry): Promise<void> {
+    if (!this.coverCacheMigrationComplete) {
+      throw new Error("封面缓存服务不可用，已停止写入以保护旧配置。");
+    }
+    await this.coverCacheService.save(key, entry);
+    this.settings.bookCoverCache = this.coverCacheService.snapshot();
+  }
+
+  async pruneBookCoverCache(validKeys: Iterable<string>): Promise<number> {
+    if (!this.coverCacheMigrationComplete) return 0;
+    const removed = await this.coverCacheService.prune(validKeys);
+    if (removed) this.settings.bookCoverCache = this.coverCacheService.snapshot();
+    return removed;
   }
 };

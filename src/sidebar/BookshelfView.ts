@@ -1,6 +1,8 @@
 import { ItemView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { EpubView } from "../EpubView";
-import { JarvisReaderHighlightsView } from "./HighlightsView";
+import { HighlightsPanelController } from "./HighlightsView";
+import type { BookBookmark } from "../types";
+import { confirmDestructiveAction } from "../utils";
 import type JarvisReaderPlugin from "../main";
 
 declare global {
@@ -10,7 +12,6 @@ declare global {
   }
 }
 
-export const HIGHLIGHTS_VIEW_TYPE = "jarvis-reader-highlights";
 export const BOOKSHELF_VIEW_TYPE = "jarvis-reader-bookshelf";
 export function isReadableBook(file: any) {
   return file instanceof TFile && ["epub", "pdf"].includes(file.extension.toLowerCase());
@@ -19,25 +20,34 @@ export function isReadableBook(file: any) {
 export class JarvisReaderBookshelfView extends ItemView {
   plugin: JarvisReaderPlugin;
   activePanel: string;
+  activeNavigationPanel: "toc" | "bookmarks";
   dualHighlightsMode: boolean;
   panelScroll: Record<string, number>;
   pendingRevealHighlightId: string | null;
-  highlightsPanel: any;
+  highlightsPanel: HighlightsPanelController | null;
   sidebarResizeObserver: any;
   sidebarResizeTargets: HTMLElement[];
   sidebarWidthGuardOriginal: Map<HTMLElement, any>;
+  bookmarkUpdateHandler: (event: Event) => void;
 
   constructor(leaf: WorkspaceLeaf, plugin: JarvisReaderPlugin) {
     super(leaf);
     this.plugin = plugin;
     this.activePanel = "toc";
+    this.activeNavigationPanel = "toc";
     this.dualHighlightsMode = false;
-    this.panelScroll = { toc: 0, highlights: 0 };
+    this.panelScroll = { toc: 0, bookmarks: 0, highlights: 0 };
     this.pendingRevealHighlightId = null;
     this.highlightsPanel = null;
     this.sidebarResizeObserver = null;
     this.sidebarResizeTargets = [];
     this.sidebarWidthGuardOriginal = new Map();
+    this.bookmarkUpdateHandler = (event) => {
+      const activeEpub = this.getActiveEpubView();
+      const updatedPath = (event as CustomEvent<string | undefined>).detail;
+      if (updatedPath && updatedPath !== activeEpub?.file?.path) return;
+      this.render();
+    };
   }
   getViewType() {
     return BOOKSHELF_VIEW_TYPE;
@@ -49,9 +59,11 @@ export class JarvisReaderBookshelfView extends ItemView {
     return "jarvis-library-big";
   }
   async onOpen() {
+    window.addEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
     this.render();
   }
   async onClose() {
+    window.removeEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
     this.clearSidebarWidthGuard();
   }
 
@@ -183,7 +195,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     const panelActions = toolbar.createDiv({ cls: "jarvis-reader-sidebar-panel-actions" });
     
     if (mode === "single") {
-      this.makePanelButton(panelActions, "目录", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
+      this.makePanelButton(panelActions, "导航", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
         this.activePanel = "toc";
         this.render();
       });
@@ -241,15 +253,94 @@ export class JarvisReaderBookshelfView extends ItemView {
     });
   }
 
-  renderTocPanel(container: HTMLElement, activeEpub: any) {
+  renderNavigationTabs(container: HTMLElement) {
+    const tabs = container.createDiv({ cls: "jarvis-reader-navigation-tabs" });
+    const items: Array<{ key: "toc" | "bookmarks"; label: string }> = [
+      { key: "toc", label: "目录" },
+      { key: "bookmarks", label: "书签" },
+    ];
+    for (const item of items) {
+      const button = tabs.createEl("button", {
+        cls: this.activeNavigationPanel === item.key
+          ? "jarvis-reader-navigation-tab is-active"
+          : "jarvis-reader-navigation-tab",
+        text: item.label,
+        attr: { "aria-pressed": String(this.activeNavigationPanel === item.key) },
+      });
+      button.onclick = () => {
+        this.activeNavigationPanel = item.key;
+        this.render();
+      };
+    }
+  }
+
+  async removeBookmark(activeEpub: any, bookmark: BookBookmark) {
+    const confirmed = await confirmDestructiveAction(this.app, "删除书签", `确认删除书签“${bookmark.title}”吗？`);
+    if (!confirmed) return;
+    try {
+      const removed = await this.plugin.bookStateService.removeBookmark(activeEpub.file.path, bookmark);
+      if (!removed) return;
+      window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated", { detail: activeEpub.file.path }));
+    } catch (error) {
+      console.error("Failed to remove bookmark", error);
+      new Notice("书签删除失败，原书签已保留。");
+    }
+  }
+
+  renderBookmarksList(container: HTMLElement, activeEpub: any, bookmarks: BookBookmark[]) {
+    if (!bookmarks.length) {
+      container.createEl("div", {
+        cls: "jarvis-reader-bookshelf-empty",
+        text: "本书暂无书签。点击阅读器侧边的书签按钮即可保存当前位置。",
+      });
+      return;
+    }
+    const list = container.createDiv({ cls: "jarvis-reader-bookshelf-list jarvis-reader-bookmark-list" });
+    this.restorePanelScroll("bookmarks", list);
+    this.bindPanelScroll("bookmarks", list);
+    for (const bookmark of [...bookmarks].sort((a, b) => b.created - a.created)) {
+      const item = list.createDiv({ cls: "jarvis-reader-bookmark-item" });
+      item.setAttribute("role", "button");
+      item.setAttribute("tabindex", "0");
+      item.setAttribute("aria-label", `跳转到书签：${bookmark.title}`);
+      const content = item.createDiv({ cls: "jarvis-reader-bookmark-content" });
+      content.createDiv({ cls: "jarvis-reader-bookmark-title", text: bookmark.title || "未知章节" });
+      content.createDiv({ cls: "jarvis-reader-bookmark-meta", text: new Date(bookmark.created).toLocaleString() });
+      const deleteButton = item.createEl("button", {
+        cls: "jarvis-reader-bookmark-delete",
+        attr: { "aria-label": `删除书签：${bookmark.title}`, title: "删除书签" },
+      });
+      deleteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
+      deleteButton.onclick = (event) => {
+        event.stopPropagation();
+        void this.removeBookmark(activeEpub, bookmark);
+      };
+      item.onclick = () => activeEpub.jumpToCfi(bookmark.cfi);
+      item.onkeydown = (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          activeEpub.jumpToCfi(bookmark.cfi);
+        }
+      };
+    }
+  }
+
+  renderNavigationPanel(container: HTMLElement, activeEpub: any) {
     container.className = "jarvis-reader-sidebar-pane jarvis-reader-sidebar-toc-pane";
     container.empty();
+    const bookmarks = activeEpub?.file
+      ? this.plugin.settings.bookBookmarks?.[activeEpub.file.path] || []
+      : [];
+    this.renderPaneHeader(container, "导航", this.getDisplayBookTitle(activeEpub));
+    this.renderNavigationTabs(container);
+    if (this.activeNavigationPanel === "bookmarks") {
+      this.renderBookmarksList(container, activeEpub, bookmarks);
+      return;
+    }
     if (!activeEpub || !activeEpub.fileToc || !activeEpub.fileToc.length) {
-      this.renderPaneHeader(container, "目录", activeEpub && activeEpub.file ? activeEpub.file.basename : "");
       container.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "当前书籍没有目录" });
       return;
     }
-    this.renderPaneHeader(container, "目录", this.getDisplayBookTitle(activeEpub));
     const tocList = container.createDiv({ cls: "jarvis-reader-bookshelf-list jarvis-reader-toc-list" });
     this.restorePanelScroll("toc", tocList);
     this.bindPanelScroll("toc", tocList);
@@ -300,21 +391,7 @@ export class JarvisReaderBookshelfView extends ItemView {
 
   getHighlightsPanel() {
     if (!this.highlightsPanel) {
-      const panel = Object.create(JarvisReaderHighlightsView.prototype);
-      Object.assign(panel, {
-        app: this.app,
-        plugin: this.plugin,
-        reader: null,
-        searchQuery: "",
-        typeFilter: "all",
-        linksOnly: false,
-        currentChapterOnly: false,
-        sortMode: "chapter",
-        focusSearchOnRender: false,
-        listScrollTop: 0,
-        pendingRevealHighlightId: null
-      });
-      this.highlightsPanel = panel;
+      this.highlightsPanel = new HighlightsPanelController(this.plugin);
     }
     return this.highlightsPanel;
   }
@@ -412,7 +489,7 @@ export class JarvisReaderBookshelfView extends ItemView {
       this.applySidebarPaneSplit(first, second, this.getSidebarPaneSplit());
       this.attachSidebarSplitter(splitter, body, first, second);
       
-      this.renderTocPanel(first, activeEpub);
+      this.renderNavigationPanel(first, activeEpub);
       this.renderHighlightsPanel(second, activeEpub);
       return;
     }
@@ -422,7 +499,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (this.activePanel === "highlights") {
       this.renderHighlightsPanel(pane, activeEpub);
     } else {
-      this.renderTocPanel(pane, activeEpub);
+      this.renderNavigationPanel(pane, activeEpub);
     }
   }
 }

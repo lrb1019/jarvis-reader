@@ -7,6 +7,9 @@ import { buildWordAudioUrl, DEFAULT_WORD_AUDIO_TEMPLATE, getTranslationAssetStor
 import { confirmDestructiveAction, formatDuration, getBookTotalSeconds } from "../utils";
 import type { BookHighlight, WordAsset, BookProgress } from "../types";
 import { WordCard } from "../word-book/WordCard";
+import { BookBookmarksPanel } from "./BookBookmarksPanel";
+import { BookHighlightsPanel } from "./BookHighlightsPanel";
+import type { LibraryHighlight } from "./library-highlight-core";
 
 export interface LibraryAppProps {
   plugin: JarvisReaderPlugin;
@@ -61,20 +64,6 @@ function formatDateTime(dateStr?: string | number): string {
     }
   } catch (err) {}
   return String(dateStr);
-}
-
-function getHighlightNoteEntries(item: any) {
-  const entries = Array.isArray(item?.commentEntries) ? item.commentEntries.filter((entry: any) => (entry?.text || "").trim()) : [];
-  if (entries.length)
-    return entries;
-  const fallback = String(item?.comment || "").trim();
-  if (!fallback)
-    return [];
-  return fallback.split(/\n{2,}/).map((text: string, index: number) => ({
-    label: index === 0 ? "笔记" : `笔记 ${index + 1}`,
-    created: item?.updated || item?.created || "",
-    text: text.trim()
-  })).filter((entry: any) => entry.text);
 }
 
 interface ObsidianIconProps {
@@ -153,7 +142,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   // Navigation & UI States
   const [currentView, setCurrentView] = React.useState<"home" | "detail" | "stats">("home");
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
-  const [detailHighlights, setDetailHighlights] = React.useState<BookHighlight[]>([]);
+  const [detailHighlights, setDetailHighlights] = React.useState<LibraryHighlight[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
@@ -180,6 +169,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const homeRef = React.useRef<HTMLDivElement>(null);
 
   const [books, setBooks] = React.useState<TFile[]>([]);
+  const [booksLoaded, setBooksLoaded] = React.useState(false);
   const [coverCache, setCoverCache] = React.useState<Record<string, any>>(plugin.settings.bookCoverCache || {});
   const [statsTab, setStatsTab] = React.useState<"week" | "month" | "year" | "all">("week");
   const [statsDate, setStatsDate] = React.useState<Date>(() => new Date());
@@ -331,6 +321,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       (file) => file instanceof TFile && file.extension.toLowerCase() === "epub"
     );
     setBooks(filtered);
+    setBooksLoaded(true);
   }, [plugin]);
 
   React.useEffect(() => {
@@ -373,7 +364,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
     const loadHighlightDetails = async () => {
       const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
-      const highlights = await Promise.all(indexHighlights.map(async (highlight) => {
+      const highlights: LibraryHighlight[] = await Promise.all(indexHighlights.map(async (highlight) => {
         const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
         if (!(noteFile instanceof TFile)) return highlight;
         try {
@@ -446,10 +437,17 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   // Background cover queue worker
   React.useEffect(() => {
-    if (books.length === 0) return;
+    if (!booksLoaded) return;
     let cancelled = false;
 
     const runCoverCacheQueue = async () => {
+      const validKeys = books
+        .filter((file) => file.extension.toLowerCase() === "epub")
+        .map((file) => `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`);
+      await plugin.pruneBookCoverCache(validKeys);
+      if (cancelled) return;
+      setCoverCache({ ...plugin.settings.bookCoverCache });
+
       for (const file of books) {
         if (cancelled) break;
         if (file.extension.toLowerCase() !== "epub") continue;
@@ -589,7 +587,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             const publisher = metadata.publisher || "";
             const pubdate = metadata.pubdate || "";
 
-            plugin.settings.bookCoverCache[key] = {
+            const nextEntry = {
               ...(cached || {}),
               dataUrl: dataUrl || cached?.dataUrl || "",
               updated: new Date().toISOString(),
@@ -600,7 +598,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               coverVersion: 10,
             };
 
-            await plugin.saveSettings();
+            await plugin.saveBookCoverCacheEntry(key, nextEntry);
             setCoverCache({ ...plugin.settings.bookCoverCache });
           } catch (err) {
             console.warn("Failed to extract metadata for", file.path, err);
@@ -613,7 +611,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     return () => {
       cancelled = true;
     };
-  }, [books, plugin]);
+  }, [books, booksLoaded, plugin]);
 
   // Book getters
   const getCover = (file: TFile) => {
@@ -1089,18 +1087,24 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   };
 
   const deleteBook = async (file: TFile) => {
-    const confirmed = await confirmDestructiveAction(plugin.app, "删除书籍", `确认要从库中彻底删除《${file.basename}》吗？`);
+    const confirmed = await confirmDestructiveAction(
+      plugin.app,
+      "删除电子书文件",
+      `确认删除《${file.basename}》的 EPUB 文件吗？书籍笔记、划线和知识笔记会保留，阅读位置、进度、书签和封面缓存会清理。`,
+    );
     if (confirmed) {
       try {
         await plugin.app.vault.delete(file);
-        new Notice(`已删除书籍: ${file.basename}`);
+        await plugin.bookStateService.clearRuntimeState(file.path);
+        new Notice(`已删除电子书文件：${file.basename}`);
         if (activeBook?.path === file.path) {
           setCurrentView("home");
           setActiveBook(null);
         }
         loadBooks();
       } catch (err) {
-        new Notice(`删除失败: ${err}`);
+        console.error("Failed to delete book or clean runtime state", err);
+        new Notice(`删除或清理失败：${String(err)}`);
       }
     }
   };
@@ -2386,13 +2390,13 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           if (targetFile instanceof TFile) {
             const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
-            plugin.settings.bookCoverCache[key] = {
+            const nextEntry = {
               ...existingCache,
               vaultPath: targetFile.path,
               isCustom: true,
               updated: new Date().toISOString()
             };
-            await plugin.saveSettings();
+            await plugin.saveBookCoverCacheEntry(key, nextEntry);
             setCoverCache({ ...plugin.settings.bookCoverCache });
           }
         }, "image/jpeg", 0.85);
@@ -2649,128 +2653,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         {/* Bottom Tab Content */}
         <div className="jarvis-library-detail-content">
           {activeTab === "highlights" ? (
-            /* Highlights List */
-            highlights.length === 0 ? (
-              <div className="jarvis-library-tab-empty">
-                <p>本书暂无划线或笔记。在阅读器中选中文本即可添加。</p>
-              </div>
-            ) : (
-              <div className="jarvis-library-highlights-list">
-                {highlights.map((h: BookHighlight) => {
-                  const noteEntries = getHighlightNoteEntries(h);
-                  const assocSec = Array.isArray((h as any).aiSections) ? (h as any).aiSections.find((s: any) => s.title === "关联文章") : null;
-                  const assocLinks = assocSec ? [...new Set(assocSec.links || [])] : [];
-                  const colors = plugin.settings.highlightColors || {};
-                  const normalColor = colors.normal || "#ffeb3b";
-                  const isNote = noteEntries.length > 0 || assocLinks.length > 0;
-                  const quoteStyle: React.CSSProperties = isNote 
-                    ? {
-                        borderLeftColor: "var(--interactive-accent)",
-                        background: "none",
-                        padding: "0 0 0 12px",
-                        borderLeftWidth: "3px",
-                        borderLeftStyle: "solid"
-                      }
-                    : {
-                        borderLeftColor: normalColor,
-                        background: `color-mix(in srgb, ${normalColor} 12%, transparent)`,
-                        padding: "6px 10px 6px 12px",
-                        borderRadius: "0 6px 6px 0",
-                        borderLeftWidth: "3px",
-                        borderLeftStyle: "solid"
-                      };
-                  return (
-                    <div key={h.id || h.blockId} className="jarvis-library-highlight-card">
-                      <div className="hl-card-header">
-                        <span className="hl-card-chapter">{h.chapterTitle || "正文章节"}</span>
-                        <span className="hl-card-date">{formatDate(h.updated || h.created)}</span>
-                      </div>
-                      <div className="hl-card-body">
-                        <blockquote 
-                          className="hl-card-quote" 
-                          style={quoteStyle}
-                        >
-                          <p>{h.quote}</p>
-                        </blockquote>
-                        
-                        {noteEntries.length > 0 && (
-                          <div className="hl-card-notes-container" style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {noteEntries.map((entry: any, idx: number) => (
-                              <div key={idx} className="jarvis-reader-highlight-note-card" style={{ padding: '8px 10px', marginTop: '4px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: 'var(--text-normal)', marginBottom: '4px' }}>
-                                  <ObsidianIcon name="sticky-note" style={{ width: '13px', height: '13px' }} />
-                                  <span>{entry.label}</span>
-                                  <span style={{ marginLeft: 'auto', fontWeight: 'normal', fontSize: '11px', color: 'var(--text-muted)' }}>{formatDateTime(entry.created)}</span>
-                                </div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-normal)' }}>
-                                  <MarkdownText content={entry.text} plugin={plugin} />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {assocLinks.length > 0 && (
-                          <div className="hl-card-assoc-container" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px solid var(--background-modifier-border)', paddingTop: '8px' }}>
-                            {assocLinks.map((link: string, idx: number) => {
-                              const [linkPath, linkTime] = link.split("|");
-                              let displayText = linkPath;
-                              if (linkPath.includes("#^")) {
-                                const parts = linkPath.split("#^");
-                                displayText = `${parts[0]} > ^${parts[1]}`;
-                              } else if (linkPath.includes("#")) {
-                                const parts = linkPath.split("#");
-                                displayText = `${parts[0]} > ${parts[1]}`;
-                              }
-                              return (
-                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '2px 0', height: '28px', minHeight: '28px' }}>
-                                  <span style={{ color: 'var(--text-muted)', fontSize: '14px', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}>•</span>
-                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-normal)' }}>
-                                    <ObsidianIcon name="link" style={{ width: '13px', height: '13px' }} />
-                                  </span>
-                                  <a 
-                                    className="internal-link" 
-                                    style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--link-color)', fontSize: '13px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                                    onClick={() => {
-                                      const { TFile } = require("obsidian");
-                                      const file = plugin.app.metadataCache.getFirstLinkpathDest(linkPath, "");
-                                      if (file instanceof TFile) {
-                                        plugin.app.workspace.getLeaf(false).openFile(file);
-                                      } else {
-                                        new Notice(`未找到文件: ${linkPath}`);
-                                      }
-                                    }}
-                                  >
-                                    {displayText}
-                                  </a>
-                                  {linkTime && (
-                                    <span style={{ margin: '0 0 0 auto', fontSize: '11px', color: 'var(--text-muted)', opacity: 0.8 }}>
-                                      {formatDateTime(linkTime)}
-                                    </span>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="hl-card-actions">
-                        <button className="hl-card-action-btn" onClick={() => {
-                          const commentText = h.comment ? `（感想：${h.comment}）` : "";
-                          navigator.clipboard.writeText(`《${title}》：「${h.quote}」${commentText}`);
-                          new Notice("高亮已复制到剪贴板");
-                        }}>
-                          复制内容
-                        </button>
-                        <button className="hl-card-action-btn action-jump" onClick={() => jumpToHighlight(activeBook, h)}>
-                          跳转原文 →
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )
+            <BookHighlightsPanel plugin={plugin} book={activeBook} title={title} highlights={highlights} onJump={jumpToHighlight} />
           ) : activeTab === "words" ? (
             /* Word Cards List */
             wordAssets.length === 0 ? (
@@ -2821,61 +2704,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 </div>
               </div>
             )
-          ) : (
-            /* Bookmarks List */
-            bookmarks.length === 0 ? (
-              <div className="jarvis-library-tab-empty">
-                <p>本书暂无保存的书签。在阅读器中点击右侧悬浮栏的书签按钮即可添加。</p>
-              </div>
-            ) : (
-              <div className="jarvis-library-bookmarks-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {[...bookmarks].sort((a,b) => b.created - a.created).map((b) => {
-                  const dateStr = new Date(b.created).toLocaleString();
-                  return (
-                    <div key={b.created} className="jarvis-library-bookmark-card hl-card">
-                      <div className="hl-card-content" style={{ paddingBottom: '12px' }}>
-                        <div style={{ fontWeight: "bold", fontSize: "1.1em", marginBottom: "4px", color: "var(--text-normal)" }}>{b.title}</div>
-                        <div style={{ fontSize: "0.85em", color: "var(--text-muted)" }}>{dateStr}</div>
-                      </div>
-                      <div className="hl-card-actions">
-                        <button className="hl-card-action-btn" onClick={(e) => {
-                          e.stopPropagation();
-                          plugin.settings.bookBookmarks[activeBook.path] = plugin.settings.bookBookmarks[activeBook.path].filter((x: any) => x.created !== b.created);
-                          plugin.saveSettings().then(() => {
-                            window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
-                          });
-                        }}>
-                          删除
-                        </button>
-                        <button className="hl-card-action-btn action-jump" onClick={() => {
-                          // Jump to bookmark
-                          let found = false;
-                          plugin.app.workspace.iterateAllLeaves((leaf) => {
-                            if (leaf.view.getViewType() === "epub" && (leaf.view as any).file?.path === activeBook.path) {
-                                if (typeof (leaf.view as any).jumpToCfi === "function") {
-                                    (leaf.view as any).jumpToCfi(b.cfi);
-                                }
-                                plugin.app.workspace.setActiveLeaf(leaf, { focus: true });
-                                found = true;
-                            }
-                          });
-                          if (!found) {
-                            const leaf = plugin.app.workspace.getLeaf(true);
-                            leaf.openFile(activeBook, { eState: { epubcifi: b.cfi } });
-                            if (typeof plugin.openBookshelfPane === "function") {
-                              plugin.openBookshelfPane(true);
-                            }
-                          }
-                        }}>
-                          跳转位置 →
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )
-          )}
+          ) : <BookBookmarksPanel plugin={plugin} book={activeBook} bookmarks={bookmarks} />}
         </div>
       </div>
     );

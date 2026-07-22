@@ -1,12 +1,20 @@
 # Jarvis Reader
 
-Current version: 1.2.0
+Current version: 1.3.0
 
 [中文说明](./README.md) | English
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a library dashboard, reading progress, table of contents navigation, highlights, notes, offline lookup, AI translation, vocabulary cards, and a word book into one reading workflow.
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+## v1.3.0
+
+- Strengthened persistence boundaries for highlights, vocabulary assets, settings, and reading statistics with atomic sidecar replacement, highlight transaction recovery, conflict backups, and rollback on failure.
+- Moved cover cache data out of `data.json` into independent cache files, fixed first-load cache pruning, and restored immediate library cover rendering.
+- Added `Contents / Bookmarks` navigation to the reading sidebar with current-book jumps and confirmed deletion.
+- Knowledge-note promotion now includes the source quote, every personal note, and the source block link; repeated promotion opens the existing note for that source block.
+- Unified note projections across book details, the sidebar, and the reader while simplifying translation cards, vocabulary cards, and book-detail layout.
 
 ## v1.1.4
 
@@ -46,7 +54,7 @@ Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works w
 - **Frontmatter status sync**: Reading status, rating, and tags align with the corresponding Markdown book note.
 - **Immersive EPUB reading**: Supports paginated or scrolling reading, single or dual-page modes, font size, line height, table of contents, and reading-location recovery.
 - **Highlights and notes**: Create plain highlights, write notes, append notes, open the corresponding Markdown block, filter in the sidebar, and jump back to the source text.
-- **Reading bookmarks**: Add bookmarks in the reader and jump back to precise EPUB CFI locations from the book detail page.
+- **Reading bookmarks**: Add bookmarks in the reader and jump back to precise EPUB CFI locations from the reading sidebar or book detail page.
 - **Offline lookup and AI translation**: Single words are looked up through bundled ECDICT first; phrases, sentences, and misses require explicit AI translation.
 - **Vocabulary assets**: Save words, phrases, and sentences with source underlines, hover cards, mastery state, and permanent deletion.
 - **Word sidebar and word book**: Review current-book or global vocabulary cards.
@@ -85,7 +93,7 @@ THIRD_PARTY_NOTICES.md
 - Plain highlights save only the selected text; notes save both the selected text and your content into the corresponding Markdown book note.
 - Click a highlight with notes to open the read-only note window.
 - In the note window, `pencil` opens the corresponding Markdown block, `file-pen-line` appends a note, and `x` closes the window.
-- A highlight with a reflection can create an independent Markdown knowledge note from the note window; configure its destination folder in plugin settings.
+- A highlight with a reflection can create an independent Markdown knowledge note containing the source quote, every personal note, and the source block link; configure its destination folder in plugin settings.
 - Selecting an English word first shows the bundled ECDICT result.
 - Selecting a phrase or sentence and clicking `Translate` can call AI translation.
 - Saved translation results enter the vocabulary system as words, phrases, or sentences.
@@ -98,7 +106,8 @@ Jarvis Reader stores data locally in your Obsidian vault by default.
 
 Main data locations:
 
-- `data.json`: plugin settings, reading locations, reading progress, cached covers, bookmarks, and lightweight runtime data.
+- `data.json`: plugin settings, reading locations, reading progress, bookmarks, and lightweight runtime data.
+- `cache/covers/`: independent local cover-cache entries for each book.
 - `index/word-assets.json`: primary data for words, phrases, and sentence assets.
 - `index/highlights.json`: highlight metadata snapshot for recovery.
 - `logs/index-changes.jsonl`: index change log.
@@ -121,7 +130,7 @@ npm run verify
 
 `npm run verify` runs:
 
-1. TypeScript type checking.
+1. Standard TypeScript checks plus strict checks for core modules.
 2. Node tests.
 3. Production build with esbuild.
 4. `node --check main.js`.

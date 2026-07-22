@@ -2,6 +2,7 @@ import { buildKnowledgeNoteContent, buildKnowledgeNotePath, type KnowledgeNoteDr
 
 export interface KnowledgeNoteStorage<File> {
   exists(path: string): boolean;
+  findBySource(sourceNotePath: string, sourceBlockId: string): Promise<File | null>;
   createFolder(path: string): Promise<void>;
   createFile(path: string, content: string): Promise<File>;
 }
@@ -19,6 +20,9 @@ export class KnowledgeNoteService<File> {
   }
 
   async create(request: CreateKnowledgeNoteRequest): Promise<File> {
+    const existing = await this.storage.findBySource(request.sourceNotePath, request.sourceBlockId);
+    if (existing) return existing;
+
     const folder = request.folder.trim().replace(/^\/+|\/+$/g, "");
     await this.ensureFolders(folder);
 

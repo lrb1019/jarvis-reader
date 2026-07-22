@@ -7,14 +7,16 @@ interface MemoryFile {
   content: string;
 }
 
-function createStorage(existing: string[] = []): KnowledgeNoteStorage<MemoryFile> & { folders: string[]; files: MemoryFile[] } {
-  const paths = new Set(existing);
+function createStorage(existing: Array<string | MemoryFile> = []): KnowledgeNoteStorage<MemoryFile> & { folders: string[]; files: MemoryFile[] } {
+  const paths = new Set(existing.map((item) => typeof item === "string" ? item : item.path));
+  const existingFiles = existing.filter((item): item is MemoryFile => typeof item !== "string");
   const folders: string[] = [];
   const files: MemoryFile[] = [];
   return {
     folders,
     files,
     exists: (path) => paths.has(path),
+    findBySource: async (sourceNotePath, sourceBlockId) => existingFiles.find((file) => file.content.includes(`[[${sourceNotePath}#^${sourceBlockId}]]`)) || null,
     createFolder: async (path) => { paths.add(path); folders.push(path); },
     createFile: async (path, content) => {
       paths.add(path);
@@ -27,7 +29,7 @@ function createStorage(existing: string[] = []): KnowledgeNoteStorage<MemoryFile
 
 const request = {
   folder: "知识库/想法",
-  title: "延迟回报",
+  title: "读书笔记",
   body: "我的判断",
   sourceNotePath: "阅读/原子习惯",
   sourceBlockId: "abc",
@@ -40,15 +42,27 @@ test("knowledge note service creates missing folders and a linked Markdown note"
   const file = await new KnowledgeNoteService(storage).create(request);
 
   assert.deepEqual(storage.folders, ["知识库", "知识库/想法"]);
-  assert.equal(file.path, "知识库/想法/延迟回报.md");
+  assert.equal(file.path, "知识库/想法/读书笔记.md");
   assert.match(file.content, /\[\[阅读\/原子习惯#\^abc\]\]/);
 });
 
 test("knowledge note service adds a suffix instead of overwriting an existing note", async () => {
-  const storage = createStorage(["知识库", "知识库/想法", "知识库/想法/延迟回报.md"]);
+  const storage = createStorage(["知识库", "知识库/想法", "知识库/想法/读书笔记.md"]);
   const file = await new KnowledgeNoteService(storage).create(request);
 
-  assert.equal(file.path, "知识库/想法/延迟回报 2.md");
+  assert.equal(file.path, "知识库/想法/读书笔记 2.md");
+});
+
+test("knowledge note service returns an existing note for the same source block", async () => {
+  const existing = {
+    path: "知识库/想法/旧标题.md",
+    content: "## 来源\n\n[[阅读/原子习惯#^abc]]\n",
+  };
+  const storage = createStorage([existing]);
+  const file = await new KnowledgeNoteService(storage).create(request);
+
+  assert.equal(file, existing);
+  assert.equal(storage.files.length, 0);
 });
 
 test("knowledge note service stops before writing when folder creation fails", async () => {

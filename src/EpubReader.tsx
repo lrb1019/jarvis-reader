@@ -13,6 +13,7 @@ import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
 import { triggerClaudianPrompt, buildPromptFromTemplate } from "./claudianBridge";
 import type { SmartCommand } from "./claudianBridge";
+import { ReaderSideControls } from "./reader/ReaderSideControls";
 
 export interface EpubReaderProps {
   contents: ArrayBuffer;
@@ -58,7 +59,7 @@ export interface EpubReaderProps {
   wikiLinkCandidates: any[];
   getWikiLinkCandidates: () => any[];
   openWikiLink: (target: string) => void;
-  promoteHighlight?: (highlight: BookHighlight, reflection: string) => Promise<void>;
+  promoteHighlight?: (highlight: BookHighlight) => Promise<void>;
   onInteraction?: () => void;
   app?: any;
   smartCommands?: SmartCommand[];
@@ -2037,7 +2038,7 @@ const showWordHoverCard = (asset, element) => {
     })).filter((entry) => entry.text);
   };
   const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries(pendingSelection) : [];
-  const promotableHighlightNote = highlightNoteEntries[highlightNoteEntries.length - 1]?.text || highlightComment.trim();
+  const hasPromotableHighlightNote = highlightNoteEntries.length > 0 || !!highlightComment.trim();
   const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
   const renderHighlightNotes = () => highlightNoteEntries.length ? React.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
@@ -2418,7 +2419,7 @@ const showWordHoverCard = (asset, element) => {
   const activeWordPopoverRect = pendingWordSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
   const visibleWordPopoverRect = activeWordPopoverRect ? clampHighlightPopoverRect({
     ...activeWordPopoverRect,
-    height: Math.max(activeWordPopoverRect.height || 0, 360)
+    width: Math.min(activeWordPopoverRect.width || 480, 480)
   }) : null;
   const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
@@ -2483,63 +2484,18 @@ const showWordHoverCard = (asset, element) => {
       clearHighlightUi();
       hideWordHoverCard();
     }
-  },  React.createElement("div", {
-    className: "jarvis-reader-side-hover-zone"
-  },  React.createElement("div", {
-    className: "jarvis-reader-side-controls"
-  },  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "添加书签",
-    "aria-label": "添加书签",
-    onClick: () => {
-      if (typeof addBookmark === "function" && currentLocationRef.current && readerTitleRef.current) {
-        addBookmark(currentLocationRef.current, readerTitleRef.current);
-      }
-    },
-    dangerouslySetInnerHTML: { __html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>' }
-  }),  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "\u521b\u5efa\u6216\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
-    "aria-label": "\u521b\u5efa\u6216\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
-    onClick: createBookNote,
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>' }
-  }),  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "\u653e\u5927",
-    "aria-label": "\u653e\u5927",
-    onClick: () => setReaderZoom(0.05),
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>' }
-  }),  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "\u7f29\u5c0f",
-    "aria-label": "\u7f29\u5c0f",
-    onClick: () => setReaderZoom(-0.05),
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg>' }
-  }),  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "\u51cf\u5c0f\u884c\u8ddd",
-    "aria-label": "\u51cf\u5c0f\u884c\u8ddd",
-    onClick: () => setReaderLineHeight(-0.05),
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8"></path><path d="M8 12h8"></path><path d="M8 18h8"></path><path d="M4 9l2-2 2 2"></path><path d="M4 15l2 2 2-2"></path></svg>' }
-  }),  React.createElement("button", {
-    className: "jarvis-reader-side-button",
-    title: "\u589e\u5927\u884c\u8ddd",
-    "aria-label": "\u589e\u5927\u884c\u8ddd",
-    onClick: () => setReaderLineHeight(0.05),
-    dangerouslySetInnerHTML: { __html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8"></path><path d="M8 12h8"></path><path d="M8 18h8"></path><path d="M4 6l2-2 2 2"></path><path d="M4 18l2 2 2-2"></path></svg>' }
-  }), singlePage ?  React.createElement("button", {
-    className: "jarvis-reader-side-button jarvis-reader-side-mode-button",
-    title: effectiveScrolled ? "\u5207\u6362\u5230\u5206\u9875" : "\u5207\u6362\u5230\u6eda\u52a8",
-    "aria-label": effectiveScrolled ? "\u5207\u6362\u5230\u5206\u9875" : "\u5207\u6362\u5230\u6eda\u52a8",
-    onClick: () => setScrolled(!effectiveScrolled),
-    dangerouslySetInnerHTML: { __html: effectiveScrolled ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h10a6 6 0 0 1 0 12H6"></path></svg>' }
-  }) : null,  React.createElement("button", {
-    className: "jarvis-reader-side-button jarvis-reader-side-mode-button",
-    title: singlePage ? "\u5207\u6362\u5230\u53cc\u9875" : "\u5207\u6362\u5230\u5355\u9875",
-    "aria-label": singlePage ? "\u5207\u6362\u5230\u53cc\u9875" : "\u5207\u6362\u5230\u5355\u9875",
-    onClick: () => setSinglePage(!singlePage),
-    dangerouslySetInnerHTML: { __html: singlePage ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="8" height="14" rx="1"></rect><rect x="13" y="5" width="8" height="14" rx="1"></rect></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="12" height="16" rx="2"></rect></svg>' }
-  }))),  React.createElement(ReactReader, {
+  }, React.createElement(ReaderSideControls, {
+    location: currentLocationRef.current,
+    chapterTitle: readerTitleRef.current,
+    singlePage,
+    scrolled: effectiveScrolled,
+    onAddBookmark: addBookmark,
+    onOpenBookNote: createBookNote,
+    onZoom: setReaderZoom,
+    onLineHeight: setReaderLineHeight,
+    onScrolledChange: setScrolled,
+    onSinglePageChange: setSinglePage,
+  }), React.createElement(ReactReader, {
     title: readerTitle,
     showToc: false,
     location,
@@ -2902,15 +2858,44 @@ const showWordHoverCard = (asset, element) => {
     style: visibleWordPopoverRect ? {
       left: visibleWordPopoverRect.x,
       top: visibleWordPopoverRect.y,
-      width: visibleWordPopoverRect.width,
-      height: visibleWordPopoverRect.height
+      width: visibleWordPopoverRect.width
     } : void 0,
     onClick: (event) => event.stopPropagation()
   },  React.createElement("div", {
-    className: "jarvis-reader-highlight-title",
+    className: "jarvis-reader-word-card-head",
+    style: { cursor: "grab" },
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
-  }, "\u7ffb\u8bd1"),  React.createElement("div", {
+  }, React.createElement("div", {
+    className: "jarvis-reader-word-card-head-row"
+  }, React.createElement("div", {
+    className: "jarvis-reader-highlight-title"
+  }, "\u7ffb\u8bd1"), React.createElement("div", {
+    style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
+  }), React.createElement("div", {
+    className: "jarvis-reader-word-card-actions",
+    onPointerDown: (event) => event.stopPropagation()
+  }, savedWordAsset ?  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
+    title: "\u6253\u5f00\u8bcd\u6761",
+    onClick: () => openWordNote(savedWordAsset)
+  }, renderObsidianIcon("book-open")) : null, canSwitchPendingWordToAi ?  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
+    title: "AI \u7ffb\u8bd1",
+    onClick: translatePendingWordWithAi
+  }, renderObsidianIcon("bot")) : null, savedWordAsset && savedWordAsset.mastered ?  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
+    title: "\u91cd\u65b0\u52a0\u5165",
+    onClick: restorePendingWordAsset
+  }, renderObsidianIcon("rotate-ccw")) : null, canPersistPendingWord && !savedWordAsset ?  React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-save",
+    title: persistPendingLabel,
+    onClick: persistPendingWordAsset
+  }, renderObsidianIcon("bookmark-plus")) : null, React.createElement("button", {
+    className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
+    title: "\u5173\u95ed",
+    onClick: clearHighlightUi
+  }, renderObsidianIcon("x"))))),  React.createElement("div", {
     className: "jarvis-reader-word-panel"
   }, wordLookupState.status === "loading" ?  React.createElement("div", {
     className: "jarvis-reader-word-muted"
@@ -2931,32 +2916,7 @@ const showWordHoverCard = (asset, element) => {
   ) : null,
   React.createElement("div", { className: "jarvis-reader-word-definition-card" }, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) :  React.createElement("div", {
     className: "jarvis-reader-word-translation"
-  }, wordLookupState.result.translation))) : null),  React.createElement("div", {
-    className: "jarvis-reader-highlight-actions"
-  },  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
-    "aria-label": "取消",
-    onClick: clearHighlightUi
-  }, renderObsidianIcon("x")), savedWordAsset ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
-    "aria-label": "打开词条",
-    onClick: () => openWordNote(savedWordAsset)
-  }, renderObsidianIcon("book-open")) : null, canSwitchPendingWordToAi ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-word-action-icon",
-    "aria-label": "AI 翻译",
-    onClick: translatePendingWordWithAi
-  }, renderObsidianIcon("bot")) : null, savedWordAsset && savedWordAsset.mastered ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
-    "aria-label": "重新加入",
-    onClick: restorePendingWordAsset
-  }, renderObsidianIcon("rotate-ccw")) : null, canPersistPendingWord && !savedWordAsset ?  React.createElement("button", {
-    className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary jarvis-reader-word-action-icon",
-    "aria-label": persistPendingLabel,
-    onClick: persistPendingWordAsset
-  }, renderObsidianIcon("bookmark-plus")) : null,  React.createElement("div", {
-    className: "jarvis-reader-highlight-resize-handle",
-    onPointerDown: beginHighlightPopoverResize
-  }))) : null, pendingSelection ?  React.createElement("div", {
+  }, wordLookupState.result.translation))) : null)) : null, pendingSelection ?  React.createElement("div", {
     className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
     style: visibleHighlightPopoverRect ? {
       left: visibleHighlightPopoverRect.x,
@@ -2988,11 +2948,11 @@ const showWordHoverCard = (asset, element) => {
       setHighlightContentTab("notes");
     }
   }, renderObsidianIcon("file-pen-line")) : null,
-  isExistingHighlightComment && promotableHighlightNote && typeof promoteHighlight === "function" ? React.createElement("button", {
+  isExistingHighlightComment && hasPromotableHighlightNote && typeof promoteHighlight === "function" ? React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
     title: "提升为知识笔记",
-    onClick: () => promoteHighlight(pendingSelection, promotableHighlightNote)
+    onClick: () => promoteHighlight(pendingSelection)
   }, renderObsidianIcon("file-plus-2")) : null,
   ...(smartCommands || []).filter(c => c.enabled !== false && (c.scope === "note" || c.scope === "both")).map(cmd =>
     React.createElement("button", {

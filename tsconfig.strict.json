@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true
+  },
+  "files": [
+    "src/book-note-document.ts",
+    "src/book-state-service.ts",
+    "src/conflict-resolution-core.ts",
+    "src/cover-cache-service.ts",
+    "src/highlight-transaction-service.ts",
+    "src/index-sidecars.ts",
+    "src/reading-stats-service.ts",
+    "src/reader/ReaderSideControls.tsx",
+    "src/library/library-highlight-core.ts",
+    "src/settings-save-queue.ts"
+  ],
+  "include": []
+}

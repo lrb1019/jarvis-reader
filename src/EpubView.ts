@@ -13,6 +13,9 @@ import { getReaderProgress } from "./progress";
 import { getMarkdownLinkCandidates } from "./wiki-editor";
 import { EpubReader, getLightWordAsset } from "./EpubReader";
 import type { JarvisReaderSettings, BookHighlight } from "./types";
+import { ReadingStatsService } from "./reading-stats-service";
+import { buildKnowledgeNoteBody } from "./knowledge-note";
+import type { HighlightCommentEntry } from "./book-note-document";
 
 function getWordAssetsMap(settings: any): Record<string, any> {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
@@ -31,8 +34,9 @@ export class EpubView extends FileView {
   highlightEditor: any = null;
   highlightDeleted: any = null;
   lastInteractionTime: number = Date.now();
-  pendingStatsSeconds: number = 0;
   statsSaveTimer: any = null;
+  statsBookFile: TFile | null = null;
+  readingStatsService = new ReadingStatsService();
   interactionCleanup: (() => void) | null = null;
   reactRoot: Root | null = null;
 
@@ -124,35 +128,54 @@ export class EpubView extends FileView {
     return getHighlightsForBook(this.plugin.settings, this.file!.path);
   }
 
-  async promoteHighlight(highlight: BookHighlight, reflection: string): Promise<void> {
-    if (!highlight.notePath || !reflection.trim()) return;
-    const title = reflection.trim().split(/\r?\n/)[0].slice(0, 48) || "未命名想法";
+  async promoteHighlight(highlight: BookHighlight): Promise<void> {
+    if (!highlight.notePath) return;
     try {
+      const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
+      if (!(noteFile instanceof TFile)) {
+        new Notice("找不到这条划线对应的书籍笔记。");
+        return;
+      }
+      const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
+      const entries = (details.commentEntries as HighlightCommentEntry[]).filter((entry) => entry.text.trim());
+      if (!entries.length) return;
       const file = await this.plugin.knowledgeNoteService.create({
         folder: this.plugin.settings.knowledgeNoteFolder || "",
-        title,
-        body: reflection,
+        title: "读书笔记",
+        body: buildKnowledgeNoteBody(details.quote || highlight.quote || "", entries),
         sourceNotePath: highlight.notePath,
         sourceBlockId: highlight.blockId || highlight.id,
         sourceBookTitle: highlight.bookTitle,
         createdAt: new Date().toISOString().slice(0, 10),
       });
       await this.app.workspace.getLeaf(true).openFile(file);
-      new Notice("已创建知识笔记。");
+      new Notice("已打开知识笔记。");
     } catch (error) {
       console.error("Jarvis Reader knowledge note creation failed.", error);
       new Notice(`创建知识笔记失败：${error instanceof Error ? error.message : "未知错误"}`);
     }
   }
 
-  async commitHighlightIndex(nextHighlights: BookHighlight[], reason: string): Promise<boolean> {
-    const bookPath = this.file!.path;
+  async runHighlightTransaction(
+    notePath: string,
+    previousHighlights: BookHighlight[],
+    nextHighlights: BookHighlight[],
+    reason: string,
+    applyMarkdown: () => Promise<void>,
+  ): Promise<boolean> {
     try {
-      await this.plugin.highlightService.replaceBookHighlights(bookPath, nextHighlights, reason);
+      await this.plugin.highlightTransactionService.execute({
+        bookPath: this.file!.path,
+        notePath,
+        previousHighlights,
+        nextHighlights,
+        reason,
+        applyMarkdown,
+      });
       return true;
     } catch (error) {
-      console.error("Jarvis Reader highlight index save failed after Markdown write.", error);
-      new Notice("书籍笔记已保存，但高亮索引未保存。请先恢复 highlights.json；Markdown 正文不会丢失，但这条 EPUB 标记需要手动重新创建。", 0);
+      console.error("Jarvis Reader highlight transaction failed.", error);
+      new Notice(`高亮操作失败，系统已尝试恢复操作前状态：${error instanceof Error ? error.message : "未知错误"}`, 0);
       return false;
     }
   }
@@ -225,9 +248,14 @@ export class EpubView extends FileView {
       blockId: id,
       created: new Date().toISOString(),
     };
-    await this.plugin.bookNoteService.appendHighlight(noteFile, highlight);
     const list = getHighlightsForBook(this.plugin.settings, this.file!.path);
-    if (!await this.commitHighlightIndex([...list, highlight], "create-highlight")) {
+    if (!await this.runHighlightTransaction(
+      noteFile.path,
+      list,
+      [...list, highlight],
+      "create-highlight",
+      () => this.plugin.bookNoteService.appendHighlight(noteFile, highlight),
+    )) {
       return null;
     }
     this.selectedHighlightId = highlight.id;
@@ -260,18 +288,23 @@ export class EpubView extends FileView {
       (updated as any).commentEntries = highlight.commentEntries;
     }
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath!);
-    if (noteFile instanceof TFile) {
+    if (!(noteFile instanceof TFile)) {
+      new Notice(`找不到书籍笔记：${updated.notePath || "未知路径"}`);
+      return null;
+    }
+    const nextHighlights = list.map((item) => item.id === updated.id ? updated : item);
+    if (!await this.runHighlightTransaction(noteFile.path, list, nextHighlights, "update-highlight", async () => {
       if (shouldAppendComment) {
         await this.plugin.bookNoteService.appendReflection(noteFile, updated, nextComment);
         const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, updated);
         updated = { ...updated, comment: details.comment } as BookHighlight;
         (updated as any).commentEntries = details.commentEntries;
         (updated as any).aiSections = details.aiSections;
+        nextHighlights[index] = updated;
       } else {
         await this.plugin.bookNoteService.replaceHighlight(noteFile, updated);
       }
-    }
-    if (!await this.commitHighlightIndex(list.map((item) => item.id === updated.id ? updated : item), "update-highlight")) {
+    })) {
       return null;
     }
     this.selectedHighlightId = updated.id!;
@@ -290,10 +323,27 @@ export class EpubView extends FileView {
       return false;
     const noteFile = this.app.vault.getAbstractFileByPath(existing.notePath!);
     if (noteFile instanceof TFile) {
-      await this.plugin.bookNoteService.deleteHighlight(noteFile, existing);
-    }
-    if (!await this.commitHighlightIndex(list.filter((item) => item.id !== existing.id), "delete-highlight")) {
-      return false;
+      if (!await this.runHighlightTransaction(
+        noteFile.path,
+        list,
+        list.filter((item) => item.id !== existing.id),
+        "delete-highlight",
+        () => this.plugin.bookNoteService.deleteHighlight(noteFile, existing),
+      )) {
+        return false;
+      }
+    } else {
+      try {
+        await this.plugin.highlightService.replaceBookHighlights(
+          this.file!.path,
+          list.filter((item) => item.id !== existing.id),
+          "delete-highlight-with-missing-note",
+        );
+      } catch (error) {
+        console.error("Jarvis Reader orphan highlight delete failed.", error);
+        new Notice("书籍笔记已不存在，但高亮索引删除失败；索引保持原样。", 0);
+        return false;
+      }
     }
     if (this.selectedHighlightId === existing.id) {
       this.selectedHighlightId = null;
@@ -374,7 +424,9 @@ export class EpubView extends FileView {
     }, 80);
   }
 
-  stopThemeSync(): void {
+  async stopThemeSync(): Promise<void> {
+    const statsFile = this.statsBookFile;
+    this.statsBookFile = null;
     this.currentRendition = null;
     if (this.themeSyncInterval) {
       window.clearInterval(this.themeSyncInterval);
@@ -384,7 +436,6 @@ export class EpubView extends FileView {
       window.clearInterval(this.statsSaveTimer);
       this.statsSaveTimer = null;
     }
-    this.saveReadingStats();
     if (this.themeSyncViewportHandler && window.visualViewport) {
       window.visualViewport.removeEventListener("resize", this.themeSyncViewportHandler);
       this.themeSyncViewportHandler = null;
@@ -393,18 +444,23 @@ export class EpubView extends FileView {
       this.interactionCleanup();
       this.interactionCleanup = null;
     }
+    if (statsFile) await this.saveReadingStats(statsFile);
   }
 
   startThemeSync(rendition: any): void {
-    this.stopThemeSync();
+    void this.stopThemeSync().catch((error) => this.reportBackgroundSaveError("切换阅读状态", error));
     this.currentRendition = rendition;
+    this.statsBookFile = this.file;
     this.statsSaveTimer = window.setInterval(() => {
-      this.saveReadingStats();
+      if (this.statsBookFile) {
+        void this.saveReadingStats(this.statsBookFile).catch((error) => this.reportBackgroundSaveError("阅读统计", error));
+      }
     }, 30000);
     let lastThemeKey = "";
     const sync = () => {
       if (Date.now() - this.lastInteractionTime < 120000) {
-        this.pendingStatsSeconds++;
+        const bookPath = this.statsBookFile?.path;
+        if (bookPath) this.readingStatsService.add(bookPath);
       }
       const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
       const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
@@ -424,25 +480,19 @@ export class EpubView extends FileView {
     }
   }
 
-  async saveReadingStats(): Promise<void> {
-    if (this.pendingStatsSeconds <= 0) return;
-    const file = this.file;
-    if (!file) return;
-    const seconds = this.pendingStatsSeconds;
-    this.pendingStatsSeconds = 0;
+  async saveReadingStats(file: TFile): Promise<void> {
+    const bookPath = file.path;
+    if (this.readingStatsService.pending(bookPath) <= 0) return;
     const today = new Date().toLocaleDateString("en-CA");
     if (!this.plugin.settings.readingStats) {
       this.plugin.settings.readingStats = {};
     }
-    if (!this.plugin.settings.readingStats[today]) {
-      this.plugin.settings.readingStats[today] = {};
-    }
-    const bookPath = file.path;
-    if (!this.plugin.settings.readingStats[today][bookPath]) {
-      this.plugin.settings.readingStats[today][bookPath] = 0;
-    }
-    this.plugin.settings.readingStats[today][bookPath] += seconds;
-    await this.plugin.saveSettings();
+    await this.readingStatsService.flush(
+      bookPath,
+      today,
+      this.plugin.settings.readingStats,
+      () => this.plugin.saveSettings(),
+    );
 
     // Sync reading time to frontmatter
     let totalSecs = 0;
@@ -462,6 +512,11 @@ export class EpubView extends FileView {
     } catch (e) {
       console.warn("Failed to sync reading time to metadata", e);
     }
+  }
+
+  reportBackgroundSaveError(context: string, error: unknown): void {
+    console.error(`Jarvis Reader ${context}保存失败。`, error);
+    new Notice(`${context}保存失败，将在下次操作时重试。`);
   }
 
   async setReaderZoom(delta: number): Promise<void> {
@@ -529,7 +584,7 @@ export class EpubView extends FileView {
 
   async onLoadFile(file: TFile): Promise<void> {
     this.setHeaderMenuVisibility(true);
-    this.stopThemeSync();
+    await this.stopThemeSync();
     if (this.reactRoot) {
       this.reactRoot.unmount();
       this.reactRoot = null;
@@ -537,7 +592,6 @@ export class EpubView extends FileView {
     (this.contentEl as any).empty();
 
     this.lastInteractionTime = Date.now();
-    this.pendingStatsSeconds = 0;
     
     const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
     const interactionHandler = () => { this.lastInteractionTime = Date.now(); };
@@ -568,8 +622,8 @@ export class EpubView extends FileView {
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
       initLocation: await this.getInitLocation(),
-      saveLocation: (location: string) => { this.setInitLocation(location); },
-      saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { this.setBookProgress(relocated, chapterTitle, rendition); },
+      saveLocation: (location: string) => { void this.setInitLocation(location).catch((error) => this.reportBackgroundSaveError("阅读位置", error)); },
+      saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { void this.setBookProgress(relocated, chapterTitle, rendition).catch((error) => this.reportBackgroundSaveError("阅读进度", error)); },
       tocMemo: (toc: any) => { this.fileToc = toc; this.plugin.refreshReaderSidebar(this); },
       createBookNote: () => { this.createBookNote(); },
       highlights: await this.getBookHighlightsForReader(),
@@ -602,7 +656,7 @@ export class EpubView extends FileView {
       wikiLinkCandidates: getMarkdownLinkCandidates(this.app),
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
-      promoteHighlight: (highlight: BookHighlight, reflection: string) => this.promoteHighlight(highlight, reflection),
+      promoteHighlight: (highlight: BookHighlight) => this.promoteHighlight(highlight),
       onInteraction: () => { this.lastInteractionTime = Date.now(); },
       app: this.app,
       smartCommands: this.plugin.settings.smartCommands || [],
@@ -612,7 +666,7 @@ export class EpubView extends FileView {
 
   onunload(): void {
     this.setHeaderMenuVisibility(false);
-    this.stopThemeSync();
+    void this.stopThemeSync().catch((error) => this.reportBackgroundSaveError("关闭阅读器时的统计", error));
     this.plugin.clearActiveReader(this);
     if (this.reactRoot) {
       this.reactRoot.unmount();
@@ -640,29 +694,22 @@ export class EpubView extends FileView {
   async addBookmark(cfi: string, title: string) {
     if (!cfi) return;
     const path = this.file.path;
-    if (!this.plugin.settings.bookBookmarks) {
-      this.plugin.settings.bookBookmarks = {};
-    }
-    if (!this.plugin.settings.bookBookmarks[path]) {
-      this.plugin.settings.bookBookmarks[path] = [];
-    }
-    
-    // Check if already exists
-    const exists = this.plugin.settings.bookBookmarks[path].find((b: any) => b.cfi === cfi);
-    if (!exists) {
-      this.plugin.settings.bookBookmarks[path].push({
+    try {
+      const added = await this.plugin.bookStateService.addBookmark(path, {
         cfi,
         title: title || "未知章节",
-        created: Date.now()
+        created: Date.now(),
       });
-      await this.plugin.saveSettings();
-      new Notice("🔖 书签已添加");
-      
-      // Fire event to refresh LibraryApp
+      if (!added) {
+        new Notice("该位置已存在书签");
+        return;
+      }
+      new Notice("书签已添加");
       const event = new CustomEvent("jarvis-reader-bookmarks-updated", { detail: path });
       window.dispatchEvent(event);
-    } else {
-      new Notice("🔖 该位置已存在书签");
+    } catch (error) {
+      console.error("Failed to add bookmark", error);
+      new Notice("书签保存失败，未保留本次更改。");
     }
   }
 

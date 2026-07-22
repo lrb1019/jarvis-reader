@@ -1,9 +1,10 @@
-import { ItemView, WorkspaceLeaf, Menu } from "obsidian";
-import { HIGHLIGHTS_VIEW_TYPE } from "./BookshelfView";
+import { Menu, type App } from "obsidian";
 import type JarvisReaderPlugin from "../main";
 import { confirmDestructiveAction } from "../utils";
 
-export class JarvisReaderHighlightsView extends ItemView {
+export class HighlightsPanelController {
+  app: App;
+  contentEl: HTMLElement | null;
   plugin: JarvisReaderPlugin;
   reader: any;
   searchQuery: string;
@@ -15,8 +16,9 @@ export class JarvisReaderHighlightsView extends ItemView {
   listScrollTop: number;
   pendingRevealHighlightId: string | null;
 
-  constructor(leaf: WorkspaceLeaf, plugin: JarvisReaderPlugin) {
-    super(leaf);
+  constructor(plugin: JarvisReaderPlugin) {
+    this.app = plugin.app;
+    this.contentEl = null;
     this.plugin = plugin;
     this.reader = null;
     this.searchQuery = "";
@@ -27,15 +29,6 @@ export class JarvisReaderHighlightsView extends ItemView {
     this.focusSearchOnRender = false;
     this.listScrollTop = 0;
     this.pendingRevealHighlightId = null;
-  }
-  getViewType() {
-    return HIGHLIGHTS_VIEW_TYPE;
-  }
-  getDisplayText() {
-    return "Jarvis Reader 笔记";
-  }
-  getIcon() {
-    return "sticky-note";
   }
   setReader(reader) {
     this.reader = reader;

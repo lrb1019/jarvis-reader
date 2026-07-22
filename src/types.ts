@@ -101,8 +101,15 @@ export interface BookProgress {
 }
 
 export interface BookCoverCacheEntry {
-  dataUrl: string;
+  dataUrl?: string;
   updated: string;
+  description?: string;
+  creator?: string;
+  publisher?: string;
+  pubdate?: string;
+  coverVersion?: number;
+  vaultPath?: string;
+  isCustom?: boolean;
 }
 
 export type BookLocations = Record<string, string | number>;
@@ -209,4 +216,4 @@ export interface JarvisReaderSettings {
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &
   Record<string, unknown>;
 
-export type PersistedSettingsData = Omit<JarvisReaderSettings, "wordAssets" | "bookHighlights">;
+export type PersistedSettingsData = Omit<JarvisReaderSettings, "wordAssets" | "bookHighlights" | "bookCoverCache">;
