@@ -6,7 +6,7 @@ export function formatBlockquote(text: string): string {
 }
 
 export function formatHighlightNoteBlock(highlight: BookHighlight): string {
-  const title = highlight.chapterTitle || "\u672a\u547d\u540d\u7ae0\u8282";
+  const title = (highlight.chapterTitle || "").replace(/\s+/g, " ").trim() || "\u672a\u547d\u540d\u7ae0\u8282";
   const quote = formatBlockquote(highlight.quote);
   const entries = (highlight as any).commentEntries;
   let commentBlock = "";

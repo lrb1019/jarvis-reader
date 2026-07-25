@@ -88,3 +88,24 @@ test("hydrates quote and notes from Markdown when the index contains no content 
   assert.equal(details.quote, "原文第一行\n原文第二行");
   assert.deepEqual(details.commentEntries.map((entry) => entry.text), ["第一条笔记"]);
 });
+
+test("ignores multiline chapter titles leaked outside a newly written callout", () => {
+  const source = `## 无处不在的系统
+
+> [!note]${" "}
+          无处不在的系统
+${"        "}
+> “是你的手。你把手拿开了。”大家回答
+>
+> **笔记**
+> created: 2026-07-25 09:40:08
+>
+> 测试笔记
+> **时间**
+> 2026-07-25 09:40:08
+^ar-current
+`;
+  const details = readHighlightDetailsDocument(source, { blockId: "ar-current" });
+  assert.equal(details.quote, "“是你的手。你把手拿开了。”大家回答");
+  assert.deepEqual(details.commentEntries.map((entry) => entry.text), ["测试笔记"]);
+});

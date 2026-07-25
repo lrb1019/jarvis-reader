@@ -53590,7 +53590,7 @@ function formatBlockquote(text) {
   return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
 }
 function formatHighlightNoteBlock(highlight) {
-  const title = highlight.chapterTitle || "\u672A\u547D\u540D\u7AE0\u8282";
+  const title = (highlight.chapterTitle || "").replace(/\s+/g, " ").trim() || "\u672A\u547D\u540D\u7AE0\u8282";
   const quote = formatBlockquote(highlight.quote);
   const entries = highlight.commentEntries;
   let commentBlock = "";
@@ -53803,11 +53803,13 @@ function readHighlightDetailsDocument(content, highlight) {
     currentSection = null;
   };
   for (let i = range.startIndex + 1; i < range.blockIndex; i++) {
-    const line = normalizeBlockquoteLine(lines[i] || "");
+    const rawLine = lines[i] || "";
+    if (!/^\s*>/.test(rawLine)) continue;
+    const line = normalizeBlockquoteLine(rawLine.trimStart());
     const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
     const aiMatch = line.match(/^#{3}\s+(.+?)\s*$/);
     if (readingQuote) {
-      if (!line || noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
+      if (noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
       else {
         quoteLines.push(line);
         continue;

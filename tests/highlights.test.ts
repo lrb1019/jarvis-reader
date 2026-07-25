@@ -56,6 +56,18 @@ test("formats a no-note highlight without merging the timestamp into its quote",
   assert.doesNotMatch(block, />> \*\*时间\*\*/);
 });
 
+test("normalizes multiline chapter titles before writing callout headers", () => {
+  const block = formatHighlightNoteBlock({
+    id: "h3", bookPath: "Book.epub", bookTitle: "Book",
+    chapterTitle: "\n          无处不在的系统\n        ",
+    cfiRange: "epubcfi(/6/2)", quote: "真正的划线原文", comment: "", notePath: "Book.md",
+    blockId: "ar-multiline-title", created: "2026-07-25T00:00:00.000Z",
+  });
+
+  assert.match(block, /^> \[!note\] 无处不在的系统\n> 真正的划线原文/);
+  assert.doesNotMatch(block, /\n\s+无处不在的系统\s*\n/);
+});
+
 test("builds stable highlight index metadata without duplicating Markdown content", () => {
   assert.deepEqual(buildHighlightMetadata({ blockId: "block", quote: "Quote", comment: "Thought", markColor: "green" }), {
     id: "block",

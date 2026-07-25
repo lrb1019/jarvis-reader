@@ -149,11 +149,15 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
   };
 
   for (let i = range.startIndex + 1; i < range.blockIndex; i++) {
-    const line = normalizeBlockquoteLine(lines[i] || "");
+    const rawLine = lines[i] || "";
+    // A callout body must stay inside blockquotes. Ignore chapter-title text
+    // that leaked onto plain lines from earlier multiline TOC titles.
+    if (!/^\s*>/.test(rawLine)) continue;
+    const line = normalizeBlockquoteLine(rawLine.trimStart());
     const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
     const aiMatch = line.match(/^#{3}\s+(.+?)\s*$/);
     if (readingQuote) {
-      if (!line || noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
+      if (noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
       else {
         quoteLines.push(line);
         continue;

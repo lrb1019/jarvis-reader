@@ -1,6 +1,6 @@
 {
   "name": "jarvis-reader",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "TypeScript source migration workspace for Jarvis Reader",
   "private": true,
   "type": "module",
