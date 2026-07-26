@@ -14,18 +14,29 @@ logs/
 backups/
 cache/
 pending/
+.local-secrets/
 
 # 本地项目管理文件（不上传 GitHub）
 00 项目总览.md
-01 项目规则.md
+01 PROJECT_RULES.md
 02 后续想法.md
 03 改动日志.md
 04 接续说明.md
 05 审查流程.md
 06 发布与同步流程.md
-AGENTS.md
 GEMINI.md
 extract_transcript.js
 skill/
 书架参考/
 *.zip
+
+# 可同步的项目管理文件（正式来源由本机 Git 配置指定）
+!项目管理/
+!项目管理/00 项目总览.md
+!项目管理/01 项目规则.md
+!项目管理/02 后续想法.md
+!项目管理/03 改动日志.md
+!项目管理/04 接续说明.md
+!项目管理/05 审查流程.md
+!项目管理/06 发布与同步流程.md
+!/AGENTS.md
