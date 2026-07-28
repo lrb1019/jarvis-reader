@@ -58817,6 +58817,13 @@ function buildKnowledgeNotePath(folder, title) {
   return `${cleanFolder ? `${cleanFolder}/` : ""}${cleanTitle}.md`;
 }
 
+// src/workspace-navigation.ts
+async function openFileInActiveTab(workspace, file) {
+  const leaf = workspace.getLeaf("tab");
+  await leaf.openFile(file, { active: true });
+  workspace.setActiveLeaf(leaf, { focus: true });
+}
+
 // src/EpubView.ts
 function getWordAssetsMap(settings) {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
@@ -58931,7 +58938,7 @@ var EpubView = class extends import_obsidian7.FileView {
         sourceBookTitle: highlight.bookTitle,
         createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
       });
-      await this.app.workspace.getLeaf(true).openFile(file);
+      await openFileInActiveTab(this.app.workspace, file);
       new import_obsidian7.Notice("\u5DF2\u6253\u5F00\u77E5\u8BC6\u7B14\u8BB0\u3002");
     } catch (error) {
       console.error("Jarvis Reader knowledge note creation failed.", error);

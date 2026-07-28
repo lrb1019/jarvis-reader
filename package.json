@@ -14,6 +14,7 @@
     "build": "node esbuild.config.mjs production",
     "dev": "node esbuild.config.mjs",
     "verify": "npm run typecheck && npm run typecheck:strict && npm test && npm run build && node --check main.js",
+    "deploy:local": "npm run verify && node deploy-local.mjs",
     "package:release": "node release-package.mjs",
     "sync:management": "node sync-project-management.mjs",
     "version": "node version-bump.mjs && git add manifest.json versions.json"

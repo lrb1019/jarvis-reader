@@ -16,6 +16,7 @@ import type { JarvisReaderSettings, BookHighlight } from "./types";
 import { ReadingStatsService } from "./reading-stats-service";
 import { buildKnowledgeNoteBody } from "./knowledge-note";
 import type { HighlightCommentEntry } from "./book-note-document";
+import { openFileInActiveTab } from "./workspace-navigation";
 
 function getWordAssetsMap(settings: any): Record<string, any> {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
@@ -148,7 +149,7 @@ export class EpubView extends FileView {
         sourceBookTitle: highlight.bookTitle,
         createdAt: new Date().toISOString().slice(0, 10),
       });
-      await this.app.workspace.getLeaf(true).openFile(file);
+      await openFileInActiveTab(this.app.workspace, file);
       new Notice("已打开知识笔记。");
     } catch (error) {
       console.error("Jarvis Reader knowledge note creation failed.", error);
