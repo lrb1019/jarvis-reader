@@ -58822,6 +58822,18 @@ async function openFileInActiveTab(workspace, file) {
   const leaf = workspace.getLeaf("tab");
   await leaf.openFile(file, { active: true });
   workspace.setActiveLeaf(leaf, { focus: true });
+  return leaf;
+}
+async function openFileOnceInActiveTab(workspace, file, viewType) {
+  const existingLeaf = workspace.getLeavesOfType(viewType).find((leaf) => {
+    const openFile = leaf.view?.file;
+    return openFile?.path === file.path;
+  });
+  if (existingLeaf) {
+    workspace.setActiveLeaf(existingLeaf, { focus: true });
+    return existingLeaf;
+  }
+  return await openFileInActiveTab(workspace, file);
 }
 
 // src/EpubView.ts
@@ -61664,11 +61676,11 @@ function LibraryApp({ plugin }) {
     }
   };
   const openBook = async (file) => {
-    const leaf = plugin.app.workspace.getLeaf(true);
-    await leaf.openFile(file, { active: true });
+    const leaf = await openFileOnceInActiveTab(plugin.app.workspace, file, "epub");
     if (typeof plugin.openBookshelfPane === "function") {
       await plugin.openBookshelfPane(true);
     }
+    plugin.app.workspace.setActiveLeaf(leaf, { focus: true });
   };
   const openNote = async (file) => {
     const progress = getProgress(file);

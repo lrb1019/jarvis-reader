@@ -3073,7 +3073,7 @@ g.jarvis-reader-highlight-with-comment line {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  height: 420px;
+  min-height: 420px;
 }
 
 .detail-header-intro-side {

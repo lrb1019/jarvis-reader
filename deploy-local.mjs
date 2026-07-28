@@ -10,7 +10,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
-const sourceBundle = join(projectRoot, "main.js");
+const runtimeArtifacts = ["main.js", "styles.css"];
 
 function readRuntimePluginDirectory() {
   try {
@@ -34,8 +34,10 @@ function readManifest(root) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
-if (!existsSync(sourceBundle)) {
-  throw new Error("缺少 main.js，请先运行 npm run verify");
+for (const artifact of runtimeArtifacts) {
+  if (!existsSync(join(projectRoot, artifact))) {
+    throw new Error(`缺少 ${artifact}，请先运行 npm run verify`);
+  }
 }
 
 const runtimePluginDirectory = resolve(readRuntimePluginDirectory());
@@ -54,16 +56,25 @@ if (
   );
 }
 
-const pendingBundle = join(runtimePluginDirectory, ".main.pending.js");
-const runtimeBundle = join(runtimePluginDirectory, "main.js");
+const pendingArtifacts = runtimeArtifacts.map((artifact) => ({
+  source: join(projectRoot, artifact),
+  pending: join(runtimePluginDirectory, `.${artifact}.pending`),
+  destination: join(runtimePluginDirectory, artifact),
+}));
 
 try {
-  copyFileSync(sourceBundle, pendingBundle);
-  renameSync(pendingBundle, runtimeBundle);
+  for (const artifact of pendingArtifacts) {
+    copyFileSync(artifact.source, artifact.pending);
+  }
+  for (const artifact of pendingArtifacts) {
+    renameSync(artifact.pending, artifact.destination);
+  }
 } finally {
-  if (existsSync(pendingBundle)) {
-    unlinkSync(pendingBundle);
+  for (const artifact of pendingArtifacts) {
+    if (existsSync(artifact.pending)) {
+      unlinkSync(artifact.pending);
+    }
   }
 }
 
-console.log(`已部署 main.js 到本地验收目录：${runtimePluginDirectory}`);
+console.log(`已部署 ${runtimeArtifacts.join("、")} 到本地验收目录：${runtimePluginDirectory}`);

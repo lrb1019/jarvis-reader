@@ -10,6 +10,7 @@ import { WordCard } from "../word-book/WordCard";
 import { BookBookmarksPanel } from "./BookBookmarksPanel";
 import { BookHighlightsPanel } from "./BookHighlightsPanel";
 import type { LibraryHighlight } from "./library-highlight-core";
+import { openFileOnceInActiveTab } from "../workspace-navigation";
 
 export interface LibraryAppProps {
   plugin: JarvisReaderPlugin;
@@ -1073,11 +1074,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   // Actions
   const openBook = async (file: TFile) => {
-    const leaf = plugin.app.workspace.getLeaf(true);
-    await leaf.openFile(file, { active: true });
+    const leaf = await openFileOnceInActiveTab(plugin.app.workspace, file, "epub");
     if (typeof plugin.openBookshelfPane === "function") {
       await plugin.openBookshelfPane(true);
     }
+    plugin.app.workspace.setActiveLeaf(leaf, { focus: true });
   };
 
   const openNote = async (file: TFile) => {
