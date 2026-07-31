@@ -1,6 +1,7 @@
 // Extracted from main.js L47199-47568
 
 import React, { useRef, useEffect } from "react";
+import { isReaderPageTurnKey } from "./editor-keyboard-core";
 
 interface LinkCandidate {
   kind: "file" | "heading" | "block";
@@ -351,6 +352,20 @@ export const WikiLinkCodeMirrorEditor: React.FC<WikiLinkCodeMirrorEditorProps> =
       valueRef.current = next;
       onChange(next);
     });
+    const containReaderPageTurnKeys = EditorView2.domEventHandlers({
+      keydown(event: KeyboardEvent) {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+        return false;
+      },
+      keyup(event: KeyboardEvent) {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+        return false;
+      }
+    });
     const view = new EditorView2({
       state: EditorState2.create({
         doc: valueRef.current,
@@ -360,6 +375,7 @@ export const WikiLinkCodeMirrorEditor: React.FC<WikiLinkCodeMirrorEditorProps> =
           wrapWikiKeymap,
           wikiCompletion,
           createWikiLinkDecorationsExtension(cm),
+          containReaderPageTurnKeys,
           updateListener,
           EditorView2.lineWrapping,
           EditorView2.theme({
@@ -401,7 +417,17 @@ export const WikiLinkCodeMirrorEditor: React.FC<WikiLinkCodeMirrorEditorProps> =
       className: "jarvis-reader-highlight-input",
       value: value || "",
       placeholder,
-      onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => onChange(event.currentTarget.value)
+      onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => onChange(event.currentTarget.value),
+      onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+      },
+      onKeyUp: (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+      }
     });
   }
   return React.createElement("div", {

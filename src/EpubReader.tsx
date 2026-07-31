@@ -11,9 +11,10 @@ import { dedupeHighlightsByCfi } from "./highlight-core";
 import { formatLocalDateTime } from "./utils-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
-import { triggerClaudianPrompt, buildPromptFromTemplate } from "./claudianBridge";
+import { triggerClaudianPrompt, prepareSmartCommandPromptFromVault } from "./claudianBridge";
 import type { SmartCommand } from "./claudianBridge";
 import { ReaderSideControls } from "./reader/ReaderSideControls";
+import { moveFloatingCardRect } from "./floating-card-core";
 
 export interface EpubReaderProps {
   contents: ArrayBuffer;
@@ -226,9 +227,11 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const [wikiSuggest, setWikiSuggest] = useState<any>(null);
   const [wikiEditRange, setWikiEditRange] = useState<any>(null);
   const [highlightPopoverRect, setHighlightPopoverRect] = useState<any>(null);
+  const [wordTranslationRect, setWordTranslationRect] = useState<any>(null);
   const containerRef = useRef<any>(null);
   const highlightInputRef = useRef<any>(null);
   const highlightPopoverRectRef = useRef<any>(null);
+  const wordTranslationRectRef = useRef<any>(null);
   const renditionRef = useRef<any>(null);
   const currentLocationRef = useRef<string | null>(initLocation);
   const pendingInitLocationRef = useRef<string | null>(initLocation);
@@ -413,6 +416,49 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     const next = getDefaultHighlightPopoverRect();
     highlightPopoverRectRef.current = next;
     setHighlightPopoverRect(next);
+  };
+  const getDefaultWordTranslationRect = () => {
+    const rect = getDefaultHighlightPopoverRect();
+    return {
+      ...rect,
+      width: Math.min(rect.width || 480, 480)
+    };
+  };
+  const resetWordTranslationRect = () => {
+    const next = getDefaultWordTranslationRect();
+    wordTranslationRectRef.current = next;
+    setWordTranslationRect(next);
+  };
+  const beginWordTranslationMove = (event) => {
+    if (event.button != null && event.button !== 0)
+      return;
+    const interactiveTarget = event.target && typeof event.target.closest === "function" ? event.target.closest("button, textarea, input, .cm-editor") : null;
+    if (interactiveTarget)
+      return;
+    event.preventDefault();
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
+    const startRect = wordTranslationRectRef.current || getDefaultWordTranslationRect();
+    wordTranslationRectRef.current = startRect;
+    setWordTranslationRect(startRect);
+    const startPointer = { x: event.clientX, y: event.clientY };
+    const onMove = (moveEvent) => {
+      const next = moveFloatingCardRect(startRect, startPointer, {
+        x: moveEvent.clientX,
+        y: moveEvent.clientY
+      });
+      wordTranslationRectRef.current = next;
+      setWordTranslationRect(next);
+    };
+    const onUp = () => {
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+    };
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp, { once: true });
   };
   const beginHighlightPopoverMove = (event) => {
     if (event.button != null && event.button !== 0)
@@ -872,6 +918,8 @@ const showWordHoverCard = (asset, element) => {
   const openWordTranslator = async (item, options: { autoLocalOnly?: boolean } = {}) => {
     if (!item || typeof translateSelection !== "function")
       return false;
+    wordTranslationRectRef.current = null;
+    setWordTranslationRect(null);
     const normalized = normalizeWordSelection(item.quote || "");
     if (options.autoLocalOnly) {
       if (!normalized || !normalized.isSingleWord)
@@ -1391,6 +1439,9 @@ const showWordHoverCard = (asset, element) => {
     highlightPopoverRectRef.current = highlightPopoverRect;
   }, [highlightPopoverRect]);
   useEffect(() => {
+    wordTranslationRectRef.current = wordTranslationRect;
+  }, [wordTranslationRect]);
+  useEffect(() => {
     pendingHighlightMenuRef.current = pendingHighlightMenu;
   }, [pendingHighlightMenu]);
   useEffect(() => {
@@ -1807,7 +1858,7 @@ const showWordHoverCard = (asset, element) => {
     clearWordLookup();
   };
 
-  const fireSmartCommand = (cmd: SmartCommand, scope: "selection" | "note") => {
+  const fireSmartCommand = async (cmd: SmartCommand, scope: "selection" | "note") => {
     setSmartCmdMenuScope(null);
     const effectiveApp = app || (window as any).app;
     if (!effectiveApp) {
@@ -1832,14 +1883,20 @@ const showWordHoverCard = (asset, element) => {
       const quoteFormatted = `${bookPrefix}原文：${quoteText}`;
       selectionText = noteContent ? `${quoteFormatted}\n想法：${noteContent}` : quoteFormatted;
     }
-    const finalPrompt = buildPromptFromTemplate(cmd.prompt, {
-      selection: selectionText || noteContent,
-      content: noteContent || selectionText,
-      book_title: bookTitle || title || "",
-      chapter: readerTitleRef.current || ""
-    });
-    triggerClaudianPrompt(effectiveApp, finalPrompt);
-    new Notice(`已发送「${cmd.label}」指令到 Claudian`);
+    try {
+      const finalPrompt = await prepareSmartCommandPromptFromVault(effectiveApp, cmd, {
+        selection: selectionText || noteContent,
+        content: noteContent || selectionText,
+        book_title: bookTitle || title || "",
+        chapter: readerTitleRef.current || ""
+      });
+      triggerClaudianPrompt(effectiveApp, finalPrompt);
+      new Notice(`已发送「${cmd.label}」指令到 Claudian`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Jarvis Reader smart command failed.", error);
+      new Notice(message);
+    }
   };
 
   const copyHighlightQuote = async (item) => {
@@ -2416,11 +2473,9 @@ const showWordHoverCard = (asset, element) => {
     const blockId = pendingSelection.blockId || pendingSelection.id || "";
     openWikiLink(blockId ? `${pendingSelection.notePath}#^${blockId}` : pendingSelection.notePath);
   };
-  const activeWordPopoverRect = pendingWordSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
-  const visibleWordPopoverRect = activeWordPopoverRect ? clampHighlightPopoverRect({
-    ...activeWordPopoverRect,
-    width: Math.min(activeWordPopoverRect.width || 480, 480)
-  }) : null;
+  const visibleWordPopoverRect = pendingWordSelection
+    ? wordTranslationRect || getDefaultWordTranslationRect()
+    : null;
   const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
   const pendingTranslationKind = pendingWordSelection && wordLookupState.result ? getTranslationAssetKind(pendingWordSelection.quote || "", wordLookupState.result) : normalizedPendingWord && normalizedPendingWord.isPhrase ? "phrase" : "word";
@@ -2843,7 +2898,7 @@ const showWordHoverCard = (asset, element) => {
                 role: "button",
                 onClick: (e) => {
                   e.stopPropagation();
-                  fireSmartCommand(cmd, "selection");
+                  void fireSmartCommand(cmd, "selection");
                   setPendingHighlightMenu(null);
                   setHoveredMenuItem(null);
                 }
@@ -2864,8 +2919,8 @@ const showWordHoverCard = (asset, element) => {
   },  React.createElement("div", {
     className: "jarvis-reader-word-card-head",
     style: { cursor: "grab" },
-    onPointerDown: beginHighlightPopoverMove,
-    onDoubleClick: resetHighlightPopoverRect
+    onPointerDown: beginWordTranslationMove,
+    onDoubleClick: resetWordTranslationRect
   }, React.createElement("div", {
     className: "jarvis-reader-word-card-head-row"
   }, React.createElement("div", {
@@ -2960,7 +3015,7 @@ const showWordHoverCard = (asset, element) => {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
       title: cmd.label,
-      onClick: () => fireSmartCommand(cmd, "note")
+      onClick: () => { void fireSmartCommand(cmd, "note"); }
     }, renderObsidianIcon(cmd.icon || "bot"))
   ),
   React.createElement("button", {

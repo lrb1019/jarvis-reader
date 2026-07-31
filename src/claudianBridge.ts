@@ -1,14 +1,21 @@
-import { App, Notice } from "obsidian";
+import { App, Notice, TFile } from "obsidian";
+import {
+  buildPromptFromTemplate,
+  prepareSmartCommandPrompt,
+} from "./smart-command-core";
+import type {
+  SmartCommand,
+  SmartCommandVariables,
+} from "./smart-command-core";
 
-export interface SmartCommand {
-  id: string;
-  label: string;
-  description?: string;
-  icon: string;
-  prompt: string;
-  enabled: boolean;
-  scope: "selection" | "note" | "both";
-}
+export {
+  buildPromptFromTemplate,
+  prepareSmartCommandPrompt,
+};
+export type {
+  SmartCommand,
+  SmartCommandVariables,
+} from "./smart-command-core";
 
 interface ClaudianPlugin {
   activateView(): Promise<void>;
@@ -20,19 +27,18 @@ interface ObsidianAppWithPlugins extends App {
   };
 }
 
-/**
- * Replace template variables in a prompt string.
- * Supported: {{selection}}, {{content}}, {{book_title}}, {{chapter}}
- */
-export function buildPromptFromTemplate(
-  template: string,
-  vars: Record<string, string>
-): string {
-  let result = template;
-  for (const [key, value] of Object.entries(vars)) {
-    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
-  }
-  return result;
+export async function prepareSmartCommandPromptFromVault(
+  app: App,
+  command: SmartCommand,
+  vars: SmartCommandVariables
+): Promise<string> {
+  return prepareSmartCommandPrompt(command, vars, async (path) => {
+    const file = app.vault.getAbstractFileByPath(path);
+    if (!(file instanceof TFile)) {
+      return null;
+    }
+    return app.vault.read(file);
+  });
 }
 
 /**

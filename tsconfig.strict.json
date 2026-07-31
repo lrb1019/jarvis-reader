@@ -9,11 +9,14 @@
     "src/book-state-service.ts",
     "src/conflict-resolution-core.ts",
     "src/cover-cache-service.ts",
+    "src/editor-keyboard-core.ts",
+    "src/floating-card-core.ts",
     "src/highlight-transaction-service.ts",
     "src/index-sidecars.ts",
     "src/reading-stats-service.ts",
     "src/reader/ReaderSideControls.tsx",
     "src/library/library-highlight-core.ts",
+    "src/smart-command-core.ts",
     "src/settings-save-queue.ts"
   ],
   "include": []

@@ -55133,6 +55133,13 @@ function getReaderProgress(relocated, rendition) {
 
 // src/wiki-editor.ts
 var import_react = __toESM(require_react(), 1);
+
+// src/editor-keyboard-core.ts
+function isReaderPageTurnKey(key) {
+  return key === "ArrowLeft" || key === "ArrowRight";
+}
+
+// src/wiki-editor.ts
 function getMarkdownLinkCandidates(app) {
   var _a, _b;
   const files = (((_a = app == null ? void 0 : app.vault) == null ? void 0 : _a.getFiles) ? app.vault.getFiles() : []).filter((file) => {
@@ -55445,6 +55452,20 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
       valueRef.current = next;
       onChange(next);
     });
+    const containReaderPageTurnKeys = EditorView2.domEventHandlers({
+      keydown(event) {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+        return false;
+      },
+      keyup(event) {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+        return false;
+      }
+    });
     const view = new EditorView2({
       state: EditorState2.create({
         doc: valueRef.current,
@@ -55454,6 +55475,7 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
           wrapWikiKeymap,
           wikiCompletion,
           createWikiLinkDecorationsExtension(cm),
+          containReaderPageTurnKeys,
           updateListener,
           EditorView2.lineWrapping,
           EditorView2.theme({
@@ -55495,7 +55517,17 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
       className: "jarvis-reader-highlight-input",
       value: value || "",
       placeholder,
-      onChange: (event) => onChange(event.currentTarget.value)
+      onChange: (event) => onChange(event.currentTarget.value),
+      onKeyDown: (event) => {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+      },
+      onKeyUp: (event) => {
+        if (isReaderPageTurnKey(event.key)) {
+          event.stopPropagation();
+        }
+      }
     });
   }
   return import_react.default.createElement("div", {
@@ -55521,12 +55553,84 @@ init_utils_core();
 
 // src/claudianBridge.ts
 var import_obsidian5 = require("obsidian");
+
+// src/smart-command-core.ts
+var WINDOWS_ABSOLUTE_PATH = /^[A-Za-z]:[\\/]/;
 function buildPromptFromTemplate(template, vars) {
   let result = template;
   for (const [key, value] of Object.entries(vars)) {
     result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
   }
   return result;
+}
+function resolveSkillFilePath(configuredPath) {
+  const rawPath = (configuredPath || "").trim();
+  if (!rawPath) {
+    throw new Error("\u8BF7\u5148\u8BBE\u7F6E Skill \u76EE\u5F55\u3002");
+  }
+  if (rawPath.startsWith("/") || rawPath.startsWith("~") || WINDOWS_ABSOLUTE_PATH.test(rawPath)) {
+    throw new Error("Skill \u76EE\u5F55\u5FC5\u987B\u4F7F\u7528\u77E5\u8BC6\u5E93\u76F8\u5BF9\u8DEF\u5F84\u3002");
+  }
+  const normalizedPath = rawPath.replace(/\\/g, "/").replace(/^\.\/+/, "").replace(/\/+/g, "/").replace(/\/+$/g, "");
+  const pathSegments = normalizedPath.split("/");
+  if (pathSegments.some((segment) => segment === "..")) {
+    throw new Error("Skill \u76EE\u5F55\u4E0D\u80FD\u8DF3\u51FA\u5F53\u524D\u77E5\u8BC6\u5E93\u3002");
+  }
+  if (!normalizedPath) {
+    throw new Error("\u8BF7\u5148\u8BBE\u7F6E Skill \u76EE\u5F55\u3002");
+  }
+  if (normalizedPath.endsWith("/SKILL.md") || normalizedPath === "SKILL.md") {
+    return normalizedPath;
+  }
+  if (normalizedPath.toLowerCase().endsWith(".md")) {
+    throw new Error("Skill \u6587\u4EF6\u5FC5\u987B\u547D\u540D\u4E3A SKILL.md\u3002");
+  }
+  return `${normalizedPath}/SKILL.md`;
+}
+function buildDefaultSkillTask(vars) {
+  const lines = [];
+  if (vars.chapter) {
+    lines.push(`\u7AE0\u8282\uFF1A${vars.chapter}`);
+  }
+  lines.push(vars.selection || vars.content);
+  return lines.join("\n").trim();
+}
+async function prepareSmartCommandPrompt(command, vars, readSkillFile) {
+  if (command.source !== "skill") {
+    return buildPromptFromTemplate(command.prompt, vars);
+  }
+  const skillFilePath = resolveSkillFilePath(command.skillPath);
+  let skillContent;
+  try {
+    skillContent = await readSkillFile(skillFilePath);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`\u8BFB\u53D6 Skill \u5931\u8D25\uFF1A${message}`);
+  }
+  if (skillContent === null) {
+    throw new Error(`\u627E\u4E0D\u5230 Skill \u6587\u4EF6\uFF1A${skillFilePath}`);
+  }
+  if (!skillContent.trim()) {
+    throw new Error(`Skill \u6587\u4EF6\u5185\u5BB9\u4E3A\u7A7A\uFF1A${skillFilePath}`);
+  }
+  const taskTemplate = command.prompt.trim();
+  const task = taskTemplate ? buildPromptFromTemplate(taskTemplate, vars) : buildDefaultSkillTask(vars);
+  return [
+    `\u8BFB\u53D6\u5E76\u9075\u5FAA\uFF1A${skillFilePath}`,
+    "",
+    task
+  ].join("\n");
+}
+
+// src/claudianBridge.ts
+async function prepareSmartCommandPromptFromVault(app, command, vars) {
+  return prepareSmartCommandPrompt(command, vars, async (path) => {
+    const file = app.vault.getAbstractFileByPath(path);
+    if (!(file instanceof import_obsidian5.TFile)) {
+      return null;
+    }
+    return app.vault.read(file);
+  });
 }
 function triggerClaudianPrompt(app, prompt) {
   const appWithPlugins = app;
@@ -55602,6 +55706,15 @@ function ReaderSideControls(props) {
     singlePage && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { className: "jarvis-reader-side-mode-button", label: scrolled ? "\u5207\u6362\u5230\u5206\u9875" : "\u5207\u6362\u5230\u6EDA\u52A8", icon: scrolled ? ICONS.paged : ICONS.scroll, onClick: () => onScrolledChange(!scrolled) }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { className: "jarvis-reader-side-mode-button", label: singlePage ? "\u5207\u6362\u5230\u53CC\u9875" : "\u5207\u6362\u5230\u5355\u9875", icon: singlePage ? ICONS.dual : ICONS.single, onClick: () => onSinglePageChange(!singlePage) })
   ] }) });
+}
+
+// src/floating-card-core.ts
+function moveFloatingCardRect(startRect, startPointer, currentPointer) {
+  return {
+    ...startRect,
+    x: startRect.x + currentPointer.x - startPointer.x,
+    y: startRect.y + currentPointer.y - startPointer.y
+  };
 }
 
 // src/EpubReader.tsx
@@ -55759,9 +55872,11 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const [wikiSuggest, setWikiSuggest] = (0, import_react2.useState)(null);
   const [wikiEditRange, setWikiEditRange] = (0, import_react2.useState)(null);
   const [highlightPopoverRect, setHighlightPopoverRect] = (0, import_react2.useState)(null);
+  const [wordTranslationRect, setWordTranslationRect] = (0, import_react2.useState)(null);
   const containerRef = (0, import_react2.useRef)(null);
   const highlightInputRef = (0, import_react2.useRef)(null);
   const highlightPopoverRectRef = (0, import_react2.useRef)(null);
+  const wordTranslationRectRef = (0, import_react2.useRef)(null);
   const renditionRef = (0, import_react2.useRef)(null);
   const currentLocationRef = (0, import_react2.useRef)(initLocation);
   const pendingInitLocationRef = (0, import_react2.useRef)(initLocation);
@@ -55938,6 +56053,49 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const next = getDefaultHighlightPopoverRect();
     highlightPopoverRectRef.current = next;
     setHighlightPopoverRect(next);
+  };
+  const getDefaultWordTranslationRect = () => {
+    const rect = getDefaultHighlightPopoverRect();
+    return {
+      ...rect,
+      width: Math.min(rect.width || 480, 480)
+    };
+  };
+  const resetWordTranslationRect = () => {
+    const next = getDefaultWordTranslationRect();
+    wordTranslationRectRef.current = next;
+    setWordTranslationRect(next);
+  };
+  const beginWordTranslationMove = (event) => {
+    if (event.button != null && event.button !== 0)
+      return;
+    const interactiveTarget = event.target && typeof event.target.closest === "function" ? event.target.closest("button, textarea, input, .cm-editor") : null;
+    if (interactiveTarget)
+      return;
+    event.preventDefault();
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
+    const startRect = wordTranslationRectRef.current || getDefaultWordTranslationRect();
+    wordTranslationRectRef.current = startRect;
+    setWordTranslationRect(startRect);
+    const startPointer = { x: event.clientX, y: event.clientY };
+    const onMove = (moveEvent) => {
+      const next = moveFloatingCardRect(startRect, startPointer, {
+        x: moveEvent.clientX,
+        y: moveEvent.clientY
+      });
+      wordTranslationRectRef.current = next;
+      setWordTranslationRect(next);
+    };
+    const onUp = () => {
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+    };
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp, { once: true });
   };
   const beginHighlightPopoverMove = (event) => {
     if (event.button != null && event.button !== 0)
@@ -56395,6 +56553,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const openWordTranslator = async (item, options = {}) => {
     if (!item || typeof translateSelection !== "function")
       return false;
+    wordTranslationRectRef.current = null;
+    setWordTranslationRect(null);
     const normalized = normalizeWordSelection(item.quote || "");
     if (options.autoLocalOnly) {
       if (!normalized || !normalized.isSingleWord)
@@ -56914,6 +57074,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     highlightPopoverRectRef.current = highlightPopoverRect;
   }, [highlightPopoverRect]);
   (0, import_react2.useEffect)(() => {
+    wordTranslationRectRef.current = wordTranslationRect;
+  }, [wordTranslationRect]);
+  (0, import_react2.useEffect)(() => {
     pendingHighlightMenuRef.current = pendingHighlightMenu;
   }, [pendingHighlightMenu]);
   (0, import_react2.useEffect)(() => {
@@ -57326,7 +57489,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     setEditingNoteIndex(null);
     clearWordLookup();
   };
-  const fireSmartCommand = (cmd, scope) => {
+  const fireSmartCommand = async (cmd, scope) => {
     setSmartCmdMenuScope(null);
     const effectiveApp = app || window.app;
     if (!effectiveApp) {
@@ -57348,14 +57511,20 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       selectionText = noteContent ? `${quoteFormatted}
 \u60F3\u6CD5\uFF1A${noteContent}` : quoteFormatted;
     }
-    const finalPrompt = buildPromptFromTemplate(cmd.prompt, {
-      selection: selectionText || noteContent,
-      content: noteContent || selectionText,
-      book_title: bookTitle || title || "",
-      chapter: readerTitleRef.current || ""
-    });
-    triggerClaudianPrompt(effectiveApp, finalPrompt);
-    new import_obsidian6.Notice(`\u5DF2\u53D1\u9001\u300C${cmd.label}\u300D\u6307\u4EE4\u5230 Claudian`);
+    try {
+      const finalPrompt = await prepareSmartCommandPromptFromVault(effectiveApp, cmd, {
+        selection: selectionText || noteContent,
+        content: noteContent || selectionText,
+        book_title: bookTitle || title || "",
+        chapter: readerTitleRef.current || ""
+      });
+      triggerClaudianPrompt(effectiveApp, finalPrompt);
+      new import_obsidian6.Notice(`\u5DF2\u53D1\u9001\u300C${cmd.label}\u300D\u6307\u4EE4\u5230 Claudian`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Jarvis Reader smart command failed.", error);
+      new import_obsidian6.Notice(message);
+    }
   };
   const copyHighlightQuote = async (item) => {
     if (!item || !item.quote)
@@ -57905,11 +58074,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const blockId = pendingSelection.blockId || pendingSelection.id || "";
     openWikiLink(blockId ? `${pendingSelection.notePath}#^${blockId}` : pendingSelection.notePath);
   };
-  const activeWordPopoverRect = pendingWordSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
-  const visibleWordPopoverRect = activeWordPopoverRect ? clampHighlightPopoverRect({
-    ...activeWordPopoverRect,
-    width: Math.min(activeWordPopoverRect.width || 480, 480)
-  }) : null;
+  const visibleWordPopoverRect = pendingWordSelection ? wordTranslationRect || getDefaultWordTranslationRect() : null;
   const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
   const pendingTranslationKind = pendingWordSelection && wordLookupState.result ? getTranslationAssetKind(pendingWordSelection.quote || "", wordLookupState.result) : normalizedPendingWord && normalizedPendingWord.isPhrase ? "phrase" : "word";
@@ -58331,7 +58496,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
                 role: "button",
                 onClick: (e) => {
                   e.stopPropagation();
-                  fireSmartCommand(cmd, "selection");
+                  void fireSmartCommand(cmd, "selection");
                   setPendingHighlightMenu(null);
                   setHoveredMenuItem(null);
                 }
@@ -58352,8 +58517,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }, import_react2.default.createElement("div", {
     className: "jarvis-reader-word-card-head",
     style: { cursor: "grab" },
-    onPointerDown: beginHighlightPopoverMove,
-    onDoubleClick: resetHighlightPopoverRect
+    onPointerDown: beginWordTranslationMove,
+    onDoubleClick: resetWordTranslationRect
   }, import_react2.default.createElement("div", {
     className: "jarvis-reader-word-card-head-row"
   }, import_react2.default.createElement("div", {
@@ -58457,7 +58622,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         className: "jarvis-reader-highlight-icon-button",
         type: "button",
         title: cmd.label,
-        onClick: () => fireSmartCommand(cmd, "note")
+        onClick: () => {
+          void fireSmartCommand(cmd, "note");
+        }
       }, renderObsidianIcon(cmd.icon || "bot"))
     ),
     import_react2.default.createElement("button", {
@@ -63219,7 +63386,8 @@ var DEFAULT_SETTINGS = {
       icon: "sprout",
       prompt: "@skills/sprouting-thought \u8BF7\u5BF9\u4EE5\u4E0B\u5185\u5BB9\u8FDB\u884C\u53D1\u82BD\u601D\u8003\uFF0C\u53D1\u6563\u5EF6\u4F38\uFF1A\n\n{{selection}}",
       enabled: true,
-      scope: "both"
+      scope: "both",
+      source: "template"
     },
     {
       id: "smart-2",
@@ -63228,7 +63396,8 @@ var DEFAULT_SETTINGS = {
       icon: "book-open",
       prompt: "@skills/content-research \u8BF7\u56F4\u7ED5\u4EE5\u4E0B\u5185\u5BB9\u5F00\u5C55\u6DF1\u5EA6\u7814\u7A76\uFF1A\n\n{{selection}}",
       enabled: true,
-      scope: "both"
+      scope: "both",
+      source: "template"
     }
   ]
 };
@@ -63647,7 +63816,9 @@ created: {{created}}
         icon: "bot",
         prompt: "",
         enabled: true,
-        scope: "both"
+        scope: "both",
+        source: "template",
+        skillPath: ""
       };
       new SmartCommandEditModal(this.app, newCmd, async (saved) => {
         const cmds2 = Array.isArray(this.plugin.settings.smartCommands) ? this.plugin.settings.smartCommands : [];
@@ -63670,9 +63841,8 @@ created: {{created}}
       (0, import_obsidian15.setIcon)(iconWrap, cmd.icon || "bot");
       const textWrap = left.createDiv({ cls: "vo-actions-compact-text" });
       textWrap.createDiv({ text: cmd.label || `\u6307\u4EE4 ${index + 1}`, cls: "vo-actions-compact-title" });
-      const scopeLabel = cmd.scope === "selection" ? "\u4EC5\u5212\u7EBF\u83DC\u5355" : cmd.scope === "note" ? "\u4EC5\u611F\u60F3\u7A97\u53E3" : "\u4E24\u8005\u90FD\u6709";
       textWrap.createDiv({
-        text: `${cmd.description || "\u6682\u65E0\u63CF\u8FF0"} \xB7 \u8303\u56F4\uFF1A${scopeLabel}`,
+        text: cmd.description || "\u6682\u65E0\u63CF\u8FF0",
         cls: "vo-actions-compact-desc"
       });
       const right = row.createDiv({ cls: "vo-actions-compact-controls" });
@@ -63748,8 +63918,21 @@ var SmartCommandEditModal = class extends import_obsidian15.Modal {
         draft = { ...draft, scope: value };
       })
     );
-    new import_obsidian15.Setting(contentEl).setName("\u6307\u4EE4\u6A21\u677F").setDesc("\u70B9\u51FB\u540E\u53D1\u9001\u7ED9 Claudian \u7684\u5B8C\u6574\u5185\u5BB9\uFF0C\u53EF\u4F7F\u7528 {{selection}}\u3001{{content}}\u3001{{book_title}}\u3001{{chapter}}").addTextArea((text) => {
-      text.setPlaceholder("@skills/sprouting-thought \u8BF7\u5BF9\u4EE5\u4E0B\u5185\u5BB9\u8FDB\u884C\u53D1\u82BD\u601D\u8003\uFF1A\n\n{{selection}}").setValue(draft.prompt).onChange((value) => {
+    new import_obsidian15.Setting(contentEl).setName("\u6307\u4EE4\u6765\u6E90").setDesc("\u6A21\u677F\u6A21\u5F0F\u76F4\u63A5\u53D1\u9001\u4E0B\u65B9\u5185\u5BB9\uFF1BSkill \u6587\u4EF6\u6A21\u5F0F\u4F1A\u8BA9 Claudian \u6309\u8DEF\u5F84\u8BFB\u53D6\u6700\u65B0\u7684 SKILL.md").addDropdown(
+      (dd) => dd.addOption("template", "\u6307\u4EE4\u6A21\u677F").addOption("skill", "Skill \u6587\u4EF6").setValue(draft.source || "template").onChange((value) => {
+        draft = {
+          ...draft,
+          source: value === "skill" ? "skill" : "template"
+        };
+      })
+    );
+    new import_obsidian15.Setting(contentEl).setName("Skill \u76EE\u5F55").setDesc("\u4EC5\u7528\u4E8E Skill \u6587\u4EF6\u6A21\u5F0F\u3002\u586B\u5199\u77E5\u8BC6\u5E93\u76F8\u5BF9\u76EE\u5F55\uFF0C\u8C03\u7528\u65F6\u4F1A\u628A\u5BF9\u5E94 SKILL.md \u8DEF\u5F84\u4EA4\u7ED9 Claudian \u8BFB\u53D6\uFF1B\u4E5F\u53EF\u76F4\u63A5\u586B\u5199\u5B8C\u6574\u76F8\u5BF9\u8DEF\u5F84").addText(
+      (text) => text.setPlaceholder("\u4F8B\u5982\uFF1A09 Books/skill/fable").setValue(draft.skillPath || "").onChange((value) => {
+        draft = { ...draft, skillPath: value };
+      })
+    );
+    new import_obsidian15.Setting(contentEl).setName("\u6307\u4EE4\u5185\u5BB9").setDesc("\u6A21\u677F\u6A21\u5F0F\u4E0B\u662F\u5B8C\u6574\u6307\u4EE4\uFF1BSkill \u6587\u4EF6\u6A21\u5F0F\u4E0B\u662F\u53EF\u9009\u7684\u4EFB\u52A1\u8865\u5145\u3002\u652F\u6301 {{selection}}\u3001{{content}}\u3001{{book_title}}\u3001{{chapter}}").addTextArea((text) => {
+      text.setPlaceholder("\u8BF7\u5904\u7406\u4EE5\u4E0B\u9605\u8BFB\u5185\u5BB9\uFF1A\n\n{{selection}}").setValue(draft.prompt).onChange((value) => {
         draft = { ...draft, prompt: value };
       });
       text.inputEl.rows = 5;
@@ -63770,6 +63953,22 @@ var SmartCommandEditModal = class extends import_obsidian15.Modal {
     const saveBtn = right.createEl("button", { text: "Save", cls: "mod-cta" });
     saveBtn.style.marginLeft = "8px";
     saveBtn.addEventListener("click", () => {
+      const source = draft.source === "skill" ? "skill" : "template";
+      const skillPath = (draft.skillPath || "").trim();
+      if (source === "skill") {
+        try {
+          const skillFilePath = resolveSkillFilePath(skillPath);
+          const skillFile = this.app.vault.getAbstractFileByPath(skillFilePath);
+          if (!(skillFile instanceof import_obsidian15.TFile)) {
+            new import_obsidian15.Notice(`\u627E\u4E0D\u5230 Skill \u6587\u4EF6\uFF1A${skillFilePath}`);
+            return;
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          new import_obsidian15.Notice(message);
+          return;
+        }
+      }
       const toSave = {
         ...draft,
         label: draft.label.trim() || "\u65B0\u6307\u4EE4",
@@ -63777,7 +63976,9 @@ var SmartCommandEditModal = class extends import_obsidian15.Modal {
         icon: draft.icon.trim() || "bot",
         prompt: draft.prompt.trim(),
         scope: draft.scope || "both",
-        enabled: draft.enabled !== false
+        enabled: draft.enabled !== false,
+        source,
+        skillPath
       };
       void this.onSave(toSave).then(() => this.close());
     });

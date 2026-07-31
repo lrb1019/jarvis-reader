@@ -1,9 +1,10 @@
-import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App, Modal, setIcon } from "obsidian";
+import { PluginSettingTab, Setting, FuzzySuggestModal, TFile, TFolder, Notice, App, Modal, setIcon } from "obsidian";
 import { normalizeVaultPath } from "./utils";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
 import type { SmartCommand } from "./claudianBridge";
+import { resolveSkillFilePath } from "./smart-command-core";
 
 export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -71,7 +72,8 @@ export const DEFAULT_SETTINGS = {
       icon: "sprout",
       prompt: "@skills/sprouting-thought 请对以下内容进行发芽思考，发散延伸：\n\n{{selection}}",
       enabled: true,
-      scope: "both"
+      scope: "both",
+      source: "template"
     },
     {
       id: "smart-2",
@@ -80,7 +82,8 @@ export const DEFAULT_SETTINGS = {
       icon: "book-open",
       prompt: "@skills/content-research 请围绕以下内容开展深度研究：\n\n{{selection}}",
       enabled: true,
-      scope: "both"
+      scope: "both",
+      source: "template"
     }
   ] as SmartCommand[]
 };
@@ -575,7 +578,9 @@ created: {{created}}
         icon: "bot",
         prompt: "",
         enabled: true,
-        scope: "both"
+        scope: "both",
+        source: "template",
+        skillPath: ""
       };
       new SmartCommandEditModal(this.app, newCmd, async (saved) => {
         const cmds: SmartCommand[] = Array.isArray(this.plugin.settings.smartCommands)
@@ -608,9 +613,8 @@ created: {{created}}
       const textWrap = left.createDiv({ cls: "vo-actions-compact-text" });
       textWrap.createDiv({ text: cmd.label || `指令 ${index + 1}`, cls: "vo-actions-compact-title" });
       
-      const scopeLabel = cmd.scope === "selection" ? "仅划线菜单" : cmd.scope === "note" ? "仅感想窗口" : "两者都有";
       textWrap.createDiv({
-        text: `${cmd.description || "暂无描述"} · 范围：${scopeLabel}`,
+        text: cmd.description || "暂无描述",
         cls: "vo-actions-compact-desc"
       });
 
@@ -722,11 +726,35 @@ class SmartCommandEditModal extends Modal {
       );
 
     new Setting(contentEl)
-      .setName("指令模板")
-      .setDesc("点击后发送给 Claudian 的完整内容，可使用 {{selection}}、{{content}}、{{book_title}}、{{chapter}}")
+      .setName("指令来源")
+      .setDesc("模板模式直接发送下方内容；Skill 文件模式会让 Claudian 按路径读取最新的 SKILL.md")
+      .addDropdown(dd => dd
+        .addOption("template", "指令模板")
+        .addOption("skill", "Skill 文件")
+        .setValue(draft.source || "template")
+        .onChange(value => {
+          draft = {
+            ...draft,
+            source: value === "skill" ? "skill" : "template"
+          };
+        })
+      );
+
+    new Setting(contentEl)
+      .setName("Skill 目录")
+      .setDesc("仅用于 Skill 文件模式。填写知识库相对目录，调用时会把对应 SKILL.md 路径交给 Claudian 读取；也可直接填写完整相对路径")
+      .addText(text => text
+        .setPlaceholder("例如：09 Books/skill/fable")
+        .setValue(draft.skillPath || "")
+        .onChange(value => { draft = { ...draft, skillPath: value }; })
+      );
+
+    new Setting(contentEl)
+      .setName("指令内容")
+      .setDesc("模板模式下是完整指令；Skill 文件模式下是可选的任务补充。支持 {{selection}}、{{content}}、{{book_title}}、{{chapter}}")
       .addTextArea(text => {
         text
-          .setPlaceholder("@skills/sprouting-thought 请对以下内容进行发芽思考：\n\n{{selection}}")
+          .setPlaceholder("请处理以下阅读内容：\n\n{{selection}}")
           .setValue(draft.prompt)
           .onChange(value => { draft = { ...draft, prompt: value }; });
         text.inputEl.rows = 5;
@@ -750,6 +778,22 @@ class SmartCommandEditModal extends Modal {
     const saveBtn = right.createEl("button", { text: "Save", cls: "mod-cta" });
     saveBtn.style.marginLeft = "8px";
     saveBtn.addEventListener("click", () => {
+      const source = draft.source === "skill" ? "skill" : "template";
+      const skillPath = (draft.skillPath || "").trim();
+      if (source === "skill") {
+        try {
+          const skillFilePath = resolveSkillFilePath(skillPath);
+          const skillFile = this.app.vault.getAbstractFileByPath(skillFilePath);
+          if (!(skillFile instanceof TFile)) {
+            new Notice(`找不到 Skill 文件：${skillFilePath}`);
+            return;
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          new Notice(message);
+          return;
+        }
+      }
       const toSave: SmartCommand = {
         ...draft,
         label: draft.label.trim() || "新指令",
@@ -757,7 +801,9 @@ class SmartCommandEditModal extends Modal {
         icon: draft.icon.trim() || "bot",
         prompt: draft.prompt.trim(),
         scope: draft.scope || "both",
-        enabled: draft.enabled !== false
+        enabled: draft.enabled !== false,
+        source,
+        skillPath
       };
       void this.onSave(toSave).then(() => this.close());
     });

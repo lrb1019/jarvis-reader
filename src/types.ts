@@ -1,5 +1,6 @@
 // Shared type definitions for Jarvis Reader
 // Sourced from main.js runtime shapes, verified against stable DEFAULT_SETTINGS (L52776-52808)
+import type { SmartCommand } from "./smart-command-core";
 
 // --- Highlight types ---
 
@@ -211,6 +212,7 @@ export interface JarvisReaderSettings {
   sm2EasyBonus: number;
   sm2LapseMultiplier: number;
   sm2MaxInterval: number;
+  smartCommands: SmartCommand[];
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &
