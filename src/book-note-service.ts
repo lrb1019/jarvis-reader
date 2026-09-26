@@ -4,7 +4,7 @@ import type { HighlightNoteDetails } from "./highlights.ts";
 export interface BookNoteOperations {
   appendHighlight(noteFile: unknown, highlight: BookHighlight): Promise<void>;
   appendReflection(noteFile: unknown, highlight: BookHighlight, reflection: string): Promise<void>;
-  replaceHighlight(noteFile: unknown, highlight: BookHighlight): Promise<void>;
+  replaceHighlight(noteFile: unknown, highlight: BookHighlight, expected?: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">): Promise<void>;
   deleteHighlight(noteFile: unknown, highlight: BookHighlight): Promise<void>;
   readHighlightDetails(noteFile: unknown, highlight: BookHighlight): Promise<HighlightNoteDetails>;
 }
@@ -24,8 +24,8 @@ export class BookNoteService {
     return this.operations.appendReflection(noteFile, highlight, reflection);
   }
 
-  replaceHighlight(noteFile: unknown, highlight: BookHighlight): Promise<void> {
-    return this.operations.replaceHighlight(noteFile, highlight);
+  replaceHighlight(noteFile: unknown, highlight: BookHighlight, expected?: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">): Promise<void> {
+    return this.operations.replaceHighlight(noteFile, highlight, expected);
   }
 
   deleteHighlight(noteFile: unknown, highlight: BookHighlight): Promise<void> {

@@ -1,4 +1,5 @@
 import { buildHighlightMetadata } from "./highlight-core.ts";
+import { HighlightContentConflictError } from "./book-note-document.ts";
 import type { BookHighlight, PersistedBookHighlight } from "./types.ts";
 
 export interface HighlightTransactionAdapter {
@@ -16,6 +17,21 @@ export interface HighlightTransactionHost {
   writeNote(path: string, content: string): Promise<void>;
   getBookHighlights(bookPath: string): BookHighlight[];
   replaceBookHighlights(bookPath: string, highlights: BookHighlight[], reason: string): Promise<void>;
+}
+
+export async function writeExistingRecoveryNote<File>(
+  path: string,
+  content: string,
+  indexedFile: File | null,
+  modify: (file: File, content: string) => Promise<void>,
+  adapter: Pick<HighlightTransactionAdapter, "exists" | "write">,
+): Promise<void> {
+  if (indexedFile) {
+    await modify(indexedFile, content);
+    return;
+  }
+  if (!await adapter.exists(path)) throw new Error(`找不到书籍笔记：${path}`);
+  await adapter.write(path, content);
 }
 
 export interface HighlightTransactionRequest {
@@ -106,6 +122,10 @@ export class HighlightTransactionService {
     try {
       await request.applyMarkdown();
     } catch (error) {
+      if (error instanceof HighlightContentConflictError) {
+        await this.host.adapter.remove(pendingPath);
+        throw error;
+      }
       await this.rollbackMarkdown(pending, pendingPath, error);
       throw error;
     }

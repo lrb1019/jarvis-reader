@@ -22,7 +22,7 @@ import { KnowledgeNoteService } from "./knowledge-note-service";
 import { createKnowledgeNoteStorage } from "./knowledge-note-store";
 import { CoverCacheService } from "./cover-cache-service";
 import type { BookCoverCache, BookCoverCacheEntry } from "./types";
-import { HighlightTransactionService } from "./highlight-transaction-service";
+import { HighlightTransactionService, writeExistingRecoveryNote } from "./highlight-transaction-service";
 import { SettingsSaveQueue } from "./settings-save-queue";
 import { BookStateService } from "./book-state-service";
 import {
@@ -58,8 +58,14 @@ export default class JarvisReaderPlugin extends Plugin {
     },
     writeNote: async (path, content) => {
       const file = this.app.vault.getAbstractFileByPath(path);
-      if (!(file instanceof TFile)) throw new Error(`找不到书籍笔记：${path}`);
-      await this.app.vault.modify(file, content);
+      // 启动恢复可能早于 Obsidian 完成笔记索引。
+      await writeExistingRecoveryNote<TFile>(
+        path,
+        content,
+        file instanceof TFile ? file : null,
+        (note, body) => this.app.vault.modify(note, body),
+        this.app.vault.adapter,
+      );
     },
     getBookHighlights: (bookPath) => this.settings?.bookHighlights?.[bookPath] || [],
     replaceBookHighlights: (bookPath, highlights, reason) => this.highlightService.replaceBookHighlights(bookPath, highlights, reason),

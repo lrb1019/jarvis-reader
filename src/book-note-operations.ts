@@ -13,7 +13,7 @@ export function createBookNoteOperations(app: App): BookNoteOperations {
   return {
     appendHighlight: (noteFile, highlight) => appendHighlightToBookNote(app, noteFile as TFile, highlight),
     appendReflection: (noteFile, highlight, reflection) => appendReflectionToBookNote(app, noteFile as TFile, highlight, reflection),
-    replaceHighlight: (noteFile, highlight) => replaceHighlightInBookNote(app, noteFile as TFile, highlight),
+    replaceHighlight: (noteFile, highlight, expected) => replaceHighlightInBookNote(app, noteFile as TFile, highlight, expected),
     deleteHighlight: (noteFile, highlight) => deleteHighlightFromBookNote(app, noteFile as TFile, highlight),
     readHighlightDetails: (noteFile, highlight) => readHighlightNoteDetailsFromBookNote(app, noteFile as TFile, highlight),
   };

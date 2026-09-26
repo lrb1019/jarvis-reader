@@ -89,7 +89,18 @@ async function readValidatedSidecar<T>(
   path: string,
   parse: (payload: unknown) => T | null,
 ): Promise<SidecarReadResult<T>> {
-  if (!await adapter.exists(path)) return { status: "missing" };
+  if (!await adapter.exists(path)) {
+    const backupPath = `${path}.bak`;
+    if (!await adapter.exists(backupPath)) return { status: "missing" };
+    try {
+      const backup = parse(JSON.parse(await adapter.read(backupPath)));
+      if (!backup) return { status: "invalid" };
+      await adapter.rename(backupPath, path);
+      return { status: "ready", value: backup };
+    } catch {
+      return { status: "invalid" };
+    }
+  }
   try {
     const value = parse(JSON.parse(await adapter.read(path)));
     return value ? { status: "ready", value } : { status: "invalid" };

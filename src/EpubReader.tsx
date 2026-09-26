@@ -11,6 +11,7 @@ import { dedupeHighlightsByCfi } from "./highlight-core";
 import { formatLocalDateTime } from "./utils-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
+import type { HighlightNoteDetails } from "./book-note-document";
 import { triggerClaudianPrompt, prepareSmartCommandPromptFromVault } from "./claudianBridge";
 import type { SmartCommand } from "./claudianBridge";
 import { ReaderSideControls } from "./reader/ReaderSideControls";
@@ -1964,6 +1965,12 @@ const showWordHoverCard = (asset, element) => {
     clearHighlightUi();
   };
 
+  const expectedHighlightDetails = (item: Partial<HighlightNoteDetails>): Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections"> => ({
+    quote: item.quote || "",
+    commentEntries: item.commentEntries || [],
+    aiSections: item.aiSections || [],
+  });
+
   const deleteNoteEntry = async (indexToDelete: number) => {
     if (!pendingSelection) return;
     const currentEntries = Array.isArray(pendingSelection.commentEntries) ? [...pendingSelection.commentEntries] : [];
@@ -1973,6 +1980,7 @@ const showWordHoverCard = (asset, element) => {
     // Usually no, we just clear comments, leaving a plain highlight.
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       commentEntries: nextEntries,
       comment: nextEntries.map((e: any) => e.text).join("\n\n")
     });
@@ -2011,6 +2019,7 @@ const showWordHoverCard = (asset, element) => {
         }
         updated = await updateHighlight({
           ...pendingSelection,
+          expectedDetails: expectedHighlightDetails(pendingSelection),
           commentEntries: currentEntries,
           comment: currentEntries.map((e: any) => e.text).join("\n\n")
         });
@@ -2175,6 +2184,7 @@ const showWordHoverCard = (asset, element) => {
     
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       aiSections: currentSections
     });
     if (updated) {
@@ -2200,6 +2210,7 @@ const showWordHoverCard = (asset, element) => {
     
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       aiSections: currentSections
     });
     if (updated) {

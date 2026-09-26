@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   HighlightTransactionService,
+  writeExistingRecoveryNote,
   type HighlightTransactionAdapter,
   type HighlightTransactionHost,
 } from "../src/highlight-transaction-service.ts";
 import type { BookHighlight } from "../src/types.ts";
+import { HighlightContentConflictError } from "../src/book-note-document.ts";
 
 class MemoryTransactionAdapter implements HighlightTransactionAdapter {
   files = new Map<string, string>();
@@ -99,6 +101,53 @@ function pendingFiles(adapter: MemoryTransactionAdapter): string[] {
   return [...adapter.files.keys()].filter((path) => path.includes("/pending/highlights/"));
 }
 
+test("startup recovery writes an existing note before Obsidian indexes it", async () => {
+  const adapter = new MemoryTransactionAdapter();
+  adapter.files.set(previousHighlight.notePath, "incomplete markdown");
+  let indexedModifyCalled = false;
+
+  await writeExistingRecoveryNote<string>(
+    previousHighlight.notePath,
+    "restored markdown",
+    null,
+    async () => { indexedModifyCalled = true; },
+    adapter,
+  );
+
+  assert.equal(adapter.files.get(previousHighlight.notePath), "restored markdown");
+  assert.equal(indexedModifyCalled, false);
+});
+
+test("startup recovery does not recreate a deleted note", async () => {
+  const adapter = new MemoryTransactionAdapter();
+
+  await assert.rejects(writeExistingRecoveryNote<string>(
+    previousHighlight.notePath,
+    "restored markdown",
+    null,
+    async () => {},
+    adapter,
+  ), /找不到书籍笔记/);
+
+  assert.equal(adapter.files.has(previousHighlight.notePath), false);
+});
+
+test("recovery uses Obsidian's modify method for an indexed note", async () => {
+  const adapter = new MemoryTransactionAdapter();
+  let modified = "";
+
+  await writeExistingRecoveryNote(
+    previousHighlight.notePath,
+    "restored markdown",
+    previousHighlight.notePath,
+    async (_file, content) => { modified = content; },
+    adapter,
+  );
+
+  assert.equal(modified, "restored markdown");
+  assert.equal(adapter.files.has(previousHighlight.notePath), false);
+});
+
 test("highlight transaction commits Markdown and index before clearing its recovery record", async () => {
   const adapter = new MemoryTransactionAdapter();
   const state = createHost(adapter);
@@ -134,6 +183,26 @@ test("index failure restores the previous Markdown and removes the resolved reco
   }), /Simulated index failure/);
 
   assert.equal(state.note, "before markdown");
+  assert.equal(state.highlights[0].updated, previousHighlight.updated);
+  assert.equal(pendingFiles(adapter).length, 0);
+});
+
+test("rejected stale edit leaves newer Markdown untouched and clears its recovery record", async () => {
+  const adapter = new MemoryTransactionAdapter();
+  const state = createHost(adapter);
+  state.note = "newer edit from another interface";
+  const service = new HighlightTransactionService(state.host);
+
+  await assert.rejects(service.execute({
+    bookPath: previousHighlight.bookPath,
+    notePath: previousHighlight.notePath,
+    reason: "update-highlight",
+    previousHighlights: [previousHighlight],
+    nextHighlights: [nextHighlight],
+    applyMarkdown: async () => { throw new HighlightContentConflictError(); },
+  }), /其他位置修改/);
+
+  assert.equal(state.note, "newer edit from another interface");
   assert.equal(state.highlights[0].updated, previousHighlight.updated);
   assert.equal(pendingFiles(adapter).length, 0);
 });

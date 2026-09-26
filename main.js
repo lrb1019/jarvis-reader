@@ -53690,6 +53690,12 @@ function buildHighlightNoteUpdate(current, incoming, comment, updated) {
 
 // src/book-note-document.ts
 init_utils_core();
+var HighlightContentConflictError = class extends Error {
+  constructor() {
+    super("\u8FD9\u6761\u5212\u7EBF\u7684\u7B14\u8BB0\u5DF2\u5728\u5176\u4ED6\u4F4D\u7F6E\u4FEE\u6539\u3002\u8BF7\u91CD\u65B0\u6253\u5F00\u540E\u518D\u7F16\u8F91\u3002");
+    this.name = "HighlightContentConflictError";
+  }
+};
 function normalizeHeadingText(text) {
   return (text || "").replace(/\s+/g, " ").replace(/#+\s*$/g, "").trim();
 }
@@ -53868,6 +53874,13 @@ function replaceHighlightDocument(content, highlight) {
   lines.splice(range.startIndex, range.blockIndex - range.startIndex + 1, ...formatHighlightNoteBlock(highlight).split("\n"));
   return lines.join("\n");
 }
+function replaceHighlightDocumentIfUnchanged(content, highlight, expected) {
+  if (!getBlockRange(content.split(/\r?\n/), highlight.blockId)) throw new HighlightContentConflictError();
+  const current = readHighlightDetailsDocument(content, highlight);
+  const same = current.quote === expected.quote && JSON.stringify(current.commentEntries) === JSON.stringify(expected.commentEntries) && JSON.stringify(current.aiSections) === JSON.stringify(expected.aiSections);
+  if (!same) throw new HighlightContentConflictError();
+  return replaceHighlightDocument(content, highlight);
+}
 function deleteHighlightDocument(content, blockId) {
   const lines = content.split(/\r?\n/);
   const range = getBlockRange(lines, blockId);
@@ -53895,7 +53908,11 @@ async function appendReflectionToBookNote(app, noteFile, highlight, reflection) 
 async function readHighlightNoteDetailsFromBookNote(app, noteFile, highlight) {
   return readHighlightDetailsDocument(await app.vault.read(noteFile), highlight);
 }
-async function replaceHighlightInBookNote(app, noteFile, highlight) {
+async function replaceHighlightInBookNote(app, noteFile, highlight, expected) {
+  if (expected) {
+    await app.vault.process(noteFile, (content2) => replaceHighlightDocumentIfUnchanged(content2, highlight, expected));
+    return;
+  }
   const content = await app.vault.read(noteFile);
   await app.vault.modify(noteFile, replaceHighlightDocument(content, highlight));
 }
@@ -57590,12 +57607,18 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }
     clearHighlightUi();
   };
+  const expectedHighlightDetails = (item) => ({
+    quote: item.quote || "",
+    commentEntries: item.commentEntries || [],
+    aiSections: item.aiSections || []
+  });
   const deleteNoteEntry = async (indexToDelete) => {
     if (!pendingSelection) return;
     const currentEntries = Array.isArray(pendingSelection.commentEntries) ? [...pendingSelection.commentEntries] : [];
     const nextEntries = currentEntries.filter((_, idx) => idx !== indexToDelete);
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       commentEntries: nextEntries,
       comment: nextEntries.map((e) => e.text).join("\n\n")
     });
@@ -57634,6 +57657,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         }
         updated = await updateHighlight({
           ...pendingSelection,
+          expectedDetails: expectedHighlightDetails(pendingSelection),
           commentEntries: currentEntries,
           comment: currentEntries.map((e) => e.text).join("\n\n")
         });
@@ -57801,6 +57825,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     assocSec.links = [...currentLinks, `${fileName}|${nowStr}`];
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       aiSections: currentSections
     });
     if (updated) {
@@ -57821,6 +57846,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     assocSec.links = assocSec.links.filter((l) => l.split("|")[0] !== fileName);
     const updated = await updateHighlight({
       ...pendingSelection,
+      expectedDetails: expectedHighlightDetails(pendingSelection),
       aiSections: currentSections
     });
     if (updated) {
@@ -59137,7 +59163,11 @@ var EpubView = class extends import_obsidian7.FileView {
       return true;
     } catch (error) {
       console.error("Jarvis Reader highlight transaction failed.", error);
-      new import_obsidian7.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+      if (error instanceof HighlightContentConflictError) {
+        new import_obsidian7.Notice(error.message, 0);
+      } else {
+        new import_obsidian7.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+      }
       return false;
     }
   }
@@ -59259,7 +59289,11 @@ var EpubView = class extends import_obsidian7.FileView {
         updated.aiSections = details.aiSections;
         nextHighlights[index] = updated;
       } else {
-        await this.plugin.bookNoteService.replaceHighlight(noteFile, updated);
+        await this.plugin.bookNoteService.replaceHighlight(
+          noteFile,
+          updated,
+          highlight.expectedDetails
+        );
       }
     })) {
       return null;
@@ -61518,7 +61552,7 @@ function LibraryApp({ plugin }) {
       highlights: totalHighlights,
       words: totalWords
     };
-  }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
+  }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress, refreshTrigger]);
   const selectedStats = React5.useMemo(() => {
     const today = (0, import_obsidian13.moment)(statsDate);
     let startDate;
@@ -67214,8 +67248,8 @@ var BookNoteService = class {
   appendReflection(noteFile, highlight, reflection) {
     return this.operations.appendReflection(noteFile, highlight, reflection);
   }
-  replaceHighlight(noteFile, highlight) {
-    return this.operations.replaceHighlight(noteFile, highlight);
+  replaceHighlight(noteFile, highlight, expected) {
+    return this.operations.replaceHighlight(noteFile, highlight, expected);
   }
   deleteHighlight(noteFile, highlight) {
     return this.operations.deleteHighlight(noteFile, highlight);
@@ -67230,7 +67264,7 @@ function createBookNoteOperations(app) {
   return {
     appendHighlight: (noteFile, highlight) => appendHighlightToBookNote(app, noteFile, highlight),
     appendReflection: (noteFile, highlight, reflection) => appendReflectionToBookNote(app, noteFile, highlight, reflection),
-    replaceHighlight: (noteFile, highlight) => replaceHighlightInBookNote(app, noteFile, highlight),
+    replaceHighlight: (noteFile, highlight, expected) => replaceHighlightInBookNote(app, noteFile, highlight, expected),
     deleteHighlight: (noteFile, highlight) => deleteHighlightFromBookNote(app, noteFile, highlight),
     readHighlightDetails: (noteFile, highlight) => readHighlightNoteDetailsFromBookNote(app, noteFile, highlight)
   };
@@ -67395,6 +67429,14 @@ var CoverCacheService = class {
 };
 
 // src/highlight-transaction-service.ts
+async function writeExistingRecoveryNote(path, content, indexedFile, modify, adapter) {
+  if (indexedFile) {
+    await modify(indexedFile, content);
+    return;
+  }
+  if (!await adapter.exists(path)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
+  await adapter.write(path, content);
+}
 var PENDING_FOLDER = ".obsidian/plugins/jarvis-reader/pending/highlights";
 function isRecord4(value) {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -67446,6 +67488,10 @@ var HighlightTransactionService = class {
     try {
       await request.applyMarkdown();
     } catch (error) {
+      if (error instanceof HighlightContentConflictError) {
+        await this.host.adapter.remove(pendingPath);
+        throw error;
+      }
       await this.rollbackMarkdown(pending, pendingPath, error);
       throw error;
     }
@@ -67695,7 +67741,18 @@ async function ensureSidecarFolder(adapter, folderPath) {
   }
 }
 async function readValidatedSidecar(adapter, path, parse) {
-  if (!await adapter.exists(path)) return { status: "missing" };
+  if (!await adapter.exists(path)) {
+    const backupPath = `${path}.bak`;
+    if (!await adapter.exists(backupPath)) return { status: "missing" };
+    try {
+      const backup = parse(JSON.parse(await adapter.read(backupPath)));
+      if (!backup) return { status: "invalid" };
+      await adapter.rename(backupPath, path);
+      return { status: "ready", value: backup };
+    } catch {
+      return { status: "invalid" };
+    }
+  }
   try {
     const value = parse(JSON.parse(await adapter.read(path)));
     return value ? { status: "ready", value } : { status: "invalid" };
@@ -67753,8 +67810,13 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     },
     writeNote: async (path, content) => {
       const file = this.app.vault.getAbstractFileByPath(path);
-      if (!(file instanceof import_obsidian23.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
-      await this.app.vault.modify(file, content);
+      await writeExistingRecoveryNote(
+        path,
+        content,
+        file instanceof import_obsidian23.TFile ? file : null,
+        (note, body) => this.app.vault.modify(note, body),
+        this.app.vault.adapter
+      );
     },
     getBookHighlights: (bookPath) => this.settings?.bookHighlights?.[bookPath] || [],
     replaceBookHighlights: (bookPath, highlights, reason) => this.highlightService.replaceBookHighlights(bookPath, highlights, reason)

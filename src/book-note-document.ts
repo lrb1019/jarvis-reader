@@ -25,6 +25,13 @@ export interface HighlightNoteDetails {
   aiSections: HighlightAiSection[];
 }
 
+export class HighlightContentConflictError extends Error {
+  constructor() {
+    super("这条划线的笔记已在其他位置修改。请重新打开后再编辑。");
+    this.name = "HighlightContentConflictError";
+  }
+}
+
 type HighlightDetailsSource = Pick<BookHighlight, "blockId"> & Partial<Pick<BookHighlight, "quote" | "comment">>;
 
 function normalizeHeadingText(text: string): string {
@@ -214,6 +221,20 @@ export function replaceHighlightDocument(content: string, highlight: BookHighlig
   if (!range) return insertHighlightDocument(content, highlight);
   lines.splice(range.startIndex, range.blockIndex - range.startIndex + 1, ...formatHighlightNoteBlock(highlight).split("\n"));
   return lines.join("\n");
+}
+
+export function replaceHighlightDocumentIfUnchanged(
+  content: string,
+  highlight: BookHighlight,
+  expected: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">,
+): string {
+  if (!getBlockRange(content.split(/\r?\n/), highlight.blockId)) throw new HighlightContentConflictError();
+  const current = readHighlightDetailsDocument(content, highlight);
+  const same = current.quote === expected.quote
+    && JSON.stringify(current.commentEntries) === JSON.stringify(expected.commentEntries)
+    && JSON.stringify(current.aiSections) === JSON.stringify(expected.aiSections);
+  if (!same) throw new HighlightContentConflictError();
+  return replaceHighlightDocument(content, highlight);
 }
 
 export function deleteHighlightDocument(content: string, blockId: string): string {

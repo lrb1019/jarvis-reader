@@ -15,7 +15,7 @@ import { EpubReader, getLightWordAsset } from "./EpubReader";
 import type { JarvisReaderSettings, BookHighlight } from "./types";
 import { ReadingStatsService } from "./reading-stats-service";
 import { buildKnowledgeNoteBody } from "./knowledge-note";
-import type { HighlightCommentEntry } from "./book-note-document";
+import { HighlightContentConflictError, type HighlightCommentEntry, type HighlightNoteDetails } from "./book-note-document";
 import { openFileInActiveTab } from "./workspace-navigation";
 
 function getWordAssetsMap(settings: any): Record<string, any> {
@@ -176,7 +176,11 @@ export class EpubView extends FileView {
       return true;
     } catch (error) {
       console.error("Jarvis Reader highlight transaction failed.", error);
-      new Notice(`高亮操作失败，系统已尝试恢复操作前状态：${error instanceof Error ? error.message : "未知错误"}`, 0);
+      if (error instanceof HighlightContentConflictError) {
+        new Notice(error.message, 0);
+      } else {
+        new Notice(`高亮操作失败，系统已尝试恢复操作前状态：${error instanceof Error ? error.message : "未知错误"}`, 0);
+      }
       return false;
     }
   }
@@ -303,7 +307,11 @@ export class EpubView extends FileView {
         (updated as any).aiSections = details.aiSections;
         nextHighlights[index] = updated;
       } else {
-        await this.plugin.bookNoteService.replaceHighlight(noteFile, updated);
+        await this.plugin.bookNoteService.replaceHighlight(
+          noteFile,
+          updated,
+          highlight.expectedDetails as Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections"> | undefined,
+        );
       }
     })) {
       return null;

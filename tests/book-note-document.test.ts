@@ -6,6 +6,7 @@ import {
   insertHighlightDocument,
   readHighlightDetailsDocument,
   replaceHighlightDocument,
+  replaceHighlightDocumentIfUnchanged,
 } from "../src/book-note-document.ts";
 import type { BookHighlight } from "../src/types.ts";
 
@@ -51,6 +52,26 @@ test("replaces only the selected block and leaves surrounding manual Markdown un
   assert.match(result, /更新原文/);
   assert.match(result, /更新笔记/);
   assert.doesNotMatch(result, /原文第一行/);
+});
+
+test("stale editor cannot overwrite a note added elsewhere to the same highlight", () => {
+  const first = insertHighlightDocument("# A\n", makeHighlight());
+  const expected = readHighlightDetailsDocument(first, makeHighlight());
+  const changedElsewhere = appendReflectionDocument(first, makeHighlight(), "另一处刚保存的笔记");
+  const edited = makeHighlight({ comment: "第一条笔记已改" });
+
+  assert.throws(() => replaceHighlightDocumentIfUnchanged(changedElsewhere, edited, expected), /其他位置修改/);
+  assert.match(changedElsewhere, /另一处刚保存的笔记/);
+  assert.match(replaceHighlightDocumentIfUnchanged(first, edited, expected), /第一条笔记已改/);
+});
+
+test("stale editor cannot recreate a highlight block removed elsewhere", () => {
+  const first = insertHighlightDocument("# A\n", makeHighlight());
+  const expected = readHighlightDetailsDocument(first, makeHighlight());
+  const removed = deleteHighlightDocument(first, "h-1");
+
+  assert.throws(() => replaceHighlightDocumentIfUnchanged(removed, makeHighlight({ comment: "旧编辑" }), expected), /其他位置修改/);
+  assert.doesNotMatch(removed, /\^h-1/);
 });
 
 test("deletes only the selected highlight block", () => {

@@ -680,7 +680,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       highlights: totalHighlights,
       words: totalWords,
     };
-  }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress]);
+  }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress, refreshTrigger]);
 
   // Detailed stats for the Jarvis Reader stats modal
   const selectedStats = React.useMemo(() => {

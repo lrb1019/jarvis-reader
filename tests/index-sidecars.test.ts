@@ -122,6 +122,41 @@ test("invalid sidecars are rejected without modifying their original content", a
   assert.equal(adapter.files.get(highlightPath), invalidHighlightContent);
 });
 
+test("startup restores a validated backup when atomic replacement lost the primary file", async () => {
+  const adapter = new MemorySidecarAdapter();
+  await writeHighlightSidecar(adapter, highlightPath, bookHighlights, "2026-07-10T00:00:00.000Z");
+  await writeWordAssetSidecar(adapter, wordAssetPath, wordAssets, "2026-07-10T00:00:00.000Z");
+  const originalHighlight = adapter.files.get(highlightPath)!;
+  const originalWords = adapter.files.get(wordAssetPath)!;
+  await adapter.rename(highlightPath, `${highlightPath}.bak`);
+  await adapter.rename(wordAssetPath, `${wordAssetPath}.bak`);
+
+  assert.deepEqual(await readHighlightSidecar(adapter, highlightPath), { status: "ready", value: bookHighlights });
+  assert.deepEqual(await readWordAssetSidecar(adapter, wordAssetPath), { status: "ready", value: wordAssets });
+  assert.equal(adapter.files.get(highlightPath), originalHighlight);
+  assert.equal(adapter.files.get(wordAssetPath), originalWords);
+  assert.equal(adapter.files.has(`${highlightPath}.bak`), false);
+  assert.equal(adapter.files.has(`${wordAssetPath}.bak`), false);
+});
+
+test("invalid backup cannot turn a missing primary sidecar into empty data", async () => {
+  const adapter = new MemorySidecarAdapter();
+  adapter.files.set(`${highlightPath}.bak`, "{broken backup");
+
+  assert.deepEqual(await readHighlightSidecar(adapter, highlightPath), { status: "invalid" });
+  assert.equal(adapter.files.has(highlightPath), false);
+  assert.equal(adapter.files.get(`${highlightPath}.bak`), "{broken backup");
+});
+
+test("valid primary stays authoritative when a stale backup exists", async () => {
+  const adapter = new MemorySidecarAdapter();
+  await writeHighlightSidecar(adapter, highlightPath, bookHighlights, "2026-07-10T00:00:00.000Z");
+  adapter.files.set(`${highlightPath}.bak`, "{broken backup");
+
+  assert.deepEqual(await readHighlightSidecar(adapter, highlightPath), { status: "ready", value: bookHighlights });
+  assert.equal(adapter.files.get(`${highlightPath}.bak`), "{broken backup");
+});
+
 test("highlight sidecars reload index metadata without Markdown content copies", async () => {
   const adapter = new MemorySidecarAdapter();
   const indexOnlyHighlights = {
