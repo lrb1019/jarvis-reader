@@ -37,8 +37,8 @@ Management documents define intended boundaries. Current code and runtime eviden
 ## Current Baseline
 
 - Product: Jarvis Reader
-- Baseline release: `1.3.1`
-- Baseline commit: `bbc485c`
+- Baseline release: `1.3.3`
+- Baseline release commit: `e75b7ac`
 - Main branch: `main`
 - Obsidian minimum version: `0.15.0`
 - Source of implementation: `src/`
