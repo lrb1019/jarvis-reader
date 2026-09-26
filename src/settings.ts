@@ -132,65 +132,56 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     titleEl.style.color = "var(--text-normal)";
     
     const tabsContainer = headerDiv.createDiv("jarvis-settings-tabs-container");
-    tabsContainer.style.display = "flex";
-    tabsContainer.style.gap = "16px";
-    tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     
     const tabs = [
       { 
         id: "storage", 
-        label: "目录与文件",
+        label: "笔记与文件",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path></svg>`
       },
       { 
         id: "translation", 
-        label: "AI 与翻译",
+        label: "翻译服务",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
       },
       { 
         id: "words", 
-        label: "词句发音与显示",
+        label: "词句标记与发音",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
       },
       { 
         id: "appearance", 
-        label: "阅读器与外观",
+        label: "阅读外观",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
       },
       { 
         id: "review", 
-        label: "记忆与复习",
+        label: "记忆复习",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
       },
       { 
         id: "smartcmd", 
-        label: "智能指令",
+        label: "扩展指令",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 8v4l3 3"></path><circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle></svg>`
       }
     ];
 
     tabs.forEach(tab => {
-      const tabEl = tabsContainer.createDiv("jarvis-settings-tab");
+      const tabEl = tabsContainer.createEl("button", {
+        cls: "jarvis-settings-tab",
+        attr: { type: "button", "aria-current": this.activeTab === tab.id ? "page" : "false" }
+      });
       tabEl.innerHTML = tab.icon + tab.label;
-      tabEl.style.display = "inline-flex";
-      tabEl.style.alignItems = "center";
-      tabEl.style.cursor = "pointer";
-      tabEl.style.padding = "6px 2px";
-      tabEl.style.fontWeight = "500";
-      tabEl.style.fontSize = "13px";
-      tabEl.style.color = this.activeTab === tab.id ? "var(--text-accent)" : "var(--text-muted)";
-      tabEl.style.borderBottom = this.activeTab === tab.id ? "2px solid var(--text-accent)" : "2px solid transparent";
-      tabEl.style.transition = "all 0.15s ease";
-      
-      tabEl.onclick = () => {
+      tabEl.addEventListener("click", () => {
         this.activeTab = tab.id;
         this.display();
-      };
+      });
     });
 
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
 
     if (this.activeTab === "storage") {
+      new Setting(contentDiv).setName("读书笔记").setHeading();
       let bookFolderText: any = null;
       new Setting(contentDiv).setName("读书笔记文件夹").setDesc("保存自动生成读书笔记的文件夹").addText((text) => {
         bookFolderText = text;
@@ -214,6 +205,23 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         }
       }));
 
+      new Setting(contentDiv).setName("知识笔记").setHeading();
+      let knowledgeFolderText: any = null;
+      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("从阅读感想提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
+        knowledgeFolderText = text;
+        text.setPlaceholder("如: 知识库/想法").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("选择").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.knowledgeNoteFolder = path;
+          await this.plugin.saveSettings();
+          knowledgeFolderText?.setValue(path);
+        }).open();
+      }));
+
+      new Setting(contentDiv).setName("其他文件").setHeading();
       let customCoverFolderText: any = null;
       new Setting(contentDiv).setName("自定义封面文件夹").setDesc("保存自定义图书封面的文件夹路径").addText((text) => {
         customCoverFolderText = text;
@@ -260,22 +268,8 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         }
       }));
 
-      let knowledgeFolderText: any = null;
-      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("从阅读感想提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
-        knowledgeFolderText = text;
-        text.setPlaceholder("如: 知识库/想法").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("选择").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.knowledgeNoteFolder = path;
-          await this.plugin.saveSettings();
-          knowledgeFolderText?.setValue(path);
-        }).open();
-      }));
-
-      new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
+      new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}")
+        .setClass("jarvis-settings-book-note-template").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -290,14 +284,9 @@ created: {{created}}
           this.plugin.settings.bookNoteTemplate = value;
           await this.plugin.saveSettings();
         });
-        text.inputEl.rows = 13;
-        text.inputEl.style.width = "100%";
+        text.inputEl.rows = 7;
       });
 
-      new Setting(contentDiv).setName("自动标记单词").setDesc("开启后，在 EPUB 阅读器中会自动使用蓝色下划线标记已保存的单词。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
-        this.plugin.settings.enableAutoHighlight = value;
-        await this.plugin.saveSettings();
-      }));
     }
     
     if (this.activeTab === "translation") {
@@ -404,12 +393,22 @@ created: {{created}}
     }
 
     if (this.activeTab === "words") {
+      new Setting(contentDiv).setName("已保存词句的标记").setHeading();
+      new Setting(contentDiv).setName("在书中标记已保存的词句").setDesc("开启后，阅读器会标记已保存且能在当前书中定位的单词、短语和句子；关闭后仍保留词句记录。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+        this.plugin.settings.enableAutoHighlight = value;
+        await this.plugin.saveSettings();
+      }));
+      this.createColorPicker(contentDiv, "单词颜色", "已保存单词在阅读器中的标记颜色", "word");
+      this.createColorPicker(contentDiv, "短语颜色", "已保存短语在阅读器中的标记颜色", "phrase");
+      this.createColorPicker(contentDiv, "句子颜色", "已保存句子在阅读器中的标记颜色", "sentence");
 
+      new Setting(contentDiv).setName("词句卡片").setHeading();
       new Setting(contentDiv).setName("模糊词句卡片正文").setDesc("只模糊可滚动的词句卡片正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
 
+      new Setting(contentDiv).setName("发音").setHeading();
       new Setting(contentDiv).setName("启用单词发音").setDesc("优先使用发音链接；失败时回退到浏览器语音合成").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
@@ -460,29 +459,9 @@ created: {{created}}
         });
       });
 
-      const createColorPicker = (name: string, desc: string, key: "word" | "phrase" | "sentence" | "comment" | "normal") => {
-        new Setting(contentDiv)
-          .setName(name)
-          .setDesc(desc)
-          .addColorPicker(picker => picker
-            .setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key])
-            .onChange(async (value) => {
-              this.plugin.settings.highlightColors = {
-                ...(this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors),
-                [key]: value
-              };
-              await this.plugin.saveSettings();
-              const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
-              window.dispatchEvent(event);
-            })
-          );
-      };
-
-      createColorPicker("单词颜色", "自动识别的单词高亮底色", "word");
-      createColorPicker("短语颜色", "自动识别的短语高亮底色", "phrase");
-      createColorPicker("句子颜色", "自动识别的句子高亮底色", "sentence");
-      createColorPicker("笔记颜色", "带有笔记的划线颜色", "comment");
-      createColorPicker("默认高亮颜色", "普通的文本划线颜色", "normal");
+      new Setting(contentDiv).setName("划线颜色").setHeading();
+      this.createColorPicker(contentDiv, "带笔记划线颜色", "给划线添加笔记后显示的颜色", "comment");
+      this.createColorPicker(contentDiv, "普通划线颜色", "未添加笔记的普通划线颜色", "normal");
     }
     
     if (this.activeTab === "smartcmd") {
@@ -555,6 +534,19 @@ created: {{created}}
         });
     }
   }
+  private createColorPicker(containerEl: HTMLElement, name: string, desc: string, key: keyof typeof DEFAULT_SETTINGS.highlightColors): void {
+    new Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker
+      .setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key])
+      .onChange(async (value) => {
+        this.plugin.settings.highlightColors = {
+          ...(this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors),
+          [key]: value
+        };
+        await this.plugin.saveSettings();
+        window.dispatchEvent(new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors }));
+      }));
+  }
+
   private renderSmartCommandsTab(containerEl: HTMLElement): void {
     const header = containerEl.createDiv();
     header.style.display = "flex";

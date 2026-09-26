@@ -5327,3 +5327,52 @@ g.jarvis-reader-highlight-with-comment line {
 .jarvis-reader-assoc-suggest-item:hover {
   background: var(--background-modifier-hover);
 }
+.jarvis-settings-tabs-container {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.jarvis-settings-tabs-container .jarvis-settings-tab {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 8px 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.jarvis-settings-tabs-container .jarvis-settings-tab[aria-current="page"] {
+  color: var(--text-accent);
+  border-bottom-color: var(--text-accent);
+}
+
+.jarvis-settings-tabs-container .jarvis-settings-tab:hover {
+  color: var(--text-normal);
+}
+
+.jarvis-settings-content .jarvis-settings-book-note-template {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.jarvis-settings-book-note-template .setting-item-control,
+.jarvis-settings-book-note-template textarea {
+  width: 100%;
+}
+
+.jarvis-settings-book-note-template textarea {
+  box-sizing: border-box;
+  min-height: 0;
+  resize: vertical;
+}

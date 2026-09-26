@@ -63563,60 +63563,52 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
     titleEl.style.margin = "0";
     titleEl.style.color = "var(--text-normal)";
     const tabsContainer = headerDiv.createDiv("jarvis-settings-tabs-container");
-    tabsContainer.style.display = "flex";
-    tabsContainer.style.gap = "16px";
-    tabsContainer.style.borderBottom = "1px solid var(--background-modifier-border)";
     const tabs = [
       {
         id: "storage",
-        label: "\u76EE\u5F55\u4E0E\u6587\u4EF6",
+        label: "\u7B14\u8BB0\u4E0E\u6587\u4EF6",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path></svg>`
       },
       {
         id: "translation",
-        label: "AI \u4E0E\u7FFB\u8BD1",
+        label: "\u7FFB\u8BD1\u670D\u52A1",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
       },
       {
         id: "words",
-        label: "\u8BCD\u53E5\u53D1\u97F3\u4E0E\u663E\u793A",
+        label: "\u8BCD\u53E5\u6807\u8BB0\u4E0E\u53D1\u97F3",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
       },
       {
         id: "appearance",
-        label: "\u9605\u8BFB\u5668\u4E0E\u5916\u89C2",
+        label: "\u9605\u8BFB\u5916\u89C2",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
       },
       {
         id: "review",
-        label: "\u8BB0\u5FC6\u4E0E\u590D\u4E60",
+        label: "\u8BB0\u5FC6\u590D\u4E60",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
       },
       {
         id: "smartcmd",
-        label: "\u667A\u80FD\u6307\u4EE4",
+        label: "\u6269\u5C55\u6307\u4EE4",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 8v4l3 3"></path><circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle></svg>`
       }
     ];
     tabs.forEach((tab) => {
-      const tabEl = tabsContainer.createDiv("jarvis-settings-tab");
+      const tabEl = tabsContainer.createEl("button", {
+        cls: "jarvis-settings-tab",
+        attr: { type: "button", "aria-current": this.activeTab === tab.id ? "page" : "false" }
+      });
       tabEl.innerHTML = tab.icon + tab.label;
-      tabEl.style.display = "inline-flex";
-      tabEl.style.alignItems = "center";
-      tabEl.style.cursor = "pointer";
-      tabEl.style.padding = "6px 2px";
-      tabEl.style.fontWeight = "500";
-      tabEl.style.fontSize = "13px";
-      tabEl.style.color = this.activeTab === tab.id ? "var(--text-accent)" : "var(--text-muted)";
-      tabEl.style.borderBottom = this.activeTab === tab.id ? "2px solid var(--text-accent)" : "2px solid transparent";
-      tabEl.style.transition = "all 0.15s ease";
-      tabEl.onclick = () => {
+      tabEl.addEventListener("click", () => {
         this.activeTab = tab.id;
         this.display();
-      };
+      });
     });
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
+      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
       let bookFolderText = null;
       new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
         bookFolderText = text;
@@ -63639,6 +63631,22 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
           bookFolderText.setValue("");
         }
       }));
+      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
+      let knowledgeFolderText = null;
+      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u4ECE\u9605\u8BFB\u611F\u60F3\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
+        knowledgeFolderText = text;
+        text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
+          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
+          await this.plugin.saveSettings();
+        });
+      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
+        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
+          this.plugin.settings.knowledgeNoteFolder = path;
+          await this.plugin.saveSettings();
+          knowledgeFolderText?.setValue(path);
+        }).open();
+      }));
+      new import_obsidian15.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
       let customCoverFolderText = null;
       new import_obsidian15.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
         customCoverFolderText = text;
@@ -63683,21 +63691,7 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
           exportFolderText.setValue("");
         }
       }));
-      let knowledgeFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u4ECE\u9605\u8BFB\u611F\u60F3\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
-        knowledgeFolderText = text;
-        text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.knowledgeNoteFolder = path;
-          await this.plugin.saveSettings();
-          knowledgeFolderText?.setValue(path);
-        }).open();
-      }));
-      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").addTextArea((text) => {
+      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -63712,13 +63706,8 @@ created: {{created}}
           this.plugin.settings.bookNoteTemplate = value;
           await this.plugin.saveSettings();
         });
-        text.inputEl.rows = 13;
-        text.inputEl.style.width = "100%";
+        text.inputEl.rows = 7;
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u81EA\u52A8\u6807\u8BB0\u5355\u8BCD").setDesc("\u5F00\u542F\u540E\uFF0C\u5728 EPUB \u9605\u8BFB\u5668\u4E2D\u4F1A\u81EA\u52A8\u4F7F\u7528\u84DD\u8272\u4E0B\u5212\u7EBF\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u5355\u8BCD\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
-        this.plugin.settings.enableAutoHighlight = value;
-        await this.plugin.saveSettings();
-      }));
     }
     if (this.activeTab === "translation") {
       let translationBaseUrlText = null;
@@ -63807,10 +63796,20 @@ created: {{created}}
       }));
     }
     if (this.activeTab === "words") {
+      new import_obsidian15.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u53E5\u7684\u6807\u8BB0").setHeading();
+      new import_obsidian15.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u53E5").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u3001\u77ED\u8BED\u548C\u53E5\u5B50\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u53E5\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+        this.plugin.settings.enableAutoHighlight = value;
+        await this.plugin.saveSettings();
+      }));
+      this.createColorPicker(contentDiv, "\u5355\u8BCD\u989C\u8272", "\u5DF2\u4FDD\u5B58\u5355\u8BCD\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "word");
+      this.createColorPicker(contentDiv, "\u77ED\u8BED\u989C\u8272", "\u5DF2\u4FDD\u5B58\u77ED\u8BED\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "phrase");
+      this.createColorPicker(contentDiv, "\u53E5\u5B50\u989C\u8272", "\u5DF2\u4FDD\u5B58\u53E5\u5B50\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "sentence");
+      new import_obsidian15.Setting(contentDiv).setName("\u8BCD\u53E5\u5361\u7247").setHeading();
       new import_obsidian15.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
+      new import_obsidian15.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
       new import_obsidian15.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
@@ -63853,24 +63852,9 @@ created: {{created}}
           await this.plugin.saveSettings();
         });
       });
-      const createColorPicker = (name, desc, key) => {
-        new import_obsidian15.Setting(contentDiv).setName(name).setDesc(desc).addColorPicker(
-          (picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
-            this.plugin.settings.highlightColors = {
-              ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
-              [key]: value
-            };
-            await this.plugin.saveSettings();
-            const event = new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors });
-            window.dispatchEvent(event);
-          })
-        );
-      };
-      createColorPicker("\u5355\u8BCD\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u5355\u8BCD\u9AD8\u4EAE\u5E95\u8272", "word");
-      createColorPicker("\u77ED\u8BED\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u77ED\u8BED\u9AD8\u4EAE\u5E95\u8272", "phrase");
-      createColorPicker("\u53E5\u5B50\u989C\u8272", "\u81EA\u52A8\u8BC6\u522B\u7684\u53E5\u5B50\u9AD8\u4EAE\u5E95\u8272", "sentence");
-      createColorPicker("\u7B14\u8BB0\u989C\u8272", "\u5E26\u6709\u7B14\u8BB0\u7684\u5212\u7EBF\u989C\u8272", "comment");
-      createColorPicker("\u9ED8\u8BA4\u9AD8\u4EAE\u989C\u8272", "\u666E\u901A\u7684\u6587\u672C\u5212\u7EBF\u989C\u8272", "normal");
+      new import_obsidian15.Setting(contentDiv).setName("\u5212\u7EBF\u989C\u8272").setHeading();
+      this.createColorPicker(contentDiv, "\u5E26\u7B14\u8BB0\u5212\u7EBF\u989C\u8272", "\u7ED9\u5212\u7EBF\u6DFB\u52A0\u7B14\u8BB0\u540E\u663E\u793A\u7684\u989C\u8272", "comment");
+      this.createColorPicker(contentDiv, "\u666E\u901A\u5212\u7EBF\u989C\u8272", "\u672A\u6DFB\u52A0\u7B14\u8BB0\u7684\u666E\u901A\u5212\u7EBF\u989C\u8272", "normal");
     }
     if (this.activeTab === "smartcmd") {
       this.renderSmartCommandsTab(contentDiv);
@@ -63917,6 +63901,16 @@ created: {{created}}
         });
       });
     }
+  }
+  createColorPicker(containerEl, name, desc, key) {
+    new import_obsidian15.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+      this.plugin.settings.highlightColors = {
+        ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
+        [key]: value
+      };
+      await this.plugin.saveSettings();
+      window.dispatchEvent(new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors }));
+    }));
   }
   renderSmartCommandsTab(containerEl) {
     const header = containerEl.createDiv();
