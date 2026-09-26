@@ -1,12 +1,20 @@
 # Jarvis Reader
 
-Current version: 1.3.2
+Current version: 1.3.3
 
 [中文说明](./README.md) | English
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a library dashboard, reading progress, table of contents navigation, highlights, notes, offline lookup, AI translation, vocabulary cards, and a word book into one reading workflow.
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+## v1.3.3
+
+- Fixed the library note count so it updates immediately after a highlight is created.
+- Improved startup recovery from a highlight index backup and an unfinished write transaction. Saving stops and preserves the files when both the index and its backup are corrupt.
+- A stale editor can no longer overwrite a newer note on the same highlight; it prompts the reader to reopen the note.
+- Updated the EPUB XML parser dependency to `@xmldom/xmldom@0.8.15` to address the dependency audit findings.
+- Verified Markdown and index write failures, corrupt files, and conflict copies in the test vault. Live sync transport and an actual process crash were not simulated.
 
 ## v1.3.2
 
