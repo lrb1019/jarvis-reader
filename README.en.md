@@ -1,12 +1,20 @@
 # Jarvis Reader
 
-Current version: 1.3.3
+Current version: 1.3.4
 
 [中文说明](./README.md) | English
 
 Jarvis Reader is a personalized EPUB reader for Obsidian. It combines a library dashboard, reading progress, table of contents navigation, highlights, notes, offline lookup, AI translation, vocabulary cards, and a word book into one reading workflow.
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+## v1.3.4
+
+- Book cards now collapse when you click outside them, and blank space below a cover no longer opens a card.
+- The reading-note link list fills the available popover height, shows the number of links, and has a resize handle at the lower right.
+- Reader and settings labels consistently use “notes.” Settings are regrouped, with the book-note template at the bottom.
+- Updated the optional Claudian integration for its current input element and removed premature “sent” notices. Claudian's private interface may change again.
+- No reading data migration is required. Vault-local `books/skill/` files and smart-command settings are not included in the plugin package.
 
 ## v1.3.3
 

@@ -61231,7 +61231,7 @@ function LibraryApp({ plugin }) {
     const ownerDocument = homeRef.current?.ownerDocument;
     if (!ownerDocument) return;
     const collapseOutsideBook = (event) => {
-      if (event.target instanceof Element && event.target.closest(".jarvis-library-book-card")) return;
+      if (event.target?.closest?.(".jarvis-library-book-card")) return;
       setSelectedGridBook(null);
     };
     ownerDocument.addEventListener("pointerdown", collapseOutsideBook, true);
