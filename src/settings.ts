@@ -207,7 +207,7 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
 
       new Setting(contentDiv).setName("知识笔记").setHeading();
       let knowledgeFolderText: any = null;
-      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("从阅读感想提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
+      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("将阅读笔记提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
         knowledgeFolderText = text;
         text.setPlaceholder("如: 知识库/想法").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
@@ -708,11 +708,11 @@ class SmartCommandEditModal extends Modal {
 
     new Setting(contentEl)
       .setName("出现位置")
-      .setDesc("划线菜单触发时目标为【选中文字】，感想窗口触发时目标为【原文 + 笔记内容】")
+      .setDesc("划线菜单触发时目标为【选中文字】，笔记窗口触发时目标为【原文 + 笔记内容】")
       .addDropdown(dd => dd
         .addOption("both", "两者都有")
         .addOption("selection", "仅划线菜单（选中文字时）")
-        .addOption("note", "仅感想窗口")
+        .addOption("note", "仅笔记窗口")
         .setValue(draft.scope || "both")
         .onChange(value => { draft = { ...draft, scope: value as SmartCommand["scope"] }; })
       );

@@ -648,31 +648,47 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 }
 
 .jarvis-reader-highlight-resize-handle {
-  bottom: 7px;
+  bottom: 5px;
   cursor: nwse-resize;
-  height: 18px;
-  left: 7px;
-  opacity: 0.55;
+  height: 24px;
+  left: auto;
+  opacity: 0.82;
   position: absolute;
-  right: auto;
+  right: 5px;
+  border-radius: 4px;
   touch-action: none;
-  width: 18px;
+  width: 24px;
 }
 
 .jarvis-reader-highlight-resize-handle::before {
-  border-bottom: 1px solid var(--text-faint);
-  border-left: 1px solid var(--text-faint);
-  bottom: 3px;
+  border-bottom: 2px solid var(--text-muted);
+  border-right: 2px solid var(--text-muted);
+  bottom: 4px;
   content: "";
-  height: 10px;
-  left: 3px;
+  height: 13px;
+  left: auto;
   position: absolute;
-  right: auto;
-  width: 10px;
+  right: 4px;
+  width: 13px;
 }
 
 .jarvis-reader-highlight-resize-handle:hover {
-  opacity: 0.9;
+  background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
+  opacity: 1;
+}
+
+.jarvis-reader-highlight-subtab-count {
+  align-items: center;
+  background: color-mix(in srgb, var(--interactive-accent) 15%, var(--background-secondary));
+  border-radius: 999px;
+  color: var(--text-normal);
+  display: inline-flex;
+  font-size: var(--font-ui-smaller);
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  min-width: 18px;
+  padding: 3px 5px;
 }
 
 .jarvis-reader-highlight-button {
@@ -4946,6 +4962,50 @@ g.jarvis-reader-highlight-with-comment line {
   border-left: none !important;
   border-radius: 0 !important;
   padding: 8px 0 !important;
+}
+
+.jarvis-reader-highlight-assoc-list {
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
+  border-radius: 8px;
+  box-sizing: border-box;
+  flex: 1 1 0%;
+  min-height: 0;
+  padding: 4px 8px;
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 65%, transparent) color-mix(in srgb, var(--background-modifier-border) 45%, transparent);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.jarvis-reader-highlight-content-frame.is-association-view {
+  padding-bottom: 4px;
+}
+
+.jarvis-reader-highlight-content-frame.is-association-view .jarvis-reader-highlight-section {
+  padding-bottom: 0 !important;
+}
+
+.jarvis-reader-highlight-content-frame.is-association-view .jarvis-reader-highlight-ai-section {
+  padding-bottom: 0 !important;
+}
+
+.jarvis-reader-highlight-assoc-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.jarvis-reader-highlight-assoc-list::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--background-modifier-border) 45%, transparent);
+  border-radius: 8px;
+}
+
+.jarvis-reader-highlight-assoc-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 65%, transparent);
+  border: 2px solid var(--background-primary);
+  border-radius: 8px;
+  min-height: 28px;
+}
+
+.jarvis-reader-highlight-assoc-list::-webkit-scrollbar-thumb:hover {
+  background: var(--interactive-accent);
 }
 
 .jarvis-reader-highlight-ai-title {

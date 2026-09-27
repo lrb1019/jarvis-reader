@@ -232,6 +232,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const containerRef = useRef<any>(null);
   const highlightInputRef = useRef<any>(null);
   const highlightPopoverRectRef = useRef<any>(null);
+  const suppressHighlightPopoverResizeClickRef = useRef(false);
   const wordTranslationRectRef = useRef<any>(null);
   const renditionRef = useRef<any>(null);
   const currentLocationRef = useRef<string | null>(initLocation);
@@ -499,6 +500,9 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       return;
     event.preventDefault();
     event.stopPropagation();
+    suppressHighlightPopoverResizeClickRef.current = true;
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
     const startRect = highlightPopoverRectRef.current || getDefaultHighlightPopoverRect();
     highlightPopoverRectRef.current = startRect;
     setHighlightPopoverRect(startRect);
@@ -514,11 +518,17 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       setHighlightPopoverRect(next);
     };
     const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+      window.setTimeout(() => {
+        suppressHighlightPopoverResizeClickRef.current = false;
+      }, 0);
     };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp, { once: true });
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp, { once: true });
   };
   const epubOptions: Record<string, unknown> = effectiveScrolled ? {
     allowPopups: false,
@@ -1882,7 +1892,7 @@ const showWordHoverCard = (asset, element) => {
         || (pendingSelection.comment || "");
       const quoteText = pendingSelection.quote || "";
       const quoteFormatted = `${bookPrefix}原文：${quoteText}`;
-      selectionText = noteContent ? `${quoteFormatted}\n想法：${noteContent}` : quoteFormatted;
+      selectionText = noteContent ? `${quoteFormatted}\n笔记：${noteContent}` : quoteFormatted;
     }
     try {
       const finalPrompt = await prepareSmartCommandPromptFromVault(effectiveApp, cmd, {
@@ -1891,8 +1901,8 @@ const showWordHoverCard = (asset, element) => {
         book_title: bookTitle || title || "",
         chapter: readerTitleRef.current || ""
       });
-      triggerClaudianPrompt(effectiveApp, finalPrompt);
-      new Notice(`已发送「${cmd.label}」指令到 Claudian`);
+      await triggerClaudianPrompt(effectiveApp, finalPrompt);
+      new Notice(`已向 Claudian 提交「${cmd.label}」指令`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("Jarvis Reader smart command failed.", error);
@@ -2106,6 +2116,10 @@ const showWordHoverCard = (asset, element) => {
   const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries(pendingSelection) : [];
   const hasPromotableHighlightNote = highlightNoteEntries.length > 0 || !!highlightComment.trim();
   const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
+  const associatedLinkCount = (() => {
+    const section = highlightAiSections.find((item) => item.title === "关联文章");
+    return section ? new Set(section.links || []).size : 0;
+  })();
   const renderHighlightNotes = () => highlightNoteEntries.length ? React.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
   }, highlightNoteEntries.map((entry, index) => React.createElement("div", {
@@ -2363,7 +2377,7 @@ const showWordHoverCard = (asset, element) => {
 
     return React.createElement("div", {
       className: "jarvis-reader-highlight-ai-list",
-      style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }
+      style: { display: "flex", flex: "1 1 0%", flexDirection: "column", minHeight: 0, overflow: "hidden" }
     }, 
       React.createElement("div", {
         style: { flex: "0 0 auto", position: "relative", zIndex: 10008, width: "80%", maxWidth: "360px", margin: "0 auto 12px auto" }
@@ -2433,11 +2447,11 @@ const showWordHoverCard = (asset, element) => {
       ),
       React.createElement("div", {
         className: "jarvis-reader-highlight-ai-section",
-        style: { flex: "1 1 auto", overflowY: "auto", minHeight: 0 }
+        style: { display: "flex", flexDirection: "column", flex: "1 1 0%", overflow: "hidden", minHeight: 0 }
       },
         assocLinks.length > 0 ? React.createElement("div", {
-          className: "jarvis-reader-highlight-note-list is-compact",
-          style: { display: "flex", flexDirection: "column", gap: "8px" }
+          className: "jarvis-reader-highlight-note-list jarvis-reader-highlight-assoc-list",
+          style: { display: "flex", flex: "1 1 0%", flexDirection: "column", gap: "8px", minHeight: 0, overflowY: "auto" }
         }, assocLinks.map((link: string, linkIndex: number) => {
           const [linkPath, linkTime] = link.split("|");
           let displayText = linkPath;
@@ -2536,6 +2550,10 @@ const showWordHoverCard = (asset, element) => {
     ref: containerRef,
     style: { border: "none", height: "100%", width: "100%", overflow: "hidden" },
     onClick: (event) => {
+      if (suppressHighlightPopoverResizeClickRef.current) {
+        suppressHighlightPopoverResizeClickRef.current = false;
+        return;
+      }
       if (!pendingSelection && !pendingHighlightMenu && !pendingWordSelection && !activeWordHover)
         return;
       const popover = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-popover");
@@ -3035,7 +3053,9 @@ const showWordHoverCard = (asset, element) => {
     title: "\u5173\u95ed",
     onClick: clearHighlightUi
   }, renderObsidianIcon("x")))),  React.createElement("div", {
-    className: "jarvis-reader-highlight-content-frame"
+    className: highlightContentTab === "ai"
+      ? "jarvis-reader-highlight-content-frame is-association-view"
+      : "jarvis-reader-highlight-content-frame"
   }, React.createElement("div", {
     className: "jarvis-reader-highlight-quote"
   }, pendingSelection.quote), isReadingHighlightComment ? React.createElement(React.Fragment, null, React.createElement("div", {
@@ -3048,7 +3068,10 @@ const showWordHoverCard = (asset, element) => {
     className: highlightContentTab === "ai" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("ai")
-  }, renderObsidianIcon("link"), "关联")), React.createElement("div", {
+  }, renderObsidianIcon("link"), "关联", associatedLinkCount > 0 ? React.createElement("span", {
+    className: "jarvis-reader-highlight-subtab-count",
+    title: `共 ${associatedLinkCount} 条关联`
+  }, associatedLinkCount) : null)), React.createElement("div", {
     className: "jarvis-reader-highlight-section"
   }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : React.createElement(React.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? React.createElement("div", {
     className: "jarvis-reader-highlight-note-list is-compact"
@@ -3195,7 +3218,8 @@ const showWordHoverCard = (asset, element) => {
   }, isExistingHighlightComment ? "保存笔记" : "保存")), React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
-    title: "Resize"
+    title: "拖动右下角调整窗体大小",
+    "aria-label": "拖动右下角调整窗体大小"
   }))) : null, activeWordHover ?  React.createElement("div", {
     className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
     style: {

@@ -53684,7 +53684,7 @@ function formatHighlightNoteBlock(highlight) {
   let commentBlock = "";
   if (Array.isArray(entries) && entries.length > 0) {
     commentBlock = entries.map((entry) => {
-      const lbl = entry.label || "\u60F3\u6CD5";
+      const lbl = entry.label || "\u7B14\u8BB0";
       const createdTime = entry.created || formatLocalDateTime(highlight.created);
       return `>
 > **${lbl}**
@@ -55737,38 +55737,44 @@ async function prepareSmartCommandPromptFromVault(app, command, vars) {
     return app.vault.read(file);
   });
 }
-function triggerClaudianPrompt(app, prompt) {
+async function triggerClaudianPrompt(app, prompt) {
   const appWithPlugins = app;
   const claudianPlugin = appWithPlugins.plugins?.getPlugin(
     "realclaudian"
   );
   if (!claudianPlugin) {
-    new import_obsidian5.Notice("\u672A\u68C0\u6D4B\u5230 Claudian \u63D2\u4EF6\uFF0C\u8BF7\u5148\u5B89\u88C5\u5E76\u542F\u7528\u8BE5\u63D2\u4EF6\u3002");
-    return;
+    throw new Error("\u672A\u68C0\u6D4B\u5230 Claudian \u63D2\u4EF6\uFF0C\u8BF7\u5148\u5B89\u88C5\u5E76\u542F\u7528\u8BE5\u63D2\u4EF6\u3002");
   }
-  if (typeof claudianPlugin.activateView === "function") {
-    void claudianPlugin.activateView();
+  if (typeof claudianPlugin.activateView !== "function" || typeof claudianPlugin.getView !== "function") {
+    throw new Error("Claudian \u754C\u9762\u63A5\u53E3\u5DF2\u53D8\u5316\uFF0C\u65E0\u6CD5\u6253\u5F00\u5BF9\u8BDD\u7A97\u53E3\u3002");
   }
-  window.setTimeout(() => {
-    const textarea = activeDocument.querySelector(
-      ".claudian-input-wrapper textarea.claudian-input"
-    );
-    if (!textarea) {
-      new import_obsidian5.Notice("\u65E0\u6CD5\u5B9A\u4F4D Claudian \u8F93\u5165\u6846\uFF0C\u8BF7\u786E\u4FDD\u5176\u7A97\u53E3\u5DF2\u6253\u5F00\u3002");
-      return;
-    }
-    textarea.value = prompt;
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
-    const enterEvent = new KeyboardEvent("keydown", {
-      key: "Enter",
-      code: "Enter",
-      keyCode: 13,
-      which: 13,
-      bubbles: true,
-      cancelable: true
-    });
-    textarea.dispatchEvent(enterEvent);
-  }, 300);
+  await claudianPlugin.activateView();
+  const input = claudianPlugin.getView()?.getActiveTab()?.dom.inputEl;
+  if (!input || !input.isConnected || typeof input.value !== "string") {
+    throw new Error("Claudian \u5BF9\u8BDD\u8F93\u5165\u6846\u5C1A\u672A\u5C31\u7EEA\uFF0C\u8BF7\u6253\u5F00\u5BF9\u8BDD\u540E\u91CD\u8BD5\u3002");
+  }
+  if (input.value.trim()) {
+    throw new Error("Claudian \u8F93\u5165\u6846\u4E2D\u6709\u672A\u53D1\u9001\u7684\u5185\u5BB9\uFF0C\u8BF7\u5148\u5904\u7406\u540E\u91CD\u8BD5\u3002");
+  }
+  const inputWindow = input.ownerDocument.defaultView;
+  if (!inputWindow) {
+    throw new Error("Claudian \u5BF9\u8BDD\u7A97\u53E3\u4E0D\u53EF\u7528\uFF0C\u8BF7\u91CD\u65B0\u6253\u5F00\u540E\u91CD\u8BD5\u3002");
+  }
+  input.value = prompt;
+  input.dispatchEvent(new inputWindow.Event("input", { bubbles: true }));
+  input.focus();
+  const enterEvent = new inputWindow.KeyboardEvent("keydown", {
+    key: "Enter",
+    code: "Enter",
+    metaKey: import_obsidian5.Platform.isMacOS,
+    ctrlKey: !import_obsidian5.Platform.isMacOS,
+    bubbles: true,
+    cancelable: true
+  });
+  input.dispatchEvent(enterEvent);
+  if (!enterEvent.defaultPrevented) {
+    throw new Error("Claudian \u672A\u63A5\u6536\u53D1\u9001\u64CD\u4F5C\uFF0C\u5185\u5BB9\u5DF2\u7559\u5728\u8F93\u5165\u6846\u4E2D\uFF0C\u8BF7\u68C0\u67E5\u540E\u624B\u52A8\u53D1\u9001\u3002");
+  }
 }
 
 // src/reader/ReaderSideControls.tsx
@@ -55981,6 +55987,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const containerRef = (0, import_react2.useRef)(null);
   const highlightInputRef = (0, import_react2.useRef)(null);
   const highlightPopoverRectRef = (0, import_react2.useRef)(null);
+  const suppressHighlightPopoverResizeClickRef = (0, import_react2.useRef)(false);
   const wordTranslationRectRef = (0, import_react2.useRef)(null);
   const renditionRef = (0, import_react2.useRef)(null);
   const currentLocationRef = (0, import_react2.useRef)(initLocation);
@@ -56240,6 +56247,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     event.preventDefault();
     event.stopPropagation();
+    suppressHighlightPopoverResizeClickRef.current = true;
+    const target = event.currentTarget;
+    target.setPointerCapture(event.pointerId);
     const startRect = highlightPopoverRectRef.current || getDefaultHighlightPopoverRect();
     highlightPopoverRectRef.current = startRect;
     setHighlightPopoverRect(startRect);
@@ -56255,11 +56265,17 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       setHighlightPopoverRect(next);
     };
     const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+      if (target.hasPointerCapture(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+      window.setTimeout(() => {
+        suppressHighlightPopoverResizeClickRef.current = false;
+      }, 0);
     };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp, { once: true });
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp, { once: true });
   };
   const epubOptions = effectiveScrolled ? {
     allowPopups: false,
@@ -57614,7 +57630,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       const quoteText = pendingSelection.quote || "";
       const quoteFormatted = `${bookPrefix}\u539F\u6587\uFF1A${quoteText}`;
       selectionText = noteContent ? `${quoteFormatted}
-\u60F3\u6CD5\uFF1A${noteContent}` : quoteFormatted;
+\u7B14\u8BB0\uFF1A${noteContent}` : quoteFormatted;
     }
     try {
       const finalPrompt = await prepareSmartCommandPromptFromVault(effectiveApp, cmd, {
@@ -57623,8 +57639,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         book_title: bookTitle || title || "",
         chapter: readerTitleRef.current || ""
       });
-      triggerClaudianPrompt(effectiveApp, finalPrompt);
-      new import_obsidian6.Notice(`\u5DF2\u53D1\u9001\u300C${cmd.label}\u300D\u6307\u4EE4\u5230 Claudian`);
+      await triggerClaudianPrompt(effectiveApp, finalPrompt);
+      new import_obsidian6.Notice(`\u5DF2\u5411 Claudian \u63D0\u4EA4\u300C${cmd.label}\u300D\u6307\u4EE4`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("Jarvis Reader smart command failed.", error);
@@ -57832,6 +57848,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const highlightNoteEntries = pendingSelection ? getHighlightNoteEntries(pendingSelection) : [];
   const hasPromotableHighlightNote = highlightNoteEntries.length > 0 || !!highlightComment.trim();
   const highlightAiSections = pendingSelection && Array.isArray(pendingSelection.aiSections) ? pendingSelection.aiSections.filter((section) => (section?.text || "").trim() || (section?.links || []).length) : [];
+  const associatedLinkCount = (() => {
+    const section = highlightAiSections.find((item) => item.title === "\u5173\u8054\u6587\u7AE0");
+    return section ? new Set(section.links || []).size : 0;
+  })();
   const renderHighlightNotes = () => highlightNoteEntries.length ? import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
   }, highlightNoteEntries.map((entry, index) => import_react2.default.createElement(
@@ -58053,7 +58073,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       "div",
       {
         className: "jarvis-reader-highlight-ai-list",
-        style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }
+        style: { display: "flex", flex: "1 1 0%", flexDirection: "column", minHeight: 0, overflow: "hidden" }
       },
       import_react2.default.createElement(
         "div",
@@ -58135,11 +58155,11 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         "div",
         {
           className: "jarvis-reader-highlight-ai-section",
-          style: { flex: "1 1 auto", overflowY: "auto", minHeight: 0 }
+          style: { display: "flex", flexDirection: "column", flex: "1 1 0%", overflow: "hidden", minHeight: 0 }
         },
         assocLinks.length > 0 ? import_react2.default.createElement("div", {
-          className: "jarvis-reader-highlight-note-list is-compact",
-          style: { display: "flex", flexDirection: "column", gap: "8px" }
+          className: "jarvis-reader-highlight-note-list jarvis-reader-highlight-assoc-list",
+          style: { display: "flex", flex: "1 1 0%", flexDirection: "column", gap: "8px", minHeight: 0, overflowY: "auto" }
         }, assocLinks.map((link, linkIndex) => {
           const [linkPath, linkTime] = link.split("|");
           let displayText = linkPath;
@@ -58238,6 +58258,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     ref: containerRef,
     style: { border: "none", height: "100%", width: "100%", overflow: "hidden" },
     onClick: (event) => {
+      if (suppressHighlightPopoverResizeClickRef.current) {
+        suppressHighlightPopoverResizeClickRef.current = false;
+        return;
+      }
       if (!pendingSelection && !pendingHighlightMenu && !pendingWordSelection && !activeWordHover)
         return;
       const popover = containerRef.current && containerRef.current.querySelector(".jarvis-reader-highlight-popover");
@@ -58748,7 +58772,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       onClick: clearHighlightUi
     }, renderObsidianIcon("x"))
   )), import_react2.default.createElement("div", {
-    className: "jarvis-reader-highlight-content-frame"
+    className: highlightContentTab === "ai" ? "jarvis-reader-highlight-content-frame is-association-view" : "jarvis-reader-highlight-content-frame"
   }, import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-quote"
   }, pendingSelection.quote), isReadingHighlightComment ? import_react2.default.createElement(import_react2.default.Fragment, null, import_react2.default.createElement("div", {
@@ -58761,7 +58785,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     className: highlightContentTab === "ai" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("ai")
-  }, renderObsidianIcon("link"), "\u5173\u8054")), import_react2.default.createElement("div", {
+  }, renderObsidianIcon("link"), "\u5173\u8054", associatedLinkCount > 0 ? import_react2.default.createElement("span", {
+    className: "jarvis-reader-highlight-subtab-count",
+    title: `\u5171 ${associatedLinkCount} \u6761\u5173\u8054`
+  }, associatedLinkCount) : null)), import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-section"
   }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : import_react2.default.createElement(import_react2.default.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-note-list is-compact"
@@ -58908,7 +58935,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }, isExistingHighlightComment ? "\u4FDD\u5B58\u7B14\u8BB0" : "\u4FDD\u5B58")), import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
-    title: "Resize"
+    title: "\u62D6\u52A8\u53F3\u4E0B\u89D2\u8C03\u6574\u7A97\u4F53\u5927\u5C0F",
+    "aria-label": "\u62D6\u52A8\u53F3\u4E0B\u89D2\u8C03\u6574\u7A97\u4F53\u5927\u5C0F"
   }))) : null, activeWordHover ? import_react2.default.createElement(
     "div",
     {
@@ -60249,7 +60277,7 @@ var HighlightsPanelController = class {
         return false;
       if (this.typeFilter === "highlight" && hasComment)
         return false;
-      if (this.typeFilter === "thought" && !hasComment)
+      if (this.typeFilter === "note" && !hasComment)
         return false;
       if (this.linksOnly && !this.getWikiLinks(highlight.comment).length)
         return false;
@@ -60319,7 +60347,7 @@ var HighlightsPanelController = class {
       cls: "jarvis-reader-highlights-search",
       attr: {
         type: "search",
-        placeholder: "\u641C\u7D22\u9AD8\u4EAE\u3001\u60F3\u6CD5\u3001\u94FE\u63A5"
+        placeholder: "\u641C\u7D22\u9AD8\u4EAE\u3001\u7B14\u8BB0\u3001\u94FE\u63A5"
       }
     });
     search.value = this.searchQuery || "";
@@ -60351,7 +60379,7 @@ var HighlightsPanelController = class {
     const filters = controls.createDiv({ cls: "jarvis-reader-highlights-filters" });
     this.renderFilterButton(filters, "all", "\u5168\u90E8");
     this.renderFilterButton(filters, "highlight", "\u9AD8\u4EAE");
-    this.renderFilterButton(filters, "thought", "\u60F3\u6CD5");
+    this.renderFilterButton(filters, "note", "\u7B14\u8BB0");
     const more = filters.createEl("button", {
       cls: this.linksOnly || this.currentChapterOnly || this.sortMode === "time" ? "jarvis-reader-highlights-filter jarvis-reader-highlights-more is-active" : "jarvis-reader-highlights-filter jarvis-reader-highlights-more",
       text: "..."
@@ -61120,7 +61148,7 @@ function BookHighlightsPanel({ plugin, book, title, highlights, onJump }) {
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-actions", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
-          const note = highlight.comment ? `\uFF08\u611F\u60F3\uFF1A${highlight.comment}\uFF09` : "";
+          const note = highlight.comment ? `\uFF08\u7B14\u8BB0\uFF1A${highlight.comment}\uFF09` : "";
           void navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${highlight.quote || ""}\u300D${note}`).then(() => new import_obsidian12.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F"));
         }, children: "\u590D\u5236\u5185\u5BB9" }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => onJump(book, highlight), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
@@ -61198,6 +61226,17 @@ function LibraryApp({ plugin }) {
   const [selectedGridBook, setSelectedGridBook] = React5.useState(null);
   const [bookNotesMap, setBookNotesMap] = React5.useState({});
   const homeRef = React5.useRef(null);
+  React5.useEffect(() => {
+    if (currentView !== "home" || viewLayout !== "grid" || !selectedGridBook) return;
+    const ownerDocument = homeRef.current?.ownerDocument;
+    if (!ownerDocument) return;
+    const collapseOutsideBook = (event) => {
+      if (event.target instanceof Element && event.target.closest(".jarvis-library-book-card")) return;
+      setSelectedGridBook(null);
+    };
+    ownerDocument.addEventListener("pointerdown", collapseOutsideBook, true);
+    return () => ownerDocument.removeEventListener("pointerdown", collapseOutsideBook, true);
+  }, [currentView, viewLayout, selectedGridBook]);
   const [books, setBooks] = React5.useState([]);
   const [booksLoaded, setBooksLoaded] = React5.useState(false);
   const [coverCache, setCoverCache] = React5.useState(plugin.settings.bookCoverCache || {});
@@ -62882,7 +62921,7 @@ function LibraryApp({ plugin }) {
             "div",
             {
               className: `jarvis-library-book-card ${isSelected ? "is-selected" : ""}`,
-              style: isSelected ? { position: "absolute", top: 0, left: isLastCol ? "auto" : 0, right: isLastCol ? 0 : "auto", width: "calc(200% + 20px)", height: "max-content" } : { position: "absolute", top: 0, left: 0, width: "100%", height: "100%" },
+              style: isSelected ? { position: "absolute", top: 0, left: isLastCol ? "auto" : 0, right: isLastCol ? 0 : "auto", width: "calc(200% + 20px)", height: "max-content" } : { position: "absolute", top: 0, left: 0, width: "100%" },
               onClick: () => setSelectedGridBook(isSelected ? null : book.path),
               onDoubleClick: () => openBook(book),
               title: isSelected ? "\u53CC\u51FB\u76F4\u63A5\u5F00\u59CB\u9605\u8BFB" : "\u5355\u51FB\u67E5\u770B\u8BE6\u60C5\uFF0C\u53CC\u51FB\u5F00\u59CB\u9605\u8BFB",
@@ -63633,7 +63672,7 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
       }));
       new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
       let knowledgeFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u4ECE\u9605\u8BFB\u611F\u60F3\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
+      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
         knowledgeFolderText = text;
         text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
@@ -64029,8 +64068,8 @@ var SmartCommandEditModal = class extends import_obsidian15.Modal {
         draft = { ...draft, icon: value };
       })
     );
-    new import_obsidian15.Setting(contentEl).setName("\u51FA\u73B0\u4F4D\u7F6E").setDesc("\u5212\u7EBF\u83DC\u5355\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u9009\u4E2D\u6587\u5B57\u3011\uFF0C\u611F\u60F3\u7A97\u53E3\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u539F\u6587 + \u7B14\u8BB0\u5185\u5BB9\u3011").addDropdown(
-      (dd) => dd.addOption("both", "\u4E24\u8005\u90FD\u6709").addOption("selection", "\u4EC5\u5212\u7EBF\u83DC\u5355\uFF08\u9009\u4E2D\u6587\u5B57\u65F6\uFF09").addOption("note", "\u4EC5\u611F\u60F3\u7A97\u53E3").setValue(draft.scope || "both").onChange((value) => {
+    new import_obsidian15.Setting(contentEl).setName("\u51FA\u73B0\u4F4D\u7F6E").setDesc("\u5212\u7EBF\u83DC\u5355\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u9009\u4E2D\u6587\u5B57\u3011\uFF0C\u7B14\u8BB0\u7A97\u53E3\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u539F\u6587 + \u7B14\u8BB0\u5185\u5BB9\u3011").addDropdown(
+      (dd) => dd.addOption("both", "\u4E24\u8005\u90FD\u6709").addOption("selection", "\u4EC5\u5212\u7EBF\u83DC\u5355\uFF08\u9009\u4E2D\u6587\u5B57\u65F6\uFF09").addOption("note", "\u4EC5\u7B14\u8BB0\u7A97\u53E3").setValue(draft.scope || "both").onChange((value) => {
         draft = { ...draft, scope: value };
       })
     );

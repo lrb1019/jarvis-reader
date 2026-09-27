@@ -99,7 +99,7 @@ export function BookHighlightsPanel({ plugin, book, title, highlights, onJump }:
             </div>
             <div className="hl-card-actions">
               <button className="hl-card-action-btn" onClick={() => {
-                const note = highlight.comment ? `（感想：${highlight.comment}）` : "";
+                const note = highlight.comment ? `（笔记：${highlight.comment}）` : "";
                 void navigator.clipboard.writeText(`《${title}》：「${highlight.quote || ""}」${note}`).then(() => new Notice("高亮已复制到剪贴板"));
               }}>复制内容</button>
               <button className="hl-card-action-btn action-jump" onClick={() => onJump(book, highlight as BookHighlight)}>跳转原文 →</button>

@@ -169,6 +169,18 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [bookNotesMap, setBookNotesMap] = React.useState<Record<string, TFile>>({});
   const homeRef = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    if (currentView !== "home" || viewLayout !== "grid" || !selectedGridBook) return;
+    const ownerDocument = homeRef.current?.ownerDocument;
+    if (!ownerDocument) return;
+    const collapseOutsideBook = (event: PointerEvent) => {
+      if (event.target instanceof Element && event.target.closest('.jarvis-library-book-card')) return;
+      setSelectedGridBook(null);
+    };
+    ownerDocument.addEventListener('pointerdown', collapseOutsideBook, true);
+    return () => ownerDocument.removeEventListener('pointerdown', collapseOutsideBook, true);
+  }, [currentView, viewLayout, selectedGridBook]);
+
   const [books, setBooks] = React.useState<TFile[]>([]);
   const [booksLoaded, setBooksLoaded] = React.useState(false);
   const [coverCache, setCoverCache] = React.useState<Record<string, any>>(plugin.settings.bookCoverCache || {});
@@ -2178,7 +2190,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                     className={`jarvis-library-book-card ${isSelected ? 'is-selected' : ''}`} 
                     style={isSelected 
                       ? { position: 'absolute', top: 0, left: isLastCol ? 'auto' : 0, right: isLastCol ? 0 : 'auto', width: 'calc(200% + 20px)', height: 'max-content' } 
-                      : { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }
+                      : { position: 'absolute', top: 0, left: 0, width: '100%' }
                     }
                     onClick={() => setSelectedGridBook(isSelected ? null : book.path)}
                     onDoubleClick={() => openBook(book)}

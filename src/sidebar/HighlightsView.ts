@@ -142,7 +142,7 @@ export class HighlightsPanelController {
         return false;
       if (this.typeFilter === "highlight" && hasComment)
         return false;
-      if (this.typeFilter === "thought" && !hasComment)
+      if (this.typeFilter === "note" && !hasComment)
         return false;
       if (this.linksOnly && !this.getWikiLinks(highlight.comment).length)
         return false;
@@ -212,7 +212,7 @@ export class HighlightsPanelController {
       cls: "jarvis-reader-highlights-search",
       attr: {
         type: "search",
-        placeholder: "\u641c\u7d22\u9ad8\u4eae\u3001\u60f3\u6cd5\u3001\u94fe\u63a5"
+        placeholder: "搜索高亮、笔记、链接"
       }
     });
     search.value = this.searchQuery || "";
@@ -244,7 +244,7 @@ export class HighlightsPanelController {
     const filters = controls.createDiv({ cls: "jarvis-reader-highlights-filters" });
     this.renderFilterButton(filters, "all", "\u5168\u90e8");
     this.renderFilterButton(filters, "highlight", "\u9ad8\u4eae");
-    this.renderFilterButton(filters, "thought", "\u60f3\u6cd5");
+    this.renderFilterButton(filters, "note", "笔记");
     const more = filters.createEl("button", {
       cls: this.linksOnly || this.currentChapterOnly || this.sortMode === "time" ? "jarvis-reader-highlights-filter jarvis-reader-highlights-more is-active" : "jarvis-reader-highlights-filter jarvis-reader-highlights-more",
       text: "..."

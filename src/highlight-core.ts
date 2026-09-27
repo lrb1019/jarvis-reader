@@ -12,7 +12,7 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
   let commentBlock = "";
   if (Array.isArray(entries) && entries.length > 0) {
     commentBlock = entries.map(entry => {
-      const lbl = entry.label || "想法";
+      const lbl = entry.label || "笔记";
       const createdTime = entry.created || formatLocalDateTime(highlight.created);
       return `>\n> **${lbl}**\n> created: ${createdTime}\n>\n${formatBlockquote(entry.text)}`;
     }).join("\n") + "\n";
