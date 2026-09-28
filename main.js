@@ -518,7 +518,7 @@ var require_react_development = __commonJS({
           }
           return element;
         };
-        function createElement4(type, config, children) {
+        function createElement2(type, config, children) {
           var propName;
           var props = {};
           var key = null;
@@ -1092,7 +1092,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState7(initialState) {
+        function useState3(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1100,11 +1100,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef5(initialValue) {
+        function useRef4(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect7(create, deps) {
+        function useEffect4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1116,11 +1116,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useLayoutEffect(create, deps);
         }
-        function useCallback5(callback, deps) {
+        function useCallback3(callback, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
-        function useMemo5(create, deps) {
+        function useMemo3(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useMemo(create, deps);
         }
@@ -1617,7 +1617,7 @@ var require_react_development = __commonJS({
               error("React.createElement: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", typeString, info);
             }
           }
-          var element = createElement4.apply(this, arguments);
+          var element = createElement2.apply(this, arguments);
           if (element == null) {
             return element;
           }
@@ -1882,19 +1882,19 @@ var require_react_development = __commonJS({
         exports.memo = memo;
         exports.startTransition = startTransition;
         exports.unstable_act = act;
-        exports.useCallback = useCallback5;
+        exports.useCallback = useCallback3;
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect7;
+        exports.useEffect = useEffect4;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect2;
-        exports.useMemo = useMemo5;
+        exports.useMemo = useMemo3;
         exports.useReducer = useReducer;
-        exports.useRef = useRef5;
-        exports.useState = useState7;
+        exports.useRef = useRef4;
+        exports.useState = useState3;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2390,9 +2390,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React14 = require_react();
+        var React8 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React14.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React8.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -2441,7 +2441,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment6 = 7;
+        var Fragment2 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3598,7 +3598,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment6:
+            case Fragment2:
               return "Fragment";
             case HostComponent:
               return type;
@@ -3999,7 +3999,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React14.Children.forEach(props.children, function(child) {
+                React8.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -9423,7 +9423,7 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function createElement4(type, props, rootContainerElement, parentNamespace) {
+        function createElement2(type, props, rootContainerElement, parentNamespace) {
           var isCustomComponentTag;
           var ownerDocument = getOwnerDocumentFromRootContainer(rootContainerElement);
           var domElement;
@@ -10293,7 +10293,7 @@ var require_react_dom_development = __commonJS({
             }
             parentNamespace = hostContextDev.namespace;
           }
-          var domElement = createElement4(type, props, rootContainerInstance, parentNamespace);
+          var domElement = createElement2(type, props, rootContainerInstance, parentNamespace);
           precacheFiberNode(internalInstanceHandle, domElement);
           updateFiberProps(domElement, props);
           return domElement;
@@ -12472,7 +12472,7 @@ var require_react_dom_development = __commonJS({
           }
         }
         var fakeInternalInstance = {};
-        var emptyRefsObject = new React14.Component().refs;
+        var emptyRefsObject = new React8.Component().refs;
         var didWarnAboutStateAssignmentForComponent;
         var didWarnAboutUninitializedState;
         var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -13296,7 +13296,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment6) {
+            if (current2 === null || current2.tag !== Fragment2) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -13699,7 +13699,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment6) {
+                  if (child.tag === Fragment2) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17874,7 +17874,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment6:
+            case Fragment2:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18146,7 +18146,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment6:
+            case Fragment2:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22407,7 +22407,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment6, elements, key, mode);
+          var fiber = createFiber(Fragment2, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -23075,7 +23075,7 @@ var require_react_dom_development = __commonJS({
             unmarkContainerAsRoot(container);
           }
         };
-        function createRoot5(container, options2) {
+        function createRoot3(container, options2) {
           if (!isValidContainer(container)) {
             throw new Error("createRoot(...): Target container is not a DOM element.");
           }
@@ -23446,7 +23446,7 @@ var require_react_dom_development = __commonJS({
               error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
             }
           }
-          return createRoot5(container, options2);
+          return createRoot3(container, options2);
         }
         function hydrateRoot$1(container, initialChildren, options2) {
           {
@@ -23824,7 +23824,7 @@ var require_react_is_development = __commonJS({
         var ContextProvider = REACT_PROVIDER_TYPE;
         var Element2 = REACT_ELEMENT_TYPE;
         var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment6 = REACT_FRAGMENT_TYPE;
+        var Fragment2 = REACT_FRAGMENT_TYPE;
         var Lazy = REACT_LAZY_TYPE;
         var Memo = REACT_MEMO_TYPE;
         var Portal = REACT_PORTAL_TYPE;
@@ -23883,7 +23883,7 @@ var require_react_is_development = __commonJS({
         exports.ContextProvider = ContextProvider;
         exports.Element = Element2;
         exports.ForwardRef = ForwardRef;
-        exports.Fragment = Fragment6;
+        exports.Fragment = Fragment2;
         exports.Lazy = Lazy;
         exports.Memo = Memo;
         exports.Portal = Portal;
@@ -36578,12 +36578,12 @@ var require_svg = __commonJS({
     Object.defineProperty(exports, "__esModule", {
       value: true
     });
-    exports.createElement = createElement4;
-    function createElement4(name) {
+    exports.createElement = createElement2;
+    function createElement2(name) {
       return document.createElementNS("http://www.w3.org/2000/svg", name);
     }
     exports.default = {
-      createElement: createElement4
+      createElement: createElement2
     };
   }
 });
@@ -51949,7 +51949,7 @@ var require_react_swipeable_umd = __commonJS({
   "node_modules/react-swipeable/dist/react-swipeable.umd.js"(exports, module2) {
     (function(global2, factory) {
       typeof exports === "object" && typeof module2 !== "undefined" ? factory(exports, require_react()) : typeof define === "function" && define.amd ? define(["exports", "react"], factory) : (global2 = global2 || self, factory(global2.swipeable = {}, global2.react));
-    })(exports, (function(exports2, React14) {
+    })(exports, (function(exports2, React8) {
       function _interopNamespace(e) {
         if (e && e.__esModule) return e;
         var n = /* @__PURE__ */ Object.create(null);
@@ -51969,7 +51969,7 @@ var require_react_swipeable_umd = __commonJS({
         n["default"] = e;
         return n;
       }
-      var React__namespace = /* @__PURE__ */ _interopNamespace(React14);
+      var React__namespace = /* @__PURE__ */ _interopNamespace(React8);
       function _extends() {
         _extends = Object.assign || function(target) {
           for (var i = 1; i < arguments.length; i++) {
@@ -52771,7 +52771,7 @@ var require_react_jsx_runtime_development = __commonJS({
     if (true) {
       (function() {
         "use strict";
-        var React14 = require_react();
+        var React8 = require_react();
         var REACT_ELEMENT_TYPE = Symbol.for("react.element");
         var REACT_PORTAL_TYPE = Symbol.for("react.portal");
         var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -52797,7 +52797,7 @@ var require_react_jsx_runtime_development = __commonJS({
           }
           return null;
         }
-        var ReactSharedInternals = React14.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React8.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function error(format) {
           {
             {
@@ -53632,11 +53632,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx9 = jsxWithValidationDynamic;
-        var jsxs9 = jsxWithValidationStatic;
+        var jsx5 = jsxWithValidationDynamic;
+        var jsxs5 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx9;
-        exports.jsxs = jsxs9;
+        exports.jsx = jsx5;
+        exports.jsxs = jsxs5;
       })();
     }
   }
@@ -53660,12 +53660,12 @@ __export(main_exports, {
   default: () => JarvisReaderPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian23 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 
 // src/EpubView.ts
 var import_react3 = __toESM(require_react(), 1);
 var import_client = __toESM(require_client(), 1);
-var import_obsidian7 = require("obsidian");
+var import_obsidian6 = require("obsidian");
 init_utils();
 init_book_notes();
 
@@ -54043,7 +54043,7 @@ init_utils_core();
 init_utils_core();
 var TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
 var BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
-var DEFAULT_TRANSLATION_PROMPT = `\u4F60\u662F Obsidian \u82F1\u8BED\u7FFB\u8BD1\u4E0E\u8BCD\u53E5\u5361\u7247\u751F\u6210\u5668\u3002
+var DEFAULT_TRANSLATION_PROMPT = `\u4F60\u662F Obsidian \u82F1\u8BED\u7FFB\u8BD1\u4E0E\u8BCD\u5361\u751F\u6210\u5668\u3002
 
 \u3010\u6838\u5FC3\u4EFB\u52A1\uFF1A\u8BED\u5883\u7B2C\u4E00\u3011
 \u4F60\u5FC5\u987B\u6DF1\u5EA6\u5206\u6790\u8F93\u5165\u8BCD/\u77ED\u8BED\u5728<\u4E0A\u4E0B\u6587>\u53E5\u5B50\u4E2D\u7684\u7CBE\u786E\u542B\u4E49\u3002\u7EDD\u4E0D\u80FD\u751F\u642C\u786C\u5957\u8BCD\u5178\u7684\u9996\u9009\u542B\u4E49\uFF0C\u5FC5\u987B\u7ED3\u5408\u8BED\u5883\u5224\u65AD\u5176\u5F15\u7533\u4E49\u3001\u6BD4\u55BB\u4E49\u6216\u56FA\u5B9A\u642D\u914D\u3002
@@ -54072,7 +54072,7 @@ JSON \u7ED3\u6784\u8981\u6C42\uFF1A
 \u8F93\u5165\u5185\u5BB9\uFF1A{{word}}
 \u9009\u62E9\u7C7B\u578B\uFF1A{{selectionType}}
 \u4E0A\u4E0B\u6587\uFF1A{{sentence}}`;
-var TRANSLATION_PROMPT_HELP_TEXT = "\u5FC5\u9700\u5B57\u6BB5\uFF1Alemma\u3001translation\u3001display\u3001isWord\u3002word/phrase \u8F93\u51FA\u8BCD\u53E5\u5361\u7247\uFF1Bsentence \u53EA\u8F93\u51FA\u8BD1\u6587\u4E14 isWord=false\u3002display \u6362\u884C\u8BF7\u5199\u6210 \\n\u3002\u6D4B\u8BD5\u4F1A\u5148\u6821\u9A8C JSON \u793A\u4F8B\u3002";
+var TRANSLATION_PROMPT_HELP_TEXT = "\u5FC5\u9700\u5B57\u6BB5\uFF1Alemma\u3001translation\u3001display\u3001isWord\u3002word/phrase \u8F93\u51FA\u8BCD\u5361\uFF1Bsentence \u53EA\u8F93\u51FA\u8BD1\u6587\u4E14 isWord=false\u3002display \u6362\u884C\u8BF7\u5199\u6210 \\n\u3002\u6D4B\u8BD5\u4F1A\u5148\u6821\u9A8C JSON \u793A\u4F8B\u3002";
 var DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
 var LOCAL_DICTIONARY_CACHE = /* @__PURE__ */ new Map();
 function normalizeWordSelection(value) {
@@ -54194,7 +54194,6 @@ function normalizeDictionaryEntry(selectedText, key, entry) {
       partOfSpeech: "",
       example: "",
       display: `**\u4E2D\u6587\u91CA\u4E49**\uFF1A${translation}`,
-      isWord: true,
       sourceType: "local-dictionary"
     };
   }
@@ -54216,7 +54215,6 @@ function normalizeDictionaryEntry(selectedText, key, entry) {
       partOfSpeech,
       example: String(entry.example || "").trim(),
       display: display || translation,
-      isWord: entry.isWord !== false,
       tags: Array.isArray(entry.tags) ? entry.tags : typeof entry.tag === "string" ? entry.tag.split(" ") : [],
       collins: entry.collins,
       oxford: entry.oxford,
@@ -54243,39 +54241,22 @@ async function lookupLocalDictionary(settings = {}, selectedText, app = null) {
   }
   return null;
 }
-function getTranslationAssetKind(assetOrText, translation = null) {
+function getTranslationAssetKind(assetOrText) {
   const explicit = assetOrText && typeof assetOrText === "object" ? assetOrText.kind : "";
-  if (["word", "phrase", "sentence"].includes(explicit))
+  if (explicit === "word" || explicit === "phrase")
     return explicit;
-  const isWord = translation && typeof translation.isWord === "boolean" ? translation.isWord : assetOrText && typeof assetOrText === "object" && typeof assetOrText.isWord === "boolean" ? assetOrText.isWord : true;
   const text = assetOrText && typeof assetOrText === "object" ? assetOrText.lemma || assetOrText.quote || "" : assetOrText || "";
-  if (!isWord)
-    return "sentence";
-  const normalized = normalizeWordSelection(text || "");
-  if (normalized && normalized.isPhrase)
-    return "phrase";
-  return "word";
+  return normalizeWordSelection(text || "")?.isPhrase ? "phrase" : "word";
 }
 function getTranslationAssetKey(selection, translation) {
-  const kind = getTranslationAssetKind(selection?.quote || "", translation);
-  if (kind !== "sentence") {
-    const normalized = normalizeWordSelection(translation?.lemma || selection?.quote || "");
-    return normalized ? normalized.lemma : "";
-  }
-  const source = `${selection?.cfiRange || ""}|${selection?.quote || ""}`;
-  let hash = 0;
-  for (let index = 0; index < source.length; index++) {
-    hash = hash * 31 + source.charCodeAt(index) >>> 0;
-  }
-  return `sentence-${hash.toString(36)}`;
+  if (translation?.isWord === false)
+    return "";
+  return normalizeWordSelection(translation?.lemma || selection?.quote || "")?.lemma || "";
 }
 function getTranslationAssetStorageKey(asset) {
-  if (!asset || !asset.lemma)
+  if (!asset || asset.isWord === false)
     return "";
-  if (getTranslationAssetKind(asset) === "sentence")
-    return asset.lemma;
-  const normalized = normalizeWordSelection(asset.lemma || "");
-  return normalized ? normalized.lemma : asset.lemma;
+  return normalizeWordSelection(asset.lemma || "")?.lemma || "";
 }
 function mergeWordSources(existingSources, nextSource) {
   const list = Array.isArray(existingSources) ? [...existingSources] : [];
@@ -54338,33 +54319,31 @@ function findWordAssetBySurface(assetsMap, value) {
   if (direct)
     return direct;
   const target = normalized.surface.toLowerCase();
-  return Object.values(assetsMap).find((asset) => getTranslationAssetKind(asset) !== "sentence" && (getWordAssetSurfaceForms(asset).some((form) => form.toLowerCase() === target) || isWordInflectionOf(target, asset?.lemma))) || null;
+  return Object.values(assetsMap).find((asset) => getWordAssetSurfaceForms(asset).some((form) => form.toLowerCase() === target) || isWordInflectionOf(target, asset?.lemma)) || null;
 }
 function buildWordAssetFromSelection(file, selection, translation, existingAsset = null, settings = {}) {
-  const kind = getTranslationAssetKind(selection?.quote || "", translation);
-  const normalized = kind === "sentence" ? null : normalizeWordSelection(translation?.lemma || selection?.quote || "");
-  const assetKey = kind === "sentence" ? getTranslationAssetKey(selection, translation) : normalized?.lemma || "";
-  if (!assetKey || kind !== "sentence" && !normalized)
+  const normalized = normalizeWordSelection(translation?.lemma || selection?.quote || "");
+  if (!normalized || translation?.isWord === false)
     return null;
+  const kind = normalized.isPhrase ? "phrase" : "word";
+  const assetKey = normalized.lemma;
   const selectedSurface = normalizeWordSelection(selection?.quote || "");
   const now = (/* @__PURE__ */ new Date()).toISOString();
   const quote = normalizeHighlightQuote(selection?.quote || "");
-  const title = kind === "sentence" ? quote : normalized?.surface || assetKey;
+  const title = normalized.surface || assetKey;
   const source = {
     bookPath: file.path,
     bookTitle: file.basename,
     chapterTitle: selection?.chapterTitle || file.basename,
     cfiRange: selection?.cfiRange || "",
     quote,
-    sentence: selection?.sentence || "",
     created: now
   };
   const asset = {
     lemma: assetKey,
     title,
     kind,
-    isWord: kind !== "sentence",
-    surfaceForms: kind === "sentence" ? [] : mergeStringList(mergeStringList(existingAsset?.surfaceForms, normalized.surface), selectedSurface?.surface),
+    surfaceForms: mergeStringList(mergeStringList(existingAsset?.surfaceForms, normalized.surface), selectedSurface?.surface),
     translation: (translation?.translation || existingAsset?.translation || "").trim(),
     phonetic: (translation?.phonetic || existingAsset?.phonetic || "").trim(),
     partOfSpeech: (translation?.partOfSpeech || existingAsset?.partOfSpeech || "").trim(),
@@ -54373,7 +54352,6 @@ function buildWordAssetFromSelection(file, selection, translation, existingAsset
     tags: translation?.tags || existingAsset?.tags,
     collins: translation?.collins || existingAsset?.collins,
     oxford: translation?.oxford || existingAsset?.oxford,
-    mastered: !!existingAsset?.mastered,
     sources: mergeWordSources(existingAsset?.sources, source),
     created: existingAsset?.created || now,
     updated: now
@@ -54385,7 +54363,6 @@ function buildWordAssetMetadata(asset) {
     lemma: asset.lemma || "",
     title: asset.title || "",
     kind: getTranslationAssetKind(asset),
-    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
     surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
     translation: asset.translation || "",
     display: asset.display || "",
@@ -54395,13 +54372,7 @@ function buildWordAssetMetadata(asset) {
     tags: asset.tags,
     collins: asset.collins,
     oxford: asset.oxford,
-    mastered: !!asset.mastered,
     sources: Array.isArray(asset.sources) ? asset.sources : [],
-    nextReviewDate: asset.nextReviewDate,
-    interval: asset.interval,
-    ease: asset.ease,
-    reviews: asset.reviews,
-    reviewTimeMs: asset.reviewTimeMs,
     created: asset.created || "",
     updated: asset.updated || ""
   };
@@ -54415,7 +54386,7 @@ function isWordAssetSource(value) {
 function isWordAssetRecord(value) {
   if (!isRecord(value))
     return false;
-  return typeof value.lemma === "string" && typeof value.title === "string" && ["word", "phrase", "sentence"].includes(String(value.kind || "")) && typeof value.isWord === "boolean" && Array.isArray(value.surfaceForms) && value.surfaceForms.every((form) => typeof form === "string") && typeof value.translation === "string" && typeof value.display === "string" && typeof value.phonetic === "string" && typeof value.partOfSpeech === "string" && typeof value.example === "string" && typeof value.mastered === "boolean" && Array.isArray(value.sources) && value.sources.every(isWordAssetSource) && typeof value.created === "string" && typeof value.updated === "string";
+  return typeof value.lemma === "string" && typeof value.title === "string" && ["word", "phrase", "sentence"].includes(String(value.kind || "")) && (typeof value.isWord === "boolean" || value.isWord === void 0) && Array.isArray(value.surfaceForms) && value.surfaceForms.every((form) => typeof form === "string") && typeof value.translation === "string" && typeof value.display === "string" && typeof value.phonetic === "string" && typeof value.partOfSpeech === "string" && typeof value.example === "string" && Array.isArray(value.sources) && value.sources.every(isWordAssetSource) && typeof value.created === "string" && typeof value.updated === "string";
 }
 function parseWordAssetSidecar(payload) {
   if (!isRecord(payload) || payload.version !== 2 || !isRecord(payload.wordAssets))
@@ -55650,132 +55621,11 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
 
 // src/EpubReader.tsx
 var import_react2 = __toESM(require_react(), 1);
-var import_obsidian6 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 var import_react_reader = __toESM(require_lib3(), 1);
 var ReactReaderModule = __toESM(require_lib3(), 1);
 init_utils();
 init_utils_core();
-
-// src/claudianBridge.ts
-var import_obsidian5 = require("obsidian");
-
-// src/smart-command-core.ts
-var WINDOWS_ABSOLUTE_PATH = /^[A-Za-z]:[\\/]/;
-function buildPromptFromTemplate(template, vars) {
-  let result = template;
-  for (const [key, value] of Object.entries(vars)) {
-    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), value);
-  }
-  return result;
-}
-function resolveSkillFilePath(configuredPath) {
-  const rawPath = (configuredPath || "").trim();
-  if (!rawPath) {
-    throw new Error("\u8BF7\u5148\u8BBE\u7F6E Skill \u76EE\u5F55\u3002");
-  }
-  if (rawPath.startsWith("/") || rawPath.startsWith("~") || WINDOWS_ABSOLUTE_PATH.test(rawPath)) {
-    throw new Error("Skill \u76EE\u5F55\u5FC5\u987B\u4F7F\u7528\u77E5\u8BC6\u5E93\u76F8\u5BF9\u8DEF\u5F84\u3002");
-  }
-  const normalizedPath = rawPath.replace(/\\/g, "/").replace(/^\.\/+/, "").replace(/\/+/g, "/").replace(/\/+$/g, "");
-  const pathSegments = normalizedPath.split("/");
-  if (pathSegments.some((segment) => segment === "..")) {
-    throw new Error("Skill \u76EE\u5F55\u4E0D\u80FD\u8DF3\u51FA\u5F53\u524D\u77E5\u8BC6\u5E93\u3002");
-  }
-  if (!normalizedPath) {
-    throw new Error("\u8BF7\u5148\u8BBE\u7F6E Skill \u76EE\u5F55\u3002");
-  }
-  if (normalizedPath.endsWith("/SKILL.md") || normalizedPath === "SKILL.md") {
-    return normalizedPath;
-  }
-  if (normalizedPath.toLowerCase().endsWith(".md")) {
-    throw new Error("Skill \u6587\u4EF6\u5FC5\u987B\u547D\u540D\u4E3A SKILL.md\u3002");
-  }
-  return `${normalizedPath}/SKILL.md`;
-}
-function buildDefaultSkillTask(vars) {
-  const lines = [];
-  if (vars.chapter) {
-    lines.push(`\u7AE0\u8282\uFF1A${vars.chapter}`);
-  }
-  lines.push(vars.selection || vars.content);
-  return lines.join("\n").trim();
-}
-async function prepareSmartCommandPrompt(command, vars, readSkillFile) {
-  if (command.source !== "skill") {
-    return buildPromptFromTemplate(command.prompt, vars);
-  }
-  const skillFilePath = resolveSkillFilePath(command.skillPath);
-  let skillContent;
-  try {
-    skillContent = await readSkillFile(skillFilePath);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`\u8BFB\u53D6 Skill \u5931\u8D25\uFF1A${message}`);
-  }
-  if (skillContent === null) {
-    throw new Error(`\u627E\u4E0D\u5230 Skill \u6587\u4EF6\uFF1A${skillFilePath}`);
-  }
-  if (!skillContent.trim()) {
-    throw new Error(`Skill \u6587\u4EF6\u5185\u5BB9\u4E3A\u7A7A\uFF1A${skillFilePath}`);
-  }
-  const taskTemplate = command.prompt.trim();
-  const task = taskTemplate ? buildPromptFromTemplate(taskTemplate, vars) : buildDefaultSkillTask(vars);
-  return [
-    `\u8BFB\u53D6\u5E76\u9075\u5FAA\uFF1A${skillFilePath}`,
-    "",
-    task
-  ].join("\n");
-}
-
-// src/claudianBridge.ts
-async function prepareSmartCommandPromptFromVault(app, command, vars) {
-  return prepareSmartCommandPrompt(command, vars, async (path) => {
-    const file = app.vault.getAbstractFileByPath(path);
-    if (!(file instanceof import_obsidian5.TFile)) {
-      return null;
-    }
-    return app.vault.read(file);
-  });
-}
-async function triggerClaudianPrompt(app, prompt) {
-  const appWithPlugins = app;
-  const claudianPlugin = appWithPlugins.plugins?.getPlugin(
-    "realclaudian"
-  );
-  if (!claudianPlugin) {
-    throw new Error("\u672A\u68C0\u6D4B\u5230 Claudian \u63D2\u4EF6\uFF0C\u8BF7\u5148\u5B89\u88C5\u5E76\u542F\u7528\u8BE5\u63D2\u4EF6\u3002");
-  }
-  if (typeof claudianPlugin.activateView !== "function" || typeof claudianPlugin.getView !== "function") {
-    throw new Error("Claudian \u754C\u9762\u63A5\u53E3\u5DF2\u53D8\u5316\uFF0C\u65E0\u6CD5\u6253\u5F00\u5BF9\u8BDD\u7A97\u53E3\u3002");
-  }
-  await claudianPlugin.activateView();
-  const input = claudianPlugin.getView()?.getActiveTab()?.dom.inputEl;
-  if (!input || !input.isConnected || typeof input.value !== "string") {
-    throw new Error("Claudian \u5BF9\u8BDD\u8F93\u5165\u6846\u5C1A\u672A\u5C31\u7EEA\uFF0C\u8BF7\u6253\u5F00\u5BF9\u8BDD\u540E\u91CD\u8BD5\u3002");
-  }
-  if (input.value.trim()) {
-    throw new Error("Claudian \u8F93\u5165\u6846\u4E2D\u6709\u672A\u53D1\u9001\u7684\u5185\u5BB9\uFF0C\u8BF7\u5148\u5904\u7406\u540E\u91CD\u8BD5\u3002");
-  }
-  const inputWindow = input.ownerDocument.defaultView;
-  if (!inputWindow) {
-    throw new Error("Claudian \u5BF9\u8BDD\u7A97\u53E3\u4E0D\u53EF\u7528\uFF0C\u8BF7\u91CD\u65B0\u6253\u5F00\u540E\u91CD\u8BD5\u3002");
-  }
-  input.value = prompt;
-  input.dispatchEvent(new inputWindow.Event("input", { bubbles: true }));
-  input.focus();
-  const enterEvent = new inputWindow.KeyboardEvent("keydown", {
-    key: "Enter",
-    code: "Enter",
-    metaKey: import_obsidian5.Platform.isMacOS,
-    ctrlKey: !import_obsidian5.Platform.isMacOS,
-    bubbles: true,
-    cancelable: true
-  });
-  input.dispatchEvent(enterEvent);
-  if (!enterEvent.defaultPrevented) {
-    throw new Error("Claudian \u672A\u63A5\u6536\u53D1\u9001\u64CD\u4F5C\uFF0C\u5185\u5BB9\u5DF2\u7559\u5728\u8F93\u5165\u6846\u4E2D\uFF0C\u8BF7\u68C0\u67E5\u540E\u624B\u52A8\u53D1\u9001\u3002");
-  }
-}
 
 // src/reader/ReaderSideControls.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
@@ -55840,8 +55690,7 @@ function getWordLookupResultFromAsset(asset, selectedText = "") {
     phonetic: asset.phonetic || "",
     partOfSpeech: asset.partOfSpeech || "",
     example: asset.example || "",
-    display: asset.display || "",
-    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence"
+    display: asset.display || ""
   };
 }
 function getLightWordAsset(asset) {
@@ -55931,7 +55780,7 @@ var ObsidianMarkdown = ({ text, onOpenLink }) => {
     el.empty();
     const globalApp = window.app;
     if (globalApp) {
-      import_obsidian6.MarkdownRenderer.render(
+      import_obsidian5.MarkdownRenderer.render(
         globalApp,
         text || "",
         el,
@@ -55960,7 +55809,7 @@ var ObsidianMarkdown = ({ text, onOpenLink }) => {
     className: "markdown-preview-view clean-markdown-view"
   });
 };
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, openWordNote, setWordMastered, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app, smartCommands, bookTitle }) => {
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
   const [location, setLocation] = (0, import_react2.useState)(initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
@@ -55998,11 +55847,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const pendingWordLookupRef = (0, import_react2.useRef)(0);
   const [theme, setTheme] = (0, import_react2.useState)(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
   const [currentColors, setCurrentColors] = (0, import_react2.useState)(highlightColors);
-  const [smartCmdMenuScope, setSmartCmdMenuScope] = (0, import_react2.useState)(null);
-  const smartCmdMenuRef = (0, import_react2.useRef)(null);
   const [activeSelectionInfo, setActiveSelectionInfo] = (0, import_react2.useState)(null);
   const activeSelectionInfoRef = (0, import_react2.useRef)(null);
-  const [hoveredMenuItem, setHoveredMenuItem] = (0, import_react2.useState)(null);
   (0, import_react2.useEffect)(() => {
     setCurrentColors(highlightColors);
   }, [highlightColors]);
@@ -56644,7 +56490,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!normalized)
       return null;
     const asset = findWordAssetBySurface(wordAssetsRef.current, normalized.surface);
-    if (!asset || asset.mastered)
+    if (!asset)
       return null;
     const wordRange = doc.createRange();
     wordRange.setStart(node, start);
@@ -56829,7 +56675,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         window.setTimeout(() => syncAutoWordHighlights(renditionRef.current), 0);
       }
     } catch (error) {
-      new import_obsidian6.Notice(error && error.message ? error.message : "Failed to save translation.");
+      new import_obsidian5.Notice(error && error.message ? error.message : "Failed to save translation.");
     }
   };
   const translatePendingWordWithAi = async () => {
@@ -56865,57 +56711,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return true;
     }
   };
-  const restorePendingWordAsset = async () => {
-    if (!savedWordAsset || typeof setWordMastered !== "function")
-      return;
-    const assetKey = getTranslationAssetStorageKey(savedWordAsset);
-    if (!assetKey)
-      return;
-    try {
-      const updated = await setWordMastered(savedWordAsset, false);
-      setCurrentWordAssets((current) => {
-        const next = {
-          ...current,
-          [assetKey]: updated || {
-            ...savedWordAsset,
-            mastered: false
-          }
-        };
-        wordAssetsRef.current = next;
-        return next;
-      });
-      clearAutoWordHighlights(renditionRef.current);
-      syncAutoWordHighlights(renditionRef.current);
-      new import_obsidian6.Notice("Word restored.");
-    } catch (error) {
-      new import_obsidian6.Notice(error && error.message ? error.message : "Failed to restore word.");
-    }
-  };
-  const markActiveWordMastered = async () => {
-    const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
-    const assetKey = getTranslationAssetStorageKey(asset);
-    if (!asset || !assetKey || typeof setWordMastered !== "function")
-      return;
-    try {
-      const updated = await setWordMastered(asset, true);
-      setCurrentWordAssets((current) => {
-        const next = {
-          ...current,
-          [assetKey]: updated || {
-            ...asset,
-            mastered: true
-          }
-        };
-        wordAssetsRef.current = next;
-        return next;
-      });
-      clearAutoWordHighlights(renditionRef.current);
-      syncAutoWordHighlights(renditionRef.current);
-      setActiveWordHover(null);
-    } catch (error) {
-      new import_obsidian6.Notice(error && error.message ? error.message : "Failed to mark mastered.");
-    }
-  };
   const deleteActiveWordAsset = async () => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
     const assetKey = getTranslationAssetStorageKey(asset);
@@ -56923,7 +56718,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     const effectiveApp = app || window.app;
     if (!effectiveApp) {
-      new import_obsidian6.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+      new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
       return;
     }
     const confirmed = await confirmDestructiveAction(
@@ -56950,7 +56745,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       clearAutoWordHighlights(renditionRef.current);
       syncAutoWordHighlights(renditionRef.current);
     } catch (error) {
-      new import_obsidian6.Notice(error && error.message ? error.message : "Failed to delete translation card.");
+      new import_obsidian5.Notice(error && error.message ? error.message : "Failed to delete translation card.");
     }
   };
   const translateActiveWordWithAi = async () => {
@@ -56958,7 +56753,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!asset || !assetKey || typeof translateSelection !== "function" || typeof saveWordAsset !== "function")
       return;
-    new import_obsidian6.Notice("\u6B63\u5728\u4F7F\u7528AI\u7FFB\u8BD1...");
+    new import_obsidian5.Notice("\u6B63\u5728\u4F7F\u7528AI\u7FFB\u8BD1...");
     try {
       const quote = asset.title || asset.lemma || "";
       const sentence = asset.sources && asset.sources[0] && asset.sources[0].sentence || asset.sources && asset.sources[0] && asset.sources[0].quote || "";
@@ -56977,9 +56772,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         return next;
       });
       setActiveWordHover((current) => current ? { ...current, asset: updatedAsset } : null);
-      new import_obsidian6.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
+      new import_obsidian5.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
     } catch (error) {
-      new import_obsidian6.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
+      new import_obsidian5.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
     }
   };
   const clearAutoWordHighlights = (rendition) => {
@@ -57029,7 +56824,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     rendition.__jarvisReaderWordHighlightIds.add(cfiRange);
     try {
       const kind = getTranslationAssetKind(asset);
-      const strokeColorVar = kind === "sentence" ? currentColors?.sentence || "#40c057" : kind === "phrase" ? currentColors?.phrase || "#ae3ec9" : currentColors?.word || "#4dabf7";
+      const strokeColorVar = kind === "phrase" ? currentColors?.phrase || "#ae3ec9" : currentColors?.word || "#4dabf7";
       const openWordCardFromEvent = (event) => {
         if (event && typeof event.preventDefault === "function")
           event.preventDefault();
@@ -57097,7 +56892,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const collectAutoWordMatches = (contents2, assetsMap) => {
     if (!contents2 || !contents2.document || !contents2.document.body || !assetsMap)
       return [];
-    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma && !asset.mastered && getTranslationAssetKind(asset) !== "sentence").flatMap((asset) => getWordAssetSurfaceForms(asset).map((surface) => ({
+    const assets = Object.values(assetsMap).filter((asset) => asset && asset.lemma).flatMap((asset) => getWordAssetSurfaceForms(asset).map((surface) => ({
       asset,
       surface,
       regex: buildWordMatchRegex(surface)
@@ -57170,7 +56965,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const contentsList = typeof rendition.getContents === "function" ? rendition.getContents() || [] : [];
     const seen = /* @__PURE__ */ new Set();
     for (const asset of Object.values(wordAssetsRef.current || {})) {
-      if (!asset || asset.mastered || !Array.isArray(asset.sources))
+      if (!asset || !Array.isArray(asset.sources))
         continue;
       for (const source of asset.sources) {
         if (!source || source.bookPath !== bookPath || !source.cfiRange || seen.has(source.cfiRange))
@@ -57610,52 +57405,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     setEditingNoteIndex(null);
     clearWordLookup();
   };
-  const fireSmartCommand = async (cmd, scope) => {
-    setSmartCmdMenuScope(null);
-    const effectiveApp = app || window.app;
-    if (!effectiveApp) {
-      new import_obsidian6.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
-      return;
-    }
-    let selectionText = "";
-    let noteContent = "";
-    const currentBookName = bookTitle || title || "";
-    const bookPrefix = currentBookName ? `\u300A${currentBookName}\u300B` : "";
-    if (scope === "selection" && pendingHighlightMenu) {
-      const quoteText = pendingHighlightMenu.quote || "";
-      selectionText = `${bookPrefix}\u539F\u6587\uFF1A${quoteText}`;
-    } else if (scope === "note" && pendingSelection) {
-      const entries = Array.isArray(pendingSelection.commentEntries) ? pendingSelection.commentEntries : [];
-      noteContent = entries.map((e) => e.text || "").filter(Boolean).join("\n\n") || (pendingSelection.comment || "");
-      const quoteText = pendingSelection.quote || "";
-      const quoteFormatted = `${bookPrefix}\u539F\u6587\uFF1A${quoteText}`;
-      selectionText = noteContent ? `${quoteFormatted}
-\u7B14\u8BB0\uFF1A${noteContent}` : quoteFormatted;
-    }
-    try {
-      const finalPrompt = await prepareSmartCommandPromptFromVault(effectiveApp, cmd, {
-        selection: selectionText || noteContent,
-        content: noteContent || selectionText,
-        book_title: bookTitle || title || "",
-        chapter: readerTitleRef.current || ""
-      });
-      await triggerClaudianPrompt(effectiveApp, finalPrompt);
-      new import_obsidian6.Notice(`\u5DF2\u5411 Claudian \u63D0\u4EA4\u300C${cmd.label}\u300D\u6307\u4EE4`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Jarvis Reader smart command failed.", error);
-      new import_obsidian6.Notice(message);
-    }
-  };
   const copyHighlightQuote = async (item) => {
     if (!item || !item.quote)
       return;
     try {
       await navigator.clipboard.writeText(item.quote);
-      new import_obsidian6.Notice("\u5DF2\u590D\u5236");
+      new import_obsidian5.Notice("\u5DF2\u590D\u5236");
     } catch (error) {
       console.warn("Jarvis Reader copy highlight failed.", error);
-      new import_obsidian6.Notice("\u590D\u5236\u5931\u8D25");
+      new import_obsidian5.Notice("\u590D\u5236\u5931\u8D25");
     }
   };
   const openHighlightCommentEditor = (item) => {
@@ -57694,7 +57452,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     const effectiveApp = app || window.app;
     if (!effectiveApp) {
-      new import_obsidian6.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+      new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
       return;
     }
     const confirmed = await confirmDestructiveAction(
@@ -57732,7 +57490,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian6.Notice("\u5DF2\u5220\u9664\u8BE5\u6761\u7B14\u8BB0\u3002");
+      new import_obsidian5.Notice("\u5DF2\u5220\u9664\u8BE5\u6761\u7B14\u8BB0\u3002");
     }
   };
   const confirmHighlight = async () => {
@@ -57889,7 +57647,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           onClick: async () => {
             const effectiveApp = app || window.app;
             if (!effectiveApp) {
-              new import_obsidian6.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+              new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
               return;
             }
             const confirmed = await confirmDestructiveAction(
@@ -57926,7 +57684,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const currentLinks = assocSec.links || [];
     const linkNames = currentLinks.map((l) => l.split("|")[0]);
     if (linkNames.includes(fileName)) {
-      new import_obsidian6.Notice("\u5DF2\u7ECF\u5173\u8054\u4E86\u8BE5\u6587\u4EF6\u3002");
+      new import_obsidian5.Notice("\u5DF2\u7ECF\u5173\u8054\u4E86\u8BE5\u6587\u4EF6\u3002");
       return;
     }
     const nowStr = formatLocalDateTime(/* @__PURE__ */ new Date());
@@ -57942,7 +57700,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian6.Notice("\u5DF2\u5173\u8054\u6587\u7AE0\u3002");
+      new import_obsidian5.Notice("\u5DF2\u5173\u8054\u6587\u7AE0\u3002");
     }
     setShowAssocDropdown(false);
   };
@@ -57963,7 +57721,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian6.Notice("\u5DF2\u53D6\u6D88\u5173\u8054\u3002");
+      new import_obsidian5.Notice("\u5DF2\u53D6\u6D88\u5173\u8054\u3002");
     }
   };
   const renderHighlightAiSections = () => {
@@ -58211,14 +57969,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const visibleWordPopoverRect = pendingWordSelection ? wordTranslationRect || getDefaultWordTranslationRect() : null;
   const normalizedPendingWord = pendingWordSelection ? normalizeWordSelection((wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || "") : null;
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
-  const pendingTranslationKind = pendingWordSelection && wordLookupState.result ? getTranslationAssetKind(pendingWordSelection.quote || "", wordLookupState.result) : normalizedPendingWord && normalizedPendingWord.isPhrase ? "phrase" : "word";
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
   const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
-  const persistPendingLabel = pendingTranslationKind === "sentence" ? "\u4FDD\u5B58\u957F\u53E5" : pendingTranslationKind === "phrase" ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
+  const persistPendingLabel = normalizedPendingWord?.isPhrase ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
   const pendingWordTags = (() => {
     const result = wordLookupState.result;
-    if (!result || !result.isWord)
+    if (!result || result.isWord === false)
       return [];
     const tags = [];
     if (result.oxford === 1)
@@ -58239,8 +57996,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       while (element.firstChild) {
         element.removeChild(element.firstChild);
       }
-      if (typeof import_obsidian6.setIcon === "function") {
-        (0, import_obsidian6.setIcon)(element, name);
+      if (typeof import_obsidian5.setIcon === "function") {
+        (0, import_obsidian5.setIcon)(element, name);
       }
     }
   });
@@ -58556,7 +58313,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }
   }), pendingHighlightMenu ? (() => {
     const containsEnglish = /[a-zA-Z]{2,}/.test(pendingHighlightMenu.quote || "");
-    const filteredSmartcmds = (smartCommands || []).filter((c) => c.enabled !== false && (c.scope === "selection" || c.scope === "both"));
     return import_react2.default.createElement(
       "div",
       {
@@ -58606,43 +58362,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           deleteExistingHighlight(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("trash"), import_react2.default.createElement("span", null, "\u5220\u9664\u9AD8\u4EAE")) : null,
-      filteredSmartcmds.length > 0 ? import_react2.default.createElement(
-        import_react2.default.Fragment,
-        null,
-        import_react2.default.createElement("div", { className: "jarvis-reader-context-menu-divider" }),
-        import_react2.default.createElement(
-          "div",
-          {
-            className: "jarvis-reader-context-menu-item has-submenu",
-            onMouseEnter: () => setHoveredMenuItem("ai"),
-            onMouseLeave: () => setHoveredMenuItem(null),
-            style: { position: "relative" }
-          },
-          renderObsidianIcon("bot"),
-          import_react2.default.createElement("span", null, "\u667A\u80FD\u6307\u4EE4"),
-          renderObsidianIcon("chevron-right"),
-          hoveredMenuItem === "ai" ? import_react2.default.createElement(
-            "div",
-            {
-              className: "jarvis-reader-context-submenu"
-            },
-            filteredSmartcmds.map(
-              (cmd) => import_react2.default.createElement("div", {
-                key: cmd.id,
-                className: "jarvis-reader-context-menu-item",
-                role: "button",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  void fireSmartCommand(cmd, "selection");
-                  setPendingHighlightMenu(null);
-                  setHoveredMenuItem(null);
-                }
-              }, renderObsidianIcon(cmd.icon || "bot"), import_react2.default.createElement("span", null, cmd.label))
-            )
-          ) : null
-        )
-      ) : null
+      }, renderObsidianIcon("trash"), import_react2.default.createElement("span", null, "\u5220\u9664\u9AD8\u4EAE")) : null
     );
   })() : null, pendingWordSelection ? import_react2.default.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
@@ -58666,19 +58386,11 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }), import_react2.default.createElement("div", {
     className: "jarvis-reader-word-card-actions",
     onPointerDown: (event) => event.stopPropagation()
-  }, savedWordAsset ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
-    title: "\u6253\u5F00\u8BCD\u6761",
-    onClick: () => openWordNote(savedWordAsset)
-  }, renderObsidianIcon("book-open")) : null, canSwitchPendingWordToAi ? import_react2.default.createElement("button", {
+  }, canSwitchPendingWordToAi ? import_react2.default.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
     title: "AI \u7FFB\u8BD1",
     onClick: translatePendingWordWithAi
-  }, renderObsidianIcon("bot")) : null, savedWordAsset && savedWordAsset.mastered ? import_react2.default.createElement("button", {
-    className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
-    title: "\u91CD\u65B0\u52A0\u5165",
-    onClick: restorePendingWordAsset
-  }, renderObsidianIcon("rotate-ccw")) : null, canPersistPendingWord && !savedWordAsset ? import_react2.default.createElement("button", {
+  }, renderObsidianIcon("bot")) : null, canPersistPendingWord && !savedWordAsset ? import_react2.default.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-save",
     title: persistPendingLabel,
     onClick: persistPendingWordAsset
@@ -58695,7 +58407,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   }, wordLookupState.error || "\u7FFB\u8BD1\u5931\u8D25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? import_react2.default.createElement(
     import_react2.default.Fragment,
     null,
-    wordLookupState.result.isWord ? import_react2.default.createElement("div", {
+    wordLookupState.result.isWord !== false ? import_react2.default.createElement("div", {
       className: "jarvis-reader-word-head"
     }, import_react2.default.createElement("button", {
       className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button jarvis-reader-word-translate-lemma",
@@ -58754,17 +58466,6 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       title: "\u63D0\u5347\u4E3A\u77E5\u8BC6\u7B14\u8BB0",
       onClick: () => promoteHighlight(pendingSelection)
     }, renderObsidianIcon("file-plus-2")) : null,
-    ...(smartCommands || []).filter((c) => c.enabled !== false && (c.scope === "note" || c.scope === "both")).map(
-      (cmd) => import_react2.default.createElement("button", {
-        key: cmd.id,
-        className: "jarvis-reader-highlight-icon-button",
-        type: "button",
-        title: cmd.label,
-        onClick: () => {
-          void fireSmartCommand(cmd, "note");
-        }
-      }, renderObsidianIcon(cmd.icon || "bot"))
-    ),
     import_react2.default.createElement("button", {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
@@ -58955,11 +58656,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       onDoubleClick: resetWordHoverCardPosition
     }, import_react2.default.createElement("div", {
       className: "jarvis-reader-word-card-head-row"
-    }, getTranslationAssetKind(activeWordHover.asset) === "sentence" ? import_react2.default.createElement("div", {
-      className: "jarvis-reader-word-card-lemma jarvis-reader-word-card-sentence-title",
-      style: { flex: "0 0 auto", cursor: "text", fontSize: "14px", color: "var(--text-muted)" },
-      onPointerDown: (e) => e.stopPropagation()
-    }, "\u957F\u53E5\u7FFB\u8BD1") : import_react2.default.createElement("button", {
+    }, import_react2.default.createElement("button", {
       className: "jarvis-reader-word-card-lemma",
       title: "\u70B9\u51FB\u53D1\u97F3",
       style: { flex: "0 0 auto", cursor: "pointer" },
@@ -58971,21 +58668,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       className: "jarvis-reader-word-card-actions",
       onPointerDown: (e) => e.stopPropagation()
     }, import_react2.default.createElement("button", {
-      className: "jarvis-reader-word-card-action jarvis-reader-word-card-open",
-      title: "\u6253\u5F00\u8BCD\u6761",
-      onClick: () => {
-        hideWordHoverCard();
-        openWordNote(activeWordHover.asset);
-      }
-    }, renderObsidianIcon("book")), import_react2.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
       title: "AI\u7FFB\u8BD1",
       onClick: translateActiveWordWithAi
     }, renderObsidianIcon("bot")), import_react2.default.createElement("button", {
-      className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
-      title: "\u6807\u8BB0\u5DF2\u638C\u63E1",
-      onClick: markActiveWordMastered
-    }, renderObsidianIcon("check")), import_react2.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
       title: "\u5220\u9664\u8BCD\u6761",
       onClick: deleteActiveWordAsset
@@ -58994,7 +58680,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       title: "\u5173\u95ED\u5361\u7247",
       onClick: hideWordHoverCard
     }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {}, activeWordHover.asset.phonetic) : null),
-    activeWordHover.asset.isWord && (activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford) ? import_react2.default.createElement(
+    activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford ? import_react2.default.createElement(
       "div",
       { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
       activeWordHover.asset.oxford === 1 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
@@ -59003,7 +58689,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     ) : null,
     import_react2.default.createElement("div", {
       className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
-    }, getTranslationAssetKind(activeWordHover.asset) === "sentence" || (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react2.default.createElement("div", {
+    }, (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react2.default.createElement("div", {
       className: "jarvis-reader-word-card-original-sentence",
       style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
     }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react2.default.createElement("div", {
@@ -59149,7 +58835,7 @@ async function openFileOnceInActiveTab(workspace, file, viewType) {
 function getWordAssetsMap(settings) {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
 }
-var EpubView = class extends import_obsidian7.FileView {
+var EpubView = class extends import_obsidian6.FileView {
   settings;
   plugin;
   fileToc = null;
@@ -59190,44 +58876,25 @@ var EpubView = class extends import_obsidian7.FileView {
     const assetMap = getWordAssetsMap(this.plugin.settings);
     const assetKey = getTranslationAssetKey(selection, translation);
     if (!assetKey) {
-      new import_obsidian7.Notice("Only English words, short phrases, or translated sentences can be saved.");
+      new import_obsidian6.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
       return null;
     }
     const existing = assetMap[assetKey];
     const asset = buildWordAssetFromSelection(this.file, selection, translation, existing, this.plugin.settings);
     if (!asset) {
-      new import_obsidian7.Notice("Failed to build word asset.");
+      new import_obsidian6.Notice("Failed to build word asset.");
       return null;
     }
     await this.plugin.wordAssetService.save(getLightWordAsset(asset));
-    new import_obsidian7.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u5B57\u5178");
+    new import_obsidian6.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u5B57\u5178");
     return asset;
-  }
-  async openWordNote(asset) {
-    if (typeof this.plugin.openWordSidebarPane === "function") {
-      this.plugin.openWordSidebarPane(true, asset);
-    } else {
-      new import_obsidian7.Notice("\u8BCD\u53E5\u5361\u7247\u73B0\u5DF2\u65E0\u6587\u4EF6\u5316\uFF0C\u8BF7\u5728\u53F3\u4FA7\u8FB9\u680F\u67E5\u9605");
-    }
-  }
-  async setWordMastered(asset, mastered) {
-    const assetKey = getTranslationAssetStorageKey(asset);
-    if (!assetKey)
-      return null;
-    const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
-    const updated = {
-      ...current,
-      mastered: !!mastered,
-      updated: (/* @__PURE__ */ new Date()).toISOString()
-    };
-    return await this.plugin.wordAssetService.save(getLightWordAsset(updated));
   }
   async deleteWordAsset(asset) {
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!assetKey)
       return false;
     await this.plugin.wordAssetService.delete(assetKey);
-    new import_obsidian7.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+    new import_obsidian6.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
     return true;
   }
   async loadWordDisplay(asset) {
@@ -59243,8 +58910,8 @@ var EpubView = class extends import_obsidian7.FileView {
     if (!highlight.notePath) return;
     try {
       const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
-      if (!(noteFile instanceof import_obsidian7.TFile)) {
-        new import_obsidian7.Notice("\u627E\u4E0D\u5230\u8FD9\u6761\u5212\u7EBF\u5BF9\u5E94\u7684\u4E66\u7C4D\u7B14\u8BB0\u3002");
+      if (!(noteFile instanceof import_obsidian6.TFile)) {
+        new import_obsidian6.Notice("\u627E\u4E0D\u5230\u8FD9\u6761\u5212\u7EBF\u5BF9\u5E94\u7684\u4E66\u7C4D\u7B14\u8BB0\u3002");
         return;
       }
       const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
@@ -59260,10 +58927,10 @@ var EpubView = class extends import_obsidian7.FileView {
         createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
       });
       await openFileInActiveTab(this.app.workspace, file);
-      new import_obsidian7.Notice("\u5DF2\u6253\u5F00\u77E5\u8BC6\u7B14\u8BB0\u3002");
+      new import_obsidian6.Notice("\u5DF2\u6253\u5F00\u77E5\u8BC6\u7B14\u8BB0\u3002");
     } catch (error) {
       console.error("Jarvis Reader knowledge note creation failed.", error);
-      new import_obsidian7.Notice(`\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u5931\u8D25\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+      new import_obsidian6.Notice(`\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u5931\u8D25\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
     }
   }
   async runHighlightTransaction(notePath, previousHighlights, nextHighlights, reason, applyMarkdown) {
@@ -59280,9 +58947,9 @@ var EpubView = class extends import_obsidian7.FileView {
     } catch (error) {
       console.error("Jarvis Reader highlight transaction failed.", error);
       if (error instanceof HighlightContentConflictError) {
-        new import_obsidian7.Notice(error.message, 0);
+        new import_obsidian6.Notice(error.message, 0);
       } else {
-        new import_obsidian7.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+        new import_obsidian6.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
       }
       return false;
     }
@@ -59296,7 +58963,7 @@ var EpubView = class extends import_obsidian7.FileView {
         continue;
       }
       const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
-      if (!(noteFile instanceof import_obsidian7.TFile)) {
+      if (!(noteFile instanceof import_obsidian6.TFile)) {
         enriched.push(highlight);
         continue;
       }
@@ -59333,7 +59000,7 @@ var EpubView = class extends import_obsidian7.FileView {
   async createHighlight(selection) {
     const quote = normalizeHighlightQuote(selection?.quote);
     if (!quote || !selection?.cfiRange) {
-      new import_obsidian7.Notice("\u672A\u9009\u4E2D\u6587\u672C");
+      new import_obsidian6.Notice("\u672A\u9009\u4E2D\u6587\u672C");
       return null;
     }
     const noteFile = await getOrCreateBookNote(this.app, this.file, getEpubTocMd(this.fileToc), this.plugin.settings);
@@ -59365,7 +59032,7 @@ var EpubView = class extends import_obsidian7.FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id);
-    new import_obsidian7.Notice(highlight.comment ? "\u7B14\u8BB0\u5DF2\u4FDD\u5B58" : "\u9AD8\u4EAE\u5DF2\u4FDD\u5B58");
+    new import_obsidian6.Notice(highlight.comment ? "\u7B14\u8BB0\u5DF2\u4FDD\u5B58" : "\u9AD8\u4EAE\u5DF2\u4FDD\u5B58");
     return highlight;
   }
   async updateHighlight(highlight) {
@@ -59391,8 +59058,8 @@ var EpubView = class extends import_obsidian7.FileView {
       updated.commentEntries = highlight.commentEntries;
     }
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath);
-    if (!(noteFile instanceof import_obsidian7.TFile)) {
-      new import_obsidian7.Notice(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${updated.notePath || "\u672A\u77E5\u8DEF\u5F84"}`);
+    if (!(noteFile instanceof import_obsidian6.TFile)) {
+      new import_obsidian6.Notice(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${updated.notePath || "\u672A\u77E5\u8DEF\u5F84"}`);
       return null;
     }
     const nextHighlights = list.map((item) => item.id === updated.id ? updated : item);
@@ -59417,7 +59084,7 @@ var EpubView = class extends import_obsidian7.FileView {
     this.selectedHighlightId = updated.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id);
-    new import_obsidian7.Notice(updated.comment ? "\u7B14\u8BB0\u5DF2\u66F4\u65B0" : "\u9AD8\u4EAE\u5DF2\u66F4\u65B0");
+    new import_obsidian6.Notice(updated.comment ? "\u7B14\u8BB0\u5DF2\u66F4\u65B0" : "\u9AD8\u4EAE\u5DF2\u66F4\u65B0");
     return updated;
   }
   async deleteHighlight(highlight) {
@@ -59428,7 +59095,7 @@ var EpubView = class extends import_obsidian7.FileView {
     if (!existing)
       return false;
     const noteFile = this.app.vault.getAbstractFileByPath(existing.notePath);
-    if (noteFile instanceof import_obsidian7.TFile) {
+    if (noteFile instanceof import_obsidian6.TFile) {
       if (!await this.runHighlightTransaction(
         noteFile.path,
         list,
@@ -59447,7 +59114,7 @@ var EpubView = class extends import_obsidian7.FileView {
         );
       } catch (error) {
         console.error("Jarvis Reader orphan highlight delete failed.", error);
-        new import_obsidian7.Notice("\u4E66\u7C4D\u7B14\u8BB0\u5DF2\u4E0D\u5B58\u5728\uFF0C\u4F46\u9AD8\u4EAE\u7D22\u5F15\u5220\u9664\u5931\u8D25\uFF1B\u7D22\u5F15\u4FDD\u6301\u539F\u6837\u3002", 0);
+        new import_obsidian6.Notice("\u4E66\u7C4D\u7B14\u8BB0\u5DF2\u4E0D\u5B58\u5728\uFF0C\u4F46\u9AD8\u4EAE\u7D22\u5F15\u5220\u9664\u5931\u8D25\uFF1B\u7D22\u5F15\u4FDD\u6301\u539F\u6837\u3002", 0);
         return false;
       }
     }
@@ -59466,7 +59133,7 @@ var EpubView = class extends import_obsidian7.FileView {
     }
     this.renderHighlightsPane();
     this.refreshCurrentHighlightPanes();
-    new import_obsidian7.Notice("\u6807\u6CE8\u5DF2\u5220\u9664");
+    new import_obsidian6.Notice("\u6807\u6CE8\u5DF2\u5220\u9664");
     return true;
   }
   selectHighlight(highlight) {
@@ -59608,7 +59275,7 @@ var EpubView = class extends import_obsidian7.FileView {
   }
   reportBackgroundSaveError(context, error) {
     console.error(`Jarvis Reader ${context}\u4FDD\u5B58\u5931\u8D25\u3002`, error);
-    new import_obsidian7.Notice(`${context}\u4FDD\u5B58\u5931\u8D25\uFF0C\u5C06\u5728\u4E0B\u6B21\u64CD\u4F5C\u65F6\u91CD\u8BD5\u3002`);
+    new import_obsidian6.Notice(`${context}\u4FDD\u5B58\u5931\u8D25\uFF0C\u5C06\u5728\u4E0B\u6B21\u64CD\u4F5C\u65F6\u91CD\u8BD5\u3002`);
   }
   async setReaderZoom(delta) {
     const nextZoom = clampReaderZoom(clampReaderZoom(this.plugin.settings.readerZoom) + delta);
@@ -59749,13 +59416,9 @@ var EpubView = class extends import_obsidian7.FileView {
       wordAssets: this.getWordAssets(),
       translateSelection: (text, sentence = "", options = {}) => this.translateSelection(text, sentence, options),
       saveWordAsset: (selection, translation) => this.saveWordAsset(selection, translation),
-      openWordNote: (asset) => {
-        this.openWordNote(asset);
-      },
       addBookmark: (cfi, title) => {
         this.addBookmark(cfi, title);
       },
-      setWordMastered: (asset, mastered) => this.setWordMastered(asset, mastered),
       deleteWordAsset: (asset) => this.deleteWordAsset(asset),
       loadWordDisplay: (asset) => this.loadWordDisplay(asset),
       autoWordHighlight: this.shouldAutoHighlightWords(),
@@ -59774,9 +59437,7 @@ var EpubView = class extends import_obsidian7.FileView {
       onInteraction: () => {
         this.lastInteractionTime = Date.now();
       },
-      app: this.app,
-      smartCommands: this.plugin.settings.smartCommands || [],
-      bookTitle: file.basename
+      app: this.app
     }));
   }
   onunload() {
@@ -59813,15 +59474,15 @@ var EpubView = class extends import_obsidian7.FileView {
         created: Date.now()
       });
       if (!added) {
-        new import_obsidian7.Notice("\u8BE5\u4F4D\u7F6E\u5DF2\u5B58\u5728\u4E66\u7B7E");
+        new import_obsidian6.Notice("\u8BE5\u4F4D\u7F6E\u5DF2\u5B58\u5728\u4E66\u7B7E");
         return;
       }
-      new import_obsidian7.Notice("\u4E66\u7B7E\u5DF2\u6DFB\u52A0");
+      new import_obsidian6.Notice("\u4E66\u7B7E\u5DF2\u6DFB\u52A0");
       const event = new CustomEvent("jarvis-reader-bookmarks-updated", { detail: path });
       window.dispatchEvent(event);
     } catch (error) {
       console.error("Failed to add bookmark", error);
-      new import_obsidian7.Notice("\u4E66\u7B7E\u4FDD\u5B58\u5931\u8D25\uFF0C\u672A\u4FDD\u7559\u672C\u6B21\u66F4\u6539\u3002");
+      new import_obsidian6.Notice("\u4E66\u7B7E\u4FDD\u5B58\u5931\u8D25\uFF0C\u672A\u4FDD\u7559\u672C\u6B21\u66F4\u6539\u3002");
     }
   }
   canAcceptExtension(extension) {
@@ -59833,7 +59494,7 @@ var EpubView = class extends import_obsidian7.FileView {
 };
 
 // src/conflict-resolver.ts
-var import_obsidian8 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/conflict-resolution-core.ts
 function isRecord2(value) {
@@ -59936,19 +59597,6 @@ function mergeSettingsPayload(current, payload) {
       next.readingStats[date] = existingBooks;
     }
   }
-  if (payload.wordReviewStats !== void 0) {
-    if (!isRecord2(payload.wordReviewStats)) return null;
-    for (const [date, statValue] of Object.entries(payload.wordReviewStats)) {
-      if (!isRecord2(statValue)) return null;
-      const existing = next.wordReviewStats[date] || {};
-      const reviewCount = typeof statValue.reviewCount === "number" ? statValue.reviewCount : 0;
-      const reviewTimeMs = typeof statValue.reviewTimeMs === "number" ? statValue.reviewTimeMs : 0;
-      next.wordReviewStats[date] = {
-        reviewCount: Math.max(existing.reviewCount || 0, reviewCount),
-        reviewTimeMs: Math.max(existing.reviewTimeMs || 0, reviewTimeMs)
-      };
-    }
-  }
   if (payload.bookProgress !== void 0) {
     if (!isRecord2(payload.bookProgress)) return null;
     for (const [bookPath, progressValue] of Object.entries(payload.bookProgress)) {
@@ -60004,13 +59652,11 @@ async function createConflictBackup(adapter, files) {
 function currentSettingsState(host) {
   return {
     readingStats: structuredClone(host.settings.readingStats || {}),
-    wordReviewStats: structuredClone(host.settings.wordReviewStats || {}),
     bookProgress: structuredClone(host.settings.bookProgress || {})
   };
 }
 function applySettingsState(host, state) {
   host.settings.readingStats = state.readingStats;
-  host.settings.wordReviewStats = state.wordReviewStats;
   host.settings.bookProgress = state.bookProgress;
 }
 async function parseJson(adapter, path) {
@@ -60095,7 +59741,7 @@ async function mergeConfirmedConflicts(host, files) {
 // src/conflict-resolver.ts
 function confirmConflictResolution(app, files) {
   return new Promise((resolve) => {
-    const modal = new import_obsidian8.Modal(app);
+    const modal = new import_obsidian7.Modal(app);
     let settled = false;
     const finish = (value) => {
       if (settled) return;
@@ -60112,7 +59758,7 @@ function confirmConflictResolution(app, files) {
     modal.contentEl.createEl("p", {
       text: `\u5171 ${allConflictPaths(files).length} \u4E2A\u6587\u4EF6\u3002\u9009\u62E9\u201C\u7A0D\u540E\u5904\u7406\u201D\u5C06\u4FDD\u6301\u6240\u6709\u6587\u4EF6\u539F\u6837\u3002`
     });
-    new import_obsidian8.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u7A0D\u540E\u5904\u7406").onClick(() => finish(false))).addButton((button) => button.setButtonText("\u5907\u4EFD\u5E76\u5408\u5E76").setWarning().onClick(() => finish(true)));
+    new import_obsidian7.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u7A0D\u540E\u5904\u7406").onClick(() => finish(false))).addButton((button) => button.setButtonText("\u5907\u4EFD\u5E76\u5408\u5E76").setWarning().onClick(() => finish(true)));
     modal.onClose = () => finish(false);
     modal.open();
   });
@@ -60123,22 +59769,22 @@ async function resolveSyncConflicts(plugin) {
     if (!hasConflictFiles(files)) return;
     const confirmed = await confirmConflictResolution(plugin.app, files);
     if (!confirmed) {
-      new import_obsidian8.Notice("\u540C\u6B65\u51B2\u7A81\u526F\u672C\u4FDD\u6301\u539F\u6837\uFF0C\u53EF\u5728\u4E0B\u6B21\u542F\u52A8\u65F6\u7EE7\u7EED\u5904\u7406\u3002");
+      new import_obsidian7.Notice("\u540C\u6B65\u51B2\u7A81\u526F\u672C\u4FDD\u6301\u539F\u6837\uFF0C\u53EF\u5728\u4E0B\u6B21\u542F\u52A8\u65F6\u7EE7\u7EED\u5904\u7406\u3002");
       return;
     }
     const backupRoot = await mergeConfirmedConflicts(plugin, files);
-    new import_obsidian8.Notice(`\u540C\u6B65\u51B2\u7A81\u5DF2\u5907\u4EFD\u5E76\u5408\u5E76\u3002\u5907\u4EFD\u4F4D\u7F6E\uFF1A${backupRoot}`, 1e4);
+    new import_obsidian7.Notice(`\u540C\u6B65\u51B2\u7A81\u5DF2\u5907\u4EFD\u5E76\u5408\u5E76\u3002\u5907\u4EFD\u4F4D\u7F6E\uFF1A${backupRoot}`, 1e4);
   } catch (error) {
     console.error("Jarvis Reader conflict resolution failed.", error);
-    new import_obsidian8.Notice(`\u540C\u6B65\u51B2\u7A81\u5904\u7406\u5931\u8D25\uFF0C\u51B2\u7A81\u526F\u672C\u672A\u5220\u9664\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+    new import_obsidian7.Notice(`\u540C\u6B65\u51B2\u7A81\u5904\u7406\u5931\u8D25\uFF0C\u51B2\u7A81\u526F\u672C\u672A\u5220\u9664\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
   }
 }
 
 // src/sidebar/BookshelfView.ts
-var import_obsidian10 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 
 // src/sidebar/HighlightsView.ts
-var import_obsidian9 = require("obsidian");
+var import_obsidian8 = require("obsidian");
 init_utils();
 var HighlightsPanelController = class {
   app;
@@ -60303,7 +59949,7 @@ var HighlightsPanelController = class {
   renderMoreMenu(event) {
     event.preventDefault();
     event.stopPropagation();
-    const menu = new import_obsidian9.Menu();
+    const menu = new import_obsidian8.Menu();
     menu.addItem((item) => {
       item.setTitle("\u5F53\u524D\u7AE0\u8282").setIcon(this.currentChapterOnly ? "check" : "list").onClick(() => {
         this.currentChapterOnly = !this.currentChapterOnly;
@@ -60468,7 +60114,7 @@ var HighlightsPanelController = class {
       };
       card.oncontextmenu = (event) => {
         event.preventDefault();
-        const menu = new import_obsidian9.Menu();
+        const menu = new import_obsidian8.Menu();
         menu.addItem((item) => {
           item.setTitle("\u5220\u9664\u7B14\u8BB0").setIcon("trash").onClick(async () => {
             const confirmed = await confirmDestructiveAction(
@@ -60518,7 +60164,7 @@ var HighlightsPanelController = class {
 // src/sidebar/BookshelfView.ts
 init_utils();
 var BOOKSHELF_VIEW_TYPE = "jarvis-reader-bookshelf";
-var JarvisReaderBookshelfView = class extends import_obsidian10.ItemView {
+var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
   plugin;
   activePanel;
   activeNavigationPanel;
@@ -60663,7 +60309,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian10.ItemView {
     button.onclick = (event) => {
       event.preventDefault();
       if (disabled) {
-        new import_obsidian10.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
+        new import_obsidian9.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
         return;
       }
       onClick();
@@ -60769,7 +60415,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian10.ItemView {
       window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated", { detail: activeEpub.file.path }));
     } catch (error) {
       console.error("Failed to remove bookmark", error);
-      new import_obsidian10.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
+      new import_obsidian9.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
     }
   }
   renderBookmarksList(container, activeEpub, bookmarks) {
@@ -60981,18 +60627,18 @@ var JarvisReaderBookshelfView = class extends import_obsidian10.ItemView {
 };
 
 // src/library/LibraryView.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 var React6 = __toESM(require_react(), 1);
 var ReactDOM = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
 var React5 = __toESM(require_react(), 1);
-var import_obsidian13 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 init_book_notes();
 init_utils();
 
 // src/library/BookBookmarksPanel.tsx
-var import_obsidian11 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 init_utils();
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 function BookBookmarksPanel({ plugin, book, bookmarks }) {
@@ -61007,7 +60653,7 @@ function BookBookmarksPanel({ plugin, book, bookmarks }) {
       window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
     } catch (error) {
       console.error("Failed to remove bookmark", error);
-      new import_obsidian11.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
+      new import_obsidian10.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
     }
   };
   const jumpToBookmark = async (bookmark) => {
@@ -61042,7 +60688,7 @@ function BookBookmarksPanel({ plugin, book, bookmarks }) {
 
 // src/library/BookHighlightsPanel.tsx
 var import_react4 = __toESM(require_react(), 1);
-var import_obsidian12 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 
 // src/library/library-highlight-core.ts
 function getLibraryHighlightNoteEntries(highlight) {
@@ -61078,7 +60724,7 @@ function formatDateTime(value) {
 function ObsidianIcon({ name }) {
   const ref = import_react4.default.useRef(null);
   import_react4.default.useEffect(() => {
-    if (ref.current) (0, import_obsidian12.setIcon)(ref.current, name);
+    if (ref.current) (0, import_obsidian11.setIcon)(ref.current, name);
   }, [name]);
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { ref, style: { width: "13px", height: "13px", display: "inline-flex" } });
 }
@@ -61088,7 +60734,7 @@ function MarkdownText({ content, plugin }) {
     const element = ref.current;
     if (!element) return;
     element.empty();
-    void import_obsidian12.MarkdownRenderer.render(plugin.app, content, element, "", plugin).catch(console.error);
+    void import_obsidian11.MarkdownRenderer.render(plugin.app, content, element, "", plugin).catch(console.error);
   }, [content, plugin]);
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { ref, className: "jarvis-library-markdown" });
 }
@@ -61099,8 +60745,8 @@ function BookHighlightsPanel({ plugin, book, title, highlights, onJump }) {
   const normalColor = plugin.settings.highlightColors?.normal || "#ffeb3b";
   const openLink = async (linkPath) => {
     const file = plugin.app.metadataCache.getFirstLinkpathDest(linkPath, "");
-    if (file instanceof import_obsidian12.TFile) await plugin.app.workspace.getLeaf(false).openFile(file);
-    else new import_obsidian12.Notice(`\u672A\u627E\u5230\u6587\u4EF6: ${linkPath}`);
+    if (file instanceof import_obsidian11.TFile) await plugin.app.workspace.getLeaf(false).openFile(file);
+    else new import_obsidian11.Notice(`\u672A\u627E\u5230\u6587\u4EF6: ${linkPath}`);
   };
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-highlights-list", children: highlights.map((highlight) => {
     const notes = getLibraryHighlightNoteEntries(highlight);
@@ -61149,7 +60795,7 @@ function BookHighlightsPanel({ plugin, book, title, highlights, onJump }) {
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-actions", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
           const note = highlight.comment ? `\uFF08\u7B14\u8BB0\uFF1A${highlight.comment}\uFF09` : "";
-          void navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${highlight.quote || ""}\u300D${note}`).then(() => new import_obsidian12.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F"));
+          void navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${highlight.quote || ""}\u300D${note}`).then(() => new import_obsidian11.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F"));
         }, children: "\u590D\u5236\u5185\u5BB9" }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => onJump(book, highlight), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
       ] })
@@ -61197,16 +60843,6 @@ function resolveBookStatus(fm, percentage) {
 function formatBookStatus(status) {
   return status === "finished" ? "\u5DF2\u8BFB\u5B8C" : status === "reading" ? "\u5728\u8BFB" : "\u672A\u8BFB";
 }
-var MarkdownText2 = ({ content, plugin }) => {
-  const ref = React5.useRef(null);
-  React5.useEffect(() => {
-    if (ref.current) {
-      ref.current.empty();
-      import_obsidian13.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
-    }
-  }, [content, plugin]);
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { ref, className: "jarvis-library-markdown" });
-};
 function LibraryApp({ plugin }) {
   const [currentView, setCurrentView] = React5.useState("home");
   const [activeBook, setActiveBook] = React5.useState(null);
@@ -61245,132 +60881,10 @@ function LibraryApp({ plugin }) {
   const [statsChartType, setStatsChartType] = React5.useState("bar");
   const [debugImages, setDebugImages] = React5.useState(null);
   const [refreshTrigger, setRefreshTrigger] = React5.useState(0);
-  const [expandedItems, setExpandedItems] = React5.useState(/* @__PURE__ */ new Set());
-  const handleToggleSingleMastery = async (e, lemma) => {
-    e.stopPropagation();
-    if (plugin.settings.wordAssets[lemma]) {
-      const current = plugin.settings.wordAssets[lemma].mastered;
-      await plugin.wordAssetService.setMastered(lemma, !current);
-      setRefreshTrigger((p) => p + 1);
-    }
-  };
-  const handleDeleteWord = async (lemma) => {
-    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761 "${lemma}" \u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
-    if (!confirmed) return;
-    if (!plugin.settings.wordAssets[lemma]) return;
-    await plugin.wordAssetService.delete(lemma);
-    setRefreshTrigger((p) => p + 1);
-    new import_obsidian13.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
-  };
-  const renderTableRow = (asset) => {
-    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-    const isSentence = asset.kind === "sentence";
-    const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
-    const displayWord = isSentence && quote ? quote : asset.lemma;
-    const isExpanded = expandedItems.has(assetKey);
-    const handleRowClick = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
-        return;
-      }
-      const newExpanded = /* @__PURE__ */ new Set();
-      if (!expandedItems.has(assetKey)) {
-        newExpanded.add(assetKey);
-      }
-      setExpandedItems(newExpanded);
-    };
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
-      "tr",
-      {
-        style: { borderBottom: "1px solid var(--background-modifier-border)", cursor: "pointer" },
-        onClick: handleRowClick,
-        onContextMenu: (e) => {
-          e.preventDefault();
-          const menu = new import_obsidian13.Menu();
-          const isMastered = asset.mastered;
-          menu.addItem((item) => {
-            item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
-              if (plugin.settings.wordAssets[assetKey]) {
-                await plugin.wordAssetService.setMastered(assetKey, !isMastered);
-                setRefreshTrigger((p) => p + 1);
-              }
-            });
-          });
-          menu.addSeparator();
-          menu.addItem((item) => {
-            item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(() => handleDeleteWord(assetKey));
-          });
-          menu.showAtMouseEvent(e.nativeEvent);
-        },
-        children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", fontWeight: "bold" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "inline-block" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              "span",
-              {
-                style: {
-                  cursor: "pointer",
-                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
-                  ...isSentence ? { fontWeight: "normal", fontSize: "0.9em" } : {}
-                },
-                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
-                onMouseLeave: (e) => e.target.style.textDecoration = "none",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  playAudio(displayWord);
-                },
-                children: displayWord
-              }
-            ),
-            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: [
-            asset.translation && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-              "div",
-              {
-                style: {
-                  color: "var(--text-normal)",
-                  marginBottom: "4px",
-                  whiteSpace: isExpanded ? "normal" : "pre-wrap"
-                },
-                children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(MarkdownText2, { content: asset.display, plugin }) }) : asset.translation
-              }
-            ),
-            isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
-              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-tag", children: "\u725B\u6D25\u6838\u5FC3" }),
-              asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-tag", children: "\u2605".repeat(asset.collins) }),
-              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-tag", children: tag.toUpperCase() }, tag))
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-            "span",
-            {
-              style: {
-                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                width: "fit-content"
-              },
-              className: "clickable-icon",
-              onClick: (e) => {
-                e.stopPropagation();
-                handleToggleSingleMastery(e, assetKey);
-              },
-              title: asset.mastered ? "\u5DF2\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u672A\u638C\u63E1)" : "\u672A\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1)",
-              children: asset.mastered ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "10" }) })
-            }
-          ) })
-        ]
-      },
-      assetKey
-    );
-  };
   const loadBooks = React5.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof import_obsidian13.TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof import_obsidian12.TFile && file.extension.toLowerCase() === "epub"
     );
     setBooks(filtered);
     setBooksLoaded(true);
@@ -61413,7 +60927,7 @@ function LibraryApp({ plugin }) {
       const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
       const highlights = await Promise.all(indexHighlights.map(async (highlight) => {
         const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
-        if (!(noteFile instanceof import_obsidian13.TFile)) return highlight;
+        if (!(noteFile instanceof import_obsidian12.TFile)) return highlight;
         try {
           const details = await plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
           return {
@@ -61631,7 +61145,7 @@ function LibraryApp({ plugin }) {
     const cached = coverCache[key];
     if (cached?.vaultPath) {
       const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
-      if (coverFile instanceof import_obsidian13.TFile) {
+      if (coverFile instanceof import_obsidian12.TFile) {
         return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
       }
     }
@@ -61670,18 +61184,16 @@ function LibraryApp({ plugin }) {
         totalHighlights += list.length;
       }
     });
-    const totalWords = Object.keys(plugin.settings.wordAssets || {}).length;
     return {
       total,
       reading: readingCount,
       finished: finishedCount,
       unread: unreadCount,
-      highlights: totalHighlights,
-      words: totalWords
+      highlights: totalHighlights
     };
-  }, [books, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress, refreshTrigger]);
+  }, [books, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress, refreshTrigger]);
   const selectedStats = React5.useMemo(() => {
-    const today = (0, import_obsidian13.moment)(statsDate);
+    const today = (0, import_obsidian12.moment)(statsDate);
     let startDate;
     let endDate;
     let prevStartDate;
@@ -61702,10 +61214,10 @@ function LibraryApp({ plugin }) {
       prevStartDate = startDate.clone().subtract(1, "year");
       prevEndDate = endDate.clone().subtract(1, "year");
     } else {
-      startDate = (0, import_obsidian13.moment)(0);
-      endDate = (0, import_obsidian13.moment)().endOf("day");
-      prevStartDate = (0, import_obsidian13.moment)(0);
-      prevEndDate = (0, import_obsidian13.moment)().endOf("day");
+      startDate = (0, import_obsidian12.moment)(0);
+      endDate = (0, import_obsidian12.moment)().endOf("day");
+      prevStartDate = (0, import_obsidian12.moment)(0);
+      prevEndDate = (0, import_obsidian12.moment)().endOf("day");
     }
     const statsData = plugin.settings.readingStats || {};
     let totalSeconds = 0;
@@ -61716,7 +61228,7 @@ function LibraryApp({ plugin }) {
     const yearlySecondsMap = {};
     const readDays = /* @__PURE__ */ new Set();
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian13.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian12.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
@@ -61755,8 +61267,8 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           finishedBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian13.moment)(prog.updated) : (0, import_obsidian13.moment)(0);
-          const finishDateVal = fm.finish_date ? (0, import_obsidian13.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian13.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian12.moment)(prog.updated) : (0, import_obsidian12.moment)(0);
+          const finishDateVal = fm.finish_date ? (0, import_obsidian12.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian12.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
           if (isUpdatedInRange || isFinishDateInRange) {
@@ -61767,7 +61279,7 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           readBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian13.moment)(prog.updated) : (0, import_obsidian13.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian12.moment)(prog.updated) : (0, import_obsidian12.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
           if (isUpdatedInRange || hasTimeSecs) {
@@ -61782,18 +61294,11 @@ function LibraryApp({ plugin }) {
     Object.values(plugin.settings.bookHighlights || {}).forEach((list) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian13.moment)(hl.created);
+          const createdVal = (0, import_obsidian12.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             newHighlightsCount++;
           }
         });
-      }
-    });
-    let newWordsCount = 0;
-    Object.values(plugin.settings.wordAssets || {}).forEach((asset) => {
-      const createdVal = (0, import_obsidian13.moment)(asset.created);
-      if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
-        newWordsCount++;
       }
     });
     const categoryCount = {};
@@ -61866,7 +61371,6 @@ function LibraryApp({ plugin }) {
       booksReadCount,
       finishedBooksCount,
       newHighlightsCount,
-      newWordsCount,
       bookSecondsMap,
       dailySecondsMap,
       monthlySecondsMap,
@@ -61874,10 +61378,10 @@ function LibraryApp({ plugin }) {
       radarData,
       topPublishers
     };
-  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, plugin.settings.wordAssets, bookNotesMap, plugin.app.metadataCache]);
+  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache]);
   const handlePrevDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian13.moment)(prev);
+      const m = (0, import_obsidian12.moment)(prev);
       if (statsTab === "week") return m.subtract(1, "week").toDate();
       if (statsTab === "month") return m.subtract(1, "month").toDate();
       if (statsTab === "year") return m.subtract(1, "year").toDate();
@@ -61886,7 +61390,7 @@ function LibraryApp({ plugin }) {
   };
   const handleNextDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian13.moment)(prev);
+      const m = (0, import_obsidian12.moment)(prev);
       if (statsTab === "week") return m.add(1, "week").toDate();
       if (statsTab === "month") return m.add(1, "month").toDate();
       if (statsTab === "year") return m.add(1, "year").toDate();
@@ -61953,7 +61457,7 @@ function LibraryApp({ plugin }) {
       let summary = "";
       const progress = getProgress(activeBook);
       const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-      if (noteFile instanceof import_obsidian13.TFile) {
+      if (noteFile instanceof import_obsidian12.TFile) {
         const cache = plugin.app.metadataCache.getFileCache(noteFile);
         if (cache && cache.frontmatter) {
           const fm = cache.frontmatter;
@@ -62000,7 +61504,7 @@ function LibraryApp({ plugin }) {
       }
     } catch (e) {
       console.error("Failed to update frontmatter", e);
-      new import_obsidian13.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
+      new import_obsidian12.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
     }
   };
   const openBook = async (file) => {
@@ -62025,7 +61529,7 @@ function LibraryApp({ plugin }) {
       try {
         await plugin.app.vault.delete(file);
         await plugin.bookStateService.clearRuntimeState(file.path);
-        new import_obsidian13.Notice(`\u5DF2\u5220\u9664\u7535\u5B50\u4E66\u6587\u4EF6\uFF1A${file.basename}`);
+        new import_obsidian12.Notice(`\u5DF2\u5220\u9664\u7535\u5B50\u4E66\u6587\u4EF6\uFF1A${file.basename}`);
         if (activeBook?.path === file.path) {
           setCurrentView("home");
           setActiveBook(null);
@@ -62033,25 +61537,8 @@ function LibraryApp({ plugin }) {
         loadBooks();
       } catch (err) {
         console.error("Failed to delete book or clean runtime state", err);
-        new import_obsidian13.Notice(`\u5220\u9664\u6216\u6E05\u7406\u5931\u8D25\uFF1A${String(err)}`);
+        new import_obsidian12.Notice(`\u5220\u9664\u6216\u6E05\u7406\u5931\u8D25\uFF1A${String(err)}`);
       }
-    }
-  };
-  const playAudio = (word) => {
-    const template = plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE;
-    const accent = plugin.settings.wordAudioAccent || "us";
-    const url = buildWordAudioUrl(template, word, accent);
-    if (url) {
-      const audio = new Audio(url);
-      audio.play().catch((err) => {
-        new import_obsidian13.Notice("\u97F3\u9891\u64AD\u653E\u5931\u8D25");
-      });
-    }
-  };
-  const toggleWordMastery = async (lemma, currentVal) => {
-    if (plugin.settings.wordAssets[lemma]) {
-      await plugin.wordAssetService.setMastered(lemma, !currentVal);
-      loadBooks();
     }
   };
   const jumpToHighlight = async (file, highlight) => {
@@ -62061,7 +61548,7 @@ function LibraryApp({ plugin }) {
   };
   const extractAllImages = async (file) => {
     try {
-      new import_obsidian13.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
+      new import_obsidian12.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
       const buffer = await plugin.app.vault.readBinary(file);
       let epubFn = window.JarvisReader_ePub;
       if (!epubFn) {
@@ -62090,9 +61577,9 @@ function LibraryApp({ plugin }) {
       }
       imagesList.sort((a, b) => b.size - a.size);
       setDebugImages(imagesList);
-      new import_obsidian13.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
+      new import_obsidian12.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
     } catch (err) {
-      new import_obsidian13.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
+      new import_obsidian12.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
     }
   };
   const renderDebugModal = () => {
@@ -62128,7 +61615,6 @@ function LibraryApp({ plugin }) {
       booksReadCount,
       finishedBooksCount,
       newHighlightsCount,
-      newWordsCount,
       bookSecondsMap,
       dailySecondsMap,
       monthlySecondsMap,
@@ -62138,17 +61624,17 @@ function LibraryApp({ plugin }) {
     } = selectedStats;
     const statsData = plugin.settings.readingStats || {};
     const sortedDates = Object.keys(statsData).sort();
-    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian13.moment)().format("YYYY-MM-DD");
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian12.moment)().format("YYYY-MM-DD");
     const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
     let dateRangeStr = "";
     if (statsTab === "week") {
-      const start = (0, import_obsidian13.moment)(startDate);
-      const end = (0, import_obsidian13.moment)(endDate);
+      const start = (0, import_obsidian12.moment)(startDate);
+      const end = (0, import_obsidian12.moment)(endDate);
       dateRangeStr = `${start.format("YYYY \xB7 M/D")} - ${end.format("M/D")}`;
     } else if (statsTab === "month") {
-      dateRangeStr = (0, import_obsidian13.moment)(startDate).format("YYYY\u5E74M\u6708");
+      dateRangeStr = (0, import_obsidian12.moment)(startDate).format("YYYY\u5E74M\u6708");
     } else if (statsTab === "year") {
-      dateRangeStr = (0, import_obsidian13.moment)(startDate).format("YYYY\u5E74");
+      dateRangeStr = (0, import_obsidian12.moment)(startDate).format("YYYY\u5E74");
     }
     const renderLargeDuration = (secs) => {
       if (secs <= 0) {
@@ -62206,7 +61692,7 @@ function LibraryApp({ plugin }) {
     const bookDailyMaxSecs = {};
     const bookRangeHighlightsCount = {};
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian13.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian12.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       if (isCurrentRange) {
@@ -62220,7 +61706,7 @@ function LibraryApp({ plugin }) {
     Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian13.moment)(hl.created);
+          const createdVal = (0, import_obsidian12.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
           }
@@ -62251,7 +61737,7 @@ function LibraryApp({ plugin }) {
           if (statsTab === "all") {
             progRankList.push([bookPath, prog.percentage]);
           } else {
-            const updatedVal = (0, import_obsidian13.moment)(prog.updated);
+            const updatedVal = (0, import_obsidian12.moment)(prog.updated);
             if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
               progRankList.push([bookPath, prog.percentage]);
             }
@@ -62353,17 +61839,6 @@ function LibraryApp({ plugin }) {
               "\u6761"
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
-              ] }),
-              newWordsCount,
-              "\u6761"
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u6761" })
           ] })
         ] })
       ] }),
@@ -62400,29 +61875,29 @@ function LibraryApp({ plugin }) {
           if (statsTab === "week") {
             const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
             data = Array.from({ length: 7 }).map((_, i) => {
-              const day = (0, import_obsidian13.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian12.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "month") {
-            const daysInMonth = (0, import_obsidian13.moment)(startDate).daysInMonth();
+            const daysInMonth = (0, import_obsidian12.moment)(startDate).daysInMonth();
             data = Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = (0, import_obsidian13.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian12.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "year") {
             data = Array.from({ length: 12 }).map((_, i) => {
-              const month = (0, import_obsidian13.moment)(startDate).add(i, "months");
+              const month = (0, import_obsidian12.moment)(startDate).add(i, "months");
               const monthStr = month.format("YYYY-MM");
               const secs = monthlySecondsMap[monthStr] || 0;
               return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else {
-            const currentYear = (0, import_obsidian13.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian13.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+            const currentYear = (0, import_obsidian12.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian12.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
             const yearsCount = Math.max(currentYear - startYear + 1, 1);
             data = Array.from({ length: yearsCount }).map((_, i) => {
               const year = String(startYear + i);
@@ -62479,15 +61954,15 @@ function LibraryApp({ plugin }) {
           ] });
         })(),
         activeChart === "calendar" && (() => {
-          const daysInMonth = (0, import_obsidian13.moment)(startDate).daysInMonth();
-          const firstDayOffset = ((0, import_obsidian13.moment)(startDate).clone().startOf("month").day() + 6) % 7;
+          const daysInMonth = (0, import_obsidian12.moment)(startDate).daysInMonth();
+          const firstDayOffset = ((0, import_obsidian12.moment)(startDate).clone().startOf("month").day() + 6) % 7;
           const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
           const cells = [];
           for (let i = 0; i < firstDayOffset; i++) {
             cells.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
           }
           for (let d = 1; d <= daysInMonth; d++) {
-            const day = (0, import_obsidian13.moment)(startDate).clone().date(d);
+            const day = (0, import_obsidian12.moment)(startDate).clone().date(d);
             const dateStr = day.format("YYYY-MM-DD");
             const secs = dailySecondsMap[dateStr] || 0;
             cells.push(
@@ -62504,7 +61979,7 @@ function LibraryApp({ plugin }) {
         })(),
         activeChart === "heatmap" && (() => {
           const renderHeatmapWall = (yearStr) => {
-            const startOfYear = (0, import_obsidian13.moment)(`${yearStr}-01-01`);
+            const startOfYear = (0, import_obsidian12.moment)(`${yearStr}-01-01`);
             const gridStart = startOfYear.clone().startOf("isoWeek");
             const weeksCount = 53;
             const columns = [];
@@ -62576,11 +62051,11 @@ function LibraryApp({ plugin }) {
             ] }, yearStr);
           };
           if (statsTab === "year") {
-            const yearStr = (0, import_obsidian13.moment)(startDate).format("YYYY");
+            const yearStr = (0, import_obsidian12.moment)(startDate).format("YYYY");
             return renderHeatmapWall(yearStr);
           } else {
-            const currentYear = (0, import_obsidian13.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian13.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+            const currentYear = (0, import_obsidian12.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian12.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
             const yearsList = [];
             for (let y = currentYear; y >= startYear; y--) {
               yearsList.push(String(y));
@@ -62864,10 +62339,6 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.highlights })
           ] }) }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
-            "\u8BCD\u6761 ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.words })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
             "\u603B\u9605\u8BFB\u65F6\u957F ",
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: formatDuration(totalAppReadingTime) })
           ] }) })
@@ -62897,7 +62368,6 @@ function LibraryApp({ plugin }) {
         const cover = getCover(book);
         const creator = cover?.creator || author;
         const highlightsCount = getHighlightsForBook(plugin.settings, book.path).length;
-        const wordsCount = Object.values(plugin.settings.wordAssets || {}).filter((a) => a.sources?.some((s) => s.bookPath === book.path)).length;
         const noteFile = bookNotesMap[book.path];
         let fm = {};
         if (noteFile) {
@@ -62958,8 +62428,6 @@ function LibraryApp({ plugin }) {
                     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
                       "\u6570\u636E\uFF1A\u7B14\u8BB0 ",
                       highlightsCount,
-                      " \xB7 \u8BCD\u6761 ",
-                      wordsCount,
                       " \xB7 \u65F6\u957F ",
                       formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                     ] }),
@@ -63005,7 +62473,7 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u8BCD\u6761/\u65F6\u957F)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u65F6\u957F)" }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
           ] }) }),
@@ -63016,7 +62484,6 @@ function LibraryApp({ plugin }) {
             const cover = getCover(book);
             const creator = cover?.creator || author;
             const highlightsCount = getHighlightsForBook(plugin.settings, book.path).length;
-            const wordsCount = Object.values(plugin.settings.wordAssets || {}).filter((a) => a.sources?.some((s) => s.bookPath === book.path)).length;
             const noteFile = bookNotesMap[book.path];
             let fm = {};
             if (noteFile) {
@@ -63061,8 +62528,6 @@ function LibraryApp({ plugin }) {
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, children: tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "-" }) }),
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
                     highlightsCount,
-                    " / ",
-                    wordsCount,
                     " / ",
                     formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                   ] }),
@@ -63115,7 +62580,7 @@ function LibraryApp({ plugin }) {
           const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
           const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
-          if (targetFile instanceof import_obsidian13.TFile) {
+          if (targetFile instanceof import_obsidian12.TFile) {
             await plugin.app.vault.modifyBinary(targetFile, buffer);
           } else {
             try {
@@ -63125,7 +62590,7 @@ function LibraryApp({ plugin }) {
               return;
             }
           }
-          if (targetFile instanceof import_obsidian13.TFile) {
+          if (targetFile instanceof import_obsidian12.TFile) {
             const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
             const nextEntry = {
@@ -63154,9 +62619,6 @@ function LibraryApp({ plugin }) {
     const cover = getCover(activeBook);
     const highlights = detailHighlights;
     const bookmarks = plugin.settings.bookBookmarks?.[activeBook.path] || [];
-    const wordAssets = Object.values(plugin.settings.wordAssets || {}).filter(
-      (asset) => asset.sources && asset.sources.some((src) => src.bookPath === activeBook.path)
-    );
     let hash = 0;
     for (let i = 0; i < title.length; i++) {
       hash = title.charCodeAt(i) + ((hash << 5) - hash);
@@ -63249,11 +62711,6 @@ function LibraryApp({ plugin }) {
             /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-progress-stat", children: [
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
               /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "detail-progress-divider" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-value", children: wordAssets.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-label", children: "\u8BCD\u6761" })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%", flexWrap: "wrap" }, children: [
@@ -63273,13 +62730,6 @@ function LibraryApp({ plugin }) {
                 /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "10", y1: "9", x2: "8", y2: "9" })
               ] }),
               "\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6"
-            ] }),
-            wordAssets.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => plugin.openWordBook(), style: { flex: 1, minWidth: "120px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
-              ] }),
-              "\u6253\u5F00\u8BCD\u6761"
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-metadata-editor", children: [
@@ -63390,15 +62840,6 @@ function LibraryApp({ plugin }) {
           highlights.length,
           ")"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: `detail-tab-btn ${activeTab === "words" ? "is-active" : ""}`, onClick: () => setActiveTab("words"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
-          ] }),
-          "\u8BCD\u6761 (",
-          wordAssets.length,
-          ")"
-        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
           "\u4E66\u7B7E (",
@@ -63406,37 +62847,7 @@ function LibraryApp({ plugin }) {
           ")"
         ] })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookHighlightsPanel, { plugin, book: activeBook, title, highlights, onJump: jumpToHighlight }) : activeTab === "words" ? (
-        /* Word Cards List */
-        wordAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5173\u8054\u7684\u5355\u8BCD\u6216\u7FFB\u8BD1\u5361\u7247\u3002" }) }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-list", style: { overflow: "auto", padding: "0 4px 20px 4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: "32px" }, children: (() => {
-          const wordsAndPhrases = wordAssets.filter((w) => w.kind !== "sentence");
-          const sentences = wordAssets.filter((w) => w.kind === "sentence");
-          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-            wordsAndPhrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }, children: "\u5355\u8BCD & \u77ED\u8BED" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
-                ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("tbody", { children: wordsAndPhrases.map(renderTableRow) })
-              ] })
-            ] }),
-            sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)", fontSize: "1.1em", fontWeight: "600" }, children: "\u957F\u53E5" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
-                ] }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("tbody", { children: sentences.map(renderTableRow) })
-              ] })
-            ] })
-          ] });
-        })() }) })
-      ) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookBookmarksPanel, { plugin, book: activeBook, bookmarks }) })
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookHighlightsPanel, { plugin, book: activeBook, title, highlights, onJump: jumpToHighlight }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookBookmarksPanel, { plugin, book: activeBook, bookmarks }) })
     ] });
   };
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-app", children: [
@@ -63447,7 +62858,7 @@ function LibraryApp({ plugin }) {
 
 // src/library/LibraryView.ts
 var LIBRARY_VIEW_TYPE = "jarvis-reader-library";
-var LibraryView = class extends import_obsidian14.ItemView {
+var LibraryView = class extends import_obsidian13.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -63480,7 +62891,7 @@ var LibraryView = class extends import_obsidian14.ItemView {
 };
 
 // src/settings.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 init_utils();
 var DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -63502,7 +62913,6 @@ var DEFAULT_SETTINGS = {
   knowledgeNoteFolder: "\u77E5\u8BC6\u5E93/\u60F3\u6CD5",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
   customCoverFolder: "00-Attachment",
-  wordBookExportFolder: "",
   wordAssets: {},
   translationApi: {
     provider: "openai-compatible",
@@ -63513,7 +62923,6 @@ var DEFAULT_SETTINGS = {
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   enableAutoHighlight: true,
   enableWordAudio: true,
-  autoPlayAudioOnReview: true,
   wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
   wordAudioAccent: "us",
   blurWordCardBody: true,
@@ -63529,46 +62938,18 @@ var DEFAULT_SETTINGS = {
   highlightColors: {
     word: "#4dabf7",
     phrase: "#ae3ec9",
-    sentence: "#40c057",
     comment: "#f97316",
     normal: "#ffeb3b"
   },
-  readingStats: {},
-  wordReviewStats: {},
-  sm2StartingEase: 2.5,
-  sm2EasyBonus: 1.3,
-  sm2LapseMultiplier: 0.5,
-  sm2MaxInterval: 365,
-  smartCommands: [
-    {
-      id: "smart-1",
-      label: "\u53D1\u82BD\u601D\u8003",
-      description: "\u5BF9\u9009\u4E2D\u5185\u5BB9\u8FDB\u884C\u77E5\u8BC6\u78B0\u649E\u4E0E\u53D1\u6563\u5EF6\u4F38",
-      icon: "sprout",
-      prompt: "@skills/sprouting-thought \u8BF7\u5BF9\u4EE5\u4E0B\u5185\u5BB9\u8FDB\u884C\u53D1\u82BD\u601D\u8003\uFF0C\u53D1\u6563\u5EF6\u4F38\uFF1A\n\n{{selection}}",
-      enabled: true,
-      scope: "both",
-      source: "template"
-    },
-    {
-      id: "smart-2",
-      label: "\u6DF1\u5EA6\u7814\u7A76",
-      description: "\u56F4\u7ED5\u9009\u4E2D\u5185\u5BB9\u5F00\u5C55\u4E3B\u9898\u7814\u7A76",
-      icon: "book-open",
-      prompt: "@skills/content-research \u8BF7\u56F4\u7ED5\u4EE5\u4E0B\u5185\u5BB9\u5F00\u5C55\u6DF1\u5EA6\u7814\u7A76\uFF1A\n\n{{selection}}",
-      enabled: true,
-      scope: "both",
-      source: "template"
-    }
-  ]
+  readingStats: {}
 };
-var JarvisReaderFolderSuggestModal = class extends import_obsidian15.FuzzySuggestModal {
+var JarvisReaderFolderSuggestModal = class extends import_obsidian14.FuzzySuggestModal {
   onChoose;
   folders;
   constructor(app, onChoose) {
     super(app);
     this.onChoose = onChoose;
-    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian15.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
+    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian14.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
     this.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939");
   }
   getItems() {
@@ -63581,7 +62962,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian15.FuzzySugges
     this.onChoose(path);
   }
 };
-var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
+var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
   plugin;
   activeTab = "storage";
   constructor(app, plugin) {
@@ -63615,23 +62996,13 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
       },
       {
         id: "words",
-        label: "\u8BCD\u53E5\u6807\u8BB0\u4E0E\u53D1\u97F3",
+        label: "\u8BCD\u5361\u6807\u8BB0\u4E0E\u53D1\u97F3",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
       },
       {
         id: "appearance",
         label: "\u9605\u8BFB\u5916\u89C2",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
-      },
-      {
-        id: "review",
-        label: "\u8BB0\u5FC6\u590D\u4E60",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
-      },
-      {
-        id: "smartcmd",
-        label: "\u6269\u5C55\u6307\u4EE4",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 8v4l3 3"></path><circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle></svg>`
       }
     ];
     tabs.forEach((tab) => {
@@ -63647,9 +63018,9 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
     });
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
-      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
       let bookFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
         bookFolderText = text;
         text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
@@ -63670,9 +63041,9 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
           bookFolderText.setValue("");
         }
       }));
-      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
       let knowledgeFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
         knowledgeFolderText = text;
         text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
@@ -63685,9 +63056,9 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
           knowledgeFolderText?.setValue(path);
         }).open();
       }));
-      new import_obsidian15.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
       let customCoverFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
         customCoverFolderText = text;
         text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
           this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
@@ -63708,29 +63079,7 @@ var JarvisReaderSettingTab = class extends import_obsidian15.PluginSettingTab {
           customCoverFolderText.setValue("");
         }
       }));
-      let exportFolderText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u9605\u8BFB\u79EF\u7D2F\u5BFC\u51FA\u6587\u4EF6\u5939").setDesc("\u9009\u62E9\u82F1\u8BED\u8BCD\u6761\u5BFC\u51FA\u7684 Markdown \u7B14\u8BB0\u5B58\u653E\u8DEF\u5F84\uFF08\u76F8\u5BF9\u4E8E Vault \u6839\u76EE\u5F55\uFF09").addText((text) => {
-        exportFolderText = text;
-        text.setPlaceholder("\u5982: Export/Wordbooks").setValue(this.plugin.settings.wordBookExportFolder || "").onChange(async (value) => {
-          this.plugin.settings.wordBookExportFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.wordBookExportFolder = path;
-          await this.plugin.saveSettings();
-          if (exportFolderText) {
-            exportFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
-        this.plugin.settings.wordBookExportFolder = "";
-        await this.plugin.saveSettings();
-        if (exportFolderText) {
-          exportFolderText.setValue("");
-        }
-      }));
-      new import_obsidian15.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -63752,7 +63101,7 @@ created: {{created}}
       let translationBaseUrlText = null;
       let translationModelText = null;
       let translationPromptText = null;
-      new import_obsidian15.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
         dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
           const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
@@ -63774,7 +63123,7 @@ created: {{created}}
           }
         });
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
         translationBaseUrlText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
@@ -63783,7 +63132,7 @@ created: {{created}}
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
         text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
           this.plugin.settings.translationApi.apiKey = value.trim();
           await this.plugin.saveSettings();
@@ -63791,7 +63140,7 @@ created: {{created}}
         text.inputEl.type = "password";
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
         translationModelText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
@@ -63803,20 +63152,20 @@ created: {{created}}
         try {
           const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
           if (!promptCheck.ok) {
-            new import_obsidian15.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
+            new import_obsidian14.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
             return;
           }
           await translateSelectionWithApi(this.plugin.settings, "test");
-          new import_obsidian15.Notice("\u6D4B\u8BD5\u6210\u529F");
+          new import_obsidian14.Notice("\u6D4B\u8BD5\u6210\u529F");
         } catch (error) {
-          new import_obsidian15.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
+          new import_obsidian14.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
         }
       }));
       contentDiv.createDiv({
         cls: "jarvis-reader-translation-prompt-help",
         text: TRANSLATION_PROMPT_HELP_TEXT
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
         translationPromptText = text;
         text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
           this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
@@ -63825,53 +63174,48 @@ created: {{created}}
         text.inputEl.rows = 6;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian15.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
+      new import_obsidian14.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
         this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
         await this.plugin.saveSettings();
         if (translationPromptText) {
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
-        new import_obsidian15.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
+        new import_obsidian14.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
       }));
     }
     if (this.activeTab === "words") {
-      new import_obsidian15.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u53E5\u7684\u6807\u8BB0").setHeading();
-      new import_obsidian15.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u53E5").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u3001\u77ED\u8BED\u548C\u53E5\u5B50\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u53E5\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u5361\u7684\u6807\u8BB0").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u5361").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u548C\u77ED\u8BED\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u5361\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
         await this.plugin.saveSettings();
       }));
       this.createColorPicker(contentDiv, "\u5355\u8BCD\u989C\u8272", "\u5DF2\u4FDD\u5B58\u5355\u8BCD\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "word");
       this.createColorPicker(contentDiv, "\u77ED\u8BED\u989C\u8272", "\u5DF2\u4FDD\u5B58\u77ED\u8BED\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "phrase");
-      this.createColorPicker(contentDiv, "\u53E5\u5B50\u989C\u8272", "\u5DF2\u4FDD\u5B58\u53E5\u5B50\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "sentence");
-      new import_obsidian15.Setting(contentDiv).setName("\u8BCD\u53E5\u5361\u7247").setHeading();
-      new import_obsidian15.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u53E5\u5361\u7247\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u53E5\u5361\u7247\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u8BCD\u5361").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian15.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
-      new import_obsidian15.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian15.Setting(contentDiv).setName("\u590D\u4E60\u65F6\u81EA\u52A8\u53D1\u97F3").setDesc("\u6253\u5F00\u8BB0\u5FC6\u5361\u7247\u65F6\u81EA\u52A8\u64AD\u653E\u5355\u8BCD\u8BFB\u97F3").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoPlayAudioOnReview !== false).onChange(async (value) => {
-        this.plugin.settings.autoPlayAudioOnReview = value;
-        await this.plugin.saveSettings();
-      }));
-      new import_obsidian15.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
         text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
           this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
         dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
           this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
           this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
         text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
           this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
           await this.plugin.saveSettings();
@@ -63879,70 +63223,25 @@ created: {{created}}
       });
     }
     if (this.activeTab === "appearance") {
-      new import_obsidian15.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
         slider.setLimits(0.5, 3, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerZoom = value;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
         slider.setLimits(1, 3, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
           this.plugin.settings.readerLineHeight = value;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian15.Setting(contentDiv).setName("\u5212\u7EBF\u989C\u8272").setHeading();
+      new import_obsidian14.Setting(contentDiv).setName("\u5212\u7EBF\u989C\u8272").setHeading();
       this.createColorPicker(contentDiv, "\u5E26\u7B14\u8BB0\u5212\u7EBF\u989C\u8272", "\u7ED9\u5212\u7EBF\u6DFB\u52A0\u7B14\u8BB0\u540E\u663E\u793A\u7684\u989C\u8272", "comment");
       this.createColorPicker(contentDiv, "\u666E\u901A\u5212\u7EBF\u989C\u8272", "\u672A\u6DFB\u52A0\u7B14\u8BB0\u7684\u666E\u901A\u5212\u7EBF\u989C\u8272", "normal");
     }
-    if (this.activeTab === "smartcmd") {
-      this.renderSmartCommandsTab(contentDiv);
-    }
-    if (this.activeTab === "review") {
-      new import_obsidian15.Setting(contentDiv).setName("\u8D77\u59CB\u96BE\u5EA6 (Starting Ease)").setDesc("\u65B0\u8BCD\u6761\u521D\u6B21\u590D\u4E60\u6210\u529F\u540E\u7684\u521D\u59CB\u96BE\u5EA6\u7CFB\u6570\uFF08\u9ED8\u8BA4\u503C 2.5\uFF09").addText((text) => {
-        text.setPlaceholder("2.5").setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5)).onChange(async (value) => {
-          const parsed = parseFloat(value);
-          this.plugin.settings.sm2StartingEase = isNaN(parsed) || parsed <= 0 ? 2.5 : parsed;
-          await this.plugin.saveSettings();
-        });
-        text.inputEl.addEventListener("blur", () => {
-          text.setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5));
-        });
-      });
-      new import_obsidian15.Setting(contentDiv).setName("\u7B80\u5355\u5956\u52B1\u7CFB\u6570 (Easy Bonus)").setDesc("\u70B9\u51FB\u201C\u7B80\u5355\u201D\u8BC4\u5206\u65F6\uFF0C\u5BF9\u590D\u4E60\u95F4\u9694\u7684\u989D\u5916\u62C9\u957F\u500D\u6570\uFF08\u9ED8\u8BA4\u503C 1.3\uFF09").addText((text) => {
-        text.setPlaceholder("1.3").setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3)).onChange(async (value) => {
-          const parsed = parseFloat(value);
-          this.plugin.settings.sm2EasyBonus = isNaN(parsed) || parsed <= 0 ? 1.3 : parsed;
-          await this.plugin.saveSettings();
-        });
-        text.inputEl.addEventListener("blur", () => {
-          text.setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3));
-        });
-      });
-      new import_obsidian15.Setting(contentDiv).setName("\u56F0\u96BE\u6263\u51CF\u7CFB\u6570 (Lapse Multiplier)").setDesc("\u70B9\u51FB\u201C\u56F0\u96BE\u201D\u8BC4\u5206\u65F6\uFF0C\u5F53\u524D\u590D\u4E60\u95F4\u9694\u7684\u7F29\u51CF\u6BD4\u4F8B\u3002\u8303\u56F4\u9700\u5728 0 \u5230 1 \u4E4B\u95F4\uFF08\u9ED8\u8BA4\u503C 0.5\uFF0C\u5982 0.5 \u8868\u793A\u95F4\u9694\u7F29\u77ED\u4E00\u534A\uFF09").addText((text) => {
-        text.setPlaceholder("0.5").setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5)).onChange(async (value) => {
-          const parsed = parseFloat(value);
-          this.plugin.settings.sm2LapseMultiplier = isNaN(parsed) || parsed <= 0 || parsed > 1 ? 0.5 : parsed;
-          await this.plugin.saveSettings();
-        });
-        text.inputEl.addEventListener("blur", () => {
-          text.setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5));
-        });
-      });
-      new import_obsidian15.Setting(contentDiv).setName("\u6700\u5927\u590D\u4E60\u95F4\u9694 (Maximum Interval)").setDesc("\u9650\u5236\u8BCD\u6761\u590D\u4E60\u5468\u671F\u7684\u4E0A\u9650\u65F6\u95F4\uFF0C\u5355\u4F4D\u4E3A\u5929\uFF08\u9ED8\u8BA4\u503C 365\uFF09").addText((text) => {
-        text.setPlaceholder("365").setValue(String(this.plugin.settings.sm2MaxInterval ?? 365)).onChange(async (value) => {
-          const parsed = parseInt(value, 10);
-          this.plugin.settings.sm2MaxInterval = isNaN(parsed) || parsed <= 0 ? 365 : parsed;
-          await this.plugin.saveSettings();
-        });
-        text.inputEl.addEventListener("blur", () => {
-          text.setValue(String(this.plugin.settings.sm2MaxInterval ?? 365));
-        });
-      });
-    }
   }
   createColorPicker(containerEl, name, desc, key) {
-    new import_obsidian15.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+    new import_obsidian14.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
       this.plugin.settings.highlightColors = {
         ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
         [key]: value
@@ -63950,2555 +63249,6 @@ created: {{created}}
       await this.plugin.saveSettings();
       window.dispatchEvent(new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors }));
     }));
-  }
-  renderSmartCommandsTab(containerEl) {
-    const header = containerEl.createDiv();
-    header.style.display = "flex";
-    header.style.justifyContent = "space-between";
-    header.style.alignItems = "center";
-    header.style.marginBottom = "12px";
-    const titleEl = header.createEl("h3", { text: "\u6307\u4EE4\u5217\u8868" });
-    titleEl.style.margin = "0";
-    titleEl.style.fontSize = "16px";
-    titleEl.style.fontWeight = "600";
-    const addBtn = header.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "\u65B0\u589E\u6307\u4EE4" } });
-    (0, import_obsidian15.setIcon)(addBtn, "plus");
-    addBtn.addEventListener("click", () => {
-      const newCmd = {
-        id: `smart-${Date.now()}`,
-        label: "\u65B0\u6307\u4EE4",
-        description: "",
-        icon: "bot",
-        prompt: "",
-        enabled: true,
-        scope: "both",
-        source: "template",
-        skillPath: ""
-      };
-      new SmartCommandEditModal(this.app, newCmd, async (saved) => {
-        const cmds2 = Array.isArray(this.plugin.settings.smartCommands) ? this.plugin.settings.smartCommands : [];
-        cmds2.push(saved);
-        this.plugin.settings.smartCommands = cmds2;
-        await this.plugin.saveSettings();
-        this.display();
-      }).open();
-    });
-    const list = containerEl.createDiv({ cls: "vo-actions-compact-list" });
-    const cmds = Array.isArray(this.plugin.settings.smartCommands) ? this.plugin.settings.smartCommands : [];
-    if (cmds.length === 0) {
-      containerEl.createEl("p", { text: "\u6682\u65E0\u6307\u4EE4\uFF0C\u70B9\u51FB\u53F3\u4E0A\u89D2\u52A0\u53F7\u65B0\u589E\u3002", cls: "setting-item-description" });
-      return;
-    }
-    cmds.forEach((cmd, index) => {
-      const row = list.createDiv({ cls: "vo-actions-compact-row" });
-      const left = row.createDiv({ cls: "vo-actions-compact-main" });
-      const iconWrap = left.createDiv({ cls: "vo-actions-compact-icon" });
-      (0, import_obsidian15.setIcon)(iconWrap, cmd.icon || "bot");
-      const textWrap = left.createDiv({ cls: "vo-actions-compact-text" });
-      textWrap.createDiv({ text: cmd.label || `\u6307\u4EE4 ${index + 1}`, cls: "vo-actions-compact-title" });
-      textWrap.createDiv({
-        text: cmd.description || "\u6682\u65E0\u63CF\u8FF0",
-        cls: "vo-actions-compact-desc"
-      });
-      const right = row.createDiv({ cls: "vo-actions-compact-controls" });
-      const editBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "\u7F16\u8F91\u6307\u4EE4" } });
-      (0, import_obsidian15.setIcon)(editBtn, "pencil");
-      editBtn.addEventListener("click", () => {
-        new SmartCommandEditModal(this.app, { ...cmd }, async (saved) => {
-          cmds[index] = saved;
-          this.plugin.settings.smartCommands = cmds;
-          await this.plugin.saveSettings();
-          this.display();
-        }, async () => {
-          cmds.splice(index, 1);
-          this.plugin.settings.smartCommands = cmds;
-          await this.plugin.saveSettings();
-          this.display();
-        }).open();
-      });
-      const deleteBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "\u5220\u9664\u6307\u4EE4" } });
-      (0, import_obsidian15.setIcon)(deleteBtn, "trash-2");
-      deleteBtn.addEventListener("click", async () => {
-        cmds.splice(index, 1);
-        this.plugin.settings.smartCommands = cmds;
-        await this.plugin.saveSettings();
-        this.display();
-      });
-      const toggleBtn = right.createEl("button", {
-        cls: "clickable-icon",
-        attr: { "aria-label": cmd.enabled !== false ? "\u7981\u7528\u6307\u4EE4" : "\u542F\u7528\u6307\u4EE4" }
-      });
-      (0, import_obsidian15.setIcon)(toggleBtn, cmd.enabled !== false ? "toggle-right" : "toggle-left");
-      toggleBtn.addEventListener("click", async () => {
-        cmds[index] = { ...cmd, enabled: cmd.enabled === false };
-        this.plugin.settings.smartCommands = cmds;
-        await this.plugin.saveSettings();
-        this.display();
-      });
-    });
-  }
-};
-var SmartCommandEditModal = class extends import_obsidian15.Modal {
-  cmd;
-  onSave;
-  onDelete;
-  constructor(app, cmd, onSave, onDelete) {
-    super(app);
-    this.cmd = { ...cmd };
-    this.onSave = onSave;
-    this.onDelete = onDelete;
-  }
-  onOpen() {
-    const { contentEl } = this;
-    contentEl.empty();
-    let draft = { ...this.cmd };
-    contentEl.createEl("h2", { text: "Edit Smart Action" });
-    new import_obsidian15.Setting(contentEl).setName("\u6309\u94AE\u540D\u79F0").setDesc("\u9762\u677F\u4E2D\u663E\u793A\u7684\u6309\u94AE\u6587\u5B57").addText(
-      (text) => text.setPlaceholder("\u4F8B\u5982\uFF1A\u53D1\u82BD\u601D\u8003").setValue(draft.label).onChange((value) => {
-        draft = { ...draft, label: value };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("\u5217\u8868\u63CF\u8FF0").setDesc("\u663E\u793A\u5728\u5916\u5C42\u5217\u8868\u91CC\u7684\u4E00\u53E5\u7B80\u77ED\u8BF4\u660E").addText(
-      (text) => text.setPlaceholder("\u4F8B\u5982\uFF1A\u5BF9\u9009\u4E2D\u5185\u5BB9\u53D1\u6563\u5EF6\u4F38").setValue(draft.description || "").onChange((value) => {
-        draft = { ...draft, description: value };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("\u56FE\u6807\u540D\u79F0").setDesc("\u586B\u5199 Lucide \u56FE\u6807\u540D\u79F0\uFF0C\u4F8B\u5982 sprout\u3001book-open\u3001rss").addText(
-      (text) => text.setPlaceholder("bot").setValue(draft.icon).onChange((value) => {
-        draft = { ...draft, icon: value };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("\u51FA\u73B0\u4F4D\u7F6E").setDesc("\u5212\u7EBF\u83DC\u5355\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u9009\u4E2D\u6587\u5B57\u3011\uFF0C\u7B14\u8BB0\u7A97\u53E3\u89E6\u53D1\u65F6\u76EE\u6807\u4E3A\u3010\u539F\u6587 + \u7B14\u8BB0\u5185\u5BB9\u3011").addDropdown(
-      (dd) => dd.addOption("both", "\u4E24\u8005\u90FD\u6709").addOption("selection", "\u4EC5\u5212\u7EBF\u83DC\u5355\uFF08\u9009\u4E2D\u6587\u5B57\u65F6\uFF09").addOption("note", "\u4EC5\u7B14\u8BB0\u7A97\u53E3").setValue(draft.scope || "both").onChange((value) => {
-        draft = { ...draft, scope: value };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("\u6307\u4EE4\u6765\u6E90").setDesc("\u6A21\u677F\u6A21\u5F0F\u76F4\u63A5\u53D1\u9001\u4E0B\u65B9\u5185\u5BB9\uFF1BSkill \u6587\u4EF6\u6A21\u5F0F\u4F1A\u8BA9 Claudian \u6309\u8DEF\u5F84\u8BFB\u53D6\u6700\u65B0\u7684 SKILL.md").addDropdown(
-      (dd) => dd.addOption("template", "\u6307\u4EE4\u6A21\u677F").addOption("skill", "Skill \u6587\u4EF6").setValue(draft.source || "template").onChange((value) => {
-        draft = {
-          ...draft,
-          source: value === "skill" ? "skill" : "template"
-        };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("Skill \u76EE\u5F55").setDesc("\u4EC5\u7528\u4E8E Skill \u6587\u4EF6\u6A21\u5F0F\u3002\u586B\u5199\u77E5\u8BC6\u5E93\u76F8\u5BF9\u76EE\u5F55\uFF0C\u8C03\u7528\u65F6\u4F1A\u628A\u5BF9\u5E94 SKILL.md \u8DEF\u5F84\u4EA4\u7ED9 Claudian \u8BFB\u53D6\uFF1B\u4E5F\u53EF\u76F4\u63A5\u586B\u5199\u5B8C\u6574\u76F8\u5BF9\u8DEF\u5F84").addText(
-      (text) => text.setPlaceholder("\u4F8B\u5982\uFF1A09 Books/skill/fable").setValue(draft.skillPath || "").onChange((value) => {
-        draft = { ...draft, skillPath: value };
-      })
-    );
-    new import_obsidian15.Setting(contentEl).setName("\u6307\u4EE4\u5185\u5BB9").setDesc("\u6A21\u677F\u6A21\u5F0F\u4E0B\u662F\u5B8C\u6574\u6307\u4EE4\uFF1BSkill \u6587\u4EF6\u6A21\u5F0F\u4E0B\u662F\u53EF\u9009\u7684\u4EFB\u52A1\u8865\u5145\u3002\u652F\u6301 {{selection}}\u3001{{content}}\u3001{{book_title}}\u3001{{chapter}}").addTextArea((text) => {
-      text.setPlaceholder("\u8BF7\u5904\u7406\u4EE5\u4E0B\u9605\u8BFB\u5185\u5BB9\uFF1A\n\n{{selection}}").setValue(draft.prompt).onChange((value) => {
-        draft = { ...draft, prompt: value };
-      });
-      text.inputEl.rows = 5;
-      text.inputEl.style.width = "100%";
-      text.inputEl.style.fontFamily = "var(--font-monospace)";
-      text.inputEl.style.fontSize = "12px";
-    });
-    const footer = contentEl.createDiv({ cls: "jarvis-smartcmd-modal-footer" });
-    const left = footer.createDiv();
-    const right = footer.createDiv();
-    if (this.onDelete) {
-      const deleteBtn = left.createEl("button", { text: "Delete", cls: "mod-warning" });
-      deleteBtn.addEventListener("click", () => {
-        void this.onDelete().then(() => this.close());
-      });
-    }
-    right.createEl("button", { text: "Cancel" }).addEventListener("click", () => this.close());
-    const saveBtn = right.createEl("button", { text: "Save", cls: "mod-cta" });
-    saveBtn.style.marginLeft = "8px";
-    saveBtn.addEventListener("click", () => {
-      const source = draft.source === "skill" ? "skill" : "template";
-      const skillPath = (draft.skillPath || "").trim();
-      if (source === "skill") {
-        try {
-          const skillFilePath = resolveSkillFilePath(skillPath);
-          const skillFile = this.app.vault.getAbstractFileByPath(skillFilePath);
-          if (!(skillFile instanceof import_obsidian15.TFile)) {
-            new import_obsidian15.Notice(`\u627E\u4E0D\u5230 Skill \u6587\u4EF6\uFF1A${skillFilePath}`);
-            return;
-          }
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          new import_obsidian15.Notice(message);
-          return;
-        }
-      }
-      const toSave = {
-        ...draft,
-        label: draft.label.trim() || "\u65B0\u6307\u4EE4",
-        description: (draft.description || "").trim(),
-        icon: draft.icon.trim() || "bot",
-        prompt: draft.prompt.trim(),
-        scope: draft.scope || "both",
-        enabled: draft.enabled !== false,
-        source,
-        skillPath
-      };
-      void this.onSave(toSave).then(() => this.close());
-    });
-  }
-  onClose() {
-    this.contentEl.empty();
-  }
-};
-
-// src/sidebar/WordSidebarView.ts
-var import_obsidian17 = require("obsidian");
-var React8 = __toESM(require_react(), 1);
-var import_client2 = __toESM(require_client(), 1);
-
-// src/word-book/WordCard.tsx
-var React7 = __toESM(require_react(), 1);
-var import_obsidian16 = require("obsidian");
-init_utils();
-var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
-var MarkdownPreview = ({ content, plugin }) => {
-  const ref = React7.useRef(null);
-  React7.useEffect(() => {
-    if (ref.current) {
-      ref.current.empty();
-      import_obsidian16.MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin).catch(console.error);
-    }
-  }, [content, plugin]);
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { ref, className: "jarvis-reader-markdown" });
-};
-var WordCard = ({
-  plugin,
-  asset,
-  bookTitle,
-  isExpanded: controlledIsExpanded,
-  isSelected = false,
-  isSelectionMode = false,
-  blurMode = "none",
-  onToggleExpand,
-  onToggleSelect,
-  onToggleMastery,
-  onDelete,
-  onDoubleClick,
-  contextMenuAdditionalItems
-}) => {
-  const [internalExpanded, setInternalExpanded] = React7.useState(false);
-  const isExpanded = controlledIsExpanded !== void 0 ? controlledIsExpanded : internalExpanded;
-  const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-  const handleToggleExpand = () => {
-    if (onToggleExpand) {
-      onToggleExpand(assetKey);
-    } else {
-      setInternalExpanded(!internalExpanded);
-    }
-  };
-  const handleCardClick = (e) => {
-    if (isSelectionMode && onToggleSelect) {
-      onToggleSelect(assetKey);
-    } else {
-      handleToggleExpand();
-    }
-  };
-  const isSentence = asset.kind === "sentence";
-  const displayWord = isSentence ? asset.sources?.[0]?.quote || "\u957F\u53E5" : asset.lemma;
-  const playAudio = (text) => {
-    if (plugin.settings.enableWordAudio === false) return;
-    try {
-      const accent = plugin.settings.wordAudioAccent || "us";
-      const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
-      const url = buildWordAudioUrl(template, text, accent);
-      new Audio(url).play().catch(() => {
-      });
-    } catch (err) {
-      console.warn("Jarvis Reader audio failed", err);
-    }
-  };
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const menu = new import_obsidian16.Menu();
-    let itemCount = 0;
-    const isMastered = asset.mastered;
-    if (onToggleMastery) {
-      itemCount += 1;
-      menu.addItem((item) => {
-        item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(() => onToggleMastery(assetKey, !isMastered));
-      });
-    }
-    if (onDelete) {
-      itemCount += 1;
-      menu.addItem((item) => {
-        item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(async () => {
-          const confirmed = await confirmDestructiveAction(
-            plugin.app,
-            "\u5220\u9664\u8BCD\u6761",
-            `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\u201C${displayWord}\u201D\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`
-          );
-          if (confirmed) {
-            await onDelete(assetKey);
-          }
-        });
-      });
-    }
-    if (contextMenuAdditionalItems) {
-      contextMenuAdditionalItems(menu);
-    }
-    if (itemCount > 0 || contextMenuAdditionalItems) {
-      menu.showAtMouseEvent(e.nativeEvent);
-    }
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
-    "div",
-    {
-      style: {
-        border: `1px solid ${isSelected ? "var(--interactive-accent)" : "var(--background-modifier-border)"}`,
-        borderRadius: "var(--radius-m)",
-        background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 10%, transparent)" : "var(--background-secondary)",
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-        cursor: "pointer",
-        position: "relative",
-        transition: "all 0.15s ease",
-        marginBottom: "8px"
-      },
-      onClick: handleCardClick,
-      onDoubleClick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (onDoubleClick) onDoubleClick(asset);
-      },
-      onContextMenu: handleContextMenu,
-      children: [
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { flex: 1, minWidth: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.2em", wordBreak: "break-word" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-              "span",
-              {
-                style: {
-                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
-                  ...isSentence ? { display: "block", fontSize: "0.85em", lineHeight: "1.4", fontWeight: "normal", marginBottom: "8px" } : {}
-                },
-                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
-                onMouseLeave: (e) => e.target.style.textDecoration = "none",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  playAudio(displayWord);
-                },
-                title: "\u70B9\u51FB\u53D1\u97F3",
-                children: displayWord
-              }
-            ) }),
-            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)", marginTop: "2px" }, children: asset.phonetic }),
-            asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }, children: [
-              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
-              asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
-              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0, marginLeft: "12px" }, children: isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
-          }, style: { pointerEvents: "none" } }) })
-        ] }),
-        asset.translation && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-          "div",
-          {
-            className: blurMode === "translation" ? "jarvis-blur-test" : "",
-            style: {
-              fontSize: "0.95em",
-              color: "var(--text-normal)",
-              whiteSpace: isExpanded ? "normal" : "pre-wrap",
-              marginTop: "4px"
-            },
-            children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
-          }
-        ),
-        bookTitle && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { marginTop: "auto", paddingTop: "8px", borderTop: "1px dashed var(--background-modifier-border)", fontSize: "0.8em", color: "var(--text-faint)" }, children: bookTitle })
-      ]
-    },
-    assetKey
-  );
-};
-
-// src/sidebar/WordSidebarView.ts
-var WORD_SIDEBAR_VIEW_TYPE = "jarvis-reader-word-sidebar";
-var WordSidebarView = class extends import_obsidian17.ItemView {
-  plugin;
-  reader;
-  searchQuery;
-  expandedAssets;
-  filterKind = "all";
-  filterStatus = "all";
-  sortOption = "created_desc";
-  reactRoot = null;
-  constructor(leaf, plugin) {
-    super(leaf);
-    this.plugin = plugin;
-    this.reader = null;
-    this.searchQuery = "";
-    this.expandedAssets = /* @__PURE__ */ new Set();
-  }
-  getViewType() {
-    return WORD_SIDEBAR_VIEW_TYPE;
-  }
-  getDisplayText() {
-    return "Jarvis Reader \u8BCD\u6761";
-  }
-  getIcon() {
-    return "book-a";
-  }
-  setReader(reader) {
-    if (this.reader !== reader) {
-      this.expandedAssets.clear();
-      this.searchQuery = "";
-    }
-    this.reader = reader;
-    this.render();
-  }
-  focusAsset(asset) {
-    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-    if (assetKey) {
-      this.expandedAssets.add(assetKey);
-      this.searchQuery = assetKey;
-      this.filterKind = "all";
-      this.filterStatus = "all";
-      this.render();
-    }
-  }
-  getWordAssets() {
-    if (!this.plugin.settings.wordAssets || typeof this.plugin.settings.wordAssets !== "object") {
-      return [];
-    }
-    const currentBookPath = this.reader && this.reader.file ? this.reader.file.path : null;
-    let assets = Object.values(this.plugin.settings.wordAssets);
-    if (currentBookPath) {
-      const filteredForBook = assets.filter((asset) => {
-        return asset.sources && asset.sources.some((s) => s.bookPath === currentBookPath);
-      });
-      if (filteredForBook.length > 0) {
-        assets = filteredForBook;
-      }
-    }
-    if (this.filterKind !== "all") {
-      assets = assets.filter((asset) => {
-        if (this.filterKind === "word") return asset.kind === "word" || !asset.kind;
-        if (this.filterKind === "phrase") return asset.kind === "phrase";
-        if (this.filterKind === "sentence") return asset.kind === "sentence";
-        return true;
-      });
-    }
-    if (this.filterStatus !== "all") {
-      assets = assets.filter((asset) => {
-        if (this.filterStatus === "mastered") return !!asset.mastered;
-        if (this.filterStatus === "unmastered") return !asset.mastered;
-        return true;
-      });
-    }
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
-      assets = assets.filter((asset) => {
-        const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma || "";
-        const translation = (asset.translation || "").toLowerCase();
-        return assetKey.toLowerCase().includes(q) || translation.includes(q);
-      });
-    }
-    assets.sort((a, b) => {
-      if (this.sortOption === "alpha_asc") {
-        return (a.lemma || "").localeCompare(b.lemma || "");
-      }
-      if (this.sortOption === "cfi_asc") {
-        const cfiA = a.sources && a.sources[0] && a.sources[0].cfiRange ? a.sources[0].cfiRange : "";
-        const cfiB = b.sources && b.sources[0] && b.sources[0].cfiRange ? b.sources[0].cfiRange : "";
-        return cfiA.localeCompare(cfiB);
-      }
-      if (this.sortOption === "created_asc") {
-        return new Date(a.created || 0).getTime() - new Date(b.created || 0).getTime();
-      }
-      return new Date(b.created || 0).getTime() - new Date(a.created || 0).getTime();
-    });
-    return assets;
-  }
-  async openWordBook() {
-    if (typeof this.plugin.openWordBook === "function") {
-      await this.plugin.openWordBook(true);
-    }
-  }
-  renderHeader(container, assetCount) {
-    const header = container.createDiv({ cls: "jarvis-reader-word-sidebar-header" });
-    const titleRow = header.createDiv({ cls: "jarvis-reader-word-sidebar-title-row" });
-    const currentBookName = this.reader && this.reader.file ? this.reader.file.basename : "\u5168\u5C40";
-    let displayTitle = currentBookName;
-    const m = displayTitle.match(/^(.*?)(?:[?(](.*?)[?)])?(?:\s*[-_]\s*.*)?$/);
-    if (m && m[1]) displayTitle = m[1].trim();
-    titleRow.createDiv({ cls: "jarvis-reader-word-sidebar-title", text: displayTitle });
-    const wordBookBtn = titleRow.createEl("button", {
-      cls: "jarvis-reader-word-sidebar-action"
-    });
-    wordBookBtn.setAttr("aria-label", "\u6253\u5F00\u8BCD\u6761");
-    wordBookBtn.setAttr("title", "\u6253\u5F00\u8BCD\u6761");
-    (0, import_obsidian17.setIcon)(wordBookBtn, "book");
-    wordBookBtn.onclick = () => this.openWordBook();
-    header.createDiv({ cls: "jarvis-reader-word-sidebar-subtitle", text: `\u5171 ${assetCount} \u4E2A\u8BCD\u6761` });
-  }
-  renderSearch(container) {
-    const searchWrap = container.createDiv({ cls: "jarvis-reader-highlights-search" });
-    searchWrap.style.display = "flex";
-    searchWrap.style.gap = "4px";
-    const searchInput = searchWrap.createEl("input", {
-      type: "text",
-      placeholder: "\u641C\u7D22\u8BCD\u6761\u6216\u91CA\u4E49...",
-      value: this.searchQuery
-    });
-    searchInput.style.flex = "1";
-    searchInput.oninput = (e) => {
-      this.searchQuery = e.target.value;
-      const listContainer = container.querySelector(".jarvis-reader-word-list");
-      if (listContainer instanceof HTMLElement) {
-        this.renderList(listContainer);
-      }
-    };
-    const filterTabsWrap = container.createDiv({ cls: "jarvis-reader-word-sidebar-tabs" });
-    const tabs = [
-      { id: "all", label: "\u5168\u90E8" },
-      { id: "word", label: "\u5355\u8BCD" },
-      { id: "phrase", label: "\u77ED\u8BED" },
-      { id: "sentence", label: "\u957F\u53E5" }
-    ];
-    tabs.forEach((tab) => {
-      const tabEl = filterTabsWrap.createDiv({
-        text: tab.label,
-        cls: `jarvis-reader-word-sidebar-tab${this.filterKind === tab.id ? " is-active" : ""}`
-      });
-      tabEl.onclick = () => {
-        this.filterKind = tab.id;
-        this.render();
-      };
-    });
-    const filterBtn = searchWrap.createEl("button", {
-      cls: "clickable-icon jarvis-reader-filter-btn",
-      attr: { "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F" }
-    });
-    (0, import_obsidian17.setIcon)(filterBtn, "filter");
-    filterBtn.onclick = (e) => {
-      const menu = new import_obsidian17.Menu();
-      menu.addItem((item) => item.setTitle("\u663E\u793A\u6240\u6709\u72B6\u6001").setChecked(this.filterStatus === "all").onClick(() => {
-        this.filterStatus = "all";
-        this.render();
-      }));
-      menu.addItem((item) => item.setTitle("\u5DF2\u638C\u63E1").setChecked(this.filterStatus === "mastered").onClick(() => {
-        this.filterStatus = "mastered";
-        this.render();
-      }));
-      menu.addItem((item) => item.setTitle("\u672A\u638C\u63E1").setChecked(this.filterStatus === "unmastered").onClick(() => {
-        this.filterStatus = "unmastered";
-        this.render();
-      }));
-      menu.addSeparator();
-      menu.addItem((item) => item.setTitle("\u6309\u6DFB\u52A0\u65F6\u95F4\u6392\u5E8F (\u6700\u65B0)").setChecked(this.sortOption === "created_desc").onClick(() => {
-        this.sortOption = "created_desc";
-        this.render();
-      }));
-      menu.addItem((item) => item.setTitle("\u6309\u6DFB\u52A0\u65F6\u95F4\u6392\u5E8F (\u6700\u65E9)").setChecked(this.sortOption === "created_asc").onClick(() => {
-        this.sortOption = "created_asc";
-        this.render();
-      }));
-      menu.addItem((item) => item.setTitle("\u6309\u5B57\u6BCD\u987A\u5E8F\u6392\u5217").setChecked(this.sortOption === "alpha_asc").onClick(() => {
-        this.sortOption = "alpha_asc";
-        this.render();
-      }));
-      menu.addItem((item) => item.setTitle("\u6309\u6587\u7AE0\u5148\u540E\u4F4D\u7F6E\u6392\u5E8F").setChecked(this.sortOption === "cfi_asc").onClick(() => {
-        this.sortOption = "cfi_asc";
-        this.render();
-      }));
-      menu.showAtMouseEvent(e);
-    };
-  }
-  renderList(listContainer) {
-    if (!this.reactRoot) {
-      this.reactRoot = (0, import_client2.createRoot)(listContainer);
-    }
-    if (!this.reader) {
-      this.reactRoot.render(
-        React8.createElement("div", { className: "jarvis-reader-bookshelf-empty" }, "\u8BF7\u5148\u6253\u5F00\u4E00\u672C EPUB \u4E66\u7C4D")
-      );
-      return;
-    }
-    const assets = this.getWordAssets();
-    if (assets.length === 0) {
-      this.reactRoot.render(
-        React8.createElement("div", { className: "jarvis-reader-bookshelf-empty" }, "\u6682\u65E0\u8BCD\u6761")
-      );
-      return;
-    }
-    const handleToggleMastery = async (lemma, mastered) => {
-      const asset = this.plugin.settings.wordAssets[lemma];
-      if (asset) {
-        if (this.reader && typeof this.reader.setWordMastered === "function") {
-          await this.reader.setWordMastered(asset, mastered);
-        } else {
-          await this.plugin.wordAssetService.setMastered(lemma, mastered);
-          this.render();
-        }
-      }
-    };
-    const handleDelete = async (assetKey) => {
-      const asset = this.plugin.settings.wordAssets[assetKey];
-      if (asset) {
-        if (this.reader && typeof this.reader.deleteWordAsset === "function") {
-          await this.reader.deleteWordAsset(asset);
-        } else {
-          await this.plugin.wordAssetService.delete(assetKey);
-          this.render();
-        }
-      }
-    };
-    const handleToggleExpand = (lemma) => {
-      if (this.expandedAssets.has(lemma)) {
-        this.expandedAssets.delete(lemma);
-      } else {
-        this.expandedAssets.add(lemma);
-      }
-      this.renderList(listContainer);
-    };
-    const handleDoubleClick = (asset) => {
-      if (this.reader && this.reader.currentRendition && asset.sources && asset.sources[0]) {
-        try {
-          this.reader.currentRendition.display(asset.sources[0].cfiRange);
-        } catch (err) {
-          console.warn("Word jump failed", err);
-        }
-      }
-    };
-    this.reactRoot.render(
-      React8.createElement(
-        React8.Fragment,
-        null,
-        assets.map((asset) => {
-          const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-          return React8.createElement(WordCard, {
-            key: assetKey,
-            plugin: this.plugin,
-            asset,
-            isExpanded: this.expandedAssets.has(assetKey),
-            onToggleExpand: handleToggleExpand,
-            onToggleMastery: handleToggleMastery,
-            onDelete: handleDelete,
-            onDoubleClick: handleDoubleClick
-          });
-        })
-      )
-    );
-  }
-  async onClose() {
-    if (this.reactRoot) {
-      this.reactRoot.unmount();
-      this.reactRoot = null;
-    }
-  }
-  render() {
-    const container = this.contentEl;
-    if (!container) return;
-    if (this.reactRoot) {
-      this.reactRoot.unmount();
-      this.reactRoot = null;
-    }
-    container.empty();
-    container.className = "view-content jarvis-reader-sidebar-view jarvis-reader-word-sidebar";
-    const allAssets = this.getWordAssets();
-    this.renderHeader(container, allAssets.length);
-    this.renderSearch(container);
-    const listContainer = container.createDiv({ cls: "jarvis-reader-word-list" });
-    this.renderList(listContainer);
-  }
-};
-
-// src/word-book/WordBookView.ts
-var import_obsidian21 = require("obsidian");
-var React12 = __toESM(require_react(), 1);
-var ReactDOM2 = __toESM(require_client(), 1);
-
-// src/word-book/WordBookApp.tsx
-var React11 = __toESM(require_react(), 1);
-var import_obsidian20 = require("obsidian");
-init_utils();
-
-// src/word-book/ReviewSession.tsx
-var React9 = __toESM(require_react(), 1);
-
-// src/word-book/SpacedRepetition.ts
-function calculateNextReview(quality, currentInterval = 0, currentEase = 2.5, currentReviews = 0, options) {
-  const startingEase = options?.startingEase ?? 2.5;
-  const easyBonus = options?.easyBonus ?? 1.3;
-  const lapseMultiplier = options?.lapseMultiplier ?? 0.5;
-  const maxInterval = options?.maxInterval ?? 365;
-  let nextInterval;
-  let nextEase = currentReviews === 0 ? startingEase : currentEase;
-  let nextReviews = currentReviews + 1;
-  if (quality === "Hard") {
-    nextInterval = Math.max(1, Math.floor(currentInterval * lapseMultiplier));
-    nextEase = Math.max(1.3, nextEase - 0.15);
-  } else if (quality === "Good") {
-    if (currentReviews === 0) {
-      nextInterval = 1;
-    } else if (currentReviews === 1) {
-      nextInterval = 3;
-    } else {
-      nextInterval = Math.round(currentInterval * nextEase);
-    }
-  } else {
-    if (currentReviews === 0) {
-      nextInterval = 4;
-    } else if (currentReviews === 1) {
-      nextInterval = 7;
-    } else {
-      nextInterval = Math.round(currentInterval * nextEase * easyBonus);
-    }
-    nextEase = nextEase + 0.15;
-  }
-  nextInterval = Math.max(1, nextInterval);
-  nextInterval = Math.min(maxInterval, nextInterval);
-  const now = /* @__PURE__ */ new Date();
-  now.setDate(now.getDate() + nextInterval);
-  const nextReviewDate = now.toISOString().split("T")[0];
-  return {
-    nextReviewDate,
-    interval: nextInterval,
-    ease: nextEase,
-    reviews: nextReviews
-  };
-}
-function getDueCards(assets, bookFilter) {
-  const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
-  return assets.filter((asset) => {
-    if (asset.mastered) return false;
-    if (bookFilter && bookFilter !== "all") {
-      const isInBook = asset.sources?.some((source) => source.bookPath === bookFilter);
-      if (!isInBook) return false;
-    }
-    if (!asset.nextReviewDate || asset.nextReviewDate <= today) {
-      return true;
-    }
-    return false;
-  });
-}
-
-// src/word-book/ReviewSession.tsx
-var import_obsidian18 = require("obsidian");
-var import_jsx_runtime6 = __toESM(require_jsx_runtime(), 1);
-function ReviewSession({ plugin, dueAssets, onComplete, onAssetUpdate }) {
-  const [currentIndex, setCurrentIndex] = React9.useState(0);
-  const [showAnswer, setShowAnswer] = React9.useState(false);
-  const [startTime, setStartTime] = React9.useState(Date.now());
-  const [isTranslating, setIsTranslating] = React9.useState(false);
-  const handleAiTranslation = async (e) => {
-    e.stopPropagation();
-    if (isTranslating) return;
-    const asset2 = dueAssets[currentIndex];
-    if (!asset2) return;
-    const lemmaKey = asset2.lemma;
-    if (!plugin.settings.wordAssets[lemmaKey]) return;
-    setIsTranslating(true);
-    new import_obsidian18.Notice("\u6B63\u5728\u4F7F\u7528AI\u91CD\u65B0\u7FFB\u8BD1...");
-    try {
-      const quote = asset2.title || asset2.lemma || "";
-      const sentence = asset2.sources && asset2.sources[0] && asset2.sources[0].sentence || asset2.sources && asset2.sources[0] && asset2.sources[0].quote || "";
-      const result = await translateSelectionWithApi(plugin.settings, quote, sentence, plugin.app, { forceAi: true });
-      if (result) {
-        await plugin.wordAssetService.update(lemmaKey, (currentAsset) => ({
-          ...currentAsset,
-          translation: result.translation || currentAsset.translation,
-          display: result.display || currentAsset.display,
-          phonetic: result.phonetic || currentAsset.phonetic,
-          partOfSpeech: result.partOfSpeech || currentAsset.partOfSpeech,
-          example: result.example || currentAsset.example,
-          tags: result.tags || currentAsset.tags,
-          collins: result.collins ?? currentAsset.collins,
-          oxford: result.oxford ?? currentAsset.oxford,
-          updated: (/* @__PURE__ */ new Date()).toISOString()
-        }));
-        new import_obsidian18.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
-        onAssetUpdate();
-      } else {
-        new import_obsidian18.Notice("AI\u7FFB\u8BD1\u6CA1\u6709\u8FD4\u56DE\u7ED3\u679C");
-      }
-    } catch (error) {
-      new import_obsidian18.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
-      console.error(error);
-    } finally {
-      setIsTranslating(false);
-    }
-  };
-  const playAudio = React9.useCallback((text) => {
-    if (plugin.settings.enableWordAudio !== false) {
-      try {
-        const accent = plugin.settings.wordAudioAccent || "us";
-        const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
-        const url = buildWordAudioUrl(template, text, accent);
-        if (url) {
-          new Audio(url).play().catch(() => {
-          });
-        }
-      } catch (e) {
-        console.error("Audio playback failed", e);
-      }
-    }
-  }, [plugin]);
-  React9.useEffect(() => {
-    setStartTime(Date.now());
-    if (plugin.settings.autoPlayAudioOnReview !== false && dueAssets[currentIndex]) {
-      const asset2 = dueAssets[currentIndex];
-      const isSentence2 = asset2.kind === "sentence";
-      const displayWord2 = isSentence2 ? asset2.sources?.[0]?.quote || asset2.lemma : asset2.lemma;
-      playAudio(displayWord2);
-    }
-  }, [currentIndex, dueAssets, plugin, playAudio]);
-  if (dueAssets.length === 0 || currentIndex >= dueAssets.length) {
-    return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "40px" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", color: "var(--color-green)" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { viewBox: "0 0 24 24", width: "22", height: "22", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h2", { style: { margin: 0, fontSize: "1.4em", fontWeight: "600", color: "var(--color-green)" }, children: "\u590D\u4E60\u5B8C\u6210\uFF01" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { style: { color: "var(--text-muted)", marginBottom: "32px" }, children: "\u60A8\u5DF2\u7ECF\u5B8C\u6210\u4E86\u4ECA\u5929\u6240\u6709\u7684\u590D\u4E60\u4EFB\u52A1\u3002" }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "jarvis-library-back-btn", onClick: onComplete, style: { padding: "8px 24px !important", fontSize: "1.1em" }, children: "\u8FD4\u56DE\u8BCD\u6761" })
-    ] });
-  }
-  const asset = dueAssets[currentIndex];
-  const startingEase = plugin.settings.sm2StartingEase ?? 2.5;
-  const easyBonus = plugin.settings.sm2EasyBonus ?? 1.3;
-  const lapseMultiplier = plugin.settings.sm2LapseMultiplier ?? 0.5;
-  const maxInterval = plugin.settings.sm2MaxInterval ?? 365;
-  const reviewOptions = { startingEase, easyBonus, lapseMultiplier, maxInterval };
-  const handleReview = async (response) => {
-    const timeSpent = Date.now() - startTime;
-    const { nextReviewDate, interval, ease, reviews } = calculateNextReview(
-      response,
-      asset.interval || 0,
-      asset.ease || startingEase,
-      asset.reviews || 0,
-      reviewOptions
-    );
-    const lemmaKey = asset.lemma;
-    if (plugin.settings.wordAssets[lemmaKey]) {
-      await plugin.wordAssetService.update(lemmaKey, (currentAsset) => ({
-        ...currentAsset,
-        nextReviewDate,
-        interval,
-        ease,
-        reviews,
-        reviewTimeMs: (currentAsset.reviewTimeMs || 0) + timeSpent,
-        updated: (/* @__PURE__ */ new Date()).toISOString()
-      }));
-      const today = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
-      if (!plugin.settings.wordReviewStats) {
-        plugin.settings.wordReviewStats = {};
-      }
-      if (!plugin.settings.wordReviewStats[today]) {
-        plugin.settings.wordReviewStats[today] = { reviewCount: 0, reviewTimeMs: 0 };
-      }
-      plugin.settings.wordReviewStats[today].reviewCount += 1;
-      plugin.settings.wordReviewStats[today].reviewTimeMs += timeSpent;
-      await plugin.saveSettingsData();
-    }
-    setShowAnswer(false);
-    setCurrentIndex(currentIndex + 1);
-    onAssetUpdate();
-  };
-  const hardStats = calculateNextReview("Hard", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
-  const goodStats = calculateNextReview("Good", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
-  const easyStats = calculateNextReview("Easy", asset.interval || 0, asset.ease || startingEase, asset.reviews || 0, reviewOptions);
-  const formatInterval = (days) => {
-    if (days < 30) return `${days}\u5929`;
-    if (days < 365) return `${(days / 30).toFixed(1)}\u4E2A\u6708`;
-    return `${(days / 365).toFixed(1)}\u5E74`;
-  };
-  const isSentence = asset.kind === "sentence";
-  const displayWord = isSentence ? asset.sources?.[0]?.quote || asset.lemma : asset.lemma;
-  const posText = asset.partOfSpeech ? `[${asset.partOfSpeech}] ` : "";
-  const typeLabel = asset.kind === "sentence" ? "\u957F\u53E5" : asset.kind === "phrase" ? "\u77ED\u8BED" : "\u5355\u8BCD";
-  const titleFontSize = asset.kind === "sentence" ? "1.6em" : displayWord.length > 15 ? "2em" : "3em";
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexDirection: "column", height: "100%", background: "var(--background-primary)", padding: "32px", maxWidth: "800px", margin: "0 auto", width: "100%", alignItems: "center", justifyContent: "center" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", maxWidth: "580px", marginBottom: "24px" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { onClick: onComplete, className: "jarvis-library-back-btn", "aria-label": "\u8FD4\u56DE\u8BCD\u6761", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("polyline", { points: "12 19 5 12 12 5" })
-        ] }),
-        "\u8FD4\u56DE\u8BCD\u6761"
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { color: "var(--text-muted)", fontSize: "0.9em", fontWeight: "bold" }, children: [
-        currentIndex + 1,
-        " / ",
-        dueAssets.length
-      ] })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "jarvis-flashcard-container", onClick: () => !showAnswer && setShowAnswer(true), children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: `jarvis-flashcard ${showAnswer ? "is-flipped" : ""}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "jarvis-flashcard-front", style: { display: "flex", flexDirection: "column", position: "relative", height: "100%" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%", padding: "24px", boxSizing: "border-box" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px", flex: 1, minWidth: 0, paddingRight: "16px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { fontSize: "0.9em", color: "var(--text-muted)", background: "var(--background-secondary)", padding: "4px 12px", borderRadius: "8px" }, children: [
-              posText,
-              typeLabel
-            ] }),
-            asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px" }, children: [
-              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
-              asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
-              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.8em", padding: "2px 8px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-            "button",
-            {
-              className: "clickable-icon",
-              onClick: async (e) => {
-                e.stopPropagation();
-                const current = asset.mastered;
-                if (plugin.settings.wordAssets[asset.lemma]) {
-                  await plugin.wordAssetService.setMastered(asset.lemma, !current);
-                  onAssetUpdate();
-                }
-              },
-              "aria-label": asset.mastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1",
-              style: {
-                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)",
-                width: "28px",
-                height: "28px",
-                padding: "0",
-                border: asset.mastered ? "1px solid var(--color-green)" : "1px solid var(--text-faint)",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              },
-              children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M20 6 9 17l-5-5" }) })
-            }
-          ) })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { position: "relative", display: "inline-flex", alignItems: isSentence ? "flex-start" : "center", justifyContent: "center", width: isSentence ? "100%" : "auto" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { fontSize: titleFontSize, fontFamily: "serif", fontWeight: "bold", textAlign: isSentence ? "left" : "center", lineHeight: 1.4, padding: "0 20px", width: "100%", wordBreak: "break-word", whiteSpace: "pre-wrap", color: "var(--text-normal)" }, children: displayWord }),
-          !isSentence && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { position: "absolute", left: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "clickable-icon", onClick: (e) => {
-            e.stopPropagation();
-            playAudio(displayWord);
-          }, "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "28", height: "28", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
-          ] }) }) })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { padding: "24px", display: "flex", justifyContent: "center", width: "100%", boxSizing: "border-box" }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "mod-cta", onClick: (e) => {
-          e.stopPropagation();
-          setShowAnswer(true);
-        }, children: "\u67E5\u770B\u91CA\u4E49" }) })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "jarvis-flashcard-back", onClick: (e) => e.stopPropagation(), style: { display: "flex", flexDirection: "column" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexDirection: "column", marginBottom: "20px", flexShrink: 0, borderLeft: "4px solid var(--interactive-accent)", borderRadius: "8px", paddingLeft: "16px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { fontSize: isSentence ? "1.3em" : "2.2em", fontFamily: "serif", fontWeight: "bold", lineHeight: 1.3, color: "var(--text-normal)" }, children: displayWord }),
-            !isSentence && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "clickable-icon", onClick: () => playAudio(displayWord), "aria-label": "\u53D1\u97F3", title: "\u53D1\u97F3", style: { opacity: 0.7 }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" })
-            ] }) })
-          ] }),
-          !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { fontSize: "1em", color: "var(--text-muted)", fontStyle: "italic", marginTop: "4px" }, children: asset.phonetic }),
-          asset.isWord && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
-            asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u725B\u6D25\u6838\u5FC3" }),
-            asset.collins && asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" }, children: "\u2605".repeat(asset.collins) }),
-            asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" }, children: tag.toUpperCase() }, tag))
-          ] })
-        ] }),
-        !isSentence && asset.sources && asset.sources[0]?.quote && asset.sources[0].quote.trim() !== asset.lemma.trim() && asset.sources[0].quote.trim() !== displayWord.trim() && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { marginBottom: "16px", padding: "12px 16px", background: "var(--background-secondary)", borderRadius: "8px", borderLeft: "4px solid var(--interactive-accent)", flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { fontStyle: "italic", color: "var(--text-normal)", fontSize: "0.95em", lineHeight: 1.5 }, children: asset.sources[0].quote }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: { fontSize: "1.05em", lineHeight: 1.6, flex: "1 1 auto", color: "var(--text-normal)", minHeight: "min-content" }, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MarkdownPreview, { content: (asset.display || asset.translation || "").replace(/\\n/g, "\n"), plugin }) }),
-        asset.sources && asset.sources[0] && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { marginTop: "20px", paddingTop: "12px", borderTop: "1px dashed var(--background-modifier-border)", color: "var(--text-muted)", fontSize: "0.85em", display: "flex", justifyContent: "space-between", flexShrink: 0 }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { children: "\u6765\u6E90" }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { children: [
-            asset.sources[0].bookTitle || asset.sources[0].bookPath,
-            " ",
-            asset.sources[0].chapterTitle ? ` \xB7 ${asset.sources[0].chapterTitle}` : ""
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px", width: "100%", flexShrink: 0 }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-            "button",
-            {
-              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--text-muted) 6%, transparent)", color: "var(--text-muted)", border: "1px solid color-mix(in srgb, var(--text-muted) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
-              onClick: (e) => {
-                e.stopPropagation();
-                setShowAnswer(false);
-              },
-              onMouseEnter: (e) => {
-                e.currentTarget.style.background = "var(--text-muted)";
-                e.currentTarget.style.color = "var(--background-primary)";
-              },
-              onMouseLeave: (e) => {
-                e.currentTarget.style.background = "color-mix(in srgb, var(--text-muted) 6%, transparent)";
-                e.currentTarget.style.color = "var(--text-muted)";
-              },
-              children: "\u56DE\u5230\u6B63\u9762"
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-            "button",
-            {
-              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
-              onClick: handleAiTranslation,
-              onMouseEnter: (e) => {
-                e.currentTarget.style.background = "var(--interactive-accent)";
-                e.currentTarget.style.color = "white";
-              },
-              onMouseLeave: (e) => {
-                e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)";
-                e.currentTarget.style.color = "var(--interactive-accent)";
-              },
-              children: isTranslating ? "\u7FFB\u8BD1\u4E2D..." : "AI\u7FFB\u8BD1"
-            }
-          ),
-          asset.sources && asset.sources[0] && asset.sources[0].bookPath && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
-            "button",
-            {
-              style: { flex: 1, padding: "10px 16px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", background: "color-mix(in srgb, var(--interactive-accent) 6%, transparent)", color: "var(--interactive-accent)", border: "1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", fontSize: "0.9em", fontWeight: "500", letterSpacing: "0.5px" },
-              onMouseEnter: (e) => {
-                e.currentTarget.style.background = "var(--interactive-accent)";
-                e.currentTarget.style.color = "white";
-              },
-              onMouseLeave: (e) => {
-                e.currentTarget.style.background = "color-mix(in srgb, var(--interactive-accent) 6%, transparent)";
-                e.currentTarget.style.color = "var(--interactive-accent)";
-              },
-              onClick: async (e) => {
-                e.stopPropagation();
-                try {
-                  const source = asset.sources[0];
-                  if (!source || !source.bookPath) {
-                    new import_obsidian18.Notice("\u6CA1\u6709\u627E\u5230\u539F\u6587\u6765\u6E90");
-                    return;
-                  }
-                  const file = plugin.app.vault.getAbstractFileByPath(source.bookPath);
-                  if (!file) {
-                    new import_obsidian18.Notice("\u627E\u4E0D\u5230\u4E66\u7C4D\u6587\u4EF6: " + source.bookPath);
-                    return;
-                  }
-                  const armJumpRetries = (leaf, logPrefix) => {
-                    let attempts = 0;
-                    const maxAttempts = 8;
-                    const run = () => {
-                      attempts += 1;
-                      const view = leaf?.view;
-                      if (!view || !view.currentRendition) {
-                        if (attempts < maxAttempts) setTimeout(run, 180);
-                        return;
-                      }
-                      try {
-                        if (typeof view.jumpToCfi === "function") {
-                          view.jumpToCfi(source.cfiRange);
-                        } else {
-                          view.currentRendition.display(source.cfiRange);
-                        }
-                      } catch (e2) {
-                        if (attempts < maxAttempts) {
-                          setTimeout(run, 180);
-                        } else {
-                          console.warn(logPrefix, e2);
-                        }
-                      }
-                    };
-                    setTimeout(run, 120);
-                  };
-                  const leaves = [];
-                  plugin.app.workspace.iterateAllLeaves((l) => {
-                    if (l.view?.getViewType() === "epub") {
-                      leaves.push(l);
-                    }
-                  });
-                  let targetLeaf = null;
-                  for (const l of leaves) {
-                    const viewState = l.getViewState();
-                    const filePath = l.view?.file?.path || viewState?.state?.file;
-                    if (filePath === file.path) {
-                      targetLeaf = l;
-                      break;
-                    }
-                  }
-                  if (!targetLeaf) {
-                    const normalizeBookName = (p) => {
-                      if (!p) return "";
-                      const filename = p.split("/").pop() || p;
-                      return filename.toLowerCase().replace(/[\s\-_]/g, "").replace(/[（(]/g, "(").replace(/[）)]/g, ")");
-                    };
-                    const targetName = normalizeBookName(file.path);
-                    for (const l of leaves) {
-                      const viewState = l.getViewState();
-                      const filePath = l.view?.file?.path || viewState?.state?.file;
-                      if (filePath && normalizeBookName(filePath) === targetName) {
-                        targetLeaf = l;
-                        break;
-                      }
-                    }
-                  }
-                  if (targetLeaf) {
-                    const viewState = targetLeaf.getViewState();
-                    const activeFilePath = targetLeaf.view?.file?.path || viewState?.state?.file || file.path;
-                    console.log(`[Jarvis Reader] Found target leaf for book: ${activeFilePath}, jumping to cfi: ${source.cfiRange}`);
-                    plugin.settings.bookInitLocations[activeFilePath] = source.cfiRange;
-                    await targetLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
-                    await targetLeaf.setEphemeralState({ epubcifi: source.cfiRange });
-                    plugin.app.workspace.setActiveLeaf(targetLeaf, { focus: true });
-                    armJumpRetries(targetLeaf, "[Jarvis Reader] Direct display failed");
-                  } else {
-                    console.log(`[Jarvis Reader] Target leaf not found, opening in a new leaf: ${file.path}`);
-                    const newLeaf = plugin.app.workspace.getLeaf(true);
-                    plugin.settings.bookInitLocations[file.path] = source.cfiRange;
-                    await newLeaf.openFile(file, { active: true, eState: { epubcifi: source.cfiRange } });
-                    await newLeaf.setEphemeralState({ epubcifi: source.cfiRange });
-                    plugin.app.workspace.setActiveLeaf(newLeaf, { focus: true });
-                    armJumpRetries(newLeaf, "[Jarvis Reader] New leaf direct display failed");
-                  }
-                } catch (err) {
-                  new import_obsidian18.Notice("\u8DF3\u8F6C\u5931\u8D25: " + String(err));
-                  console.error("Jump to source failed", err);
-                }
-              },
-              children: "\u8DF3\u8F6C\u539F\u6587"
-            }
-          )
-        ] })
-      ] })
-    ] }) }, currentIndex),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { display: "flex", gap: "20px", marginTop: "32px", justifyContent: "center", width: "100%", maxWidth: "580px", visibility: showAnswer ? "visible" : "hidden" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-        "button",
-        {
-          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-red) 6%, transparent)", color: "var(--color-red)", border: "1px solid color-mix(in srgb, var(--color-red) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-red) 5%, transparent)" },
-          onClick: () => handleReview("Hard"),
-          onMouseEnter: (e) => {
-            e.currentTarget.style.background = "var(--color-red)";
-            e.currentTarget.style.color = "white";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.background = "color-mix(in srgb, var(--color-red) 6%, transparent)";
-            e.currentTarget.style.color = "var(--color-red)";
-          },
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u56F0\u96BE" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
-              "(",
-              formatInterval(hardStats.interval),
-              ")"
-            ] })
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-        "button",
-        {
-          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-blue) 6%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-blue) 5%, transparent)" },
-          onClick: () => handleReview("Good"),
-          onMouseEnter: (e) => {
-            e.currentTarget.style.background = "var(--color-blue)";
-            e.currentTarget.style.color = "white";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.background = "color-mix(in srgb, var(--color-blue) 6%, transparent)";
-            e.currentTarget.style.color = "var(--color-blue)";
-          },
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u826F\u597D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
-              "(",
-              formatInterval(goodStats.interval),
-              ")"
-            ] })
-          ]
-        }
-      ),
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
-        "button",
-        {
-          style: { flex: 1, padding: "14px 20px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "6px", background: "color-mix(in srgb, var(--color-green) 6%, transparent)", color: "var(--color-green)", border: "1px solid color-mix(in srgb, var(--color-green) 25%, transparent)", borderRadius: "12px", cursor: "pointer", transition: "all 0.15s ease", boxShadow: "0 2px 8px color-mix(in srgb, var(--color-green) 5%, transparent)" },
-          onClick: () => handleReview("Easy"),
-          onMouseEnter: (e) => {
-            e.currentTarget.style.background = "var(--color-green)";
-            e.currentTarget.style.color = "white";
-          },
-          onMouseLeave: (e) => {
-            e.currentTarget.style.background = "color-mix(in srgb, var(--color-green) 6%, transparent)";
-            e.currentTarget.style.color = "var(--color-green)";
-          },
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontWeight: "600", fontSize: "1.1em", letterSpacing: "1px" }, children: "\u7B80\u5355" }),
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { style: { fontSize: "0.9em", opacity: 0.85, fontWeight: "500" }, children: [
-              "(",
-              formatInterval(easyStats.interval),
-              ")"
-            ] })
-          ]
-        }
-      )
-    ] })
-  ] });
-}
-
-// src/word-book/WordBookStats.tsx
-var React10 = __toESM(require_react(), 1);
-var import_obsidian19 = require("obsidian");
-init_utils();
-var import_jsx_runtime7 = __toESM(require_jsx_runtime(), 1);
-var moment2 = import_obsidian19.moment;
-function WordBookStats({ plugin, assets, onClose }) {
-  const [statsTab, setStatsTab] = React10.useState("week");
-  const [statsDate, setStatsDate] = React10.useState(/* @__PURE__ */ new Date());
-  const [statsChartType, setStatsChartType] = React10.useState("bar");
-  const selectedStats = React10.useMemo(() => {
-    const today = moment2(statsDate);
-    let startDate2;
-    let endDate2;
-    let prevStartDate;
-    let prevEndDate;
-    if (statsTab === "week") {
-      startDate2 = today.clone().startOf("isoWeek");
-      endDate2 = today.clone().endOf("isoWeek");
-      prevStartDate = startDate2.clone().subtract(1, "week");
-      prevEndDate = endDate2.clone().subtract(1, "week");
-    } else if (statsTab === "month") {
-      startDate2 = today.clone().startOf("month");
-      endDate2 = today.clone().endOf("month");
-      prevStartDate = startDate2.clone().subtract(1, "month");
-      prevEndDate = endDate2.clone().subtract(1, "month");
-    } else if (statsTab === "year") {
-      startDate2 = today.clone().startOf("year");
-      endDate2 = today.clone().endOf("year");
-      prevStartDate = startDate2.clone().subtract(1, "year");
-      prevEndDate = endDate2.clone().subtract(1, "year");
-    } else {
-      startDate2 = moment2(0);
-      endDate2 = moment2().endOf("day");
-      prevStartDate = moment2(0);
-      prevEndDate = moment2().endOf("day");
-    }
-    const statsData2 = plugin.settings.wordReviewStats || {};
-    let totalSeconds2 = 0;
-    let prevTotalSeconds = 0;
-    let totalReviews2 = 0;
-    let prevTotalReviews = 0;
-    const dailySecondsMap2 = {};
-    const monthlySecondsMap2 = {};
-    const yearlySecondsMap2 = {};
-    const reviewDays = /* @__PURE__ */ new Set();
-    Object.entries(statsData2).forEach(([dateStr, dailyData]) => {
-      const dateVal = moment2(dateStr, "YYYY-MM-DD");
-      if (!dateVal.isValid()) return;
-      const isCurrentRange = dateVal.isBetween(startDate2, endDate2, "day", "[]");
-      const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
-      const count = dailyData.reviewCount || 0;
-      const ms = dailyData.reviewTimeMs || 0;
-      const secs = Math.round(ms / 1e3);
-      if (isCurrentRange) {
-        totalSeconds2 += secs;
-        totalReviews2 += count;
-        if (count > 0 || secs > 0) {
-          reviewDays.add(dateStr);
-          dailySecondsMap2[dateStr] = (dailySecondsMap2[dateStr] || 0) + secs;
-          const monthStr = dateVal.format("YYYY-MM");
-          monthlySecondsMap2[monthStr] = (monthlySecondsMap2[monthStr] || 0) + secs;
-          const yearStr = dateVal.format("YYYY");
-          yearlySecondsMap2[yearStr] = (yearlySecondsMap2[yearStr] || 0) + secs;
-        }
-      } else if (isPrevRange && statsTab !== "all") {
-        prevTotalSeconds += secs;
-        prevTotalReviews += count;
-      }
-    });
-    let newWordsCount2 = 0;
-    assets.forEach((asset) => {
-      const createdVal = moment2(asset.created);
-      if (createdVal.isValid() && createdVal.isBetween(startDate2, endDate2, "day", "[]")) {
-        newWordsCount2++;
-      }
-    });
-    let trendPercent2 = 0;
-    if (prevTotalSeconds > 0) {
-      trendPercent2 = Math.round((totalSeconds2 - prevTotalSeconds) / prevTotalSeconds * 100);
-    } else if (totalSeconds2 > 0) {
-      trendPercent2 = 100;
-    }
-    const bookWordCountMap = {};
-    assets.forEach((asset) => {
-      const createdVal = moment2(asset.created);
-      if (createdVal.isValid() && createdVal.isBetween(startDate2, endDate2, "day", "[]")) {
-        const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
-        if (bookTitle) {
-          bookWordCountMap[bookTitle] = (bookWordCountMap[bookTitle] || 0) + 1;
-        }
-      }
-    });
-    const topBooks2 = Object.entries(bookWordCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    const activeAssets = assets.filter((a) => !a.mastered);
-    const sortedByDifficulty = [...activeAssets].sort((a, b) => {
-      const aReviews = a.reviews || 0;
-      const bReviews = b.reviews || 0;
-      if (aReviews !== bReviews) return bReviews - aReviews;
-      const aEase = a.ease || 2.5;
-      const bEase = b.ease || 2.5;
-      return aEase - bEase;
-    });
-    const totalWords2 = assets.length;
-    const masteredWords2 = assets.filter((a) => a.mastered).length;
-    const dueWords2 = getDueCards(assets).length;
-    return {
-      startDate: startDate2,
-      endDate: endDate2,
-      totalSeconds: totalSeconds2,
-      prevTotalSeconds,
-      trendPercent: trendPercent2,
-      readDaysCount: reviewDays.size,
-      newWordsCount: newWordsCount2,
-      totalReviews: totalReviews2,
-      dailySecondsMap: dailySecondsMap2,
-      monthlySecondsMap: monthlySecondsMap2,
-      yearlySecondsMap: yearlySecondsMap2,
-      topBooks: topBooks2,
-      difficultWords: sortedByDifficulty.slice(0, 10),
-      totalWords: totalWords2,
-      masteredWords: masteredWords2,
-      dueWords: dueWords2
-    };
-  }, [statsTab, statsDate, assets, plugin.settings.wordReviewStats]);
-  const handlePrevDate = () => {
-    setStatsDate((prev) => {
-      const m = moment2(prev);
-      if (statsTab === "week") return m.subtract(1, "week").toDate();
-      if (statsTab === "month") return m.subtract(1, "month").toDate();
-      if (statsTab === "year") return m.subtract(1, "year").toDate();
-      return prev;
-    });
-  };
-  const handleNextDate = () => {
-    setStatsDate((prev) => {
-      const m = moment2(prev);
-      if (statsTab === "week") return m.add(1, "week").toDate();
-      if (statsTab === "month") return m.add(1, "month").toDate();
-      if (statsTab === "year") return m.add(1, "year").toDate();
-      return prev;
-    });
-  };
-  const renderLargeDuration = (secs) => {
-    if (secs <= 0) {
-      return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-        "0",
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5206\u949F" })
-      ] });
-    }
-    const h = Math.floor(secs / 3600);
-    const m = Math.round(secs % 3600 / 60);
-    if (h > 0 && m > 0) {
-      return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-        h,
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5C0F\u65F6" }),
-        m,
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5206\u949F" })
-      ] });
-    } else if (h > 0) {
-      return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-        h,
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5C0F\u65F6" })
-      ] });
-    } else {
-      return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-        m,
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5206\u949F" })
-      ] });
-    }
-  };
-  const formatDays = (dateStr) => {
-    if (!dateStr) return "\u65B0\u8BCD";
-    const diff = new Date(dateStr).getTime() - (/* @__PURE__ */ new Date()).getTime();
-    const days = Math.ceil(diff / (1e3 * 3600 * 24));
-    if (days < 0) return "\u5DF2\u8D85\u671F";
-    if (days === 0) return "\u4ECA\u65E5";
-    return `${days}\u5929\u540E`;
-  };
-  const {
-    startDate,
-    endDate,
-    totalSeconds,
-    trendPercent,
-    readDaysCount,
-    newWordsCount,
-    totalReviews,
-    dailySecondsMap,
-    monthlySecondsMap,
-    yearlySecondsMap,
-    topBooks,
-    difficultWords,
-    totalWords,
-    masteredWords,
-    dueWords
-  } = selectedStats;
-  const statsData = plugin.settings.wordReviewStats || {};
-  const sortedDates = Object.keys(statsData).sort();
-  const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : moment2().format("YYYY-MM-DD");
-  const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
-  let dateRangeStr = "";
-  if (statsTab === "week") {
-    dateRangeStr = `${moment2(startDate).format("YYYY \xB7 M/D")} - ${moment2(endDate).format("M/D")}`;
-  } else if (statsTab === "month") {
-    dateRangeStr = moment2(startDate).format("YYYY\u5E74M\u6708");
-  } else if (statsTab === "year") {
-    dateRangeStr = moment2(startDate).format("YYYY\u5E74");
-  }
-  const avgSecs = Math.round(totalSeconds / (readDaysCount || 1));
-  const trendText = trendPercent > 0 ? `\u2191 ${trendPercent}%` : trendPercent < 0 ? `\u2193 ${Math.abs(trendPercent)}%` : "--";
-  const trendClass = trendPercent > 0 ? "jarvis-stats-trend-up" : trendPercent < 0 ? "jarvis-stats-trend-down" : "";
-  let mainCardSub = "";
-  if (statsTab === "week") {
-    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u5468 `;
-  } else if (statsTab === "month") {
-    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u4E0A\u6708 `;
-  } else if (statsTab === "year") {
-    mainCardSub = `\u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u6BD4\u53BB\u5E74 `;
-  } else {
-    mainCardSub = `${firstDateStr}\u81F3\u4ECA \xB7 \u65E5\u5747\u8BB0\u5FC6 ${formatDuration(avgSecs)} \xB7 \u4E0E Jarvis Reader \u8BB0\u5FC6\u76F8\u4F34 ${readDaysCount} \u5929`;
-  }
-  let activeChart = statsChartType;
-  if (statsTab === "week") {
-    activeChart = "bar";
-  } else if (statsTab === "month" && activeChart === "heatmap") {
-    activeChart = "bar";
-  } else if ((statsTab === "year" || statsTab === "all") && activeChart === "calendar") {
-    activeChart = "heatmap";
-  }
-  const isReadable = plugin.app.vault.getConfig ? plugin.app.vault.getConfig("readableLineLength") : true;
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-library-stats-view", style: { overflowY: "auto", height: "100%", width: "100%", padding: "20px 0" }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, style: { margin: "0 auto" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-library-stats-view-header", style: { marginBottom: "20px" }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { className: "jarvis-library-back-btn", onClick: onClose, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "12 19 5 12 12 5" })
-        ] }),
-        "\u8FD4\u56DE\u8BCD\u6761"
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u8BCD\u5E93\u7EDF\u8BA1\u770B\u677F" })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
-      ] }),
-      statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
-      ] })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-main-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
-        mainCardSub,
-        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: trendClass, children: trendText })
-      ] })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-mini-grid", children: statsTab === "all" ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
-          ] }),
-          readDaysCount,
-          "\u5929"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7D2F\u8BA1\u590D\u4E60\u5929\u6570" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "12", y1: "17", x2: "12.01", y2: "17" })
-          ] }),
-          totalWords,
-          "\u4E2A"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BCD\u5E93\u603B\u6570" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
-          ] }),
-          masteredWords,
-          "\u4E2A"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u638C\u63E1" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "12 6 12 12 16 14" })
-          ] }),
-          totalReviews,
-          "\u6B21"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7D2F\u8BA1\u590D\u4E60\u6B21\u6570" })
-      ] })
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
-          ] }),
-          readDaysCount,
-          "\u5929"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u8BB0\u5FC6\u5929\u6570" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "17 6 23 6 23 12" })
-          ] }),
-          formatDuration(avgSecs),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M12 20h9" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" })
-          ] }),
-          newWordsCount,
-          "\u4E2A"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65B0\u589E\u8BCD\u6761" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("polyline", { points: "12 6 12 12 16 14" })
-          ] }),
-          totalReviews,
-          "\u6B21"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u590D\u4E60\u6B21\u6570" })
-      ] })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-chart-section", style: { marginBottom: "32px" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
-          activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4" : statsTab === "year" ? "\u6BCF\u6708\u8BB0\u5FC6\u65F6\u95F4" : "\u6BCF\u5E74\u8BB0\u5FC6\u65F6\u95F4"),
-          activeChart === "calendar" && "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4",
-          activeChart === "heatmap" && "\u6BCF\u65E5\u8BB0\u5FC6\u65F6\u95F4"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
-          statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
-            ] }) })
-          ] }),
-          (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
-          ] })
-        ] })
-      ] }),
-      activeChart === "bar" && (() => {
-        let data = [];
-        if (statsTab === "week") {
-          const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
-          data = Array.from({ length: 7 }).map((_, i) => {
-            const day = moment2(startDate).add(i, "days");
-            const dateStr = day.format("YYYY-MM-DD");
-            const secs = dailySecondsMap[dateStr] || 0;
-            return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
-          });
-        } else if (statsTab === "month") {
-          const daysInMonth = moment2(startDate).daysInMonth();
-          data = Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = moment2(startDate).add(i, "days");
-            const dateStr = day.format("YYYY-MM-DD");
-            const secs = dailySecondsMap[dateStr] || 0;
-            return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
-          });
-        } else if (statsTab === "year") {
-          data = Array.from({ length: 12 }).map((_, i) => {
-            const month = moment2(startDate).add(i, "months");
-            const monthStr = month.format("YYYY-MM");
-            const secs = monthlySecondsMap[monthStr] || 0;
-            return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u8BB0\u5FC6 ${formatDuration(secs)}` };
-          });
-        } else {
-          const currentYear = moment2().year();
-          const startYear = earliestYearStr ? moment2(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
-          const yearsCount = Math.max(currentYear - startYear + 1, 1);
-          data = Array.from({ length: yearsCount }).map((_, i) => {
-            const year = String(startYear + i);
-            const secs = yearlySecondsMap[year] || 0;
-            return { label: year, secs, tooltip: `${year}\u5E74 \u8BB0\u5FC6 ${formatDuration(secs)}` };
-          });
-        }
-        const chartHeightPx = 136;
-        const getStep = (seconds) => {
-          if (seconds <= 15 * 60) return 5 * 60;
-          if (seconds <= 30 * 60) return 10 * 60;
-          if (seconds <= 60 * 60) return 15 * 60;
-          if (seconds <= 2 * 3600) return 30 * 60;
-          if (seconds <= 4 * 3600) return 60 * 60;
-          return 2 * 3600;
-        };
-        const rawMax = Math.max(...data.map((d) => d.secs), 0);
-        const maxVal = rawMax <= 60 * 60 ? 60 * 60 : Math.max(Math.ceil(rawMax / getStep(rawMax || 60)) * getStep(rawMax || 60), 60);
-        const tickStep = getStep(maxVal);
-        const yAxisTicks = [];
-        for (let tick = maxVal; tick >= 0; tick -= tickStep) {
-          yAxisTicks.push(tick);
-        }
-        if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
-        return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { position: "relative" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", pointerEvents: "none", zIndex: 1 }, children: yAxisTicks.map((tick) => {
-            const ratio = maxVal > 0 ? tick / maxVal : 0;
-            return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
-              "div",
-              {
-                style: {
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  bottom: `${ratio * 100}%`,
-                  borderBottom: "1px dashed var(--background-modifier-border)",
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "flex-start"
-                },
-                children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: tick === 0 ? "0" : formatDuration(tick) })
-              },
-              tick
-            );
-          }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
-            const heightPx = item.secs > 0 ? Math.max(item.secs / maxVal * chartHeightPx, 6) : 0;
-            return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPx}px` } }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
-            ] }, idx);
-          }) })
-        ] });
-      })(),
-      activeChart === "calendar" && (() => {
-        const daysInMonth = moment2(startDate).daysInMonth();
-        const firstDayOffset = (moment2(startDate).clone().startOf("month").day() + 6) % 7;
-        const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
-        const cells = [];
-        for (let i = 0; i < firstDayOffset; i++) {
-          cells.push(/* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
-        }
-        for (let d = 1; d <= daysInMonth; d++) {
-          const day = moment2(startDate).clone().date(d);
-          const dateStr = day.format("YYYY-MM-DD");
-          const secs = dailySecondsMap[dateStr] || 0;
-          cells.push(
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
-              secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
-            ] }, `day-${d}`)
-          );
-        }
-        return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
-        ] });
-      })(),
-      activeChart === "heatmap" && (() => {
-        const renderHeatmapWall = (yearStr) => {
-          const startOfYear = moment2(`${yearStr}-01-01`);
-          const gridStart = startOfYear.clone().startOf("isoWeek");
-          const weeksCount = 53;
-          const columns = [];
-          const monthLabels = [];
-          let lastMonth = -1;
-          for (let w = 0; w < weeksCount; w++) {
-            const colCells = [];
-            const colMonday = gridStart.clone().add(w * 7, "days");
-            const m = colMonday.month();
-            if (m !== lastMonth) {
-              monthLabels.push({ label: `${m + 1}\u6708`, colIndex: w });
-              lastMonth = m;
-            }
-            for (let d = 0; d < 7; d++) {
-              const cellDate = gridStart.clone().add(w * 7 + d, "days");
-              const isTargetYear = cellDate.year() === Number(yearStr);
-              const dateStr = cellDate.format("YYYY-MM-DD");
-              const secs = isTargetYear ? dailySecondsMap[dateStr] || 0 : 0;
-              const mins = secs / 60;
-              let level = 0;
-              if (mins > 0 && mins <= 1) level = 1;
-              else if (mins > 1 && mins <= 3) level = 2;
-              else if (mins > 3 && mins <= 10) level = 3;
-              else if (mins > 10) level = 4;
-              const tooltipText = isTargetYear ? `${cellDate.format("YYYY\u5E74M\u6708D\u65E5")} \u8BB0\u5FC6 ${formatDuration(secs)}` : "";
-              colCells.push(
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
-              );
-            }
-            columns.push(
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
-            );
-          }
-          const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
-            return dateStr.startsWith(yearStr) && secs > 0;
-          }).length;
-          const yearsTotalSecs = Object.entries(dailySecondsMap).filter(([dateStr]) => dateStr.startsWith(yearStr)).reduce((acc, entry) => acc + entry[1], 0);
-          return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { marginBottom: "24px" }, children: [
-            statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u4E00" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u4E09" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u4E94" })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { children: [
-                yearStr,
-                "\u5E74\u5171\u8BB0\u5FC6 ",
-                yearsTotalDays,
-                "\u5929\uFF0C\u7D2F\u8BA1 ",
-                formatDuration(yearsTotalSecs)
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u5C11" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
-                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: "\u591A" })
-              ] })
-            ] })
-          ] }, yearStr);
-        };
-        if (statsTab === "year") {
-          const yearStr = moment2(startDate).format("YYYY");
-          return renderHeatmapWall(yearStr);
-        } else {
-          const currentYear = moment2().year();
-          const startYear = earliestYearStr ? moment2(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
-          const yearsList = [];
-          for (let y = currentYear; y >= startYear; y--) {
-            yearsList.push(String(y));
-          }
-          return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
-        }
-      })()
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }, children: [
-      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-pref-card", style: { padding: "24px", minHeight: "200px" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px", fontWeight: "700", marginBottom: "16px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
-          ] }),
-          "\u6765\u6E90\u4E66\u7C4D\u8D21\u732E\u699C"
-        ] }),
-        topBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "0.95em", textAlign: "center", paddingTop: "40px" }, children: "\u8BE5\u5468\u671F\u5185\u672A\u65B0\u589E\u8BCD\u6761" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: "12px" }, children: topBooks.map(([title, count], idx) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--background-modifier-border)", paddingBottom: "8px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "10px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontSize: "13px", fontWeight: "bold", background: "var(--background-modifier-border)", borderRadius: "4px", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }, children: idx + 1 }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontSize: "14px", color: "var(--text-normal)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }, children: title })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { style: { fontSize: "13.5px", color: "var(--interactive-accent)", fontWeight: "bold" }, children: [
-            "+",
-            count,
-            " \u8BCD\u6761"
-          ] })
-        ] }, title)) })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "jarvis-stats-pref-card", style: { padding: "24px", gridColumn: statsTab === "week" ? "span 2" : "span 1" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px", fontWeight: "700", marginBottom: "16px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("path", { d: "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" }) }),
-          "\u6700\u96BE\u653B\u514B\u699C\u5355 (Top 10)"
-        ] }),
-        difficultWords.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "0.95em", textAlign: "center", paddingTop: "40px" }, children: "\u65E0\u5B66\u4E60\u4E2D\u7684\u5355\u8BCD" }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("table", { style: { width: "100%", borderCollapse: "collapse", textAlign: "left" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal" }, children: "\u8BCD\u6761" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "center" }, children: "\u590D\u4E60\u6B21\u6570" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "center" }, children: "\u96BE\u5EA6(Ease)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("th", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "12px", fontWeight: "normal", textAlign: "right" }, children: "\u4E0B\u6B21\u590D\u4E60" })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("tbody", { children: difficultWords.map((word) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("td", { style: { padding: "8px 0", fontWeight: "bold", fontSize: "13.5px", color: "var(--text-normal)" }, children: word.lemma }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("td", { style: { padding: "8px 0", color: "var(--color-orange)", fontSize: "13px", textAlign: "center" }, children: [
-              word.reviews || 0,
-              "\u6B21"
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("td", { style: { padding: "8px 0", fontSize: "13px", textAlign: "center" }, children: word.ease?.toFixed(2) || "2.50" }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("td", { style: { padding: "8px 0", color: "var(--text-muted)", fontSize: "13px", textAlign: "right" }, children: formatDays(word.nextReviewDate) })
-          ] }, word.lemma)) })
-        ] })
-      ] })
-    ] })
-  ] }) });
-}
-
-// src/word-book/WordBookApp.tsx
-var import_jsx_runtime8 = __toESM(require_jsx_runtime(), 1);
-function WordBookApp({ plugin }) {
-  const [assets, setAssets] = React11.useState([]);
-  const [search, setSearch] = React11.useState("");
-  const [filterKind, setFilterKind] = React11.useState("all");
-  const [filterStatus, setFilterStatus] = React11.useState("all");
-  const [filterBook, setFilterBook] = React11.useState("all");
-  const [sortBy, setSortBy] = React11.useState("created_desc");
-  const [selected, setSelected] = React11.useState(/* @__PURE__ */ new Set());
-  const [isSelectionMode, setIsSelectionMode] = React11.useState(false);
-  const [exportState, setExportState] = React11.useState("none");
-  const [blurMode, setBlurMode] = React11.useState("none");
-  const [expandedItems, setExpandedItems] = React11.useState(/* @__PURE__ */ new Set());
-  const [isReviewMode, setIsReviewMode] = React11.useState(false);
-  const [isStatsMode, setIsStatsMode] = React11.useState(false);
-  const [showFilterMenuPopup, setShowFilterMenuPopup] = React11.useState(false);
-  const loadAssets = React11.useCallback(() => {
-    if (plugin.settings.wordAssets && typeof plugin.settings.wordAssets === "object") {
-      setAssets(Object.values(plugin.settings.wordAssets));
-    } else {
-      setAssets([]);
-    }
-  }, [plugin.settings.wordAssets]);
-  React11.useEffect(() => {
-    loadAssets();
-    const handleRefresh = () => loadAssets();
-    window.addEventListener("jarvis-reader-word-assets-changed", handleRefresh);
-    return () => window.removeEventListener("jarvis-reader-word-assets-changed", handleRefresh);
-  }, [loadAssets]);
-  const toggleSelectAll = () => {
-    if (selected.size === filteredAssets.length && filteredAssets.length > 0) {
-      setSelected(/* @__PURE__ */ new Set());
-    } else {
-      setSelected(new Set(filteredAssets.map((a) => a.lemma)));
-    }
-  };
-  const invertSelection = () => {
-    const newSet = /* @__PURE__ */ new Set();
-    filteredAssets.forEach((a) => {
-      if (!selected.has(a.lemma)) {
-        newSet.add(a.lemma);
-      }
-    });
-    setSelected(newSet);
-  };
-  const toggleSelect = (lemma) => {
-    const newSet = new Set(selected);
-    if (newSet.has(lemma)) {
-      newSet.delete(lemma);
-    } else {
-      newSet.add(lemma);
-    }
-    setSelected(newSet);
-  };
-  const handleDeleteSelected = async () => {
-    if (selected.size === 0) return;
-    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u9009\u4E2D\u7684 ${selected.size} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
-    if (!confirmed)
-      return;
-    const count = await plugin.wordAssetService.deleteMany(selected);
-    new import_obsidian20.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664 ${count} \u4E2A\u8BCD\u6761`);
-    setSelected(/* @__PURE__ */ new Set());
-    loadAssets();
-  };
-  const handleDeleteFilteredBookWords = async () => {
-    if (filterBook === "all" || filteredAssets.length === 0) return;
-    const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u672C\u4E66\u8BCD\u6761", `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u6B63\u5728\u663E\u793A\u7684\u8FD9\u672C\u4E66\u7684 ${filteredAssets.length} \u4E2A\u8BCD\u6761\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`);
-    if (!confirmed)
-      return;
-    const count = await plugin.wordAssetService.deleteMany(filteredAssets.map((asset) => getTranslationAssetStorageKey(asset) || asset.lemma));
-    new import_obsidian20.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u6B64\u4E66\u7684 ${count} \u4E2A\u8BCD\u6761`);
-    const leaves = plugin.app.workspace.getLeavesOfType("jarvis-reader-word-sidebar");
-    leaves.forEach((leaf) => {
-      if (leaf.view && typeof leaf.view.render === "function") {
-        leaf.view.render();
-      }
-    });
-    loadAssets();
-  };
-  const handleMarkMastered = async (mastered) => {
-    if (selected.size === 0) return;
-    const count = await plugin.wordAssetService.setMasteredMany(selected, mastered);
-    new import_obsidian20.Notice(`\u5DF2\u5C06 ${count} \u4E2A\u8BCD\u6761\u6807\u8BB0\u4E3A${mastered ? "\u5DF2\u638C\u63E1" : "\u672A\u638C\u63E1"}`);
-    loadAssets();
-  };
-  const handleToggleSingleMastery = async (e, lemma) => {
-    e.stopPropagation();
-    if (plugin.settings.wordAssets[lemma]) {
-      const current = plugin.settings.wordAssets[lemma].mastered;
-      await plugin.wordAssetService.setMastered(lemma, !current);
-      loadAssets();
-    }
-  };
-  const handleContextMenu = (e, lemma) => {
-    e.preventDefault();
-    const menu = new import_obsidian20.Menu();
-    const isMastered = plugin.settings.wordAssets[lemma]?.mastered;
-    menu.addItem((item) => {
-      item.setTitle(isMastered ? "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" : "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1").setIcon(isMastered ? "cross" : "checkmark").onClick(async () => {
-        if (plugin.settings.wordAssets[lemma]) {
-          await plugin.wordAssetService.setMastered(lemma, !isMastered);
-          loadAssets();
-        }
-      });
-    });
-    menu.addSeparator();
-    menu.addItem((item) => {
-      item.setTitle("\u5F7B\u5E95\u5220\u9664").setIcon("trash").onClick(async () => {
-        const confirmed = await confirmDestructiveAction(
-          plugin.app,
-          "\u5220\u9664\u8BCD\u6761",
-          `\u786E\u5B9A\u8981\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\u201C${lemma}\u201D\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002`
-        );
-        if (!confirmed) return;
-        if (plugin.settings.wordAssets[lemma]) {
-          await plugin.wordAssetService.delete(lemma);
-          loadAssets();
-          new import_obsidian20.Notice(`\u5DF2\u5F7B\u5E95\u5220\u9664\u8BCD\u6761\uFF1A${lemma}`);
-          if (selected.has(lemma)) {
-            const next = new Set(selected);
-            next.delete(lemma);
-            setSelected(next);
-          }
-        }
-      });
-    });
-    menu.showAtMouseEvent(e.nativeEvent);
-  };
-  const handleExportPrint = () => {
-    if (selected.size === 0) {
-      new import_obsidian20.Notice("\u8BF7\u5148\u9009\u62E9\u8981\u5BFC\u51FA\u7684\u8BCD\u6761");
-      return;
-    }
-    setExportState("select_template");
-  };
-  const executeExport = async (templateType) => {
-    setExportState("none");
-    const selectedList = filteredAssets.filter((a) => selected.has(a.lemma));
-    const words2 = selectedList.filter((a) => !a.kind || a.kind === "word");
-    const phrases2 = selectedList.filter((a) => a.kind === "phrase");
-    const sentences2 = selectedList.filter((a) => a.kind === "sentence");
-    const dateStrDisp = (/* @__PURE__ */ new Date()).toLocaleDateString();
-    let markdown = `
-
-`;
-    const baseStyle = `-webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;`;
-    markdown += `
-<div style="${baseStyle} font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333; line-height: 1.5; padding: 0;">
-  <div style="${baseStyle} padding-bottom: 12px; margin-bottom: 16px; border-bottom: 2px solid #cbd5e1; display: flex; justify-content: space-between; align-items: baseline;">
-    <h1 style="${baseStyle} margin: 0 !important; font-size: 1.5em !important; font-weight: 700 !important; color: #0f172a !important; padding: 0 !important;">\u82F1\u8BED\u8BCD\u6761</h1>
-    <div style="${baseStyle} text-align: right; font-size: 0.85em; color: #64748b;">
-      ${dateStrDisp} \xB7 \u603B\u8BA1 ${selectedList.length} \u4E2A\u8BCD\u6761
-    </div>
-  </div>
-`;
-    const renderItem = (asset) => {
-      const titleText = asset.title || asset.lemma;
-      const phonetic = asset.phonetic ? `<span style="${baseStyle} font-family: monospace; font-size: 0.8em; color: #64748b; margin-left: 8px; font-style: italic;">${asset.phonetic}</span>` : "";
-      const translation = asset.translation ? asset.translation.replace(/\n/g, " ") : "";
-      let wordContent = `<span style="${baseStyle} font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.05em; font-weight: 600; color: #991b1b;">${titleText}</span>${phonetic}`;
-      if (templateType === "hide_en") {
-        wordContent = `<span style="${baseStyle} color:transparent; border-bottom: 1px solid #999; display: inline-block; width: 60%; height: 1.2em;"></span>${phonetic}`;
-      }
-      let transContent = `<span style="${baseStyle} font-size: 0.95em; color: #334155; margin-left: 0;">${translation}</span>`;
-      if (templateType === "hide_zh") {
-        transContent = `<span style="${baseStyle} color:transparent; border-bottom: 1px solid #999; display: inline-block; width: 80%; height: 1.2em; margin-left: 0;"></span>`;
-      }
-      if (asset.kind === "sentence") {
-        return `<div style="${baseStyle} break-inside: avoid; page-break-inside: avoid; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; display: flex; flex-direction: column; gap: 4px;"><div style="${baseStyle} width: 100%;">${wordContent}</div><div style="${baseStyle} width: 100%;">${transContent}</div></div>`;
-      }
-      return `<div style="${baseStyle} break-inside: avoid; page-break-inside: avoid; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; display: grid; grid-template-columns: minmax(35%, max-content) 1fr; gap: 12px; align-items: baseline;"><div style="${baseStyle} white-space: nowrap;">${wordContent}</div><div style="${baseStyle}">${transContent}</div></div>`;
-    };
-    const sectionTitleStyle = `${baseStyle} font-size: 1.1em; font-weight: 600; color: #1e293b; margin: 24px 0 8px 0; border-bottom: 1px solid #94a3b8; padding-bottom: 4px;`;
-    const gridStyle = `${baseStyle} display: block; column-count: 2; column-gap: 32px;`;
-    if (words2.length > 0) {
-      markdown += `<div style="${sectionTitleStyle}">\u5355\u8BCD (Words)</div><div style="${gridStyle}">`;
-      words2.forEach((w) => markdown += renderItem(w));
-      markdown += `</div>`;
-    }
-    if (phrases2.length > 0) {
-      markdown += `<div style="${sectionTitleStyle}">\u77ED\u8BED (Phrases)</div><div style="${gridStyle}">`;
-      phrases2.forEach((p) => markdown += renderItem(p));
-      markdown += `</div>`;
-    }
-    if (sentences2.length > 0) {
-      markdown += `<div style="${sectionTitleStyle}">\u957F\u53E5 (Sentences)</div><div style="${baseStyle} display: flex; flex-direction: column;">`;
-      sentences2.forEach((s) => markdown += renderItem(s));
-      markdown += `</div>`;
-    }
-    markdown += `</div>
-`;
-    try {
-      let folderPath = plugin.settings.wordBookExportFolder || "";
-      folderPath = folderPath.replace(/^[/]+|[/]+$/g, "");
-      if (folderPath && !plugin.app.vault.getAbstractFileByPath(folderPath)) {
-        const folders = folderPath.split("/");
-        let currentPath = "";
-        for (const f of folders) {
-          currentPath = currentPath ? `${currentPath}/${f}` : f;
-          if (!plugin.app.vault.getAbstractFileByPath(currentPath)) {
-            await plugin.app.vault.createFolder(currentPath);
-          }
-        }
-      }
-      const dateStr = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      const suffix = templateType === "full" ? "\u5B8C\u6574\u5BF9\u7167" : templateType === "hide_zh" ? "\u9ED8\u5199\u4E2D\u6587" : "\u9ED8\u5199\u82F1\u6587";
-      const fileName = `${folderPath ? folderPath + "/" : ""}\u82F1\u8BED\u8BCD\u6761_${suffix}_${dateStr}.md`;
-      const file = await plugin.app.vault.create(fileName, markdown);
-      const leaf = plugin.app.workspace.getLeaf("split", "vertical");
-      await leaf.openFile(file);
-      new import_obsidian20.Notice(`\u5BFC\u51FA\u6210\u529F\uFF1A${fileName}\u3002\u6B63\u5728\u6253\u5F00 PDF \u5BFC\u51FA...`);
-      setTimeout(() => {
-        try {
-          if (plugin.app.commands && typeof plugin.app.commands.executeCommandById === "function") {
-            plugin.app.commands.executeCommandById("workspace:export-pdf");
-          } else {
-            new import_obsidian20.Notice("\u4E0D\u652F\u6301\u81EA\u52A8\u6253\u5F00\u5BFC\u51FA\u5F39\u7A97\uFF0C\u8BF7\u624B\u52A8\u4ECE\u7B14\u8BB0\u53F3\u4E0A\u89D2\u83DC\u5355\u5BFC\u51FA PDF");
-          }
-        } catch (err) {
-          new import_obsidian20.Notice("\u81EA\u52A8\u6253\u5F00 PDF \u5BFC\u51FA\u754C\u9762\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u64CD\u4F5C");
-          console.warn("Jarvis Reader export PDF failed", err);
-        }
-      }, 500);
-    } catch (e) {
-      console.error(e);
-      new import_obsidian20.Notice("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
-    }
-  };
-  const playAudio = (lemma) => {
-    if (plugin.settings.enableWordAudio !== false) {
-      try {
-        const accent = plugin.settings.wordAudioAccent || "us";
-        const template = plugin.settings.wordAudioTemplate || "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
-        const url = buildWordAudioUrl(template, lemma, accent);
-        new Audio(url).play().catch(() => {
-        });
-      } catch (err) {
-        console.warn("Jarvis Reader audio failed", err);
-      }
-    }
-  };
-  const booksMap = React11.useMemo(() => {
-    const map = /* @__PURE__ */ new Map();
-    assets.forEach((a) => {
-      if (a.sources && a.sources[0] && a.sources[0].bookPath) {
-        map.set(a.sources[0].bookPath, a.sources[0].bookTitle || a.sources[0].bookPath);
-      }
-    });
-    return map;
-  }, [assets]);
-  const filteredAssets = React11.useMemo(() => {
-    let list = [...assets];
-    if (filterKind !== "all") {
-      list = list.filter((a) => filterKind === "word" ? !a.kind || a.kind === "word" : a.kind === filterKind);
-    }
-    if (filterStatus !== "all") {
-      list = list.filter((a) => filterStatus === "mastered" ? a.mastered : !a.mastered);
-    }
-    if (filterBook !== "all") {
-      list = list.filter((a) => a.sources && a.sources[0] && a.sources[0].bookPath === filterBook);
-    }
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (a) => (a.lemma || "").toLowerCase().includes(q) || (a.translation || "").toLowerCase().includes(q)
-      );
-    }
-    list.sort((a, b) => {
-      if (sortBy === "alpha_asc") {
-        if (a.kind === "sentence" && b.kind !== "sentence") return 1;
-        if (a.kind !== "sentence" && b.kind === "sentence") return -1;
-        return (a.lemma || "").localeCompare(b.lemma || "");
-      }
-      if (sortBy === "cfi_asc") {
-        const cfiA = a.sources && a.sources[0] && a.sources[0].cfiRange ? a.sources[0].cfiRange : "";
-        const cfiB = b.sources && b.sources[0] && b.sources[0].cfiRange ? b.sources[0].cfiRange : "";
-        return cfiA.localeCompare(cfiB);
-      }
-      if (sortBy === "created_asc") return new Date(a.created || 0).getTime() - new Date(b.created || 0).getTime();
-      return new Date(b.created || 0).getTime() - new Date(a.created || 0).getTime();
-    });
-    return list;
-  }, [assets, filterKind, filterStatus, filterBook, search, sortBy]);
-  const words = React11.useMemo(() => filteredAssets.filter((a) => a.kind === "word"), [filteredAssets]);
-  const phrases = React11.useMemo(() => filteredAssets.filter((a) => a.kind === "phrase"), [filteredAssets]);
-  const sentences = React11.useMemo(() => filteredAssets.filter((a) => a.kind === "sentence"), [filteredAssets]);
-  const renderCard = (asset) => {
-    const isSentence = asset.kind === "sentence";
-    const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
-    const displayWord = isSentence && quote ? quote : asset.lemma;
-    const assetKey = getTranslationAssetStorageKey(asset) || asset.lemma;
-    const bookTitle = asset.sources && asset.sources[0] ? asset.sources[0].bookTitle : "\u672A\u77E5";
-    const isSelected = isSelectionMode && selected.has(assetKey);
-    const isExpanded = expandedItems.has(assetKey);
-    const handleCardClick = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
-        return;
-      }
-      if (isSelectionMode) {
-        toggleSelect(assetKey);
-      } else {
-        const newExpanded = /* @__PURE__ */ new Set();
-        if (!expandedItems.has(assetKey)) {
-          newExpanded.add(assetKey);
-        }
-        setExpandedItems(newExpanded);
-      }
-    };
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-      WordCard,
-      {
-        plugin,
-        asset,
-        bookTitle,
-        isExpanded,
-        isSelected,
-        isSelectionMode,
-        blurMode,
-        onToggleExpand: (lemma) => {
-          const newExpanded = new Set(expandedItems);
-          if (newExpanded.has(lemma)) {
-            newExpanded.delete(lemma);
-          } else {
-            newExpanded.add(lemma);
-          }
-          setExpandedItems(newExpanded);
-        },
-        onToggleSelect: toggleSelect,
-        onToggleMastery: (lemma, mastered) => {
-          plugin.wordAssetService.setMastered(lemma, mastered).then(() => loadAssets());
-        },
-        onDoubleClick: () => {
-        },
-        contextMenuAdditionalItems: (menu) => {
-        }
-      }
-    );
-  };
-  const renderTableRow = (asset) => {
-    const isSentence = asset.kind === "sentence";
-    const quote = asset.sources && asset.sources[0] ? asset.sources[0].quote : "";
-    const displayWord = isSentence ? quote || asset.lemma : asset.title || asset.lemma;
-    const assetKey = isSentence ? getTranslationAssetStorageKey(asset) : asset.lemma;
-    const isExpanded = expandedItems.has(assetKey);
-    const isSelected = selected.has(assetKey);
-    const handleRowClick = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.closest("svg")) {
-        return;
-      }
-      if (isSelectionMode) {
-        toggleSelect(assetKey);
-      } else {
-        const newExpanded = /* @__PURE__ */ new Set();
-        if (!expandedItems.has(assetKey)) {
-          newExpanded.add(assetKey);
-        }
-        setExpandedItems(newExpanded);
-      }
-    };
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-      "tr",
-      {
-        style: { borderBottom: "1px solid var(--background-modifier-border)", background: isSelected ? "color-mix(in srgb, var(--interactive-accent) 8%, transparent)" : "transparent", cursor: "pointer" },
-        onContextMenu: (e) => handleContextMenu(e, assetKey),
-        onClick: handleRowClick,
-        children: [
-          isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: isSelected, onChange: () => {
-          } }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("td", { style: { padding: "12px 8px", fontWeight: "bold" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: blurMode === "word" ? "jarvis-blur-test" : "", style: { display: "inline-block" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-              "span",
-              {
-                style: {
-                  cursor: "pointer",
-                  color: asset.mastered ? "var(--color-green)" : "var(--color-red)",
-                  ...isSentence ? { fontWeight: "normal", fontSize: "0.9em" } : {}
-                },
-                onMouseEnter: (e) => e.target.style.textDecoration = "underline",
-                onMouseLeave: (e) => e.target.style.textDecoration = "none",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  playAudio(displayWord);
-                },
-                children: displayWord
-              }
-            ),
-            !isSentence && asset.phonetic && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { fontSize: "0.8em", color: "var(--text-muted)", fontWeight: "normal" }, children: asset.phonetic })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("td", { style: { padding: "12px 8px", fontSize: "0.9em", color: "var(--text-muted)" }, children: [
-            asset.translation && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-              "div",
-              {
-                className: blurMode === "translation" ? "jarvis-blur-test" : "",
-                style: {
-                  color: "var(--text-normal)",
-                  marginBottom: "4px",
-                  whiteSpace: isExpanded ? "normal" : "pre-wrap"
-                },
-                children: isExpanded && asset.display ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(MarkdownPreview, { content: asset.display, plugin }) }) : asset.translation
-              }
-            ),
-            isExpanded && asset.isWord && (asset.oxford === 1 || asset.collins || asset.tags?.length) && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "8px" }, children: [
-              asset.oxford === 1 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "jarvis-tag", children: "\u725B\u6D25\u6838\u5FC3" }),
-              asset.collins > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "jarvis-tag", children: "\u2605".repeat(asset.collins) }),
-              asset.tags?.map((tag) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "jarvis-tag", children: tag.toUpperCase() }, tag))
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("td", { style: { padding: "12px 8px", cursor: isSelectionMode ? "pointer" : "default" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-            "span",
-            {
-              style: {
-                color: asset.mastered ? "var(--color-green)" : "var(--text-faint)",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                width: "fit-content"
-              },
-              className: "clickable-icon",
-              onClick: (e) => {
-                e.stopPropagation();
-                handleToggleSingleMastery(e, assetKey);
-              },
-              title: asset.mastered ? "\u5DF2\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u672A\u638C\u63E1)" : "\u672A\u638C\u63E1 (\u70B9\u51FB\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1)",
-              children: asset.mastered ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("path", { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("polyline", { points: "22 4 12 14.01 9 11.01" })
-              ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", stroke: "currentColor", strokeWidth: "2", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("circle", { cx: "12", cy: "12", r: "10" }) })
-            }
-          ) })
-        ]
-      },
-      assetKey
-    );
-  };
-  const dueCards = React11.useMemo(() => getDueCards(assets, filterBook), [assets, filterBook]);
-  const stats = React11.useMemo(() => {
-    let total = 0;
-    let mastered = 0;
-    assets.forEach((a) => {
-      if (filterBook !== "all") {
-        if (!a.sources?.some((s) => s.bookPath === filterBook)) return;
-      }
-      total++;
-      if (a.mastered) mastered++;
-    });
-    return { total, mastered, due: dueCards.length, learning: total - mastered - dueCards.length };
-  }, [assets, filterBook, dueCards]);
-  if (isReviewMode) {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(ReviewSession, { plugin, dueAssets: dueCards, onComplete: () => setIsReviewMode(false), onAssetUpdate: loadAssets });
-  }
-  if (isStatsMode) {
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(WordBookStats, { plugin, assets, onClose: () => setIsStatsMode(false) });
-  }
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-library-app jarvis-word-book-app", style: { height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("style", { children: `
-        .jarvis-blur-test {
-          filter: blur(5px);
-          opacity: 0.6;
-          transition: all 0.2s ease;
-        }
-        .jarvis-blur-test:hover {
-          filter: blur(0);
-          opacity: 1;
-        }
-      ` }),
-    exportState === "select_template" && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "jarvis-modal-overlay", style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", zIndex: 999, display: "flex", justifyContent: "center", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-modal-content", style: { background: "var(--background-primary)", padding: "24px", borderRadius: "var(--radius-l)", width: "400px", boxShadow: "0 4px 16px rgba(0,0,0,0.2)", border: "1px solid var(--background-modifier-border)" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { style: { marginTop: 0 }, children: "\u9009\u62E9\u5BFC\u51FA\u6A21\u677F" }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { style: { color: "var(--text-muted)", fontSize: "0.9em" }, children: [
-        "\u4E3A\u4F60\u6311\u9009\u7684 ",
-        selected.size,
-        " \u4E2A\u8BCD\u6761\u9009\u62E9\u7528\u4E8E PDF \u6253\u5370\u7684\u6A21\u677F\u683C\u5F0F\uFF1A"
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "12px", margin: "24px 0" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "mod-cta", onClick: () => executeExport("full"), style: { padding: "12px" }, children: "\u5B8C\u6574\u5BF9\u7167\u7248 (\u82F1\u6587 + \u8BD1\u6587 + \u4F8B\u53E5)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_zh"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u4E2D\u6587\u7248 (\u7F3A\u91CA\u4E49\uFF0C\u7559\u767D\u624B\u5199)" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "mod-cta", onClick: () => executeExport("hide_en"), style: { padding: "12px", background: "var(--interactive-normal)", color: "var(--text-normal)" }, children: "\u9ED8\u5199\u82F1\u6587\u7248 (\u7F3A\u5355\u8BCD\uFF0C\u7559\u767D\u624B\u5199)" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { display: "flex", justifyContent: "flex-end" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { onClick: () => setExportState("none"), children: "\u53D6\u6D88" }) })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-library-home", style: { display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexShrink: 0 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { flex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h2", { style: { margin: 0, fontSize: "24px", fontWeight: 700 }, children: "\u82F1\u8BED\u8BCD\u6761" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-            "input",
-            {
-              type: "text",
-              placeholder: "\u641C\u7D22\u8BCD\u6761\u3001\u91CA\u4E49...",
-              value: search,
-              onChange: (e) => setSearch(e.target.value),
-              className: "jarvis-library-search-input"
-            }
-          ),
-          search && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearch(""), children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
-          ] }) })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
-              "button",
-              {
-                className: `jarvis-library-filter-btn ${showFilterMenuPopup ? "is-active" : ""}`,
-                onClick: () => setShowFilterMenuPopup(!showFilterMenuPopup),
-                title: "\u7B5B\u9009\u4E0E\u6392\u5E8F",
-                children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) })
-              }
-            ),
-            showFilterMenuPopup && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "jarvis-library-filter-popup", style: { right: 0, minWidth: "200px" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "10px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)", fontWeight: "bold", borderBottom: "1px solid var(--background-modifier-border)", paddingBottom: "4px" }, children: "\u7B5B\u9009\u4E0E\u6392\u5E8F" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u7C7B\u578B" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: filterKind, onChange: (e) => setFilterKind(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "all", children: "\u6240\u6709\u7C7B\u578B" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "word", children: "\u5355\u8BCD" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "phrase", children: "\u77ED\u8BED" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "sentence", children: "\u957F\u53E5" })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u72B6\u6001" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "mastered", children: "\u5DF2\u638C\u63E1" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "unmastered", children: "\u672A\u638C\u63E1" })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u6392\u5E8F" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", style: { width: "100%" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "created_desc", children: "\u65F6\u95F4\u964D\u5E8F" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "created_asc", children: "\u65F6\u95F4\u5347\u5E8F" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "alpha_asc", children: "\u5B57\u6BCD\u987A\u5E8F" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "cfi_asc", children: "\u6587\u7AE0\u4F4D\u7F6E" })
-                ] })
-              ] }),
-              booksMap.size > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.8em", color: "var(--text-muted)" }, children: "\u6765\u6E90\u4E66\u7C4D" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: filterBook, onChange: (e) => setFilterBook(e.target.value), className: "jarvis-library-select", style: { width: "100%", textOverflow: "ellipsis" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "all", children: "\u6240\u6709\u4E66\u7C4D" }),
-                  Array.from(booksMap.entries()).map(([path, title]) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: path, children: title }, path))
-                ] })
-              ] })
-            ] }) })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
-            const setting = plugin.app.setting;
-            setting.open();
-            setting.openTabById(plugin.manifest.id);
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
-          ] }) }) })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "var(--background-secondary)", padding: "14px 20px", borderRadius: "12px", border: "1px solid var(--background-modifier-border)", flexShrink: 0 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", gap: "24px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: "\u603B\u8BCD\u6C47" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--text-normal)" }, children: stats.total })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.85em", color: "var(--color-green)" }, children: "\u5DF2\u638C\u63E1" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--color-green)" }, children: stats.mastered })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.85em", color: "var(--interactive-accent)" }, children: "\u5B66\u4E60\u4E2D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--interactive-accent)" }, children: stats.learning })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.85em", color: "var(--color-red)" }, children: "\u5F85\u590D\u4E60" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "1.15em", fontWeight: "600", color: "var(--color-red)" }, children: stats.due })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", gap: "12px", alignItems: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", marginRight: "8px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: "\u6A21\u7CCA\uFF1A" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: blurMode, onChange: (e) => setBlurMode(e.target.value), className: "jarvis-library-select", style: { padding: "4px 8px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "none", children: "\u65E0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "word", children: "\u6A21\u7CCA\u5355\u8BCD" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "translation", children: "\u6A21\u7CCA\u8BD1\u6587" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-            "button",
-            {
-              className: "jarvis-library-back-btn",
-              onClick: () => setIsStatsMode(true),
-              style: { padding: "6px 16px !important" },
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
-                ] }),
-                "\u8BE6\u7EC6\u7EDF\u8BA1"
-              ]
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-            "button",
-            {
-              className: "jarvis-library-back-btn",
-              onClick: () => setIsReviewMode(true),
-              disabled: stats.due === 0,
-              style: {
-                padding: "6px 16px !important",
-                background: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-secondary) !important",
-                color: stats.due > 0 ? "var(--text-on-accent) !important" : "var(--text-muted) !important",
-                borderColor: stats.due > 0 ? "var(--interactive-accent) !important" : "var(--background-modifier-border) !important"
-              },
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("polygon", { points: "5 3 19 12 5 21 5 3" }) }),
-                "\u5F00\u59CB\u8BB0\u5FC6"
-              ]
-            }
-          )
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { display: "flex", gap: "8px", alignItems: "center", marginBottom: "16px", flexShrink: 0 }, children: !isSelectionMode ? /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(React11.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { onClick: () => setIsSelectionMode(true), className: "jarvis-library-back-btn", style: { padding: "6px 14px !important" }, children: "\u6279\u91CF\u7BA1\u7406 / \u5BFC\u51FA" }),
-        filterBook !== "all" && filteredAssets.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
-          "button",
-          {
-            onClick: handleDeleteFilteredBookWords,
-            className: "jarvis-library-back-btn",
-            style: { backgroundColor: "var(--color-red) !important", color: "white !important", borderColor: "var(--color-red) !important", padding: "6px 14px !important" },
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("polyline", { points: "3 6 5 6 21 6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
-              ] }),
-              "\u4E00\u952E\u5220\u9664\u6B64\u4E66\u8BCD\u6761"
-            ]
-          }
-        )
-      ] }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(import_jsx_runtime8.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { style: { fontSize: "0.9em", color: "var(--text-muted)", marginRight: "8px" }, children: [
-          "\u5DF2\u9009 ",
-          selected.size,
-          " / ",
-          filteredAssets.length
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: toggleSelectAll, children: "\u5168\u9009" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: invertSelection, children: "\u53CD\u9009" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => handleMarkMastered(true), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => handleMarkMastered(false), disabled: selected.size === 0, children: "\u6807\u8BB0\u4E3A\u672A\u638C\u63E1" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important", color: "var(--text-error) !important", borderColor: "var(--text-error) !important" }, onClick: handleDeleteSelected, disabled: selected.size === 0, children: "\u5F7B\u5E95\u5220\u9664" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { flex: 1 } }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important" }, onClick: () => {
-          setIsSelectionMode(false);
-          setSelected(/* @__PURE__ */ new Set());
-        }, children: "\u53D6\u6D88" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { className: "jarvis-library-back-btn", style: { padding: "6px 12px !important", background: "var(--interactive-accent) !important", color: "var(--text-on-accent) !important", borderColor: "var(--interactive-accent) !important" }, onClick: handleExportPrint, disabled: selected.size === 0, children: "\u5BFC\u51FA\u6253\u5370\u7B14\u8BB0" })
-      ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: `jarvis-library-list`, style: { flex: 1, overflow: "auto", padding: "0 4px 20px 4px", minHeight: 0 }, children: filteredAssets.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { style: { padding: "32px", textAlign: "center", color: "var(--text-muted)" }, children: "\u6CA1\u6709\u5339\u914D\u7684\u8BCD\u6761\u3002" }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", flexDirection: "column", gap: "32px" }, children: [
-        words.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u5355\u8BCD" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("tbody", { children: words.map(renderTableRow) })
-          ] })
-        ] }),
-        phrases.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u77ED\u8BED" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("tbody", { children: phrases.map(renderTableRow) })
-          ] })
-        ] }),
-        sentences.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("h3", { style: { marginTop: 0, marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--background-modifier-border)" }, children: "\u957F\u53E5" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-              isSelectionMode && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", width: "40px" } }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)" }, children: "\u8BCD\u6761" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "55%" }, children: "\u91CA\u4E49" }),
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("th", { style: { padding: "12px 8px", fontWeight: "600", fontSize: "var(--font-ui-small)", width: "60px" }, children: "\u72B6\u6001" })
-            ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("tbody", { children: sentences.map(renderTableRow) })
-          ] })
-        ] })
-      ] }) })
-    ] })
-  ] });
-}
-
-// src/word-book/WordBookView.ts
-var WORD_BOOK_VIEW_TYPE = "jarvis-reader-word-book";
-var WordBookView = class extends import_obsidian21.ItemView {
-  plugin;
-  root = null;
-  constructor(leaf, plugin) {
-    super(leaf);
-    this.plugin = plugin;
-  }
-  getViewType() {
-    return WORD_BOOK_VIEW_TYPE;
-  }
-  getDisplayText() {
-    return "\u82F1\u8BED\u8BCD\u6761";
-  }
-  getIcon() {
-    return "book";
-  }
-  async onOpen() {
-    const container = this.contentEl;
-    container.empty();
-    container.addClass("jarvis-reader-word-book-view");
-    this.root = ReactDOM2.createRoot(container);
-    this.root.render(React12.createElement(WordBookApp, { plugin: this.plugin }));
-  }
-  async onClose() {
-    if (this.root) {
-      this.root.unmount();
-      this.root = null;
-    }
-    this.contentEl.empty();
   }
 };
 
@@ -66509,7 +63259,7 @@ init_utils();
 // src/global-markdown.ts
 var import_react5 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
-var import_obsidian22 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 init_utils();
 function truncateWordDisplay2(value) {
   const raw = String(value || "");
@@ -66572,8 +63322,8 @@ var GlobalTranslationCard = ({
   const [result, setResult] = import_react5.default.useState(null);
   const [error, setError] = import_react5.default.useState("");
   const [isSaved, setIsSaved] = import_react5.default.useState(false);
-  const [isMastered, setIsMastered] = import_react5.default.useState(false);
   const cardRef = import_react5.default.useRef(null);
+  const canSave = !!getTranslationAssetKey({ quote: word, sentence }, result);
   const renderObsidianIcon = (name) => {
     return import_react5.default.createElement("span", {
       "aria-hidden": "true",
@@ -66583,8 +63333,8 @@ var GlobalTranslationCard = ({
         while (element.firstChild) {
           element.removeChild(element.firstChild);
         }
-        if (typeof import_obsidian22.setIcon === "function") {
-          (0, import_obsidian22.setIcon)(element, name);
+        if (typeof import_obsidian15.setIcon === "function") {
+          (0, import_obsidian15.setIcon)(element, name);
         }
       }
     });
@@ -66630,7 +63380,6 @@ var GlobalTranslationCard = ({
       if (saved) {
         setResult(saved);
         setIsSaved(true);
-        setIsMastered(!!saved.mastered);
         setStatus("ready");
         return;
       }
@@ -66661,7 +63410,7 @@ var GlobalTranslationCard = ({
     try {
       const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
-        new import_obsidian22.Notice("Failed to save word.");
+        new import_obsidian15.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
@@ -66675,19 +63424,19 @@ var GlobalTranslationCard = ({
         plugin.settings
       );
       if (!asset) {
-        new import_obsidian22.Notice("Failed to build word asset.");
+        new import_obsidian15.Notice("Failed to build word asset.");
         return;
       }
       await plugin.wordAssetService.save(asset);
       setIsSaved(true);
-      new import_obsidian22.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
+      new import_obsidian15.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian22.Notice("Save failed.");
+      new import_obsidian15.Notice("Save failed.");
     }
   };
   const handleAiTranslate = async () => {
@@ -66706,27 +63455,6 @@ var GlobalTranslationCard = ({
       setStatus("error");
     }
   };
-  const handleToggleMastered = async () => {
-    if (!result) return;
-    try {
-      const nextMastered = !isMastered;
-      const updated = {
-        ...result,
-        mastered: nextMastered,
-        updated: (/* @__PURE__ */ new Date()).toISOString()
-      };
-      await plugin.wordAssetService.save(updated);
-      setIsMastered(nextMastered);
-      new import_obsidian22.Notice(nextMastered ? "\u5DF2\u6807\u8BB0\u638C\u63E1" : "\u5DF2\u91CD\u65B0\u52A0\u5165\u8BCD\u5E93");
-      plugin.app.workspace.iterateAllLeaves((leaf) => {
-        if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
-          leaf.view.editor.cm.dispatch({});
-        }
-      });
-    } catch (err) {
-      new import_obsidian22.Notice("\u64CD\u4F5C\u5931\u8D25\u3002");
-    }
-  };
   const handleDeleteWord = async () => {
     const confirmed = await confirmDestructiveAction(
       plugin.app,
@@ -66736,7 +63464,7 @@ var GlobalTranslationCard = ({
     if (!confirmed) return;
     try {
       await plugin.wordAssetService.delete(word.toLowerCase());
-      new import_obsidian22.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+      new import_obsidian15.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
       onClose();
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
@@ -66744,16 +63472,24 @@ var GlobalTranslationCard = ({
         }
       });
     } catch (err) {
-      new import_obsidian22.Notice("\u5220\u9664\u5931\u8D25\u3002");
+      new import_obsidian15.Notice("\u5220\u9664\u5931\u8D25\u3002");
     }
   };
   const handlePlayAudio = () => {
-    if (!result) return;
+    if (!result || plugin.settings.enableWordAudio === false) return;
     const accent = plugin.settings.wordAudioAccent || "us";
-    const audioUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=${accent === "uk" ? 1 : 2}`;
-    const audio = new Audio(audioUrl);
-    audio.play().catch(() => {
-    });
+    const text = result.surface || result.lemma || word;
+    const audioUrl = buildWordAudioUrl(plugin.settings.wordAudioTemplate, text, accent);
+    const speak = () => {
+      if (typeof speechSynthesis === "undefined") return;
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = plugin.settings.speechLang || (accent === "uk" ? "en-GB" : "en-US");
+      utterance.rate = 0.92;
+      speechSynthesis.speak(utterance);
+    };
+    if (!audioUrl) return speak();
+    new Audio(audioUrl).play().catch(speak);
   };
   import_react5.default.useEffect(() => {
     const card = cardRef.current;
@@ -66814,12 +63550,6 @@ var GlobalTranslationCard = ({
           import_react5.default.createElement(
             "div",
             { className: "jarvis-reader-word-card-actions" },
-            import_react5.default.createElement("button", {
-              className: "jarvis-reader-word-card-action jarvis-reader-word-card-mastered",
-              title: isMastered ? "\u6807\u8BB0\u672A\u638C\u63E1" : "\u6807\u8BB0\u5DF2\u638C\u63E1",
-              onClick: handleToggleMastered,
-              style: { color: isMastered ? "var(--interactive-accent)" : "" }
-            }, renderObsidianIcon("check")),
             import_react5.default.createElement("button", {
               className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
               title: "\u5220\u9664\u8BCD\u6761",
@@ -66917,17 +63647,18 @@ var GlobalTranslationCard = ({
       status === "ready" && result && import_react5.default.createElement(
         import_react5.default.Fragment,
         null,
-        import_react5.default.createElement(
+        result.isWord !== false && import_react5.default.createElement(
           "div",
           { className: "jarvis-reader-word-head" },
           import_react5.default.createElement("button", {
             className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
+            title: "\u70B9\u51FB\u53D1\u97F3",
             onClick: handlePlayAudio,
             style: { color: "var(--text-error)", fontWeight: "bold" }
           }, word),
           result.phonetic && import_react5.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, `[${result.phonetic}]`)
         ),
-        result.isWord && (result.tags || result.collins || result.oxford) ? import_react5.default.createElement(
+        result.isWord !== false && (result.tags || result.collins || result.oxford) ? import_react5.default.createElement(
           "div",
           { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
           result.oxford === 1 ? import_react5.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
@@ -66942,11 +63673,11 @@ var GlobalTranslationCard = ({
       { className: "jarvis-reader-highlight-actions", style: { marginTop: "10px" } },
       import_react5.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: onClose }, "\u53D6\u6D88"),
       status === "ready" && import_react5.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: handleAiTranslate }, "AI\u7FFB\u8BD1"),
-      isSaved ? import_react5.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react5.default.createElement("button", {
+      canSave && (isSaved ? import_react5.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react5.default.createElement("button", {
         className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
         onClick: handleSave,
         disabled: status !== "ready"
-      }, "\u4FDD\u5B58\u5355\u8BCD")
+      }, "\u4FDD\u5B58\u5355\u8BCD"))
     )
   );
 };
@@ -67121,7 +63852,7 @@ function createWordHighlighterExtension(plugin) {
     const savedWords = /* @__PURE__ */ new Set();
     for (const key of Object.keys(assets)) {
       const asset = assets[key];
-      if (asset && asset.kind === "word" && !asset.mastered) {
+      if (asset && asset.kind === "word") {
         savedWords.add(key.toLowerCase());
       }
     }
@@ -67260,22 +63991,6 @@ var WordAssetService = class {
     if (!current) return null;
     const updated = transform(current);
     return this.save(updated, reason);
-  }
-  async setMastered(key, mastered) {
-    return this.update(key, (asset) => ({ ...asset, mastered, updated: (/* @__PURE__ */ new Date()).toISOString() }));
-  }
-  async setMasteredMany(keys, mastered) {
-    const next = { ...this.assets() };
-    let count = 0;
-    for (const key of keys) {
-      const asset = next[key];
-      if (asset) {
-        next[key] = { ...asset, mastered, updated: (/* @__PURE__ */ new Date()).toISOString() };
-        count += 1;
-      }
-    }
-    if (count) await this.commit(next, "save");
-    return count;
   }
   async delete(key) {
     if (!this.get(key)) return false;
@@ -67738,6 +64453,60 @@ var SettingsSaveQueue = class {
   }
 };
 
+// src/smart-command-migration.ts
+async function removeSmartCommandsWithBackup(settings, backup) {
+  if (!Object.prototype.hasOwnProperty.call(settings, "smartCommands")) {
+    return { settings, migrated: false };
+  }
+  await backup(JSON.stringify({ smartCommands: settings.smartCommands }, null, 2));
+  const { smartCommands: _removed, ...nextSettings } = settings;
+  return { settings: nextSettings, migrated: true };
+}
+
+// src/review-migration.ts
+var REVIEW_ASSET_FIELDS = ["mastered", "nextReviewDate", "interval", "ease", "reviews", "reviewTimeMs"];
+function isLegacySentenceAsset(key, asset) {
+  return key.startsWith("sentence-") || asset.kind === "sentence" || asset.isWord === false;
+}
+var REVIEW_SETTING_FIELDS = ["autoPlayAudioOnReview", "wordReviewStats", "sm2StartingEase", "sm2EasyBonus", "sm2LapseMultiplier", "sm2MaxInterval"];
+function hasOwn(object, key) {
+  return Object.prototype.hasOwnProperty.call(object, key);
+}
+function removeReviewFields(value, fields) {
+  const next = { ...value };
+  const removed = {};
+  for (const field of fields) {
+    if (hasOwn(next, field)) {
+      removed[field] = next[field];
+      delete next[field];
+    }
+  }
+  return { value: next, removed };
+}
+function removeReviewData(wordAssets, settings) {
+  let changed = false;
+  const nextAssets = {};
+  for (const [key, asset] of Object.entries(wordAssets)) {
+    const record = asset;
+    if (isLegacySentenceAsset(key, record)) {
+      changed = true;
+      continue;
+    }
+    const result = removeReviewFields(record, REVIEW_ASSET_FIELDS);
+    delete result.value.isWord;
+    nextAssets[key] = result.value;
+    changed ||= Object.keys(result.removed).length > 0 || hasOwn(record, "isWord");
+  }
+  const settingsResult = removeReviewFields(settings, REVIEW_SETTING_FIELDS);
+  const highlightColors = settingsResult.value.highlightColors;
+  if (highlightColors && typeof highlightColors === "object" && hasOwn(highlightColors, "sentence")) {
+    settingsResult.value.highlightColors = removeReviewFields(highlightColors, ["sentence"]).value;
+    changed = true;
+  }
+  changed ||= Object.keys(settingsResult.removed).length > 0;
+  return { wordAssets: changed ? nextAssets : wordAssets, settings: changed ? settingsResult.value : settings, changed };
+}
+
 // src/book-state-service.ts
 var BookStateService = class {
   host;
@@ -67909,10 +64678,9 @@ async function writeWordAssetSidecar(adapter, path, wordAssets, updated = (/* @_
 // src/main.ts
 var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 var LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
-var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
+var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
   bookshelfView;
   activeReaderView;
-  wordSidebarView;
   lastIndexCounts;
   wordAssetSidecarUnavailable = false;
   wordAssetService = new WordAssetService(this);
@@ -67926,7 +64694,7 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     adapter: this.app.vault.adapter,
     readNote: async (path) => {
       const file = this.app.vault.getAbstractFileByPath(path);
-      if (!(file instanceof import_obsidian23.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
+      if (!(file instanceof import_obsidian16.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
       return this.app.vault.read(file);
     },
     writeNote: async (path, content) => {
@@ -67934,7 +64702,7 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
       await writeExistingRecoveryNote(
         path,
         content,
-        file instanceof import_obsidian23.TFile ? file : null,
+        file instanceof import_obsidian16.TFile ? file : null,
         (note, body) => this.app.vault.modify(note, body),
         this.app.vault.adapter
       );
@@ -67948,17 +64716,18 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
   );
   highlightSidecarUnavailable = false;
   async onload() {
-    (0, import_obsidian23.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
-    (0, import_obsidian23.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
+    (0, import_obsidian16.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
+    (0, import_obsidian16.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
+    await this.migrateReviewData();
     const highlightRecovery = await this.highlightTransactionService.recoverPending();
     if (highlightRecovery.finalized || highlightRecovery.rolledBack) {
-      new import_obsidian23.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
+      new import_obsidian16.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
     }
     if (highlightRecovery.errors.length) {
       console.error("Jarvis Reader highlight transaction recovery failed.", highlightRecovery.errors);
-      new import_obsidian23.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
+      new import_obsidian16.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
     }
     await resolveSyncConflicts(this);
     if (needsStartupIndexPersistence) {
@@ -67972,14 +64741,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
       const view = new JarvisReaderBookshelfView(leaf, this);
       this.bookshelfView = view;
       return view;
-    });
-    this.registerView(WORD_SIDEBAR_VIEW_TYPE, (leaf) => {
-      const view = new WordSidebarView(leaf, this);
-      this.wordSidebarView = view;
-      return view;
-    });
-    this.registerView(WORD_BOOK_VIEW_TYPE, (leaf) => {
-      return new WordBookView(leaf, this);
     });
     this.registerView(LIBRARY_VIEW_TYPE, (leaf) => {
       return new LibraryView(leaf, this);
@@ -68006,22 +64767,8 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
         this.openBookshelfPane(true);
       }
     });
-    this.addCommand({
-      id: "open-jarvis-reader-word-sidebar",
-      name: "\u6253\u5F00\u8BCD\u6761\u4FA7\u8FB9\u680F",
-      callback: () => {
-        this.openWordSidebarPane(true);
-      }
-    });
-    this.addCommand({
-      id: "open-jarvis-reader-word-book",
-      name: "\u6253\u5F00\u8BCD\u6761",
-      callback: () => {
-        this.openWordBook();
-      }
-    });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file instanceof import_obsidian23.TFile && file.extension.toLowerCase() === "pdf") {
+      if (file instanceof import_obsidian16.TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0").setIcon("pencil").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -68039,12 +64786,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
             l.view.setActiveReader(view, null);
           }
         });
-        const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-        wordSidebarLeaves.forEach((l) => {
-          if (l.view && typeof l.view.setReader === "function") {
-            l.view.setReader(view);
-          }
-        });
       } else if (view instanceof JarvisReaderBookshelfView) {
         this.bookshelfView = view;
         view.render();
@@ -68056,8 +64797,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
         if (epubLeaves.length === 0) {
           const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
           bookshelfLeaves.forEach((leaf) => leaf.detach());
-          const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-          wordSidebarLeaves.forEach((leaf) => leaf.detach());
           this.activeReaderView = null;
         }
       }, 50);
@@ -68094,49 +64833,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
       }, 50);
     }
   }
-  async openWordSidebarPane(reveal = true, targetAsset = null) {
-    let leaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-    if (!leaves.length) {
-      const leaf2 = this.app.workspace.getRightLeaf(false);
-      if (!leaf2)
-        return;
-      await leaf2.setViewState({ type: WORD_SIDEBAR_VIEW_TYPE, active: true });
-      leaves = [leaf2];
-    }
-    const leaf = leaves[0];
-    if (reveal && leaf && typeof this.app.workspace.revealLeaf === "function") {
-      this.app.workspace.revealLeaf(leaf);
-    }
-    const view = leaf == null ? void 0 : leaf.view;
-    if (view instanceof WordSidebarView) {
-      this.wordSidebarView = view;
-      if (this.activeReaderView) view.setReader(this.activeReaderView);
-      if (targetAsset && typeof view.focusAsset === "function") view.focusAsset(targetAsset);
-      view.render();
-    } else if (leaf) {
-      window.setTimeout(() => {
-        const delayedView = leaf.view;
-        if (delayedView instanceof WordSidebarView) {
-          this.wordSidebarView = delayedView;
-          if (this.activeReaderView) delayedView.setReader(this.activeReaderView);
-          if (targetAsset && typeof delayedView.focusAsset === "function") delayedView.focusAsset(targetAsset);
-          delayedView.render();
-        }
-      }, 50);
-    }
-  }
-  async openWordBook() {
-    let leaves = this.app.workspace.getLeavesOfType(WORD_BOOK_VIEW_TYPE);
-    if (!leaves.length) {
-      const leaf2 = this.app.workspace.getLeaf("split", "vertical");
-      await leaf2.setViewState({ type: WORD_BOOK_VIEW_TYPE, active: true });
-      leaves = [leaf2];
-    }
-    const leaf = leaves[0];
-    if (leaf && typeof this.app.workspace.revealLeaf === "function") {
-      this.app.workspace.revealLeaf(leaf);
-    }
-  }
   async openLibrary() {
     let leaves = this.app.workspace.getLeavesOfType(LIBRARY_VIEW_TYPE);
     if (!leaves.length) {
@@ -68154,9 +64850,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     if (this.bookshelfView && typeof this.bookshelfView.setActiveReader === "function") {
       this.bookshelfView.setActiveReader(reader, preferredPanel);
     }
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(reader);
-    }
   }
   refreshReaderSidebar(reader) {
     if (reader) {
@@ -68164,11 +64857,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     }
     if (this.bookshelfView && typeof this.bookshelfView.render === "function") {
       this.bookshelfView.render();
-    }
-  }
-  refreshWordSidebar(reader) {
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(reader || this.activeReaderView);
     }
   }
   revealHighlightInSidebar(reader, highlightId) {
@@ -68192,16 +64880,11 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     if (this.bookshelfView && typeof this.bookshelfView.clearActiveReader === "function") {
       this.bookshelfView.clearActiveReader(reader);
     }
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(null);
-    }
     setTimeout(() => {
       const epubLeaves = this.app.workspace.getLeavesOfType("epub");
       if (epubLeaves.length === 0) {
         const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
         bookshelfLeaves.forEach((leaf) => leaf.detach());
-        const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-        wordSidebarLeaves.forEach((leaf) => leaf.detach());
       }
     }, 50);
   }
@@ -68300,7 +64983,9 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     for (const [key, asset] of Object.entries(wordAssets || {})) {
       if (!asset)
         continue;
-      const assetKey = getTranslationAssetStorageKey(asset) || key;
+      const legacyAsset = asset;
+      const isLegacySentence = key.startsWith("sentence-") || legacyAsset.kind === "sentence" || legacyAsset.isWord === false;
+      const assetKey = getTranslationAssetStorageKey(asset) || (isLegacySentence ? key : "");
       if (assetKey) {
         normalized[assetKey] = getLightWordAsset(asset);
       }
@@ -68324,7 +65009,7 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
         this.highlightSidecarUnavailable = true;
         this.settings.bookHighlights = {};
         console.error("Jarvis Reader highlight sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian23.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian16.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       const wordAssetSidecar = await readWordAssetSidecar(adapter, paths.wordAssets);
       if (wordAssetSidecar.status === "ready") {
@@ -68338,7 +65023,7 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
         this.wordAssetSidecarUnavailable = true;
         this.settings.wordAssets = {};
         console.error("Jarvis Reader word asset sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian23.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       if (restoredToMemory) {
         await this.logIndexChange("restore-from-sidecar");
@@ -68347,15 +65032,25 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
-      new import_obsidian23.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
+      new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
       throw error;
     }
+  }
+  async migrateReviewData() {
+    const migration = removeReviewData(this.settings.wordAssets || {}, this.settings);
+    if (!migration.changed) return;
+    const adapter = this.app.vault.adapter;
+    const paths = this.getIndexSidecarPaths();
+    await writeWordAssetSidecar(adapter, paths.wordAssets, migration.wordAssets);
+    this.settings = migration.settings;
+    await this.saveSettingsData();
+    new import_obsidian16.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
   }
   async persistWordAssetSidecar(reason = "save") {
     if (this.wordAssetSidecarUnavailable) {
       const message = "\u8BCD\u6761\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u8BCD\u6761\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D word-assets.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian23.Notice(message, 0);
+      new import_obsidian16.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -68373,7 +65068,6 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     await this.logIndexChange(reason);
   }
   onWordAssetsChanged() {
-    this.refreshWordSidebar(this.activeReaderView);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     }
@@ -68388,7 +65082,7 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     if (this.highlightSidecarUnavailable) {
       const message = "\u9AD8\u4EAE\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u9AD8\u4EAE\u7D22\u5F15\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D highlights.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian23.Notice(message, 0);
+      new import_obsidian16.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -68422,7 +65116,15 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     }
   }
   async loadSettings() {
-    const loadedSettings = await this.loadData() || {};
+    let loadedSettings = await this.loadData() || {};
+    let smartCommandsBackupPath = "";
+    const migration = await removeSmartCommandsWithBackup(loadedSettings, async (content) => {
+      const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+      smartCommandsBackupPath = `.obsidian/plugins/jarvis-reader/backups/migrations/smart-commands-${timestamp}.json`;
+      await this.ensureAdapterFolder(smartCommandsBackupPath.split("/").slice(0, -1).join("/"));
+      await this.app.vault.adapter.write(smartCommandsBackupPath, content);
+    });
+    loadedSettings = migration.settings;
     const legacyCoverCache = loadedSettings.bookCoverCache && typeof loadedSettings.bookCoverCache === "object" ? loadedSettings.bookCoverCache : {};
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedSettings);
     if (!this.settings.bookInitLocations) {
@@ -68471,13 +65173,13 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
       this.coverCacheMigrationComplete = true;
       if (backupRoot) {
         await this.saveSettingsData();
-        new import_obsidian23.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
+        new import_obsidian16.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
       }
     } catch (error) {
       this.coverCacheMigrationComplete = false;
       this.settings.bookCoverCache = legacyCoverCache;
       console.error("Jarvis Reader cover cache migration failed.", error);
-      new import_obsidian23.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
+      new import_obsidian16.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
     }
     if (!["single", "dual"].includes(this.settings.sidebarLayoutMode)) {
       this.settings.sidebarLayoutMode = "single";
@@ -68485,6 +65187,10 @@ var JarvisReaderPlugin = class extends import_obsidian23.Plugin {
     const sidebarPaneSplit = parseFloat(this.settings.sidebarPaneSplit);
     this.settings.sidebarPaneSplit = Number.isFinite(sidebarPaneSplit) ? Math.min(75, Math.max(25, sidebarPaneSplit)) : 48;
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
+    if (migration.migrated) {
+      await this.saveSettingsData();
+      new import_obsidian16.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
+    }
   }
   async saveSettings() {
     await this.saveSettingsData();

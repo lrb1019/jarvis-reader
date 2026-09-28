@@ -55,20 +55,17 @@ test("highlight conflict merge accepts only index fields and keeps newer metadat
 test("settings conflict merge does not double-count overlapping reading snapshots", () => {
   const merged = mergeSettingsPayload({
     readingStats: { "2026-07-22": { "a.epub": 120 } },
-    wordReviewStats: { "2026-07-22": { reviewCount: 3, reviewTimeMs: 1000 } },
     bookProgress: { "a.epub": { updated: "2026-07-21", percentage: 20 } },
   }, {
     readingStats: { "2026-07-22": { "a.epub": 100, "b.epub": 40 } },
-    wordReviewStats: { "2026-07-22": { reviewCount: 2, reviewTimeMs: 1500 } },
     bookProgress: { "a.epub": { updated: "2026-07-22", percentage: 30 } },
   });
   assert.deepEqual(merged?.readingStats["2026-07-22"], { "a.epub": 120, "b.epub": 40 });
-  assert.deepEqual(merged?.wordReviewStats["2026-07-22"], { reviewCount: 3, reviewTimeMs: 1500 });
   assert.equal(merged?.bookProgress["a.epub"].percentage, 30);
 });
 
 test("invalid conflict payloads stop before mutation", () => {
   assert.equal(mergeWordAssetPayload({}, { wordAssets: [] }), null);
   assert.equal(mergeHighlightPayload({}, { bookHighlights: { book: "invalid" } }), null);
-  assert.equal(mergeSettingsPayload({ readingStats: {}, wordReviewStats: {}, bookProgress: {} }, { readingStats: { day: { book: "invalid" } } }), null);
+  assert.equal(mergeSettingsPayload({ readingStats: {}, bookProgress: {} }, { readingStats: { day: { book: "invalid" } } }), null);
 });

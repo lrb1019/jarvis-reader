@@ -59,7 +59,6 @@ function createPlugin(adapter: MemoryConflictAdapter, failSettings = false): Con
     wordAssets: {},
     bookHighlights: {},
     readingStats: { "2026-07-22": { "a.epub": 120 } },
-    wordReviewStats: {},
     bookProgress: {},
   };
   return {

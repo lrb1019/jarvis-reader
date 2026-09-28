@@ -71,7 +71,7 @@ export class EpubView extends FileView {
     const assetMap = getWordAssetsMap(this.plugin.settings);
     const assetKey = getTranslationAssetKey(selection, translation);
     if (!assetKey) {
-      new Notice("Only English words, short phrases, or translated sentences can be saved.");
+      new Notice("只能保存英文单词或短语。");
       return null;
     }
     const existing = assetMap[assetKey];
@@ -85,27 +85,6 @@ export class EpubView extends FileView {
     await this.plugin.wordAssetService.save(getLightWordAsset(asset));
     new Notice("已保存到全局字典");
     return asset;
-  }
-
-  async openWordNote(asset: any): Promise<void> {
-    if (typeof this.plugin.openWordSidebarPane === "function") {
-      this.plugin.openWordSidebarPane(true, asset);
-    } else {
-      new Notice("词句卡片现已无文件化，请在右侧边栏查阅");
-    }
-  }
-
-  async setWordMastered(asset: any, mastered: boolean): Promise<any> {
-    const assetKey = getTranslationAssetStorageKey(asset);
-    if (!assetKey)
-      return null;
-    const current = getWordAssetsMap(this.plugin.settings)[assetKey] || asset;
-    const updated = {
-      ...current,
-      mastered: !!mastered,
-      updated: new Date().toISOString(),
-    };
-    return await this.plugin.wordAssetService.save(getLightWordAsset(updated));
   }
 
   async deleteWordAsset(asset: any): Promise<boolean> {
@@ -650,9 +629,7 @@ export class EpubView extends FileView {
       wordAssets: this.getWordAssets(),
       translateSelection: (text: string, sentence: string = "", options: any = {}) => this.translateSelection(text, sentence, options),
       saveWordAsset: (selection: any, translation: any) => this.saveWordAsset(selection, translation),
-      openWordNote: (asset: any) => { this.openWordNote(asset); },
       addBookmark: (cfi: string, title: string) => { this.addBookmark(cfi, title); },
-      setWordMastered: (asset: any, mastered: boolean) => this.setWordMastered(asset, mastered),
       deleteWordAsset: (asset: any) => this.deleteWordAsset(asset),
       loadWordDisplay: (asset: any) => this.loadWordDisplay(asset),
       autoWordHighlight: this.shouldAutoHighlightWords(),
@@ -667,9 +644,7 @@ export class EpubView extends FileView {
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
       promoteHighlight: (highlight: BookHighlight) => this.promoteHighlight(highlight),
       onInteraction: () => { this.lastInteractionTime = Date.now(); },
-      app: this.app,
-      smartCommands: this.plugin.settings.smartCommands || [],
-      bookTitle: file.basename
+      app: this.app
     }));
   }
 

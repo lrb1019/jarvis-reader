@@ -1016,10 +1016,6 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   transition: transform 100ms ease, background 120ms ease, color 120ms ease;
 }
 
-.jarvis-reader-word-card-mastered:hover {
-  color: var(--interactive-accent);
-}
-
 .jarvis-reader-word-card-delete:hover {
   color: var(--text-error);
 }
@@ -2117,211 +2113,6 @@ g.jarvis-reader-highlight-with-comment line {
   stroke: inherit !important;
 }
 
-/* Word Sidebar Styles */
-.jarvis-reader-word-sidebar-header {
-  padding: 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.jarvis-reader-word-sidebar-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.jarvis-reader-word-sidebar-title {
-  font-size: 1.1em;
-  font-weight: 600;
-  color: var(--text-normal);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.jarvis-reader-word-sidebar-subtitle {
-  font-size: 0.85em;
-  color: var(--text-muted);
-}
-
-.jarvis-reader-word-sidebar-action {
-  background: transparent;
-  box-shadow: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--text-muted);
-  border-radius: var(--radius-s);
-}
-
-.jarvis-reader-word-sidebar-action:hover {
-  background-color: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-.jarvis-reader-word-list {
-  padding: 4px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
-  flex: 1 1 auto;
-}
-
-.jarvis-reader-word-item {
-  background: transparent;
-  border-radius: var(--radius-s);
-  overflow: hidden;
-  transition: background-color 0.15s ease;
-}
-
-.jarvis-reader-word-item:hover {
-  background-color: var(--background-modifier-hover);
-}
-
-.jarvis-reader-word-item.is-expanded {
-  background-color: var(--background-secondary);
-}
-
-.jarvis-reader-word-item.is-mastered {
-  opacity: 0.6;
-}
-
-.jarvis-reader-word-item-header {
-  padding: 6px 8px;
-  cursor: pointer;
-}
-
-.jarvis-reader-word-lemma-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.jarvis-reader-word-lemma {
-  font-weight: 500;
-  font-size: var(--font-ui-medium);
-  color: var(--text-normal);
-}
-
-.jarvis-reader-word-lemma.has-audio {
-  cursor: pointer;
-  transition: color 0.1s ease;
-}
-
-.jarvis-reader-word-lemma.has-audio:hover {
-  color: var(--interactive-accent);
-  text-decoration: underline;
-}
-
-.jarvis-reader-word-item-display {
-  border-top: 1px dashed var(--background-modifier-border);
-  color: var(--text-normal);
-  font-size: 0.9em;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  padding: 0 8px;
-  transition: max-height 220ms ease, opacity 180ms ease, padding 180ms ease;
-}
-
-.jarvis-reader-word-item.is-expanded .jarvis-reader-word-item-display {
-  max-height: 400px;
-  opacity: 1;
-  padding: 8px;
-}
-
-.jarvis-reader-word-item-display p {
-  margin: 0.5em 0;
-}
-
-/* Word Sidebar Tabs */
-.jarvis-reader-word-sidebar-tabs {
-  background: color-mix(in srgb, var(--background-modifier-form-field) 80%, transparent);
-  border-radius: 10px;
-  display: flex;
-  gap: 0;
-  margin: 8px 0;
-  padding: 3px;
-}
-
-.jarvis-reader-word-sidebar-tab {
-  border-radius: 8px;
-  color: var(--text-muted);
-  cursor: pointer;
-  flex: 1;
-  font-size: 0.85em;
-  padding: 5px 0;
-  text-align: center;
-  transition: background 160ms ease, color 160ms ease, font-weight 160ms ease;
-}
-
-.jarvis-reader-word-sidebar-tab:hover {
-  color: var(--text-normal);
-}
-
-.jarvis-reader-word-sidebar-tab.is-active {
-  background: var(--background-primary);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
-  color: var(--text-normal);
-  font-weight: 600;
-}
-/* Global Word Book Styles */
-.jarvis-word-book-container {
-  background-color: var(--background-primary);
-}
-
-.jarvis-word-book-header input[type="text"],
-.jarvis-word-book-header select {
-  background: var(--background-modifier-form-field);
-  border: 1px solid var(--background-modifier-border);
-  color: var(--text-normal);
-  padding: 4px 8px;
-  border-radius: var(--radius-s);
-}
-
-.jarvis-word-book-header button {
-  background: var(--interactive-normal);
-  border: 1px solid var(--background-modifier-border);
-  color: var(--text-normal);
-  padding: 4px 12px;
-  border-radius: var(--radius-s);
-  cursor: pointer;
-}
-
-.jarvis-word-book-header button:hover:not(:disabled) {
-  background: var(--interactive-hover);
-}
-
-.jarvis-word-book-header button.mod-cta {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-}
-
-.jarvis-word-book-header button.mod-cta:hover:not(:disabled) {
-  background: var(--interactive-accent-hover);
-}
-
-.jarvis-word-book-header button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.jarvis-word-book-table-wrap {
-  position: relative;
-  border-top: 1px solid var(--background-modifier-border);
-}
-
-.jarvis-word-book-table th {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: var(--font-ui-small);
-}
-
-.jarvis-word-book-table tbody tr:hover {
-  background-color: var(--background-modifier-hover);
-}
-
 /* ==========================================================================
    Jarvis Reader - Central Library App Styles
    ========================================================================== */
@@ -2601,31 +2392,6 @@ g.jarvis-reader-highlight-with-comment line {
 
 .stats-strip-icon {
   font-size: 16px;
-}
-
-.jarvis-reader-word-item {
-  background-color: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.jarvis-reader-word-item:hover {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.jarvis-reader-word-item.is-mastered .jarvis-reader-word-lemma {
-  opacity: 0.8;
-}
-
-.jarvis-reader-word-item-display {
-  font-size: 0.9em;
-  line-height: 1.5;
-  color: var(--text-normal);
 }
 
 /* Book Grid Layout */
@@ -3564,10 +3330,6 @@ g.jarvis-reader-highlight-with-comment line {
   transition: all 0.2s ease;
 }
 
-.jarvis-library-word-card.is-mastered {
-  border-left-color: #2e7d32;
-}
-
 .word-card-header {
   display: flex;
   justify-content: space-between;
@@ -3641,29 +3403,6 @@ g.jarvis-reader-highlight-with-comment line {
 
 .word-pronounce-btn:hover {
   background: var(--background-modifier-hover);
-}
-
-.word-mastery-btn {
-  background: transparent;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  height: 26px;
-  font-size: 11px;
-  padding: 0 8px;
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.word-mastery-btn:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-.word-mastery-btn.mastered {
-  border-color: #2e7d32;
-  color: #2e7d32;
-  background-color: color-mix(in srgb, #2e7d32 8%, transparent);
 }
 
 .word-card-body {
@@ -5096,7 +4835,7 @@ g.jarvis-reader-highlight-with-comment line {
   line-height: 1.55 !important;
 }
 
-/* == Smart Command Button & Submenu == */
+/* == Highlight menu == */
 
 .jarvis-reader-highlight-menu {
   animation: jarvis-menu-enter 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -5187,150 +4926,6 @@ g.jarvis-reader-highlight-with-comment line {
   min-width: 130px !important;
   z-index: 100000 !important;
   animation: jarvis-menu-enter 100ms ease both !important;
-}
-
-.jarvis-reader-smart-cmd-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* For note window smart command dropdown menu */
-.jarvis-reader-smart-cmd-menu-note {
-  position: absolute;
-  top: calc(100% + 4px);
-  bottom: auto;
-  right: 0;
-  left: auto;
-  min-width: 140px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 4px;
-  gap: 2px;
-}
-.jarvis-reader-smart-cmd-item {
-  all: unset;
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 7px 12px;
-  font-size: var(--font-ui-small);
-  color: var(--text-normal);
-  cursor: pointer;
-  border-radius: 5px;
-  white-space: nowrap;
-  transition: background 0.12s ease;
-}
-.jarvis-reader-smart-cmd-item:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-accent);
-}
-
-/* == Smart Command Settings Tab == */
-.jarvis-smartcmd-toolbar {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.jarvis-smartcmd-add-btn {
-  align-self: flex-start;
-  margin-top: 4px;
-}
-.jarvis-smartcmd-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.jarvis-smartcmd-modal-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--background-modifier-border);
-}
-
-/* == Smart Command Settings Grid & Card Layout == */
-
-.vo-actions-compact-list {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px;
-	margin-bottom: 18px;
-}
-
-.vo-actions-compact-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 14px;
-	min-width: 0;
-	padding: 12px 14px;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 12px;
-	background: color-mix(in srgb, var(--background-secondary) 58%, transparent);
-}
-
-.vo-actions-compact-main {
-	display: flex;
-	align-items: flex-start;
-	gap: 12px;
-	min-width: 0;
-	flex: 1;
-}
-
-.vo-actions-compact-icon {
-	width: 18px;
-	height: 18px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	margin-top: 2px;
-	color: var(--text-normal);
-}
-
-.vo-actions-compact-icon svg {
-	width: 18px;
-	height: 18px;
-}
-
-.vo-actions-compact-text {
-	min-width: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
-.vo-actions-compact-title {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-normal);
-}
-
-.vo-actions-compact-desc {
-	font-size: 12px;
-	line-height: 1.45;
-	color: var(--text-muted);
-}
-
-.vo-actions-compact-controls {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	flex-shrink: 0;
-}
-
-@media (max-width: 900px) {
-	.vo-actions-compact-list {
-		grid-template-columns: minmax(0, 1fr);
-	}
 }
 
 .jarvis-reader-assoc-add-btn {

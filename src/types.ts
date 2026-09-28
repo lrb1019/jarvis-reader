@@ -1,7 +1,5 @@
 // Shared type definitions for Jarvis Reader
 // Sourced from main.js runtime shapes, verified against stable DEFAULT_SETTINGS (L52776-52808)
-import type { SmartCommand } from "./smart-command-core";
-
 // --- Highlight types ---
 
 export const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "pink", "purple"] as const;
@@ -41,7 +39,7 @@ export type PersistedBookHighlightsMap = Record<string, PersistedBookHighlight[]
 
 // --- Word asset types ---
 
-export type TranslationAssetKind = "word" | "phrase" | "sentence";
+export type TranslationAssetKind = "word" | "phrase";
 
 export interface WordAssetSource {
   bookPath: string;
@@ -49,7 +47,6 @@ export interface WordAssetSource {
   chapterTitle: string;
   cfiRange: string;
   quote: string;
-  sentence?: string;
   created: string;
 }
 
@@ -57,26 +54,18 @@ export interface WordAsset {
   lemma: string;
   title: string;
   kind: TranslationAssetKind;
-  isWord: boolean;
   surfaceForms: string[];
   translation: string;
   display: string;
   phonetic: string;
   partOfSpeech: string;
   example: string;
-  mastered: boolean;
   sources: WordAssetSource[];
   created: string;
   updated: string;
   tags?: string[];
   collins?: number;
   oxford?: number;
-  // Anki-style review fields (optional for now)
-  nextReviewDate?: string;
-  interval?: number;
-  ease?: number;
-  reviews?: number;
-  reviewTimeMs?: number;
   pos?: string;
 }
 
@@ -121,12 +110,6 @@ export interface DailyReadingStat {
   [bookPath: string]: number;
 }
 export type ReadingStatsMap = Record<string, DailyReadingStat>;
-
-export interface DailyWordReviewStat {
-  reviewCount: number;
-  reviewTimeMs: number;
-}
-export type WordReviewStatsMap = Record<string, DailyWordReviewStat>;
 
 export interface BookBookmark {
   cfi: string;
@@ -207,12 +190,6 @@ export interface JarvisReaderSettings {
   highlightColors: Record<string, string>;
   enableGlobalMarkdownTranslation: boolean;
   readingStats?: ReadingStatsMap;
-  wordReviewStats?: WordReviewStatsMap;
-  sm2StartingEase: number;
-  sm2EasyBonus: number;
-  sm2LapseMultiplier: number;
-  sm2MaxInterval: number;
-  smartCommands: SmartCommand[];
 }
 
 export type LoadedSettingsData = Partial<JarvisReaderSettings> &

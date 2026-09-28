@@ -46,17 +46,13 @@ test("normalizes dictionary entries into display-first cards", () => {
     partOfSpeech: "",
     example: "",
     display: "**中文释义**：复合物",
-    isWord: true,
     sourceType: "local-dictionary",
   });
 });
 
-test("builds stable sentence asset keys from CFI and quote", () => {
-  const first = getTranslationAssetKey({ cfiRange: "cfi-1", quote: "A sentence." }, { isWord: false });
-  const second = getTranslationAssetKey({ cfiRange: "cfi-1", quote: "A sentence." }, { isWord: false });
-
-  assert.match(first, /^sentence-/);
-  assert.equal(first, second);
+test("uses isWord only to reject sentence translations", () => {
+  assert.equal(getTranslationAssetKey({ quote: "existence" }, { lemma: "existence" }), "existence");
+  assert.equal(getTranslationAssetKey({ cfiRange: "cfi-1", quote: "A sentence." }, { isWord: false }), "");
 });
 
 test("builds word assets with merged surface forms and single source", () => {
@@ -91,14 +87,12 @@ const validSidecarAsset = {
   lemma: "fracture",
   title: "Fracture",
   kind: "word",
-  isWord: true,
   surfaceForms: ["fracture"],
   translation: "破裂",
   display: "**中文释义**：破裂",
   phonetic: "",
   partOfSpeech: "",
   example: "",
-  mastered: false,
   sources: [{
     bookPath: "Books/Atomic.epub",
     bookTitle: "Atomic",
@@ -111,8 +105,8 @@ const validSidecarAsset = {
   updated: "2026-07-10T00:00:00.000Z",
 };
 
-test("accepts only complete version 2 word asset sidecars", () => {
-  const parsed = parseWordAssetSidecar({ version: 2, wordAssets: { fracture: validSidecarAsset } });
+test("accepts complete version 2 word asset sidecars, including old review fields", () => {
+  const parsed = parseWordAssetSidecar({ version: 2, wordAssets: { fracture: { ...validSidecarAsset, mastered: false } } });
 
   assert.equal(parsed?.fracture?.lemma, "fracture");
   assert.equal(parseWordAssetSidecar({ version: 1, wordAssets: {} }), null);

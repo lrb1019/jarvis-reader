@@ -5,9 +5,9 @@ import { WordAssetService } from "../src/word-asset-service.ts";
 import type { WordAssetMap } from "../src/types.ts";
 
 const asset = {
-  lemma: "fracture", title: "Fracture", kind: "word" as const, isWord: true,
+  lemma: "fracture", title: "Fracture", kind: "word" as const,
   surfaceForms: ["fracture"], translation: "破裂", display: "破裂", phonetic: "", partOfSpeech: "", example: "",
-  mastered: false, sources: [], created: "2026-07-11T00:00:00.000Z", updated: "2026-07-11T00:00:00.000Z",
+  sources: [], created: "2026-07-11T00:00:00.000Z", updated: "2026-07-11T00:00:00.000Z",
 };
 
 test("word asset service commits once and notifies after a successful save", async () => {
@@ -22,14 +22,14 @@ test("word asset service commits once and notifies after a successful save", asy
   assert.equal(notifications, 1);
 });
 
-test("word asset service restores memory when sidecar persistence fails", async () => {
+test("word asset service restores memory when a save fails", async () => {
   const existing = { fracture: asset };
   const host = { settings: { wordAssets: existing }, persistWordAssetSidecar: async () => { throw new Error("write failed"); } };
   const service = new WordAssetService(host);
 
-  await assert.rejects(service.setMastered("fracture", true));
+  await assert.rejects(service.delete("fracture"));
   assert.equal(host.settings.wordAssets, existing);
-  assert.equal(host.settings.wordAssets.fracture?.mastered, false);
+  assert.equal(host.settings.wordAssets.fracture?.lemma, "fracture");
 });
 
 test("word asset service replaces the complete map with one persisted write", async () => {

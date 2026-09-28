@@ -36,24 +36,6 @@ export class WordAssetService {
     return this.save(updated, reason);
   }
 
-  async setMastered(key: string, mastered: boolean): Promise<WordAsset | null> {
-    return this.update(key, (asset) => ({ ...asset, mastered, updated: new Date().toISOString() }));
-  }
-
-  async setMasteredMany(keys: Iterable<string>, mastered: boolean): Promise<number> {
-    const next = { ...this.assets() };
-    let count = 0;
-    for (const key of keys) {
-      const asset = next[key];
-      if (asset) {
-        next[key] = { ...asset, mastered, updated: new Date().toISOString() };
-        count += 1;
-      }
-    }
-    if (count) await this.commit(next, "save");
-    return count;
-  }
-
   async delete(key: string): Promise<boolean> {
     if (!this.get(key)) return false;
     const next = { ...this.assets() };

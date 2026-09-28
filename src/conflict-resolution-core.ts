@@ -8,20 +8,12 @@ export interface ReadingStats {
   [date: string]: Record<string, number>;
 }
 
-export interface ReviewStats {
-  [date: string]: {
-    reviewCount?: number;
-    reviewTimeMs?: number;
-  };
-}
-
 export interface ProgressMap {
   [bookPath: string]: Record<string, unknown> & { updated?: string };
 }
 
 export interface SettingsConflictState {
   readingStats: ReadingStats;
-  wordReviewStats: ReviewStats;
   bookProgress: ProgressMap;
 }
 
@@ -133,20 +125,6 @@ export function mergeSettingsPayload(current: SettingsConflictState, payload: un
         existingBooks[bookPath] = Math.max(existingBooks[bookPath] || 0, seconds);
       }
       next.readingStats[date] = existingBooks;
-    }
-  }
-
-  if (payload.wordReviewStats !== undefined) {
-    if (!isRecord(payload.wordReviewStats)) return null;
-    for (const [date, statValue] of Object.entries(payload.wordReviewStats)) {
-      if (!isRecord(statValue)) return null;
-      const existing = next.wordReviewStats[date] || {};
-      const reviewCount = typeof statValue.reviewCount === "number" ? statValue.reviewCount : 0;
-      const reviewTimeMs = typeof statValue.reviewTimeMs === "number" ? statValue.reviewTimeMs : 0;
-      next.wordReviewStats[date] = {
-        reviewCount: Math.max(existing.reviewCount || 0, reviewCount),
-        reviewTimeMs: Math.max(existing.reviewTimeMs || 0, reviewTimeMs),
-      };
     }
   }
 

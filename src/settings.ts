@@ -1,10 +1,8 @@
-import { PluginSettingTab, Setting, FuzzySuggestModal, TFile, TFolder, Notice, App, Modal, setIcon } from "obsidian";
+import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
 import { normalizeVaultPath } from "./utils";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
-import type { SmartCommand } from "./claudianBridge";
-import { resolveSkillFilePath } from "./smart-command-core";
 
 export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -27,7 +25,6 @@ export const DEFAULT_SETTINGS = {
   knowledgeNoteFolder: "知识库/想法",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
   customCoverFolder: "00-Attachment",
-  wordBookExportFolder: "",
   wordAssets: {},
   translationApi: {
     provider: "openai-compatible",
@@ -38,7 +35,6 @@ export const DEFAULT_SETTINGS = {
   translationPrompt: DEFAULT_TRANSLATION_PROMPT,
   enableAutoHighlight: true,
   enableWordAudio: true,
-  autoPlayAudioOnReview: true,
   wordAudioTemplate: DEFAULT_WORD_AUDIO_TEMPLATE,
   wordAudioAccent: "us",
   blurWordCardBody: true,
@@ -54,38 +50,10 @@ export const DEFAULT_SETTINGS = {
   highlightColors: {
     word: "#4dabf7",
     phrase: "#ae3ec9",
-    sentence: "#40c057",
     comment: "#f97316",
     normal: "#ffeb3b"
   },
-  readingStats: {},
-  wordReviewStats: {},
-  sm2StartingEase: 2.5,
-  sm2EasyBonus: 1.3,
-  sm2LapseMultiplier: 0.5,
-  sm2MaxInterval: 365,
-  smartCommands: [
-    {
-      id: "smart-1",
-      label: "发芽思考",
-      description: "对选中内容进行知识碰撞与发散延伸",
-      icon: "sprout",
-      prompt: "@skills/sprouting-thought 请对以下内容进行发芽思考，发散延伸：\n\n{{selection}}",
-      enabled: true,
-      scope: "both",
-      source: "template"
-    },
-    {
-      id: "smart-2",
-      label: "深度研究",
-      description: "围绕选中内容开展主题研究",
-      icon: "book-open",
-      prompt: "@skills/content-research 请围绕以下内容开展深度研究：\n\n{{selection}}",
-      enabled: true,
-      scope: "both",
-      source: "template"
-    }
-  ] as SmartCommand[]
+  readingStats: {}
 };
 export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
   onChoose: (path: string) => void;
@@ -146,7 +114,7 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
       },
       { 
         id: "words", 
-        label: "词句标记与发音",
+        label: "词卡标记与发音",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
       },
       { 
@@ -154,16 +122,6 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         label: "阅读外观",
         icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
       },
-      { 
-        id: "review", 
-        label: "记忆复习",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`
-      },
-      { 
-        id: "smartcmd", 
-        label: "扩展指令",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 8v4l3 3"></path><circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle></svg>`
-      }
     ];
 
     tabs.forEach(tab => {
@@ -242,29 +200,6 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
         if (customCoverFolderText) {
           customCoverFolderText.setValue("");
-        }
-      }));
-
-      let exportFolderText: any = null;
-      new Setting(contentDiv).setName("阅读积累导出文件夹").setDesc("选择英语词条导出的 Markdown 笔记存放路径（相对于 Vault 根目录）").addText((text) => {
-        exportFolderText = text;
-        text.setPlaceholder("如: Export/Wordbooks").setValue(this.plugin.settings.wordBookExportFolder || "").onChange(async (value) => {
-          this.plugin.settings.wordBookExportFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("选择").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.wordBookExportFolder = path;
-          await this.plugin.saveSettings();
-          if (exportFolderText) {
-            exportFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
-        this.plugin.settings.wordBookExportFolder = "";
-        await this.plugin.saveSettings();
-        if (exportFolderText) {
-          exportFolderText.setValue("");
         }
       }));
 
@@ -393,17 +328,16 @@ created: {{created}}
     }
 
     if (this.activeTab === "words") {
-      new Setting(contentDiv).setName("已保存词句的标记").setHeading();
-      new Setting(contentDiv).setName("在书中标记已保存的词句").setDesc("开启后，阅读器会标记已保存且能在当前书中定位的单词、短语和句子；关闭后仍保留词句记录。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+      new Setting(contentDiv).setName("已保存词卡的标记").setHeading();
+      new Setting(contentDiv).setName("在书中标记已保存的词卡").setDesc("开启后，阅读器会标记已保存且能在当前书中定位的单词和短语；关闭后仍保留词卡记录。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
         await this.plugin.saveSettings();
       }));
       this.createColorPicker(contentDiv, "单词颜色", "已保存单词在阅读器中的标记颜色", "word");
       this.createColorPicker(contentDiv, "短语颜色", "已保存短语在阅读器中的标记颜色", "phrase");
-      this.createColorPicker(contentDiv, "句子颜色", "已保存句子在阅读器中的标记颜色", "sentence");
 
-      new Setting(contentDiv).setName("词句卡片").setHeading();
-      new Setting(contentDiv).setName("模糊词句卡片正文").setDesc("只模糊可滚动的词句卡片正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new Setting(contentDiv).setName("词卡").setHeading();
+      new Setting(contentDiv).setName("模糊词卡正文").setDesc("只模糊可滚动的词卡正文；鼠标悬停后显示，标题和来源始终可见").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
@@ -411,11 +345,6 @@ created: {{created}}
       new Setting(contentDiv).setName("发音").setHeading();
       new Setting(contentDiv).setName("启用单词发音").setDesc("优先使用发音链接；失败时回退到浏览器语音合成").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
-        await this.plugin.saveSettings();
-      }));
-
-      new Setting(contentDiv).setName("复习时自动发音").setDesc("打开记忆卡片时自动播放单词读音").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoPlayAudioOnReview !== false).onChange(async (value) => {
-        this.plugin.settings.autoPlayAudioOnReview = value;
         await this.plugin.saveSettings();
       }));
 
@@ -464,75 +393,6 @@ created: {{created}}
       this.createColorPicker(contentDiv, "普通划线颜色", "未添加笔记的普通划线颜色", "normal");
     }
     
-    if (this.activeTab === "smartcmd") {
-      this.renderSmartCommandsTab(contentDiv);
-    }
-
-    if (this.activeTab === "review") {
-      new Setting(contentDiv)
-        .setName("起始难度 (Starting Ease)")
-        .setDesc("新词条初次复习成功后的初始难度系数（默认值 2.5）")
-        .addText((text) => {
-          text.setPlaceholder("2.5")
-            .setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5))
-            .onChange(async (value) => {
-              const parsed = parseFloat(value);
-              this.plugin.settings.sm2StartingEase = isNaN(parsed) || parsed <= 0 ? 2.5 : parsed;
-              await this.plugin.saveSettings();
-            });
-          text.inputEl.addEventListener("blur", () => {
-            text.setValue(String(this.plugin.settings.sm2StartingEase ?? 2.5));
-          });
-        });
-
-      new Setting(contentDiv)
-        .setName("简单奖励系数 (Easy Bonus)")
-        .setDesc("点击“简单”评分时，对复习间隔的额外拉长倍数（默认值 1.3）")
-        .addText((text) => {
-          text.setPlaceholder("1.3")
-            .setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3))
-            .onChange(async (value) => {
-              const parsed = parseFloat(value);
-              this.plugin.settings.sm2EasyBonus = isNaN(parsed) || parsed <= 0 ? 1.3 : parsed;
-              await this.plugin.saveSettings();
-            });
-          text.inputEl.addEventListener("blur", () => {
-            text.setValue(String(this.plugin.settings.sm2EasyBonus ?? 1.3));
-          });
-        });
-
-      new Setting(contentDiv)
-        .setName("困难扣减系数 (Lapse Multiplier)")
-        .setDesc("点击“困难”评分时，当前复习间隔的缩减比例。范围需在 0 到 1 之间（默认值 0.5，如 0.5 表示间隔缩短一半）")
-        .addText((text) => {
-          text.setPlaceholder("0.5")
-            .setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5))
-            .onChange(async (value) => {
-              const parsed = parseFloat(value);
-              this.plugin.settings.sm2LapseMultiplier = isNaN(parsed) || parsed <= 0 || parsed > 1 ? 0.5 : parsed;
-              await this.plugin.saveSettings();
-            });
-          text.inputEl.addEventListener("blur", () => {
-            text.setValue(String(this.plugin.settings.sm2LapseMultiplier ?? 0.5));
-          });
-        });
-
-      new Setting(contentDiv)
-        .setName("最大复习间隔 (Maximum Interval)")
-        .setDesc("限制词条复习周期的上限时间，单位为天（默认值 365）")
-        .addText((text) => {
-          text.setPlaceholder("365")
-            .setValue(String(this.plugin.settings.sm2MaxInterval ?? 365))
-            .onChange(async (value) => {
-              const parsed = parseInt(value, 10);
-              this.plugin.settings.sm2MaxInterval = isNaN(parsed) || parsed <= 0 ? 365 : parsed;
-              await this.plugin.saveSettings();
-            });
-          text.inputEl.addEventListener("blur", () => {
-            text.setValue(String(this.plugin.settings.sm2MaxInterval ?? 365));
-          });
-        });
-    }
   }
   private createColorPicker(containerEl: HTMLElement, name: string, desc: string, key: keyof typeof DEFAULT_SETTINGS.highlightColors): void {
     new Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker
@@ -547,261 +407,4 @@ created: {{created}}
       }));
   }
 
-  private renderSmartCommandsTab(containerEl: HTMLElement): void {
-    const header = containerEl.createDiv();
-    header.style.display = "flex";
-    header.style.justifyContent = "space-between";
-    header.style.alignItems = "center";
-    header.style.marginBottom = "12px";
-
-    const titleEl = header.createEl("h3", { text: "指令列表" });
-    titleEl.style.margin = "0";
-    titleEl.style.fontSize = "16px";
-    titleEl.style.fontWeight = "600";
-    
-    const addBtn = header.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "新增指令" } });
-    setIcon(addBtn, "plus");
-    
-    addBtn.addEventListener("click", () => {
-      const newCmd: SmartCommand = {
-        id: `smart-${Date.now()}`,
-        label: "新指令",
-        description: "",
-        icon: "bot",
-        prompt: "",
-        enabled: true,
-        scope: "both",
-        source: "template",
-        skillPath: ""
-      };
-      new SmartCommandEditModal(this.app, newCmd, async (saved) => {
-        const cmds: SmartCommand[] = Array.isArray(this.plugin.settings.smartCommands)
-          ? this.plugin.settings.smartCommands
-          : [];
-        cmds.push(saved);
-        this.plugin.settings.smartCommands = cmds;
-        await this.plugin.saveSettings();
-        this.display();
-      }).open();
-    });
-
-    const list = containerEl.createDiv({ cls: "vo-actions-compact-list" });
-    const cmds: SmartCommand[] = Array.isArray(this.plugin.settings.smartCommands)
-      ? this.plugin.settings.smartCommands
-      : [];
-
-    if (cmds.length === 0) {
-      containerEl.createEl("p", { text: "暂无指令，点击右上角加号新增。", cls: "setting-item-description" });
-      return;
-    }
-
-    cmds.forEach((cmd, index) => {
-      const row = list.createDiv({ cls: "vo-actions-compact-row" });
-
-      const left = row.createDiv({ cls: "vo-actions-compact-main" });
-      const iconWrap = left.createDiv({ cls: "vo-actions-compact-icon" });
-      setIcon(iconWrap, cmd.icon || "bot");
-
-      const textWrap = left.createDiv({ cls: "vo-actions-compact-text" });
-      textWrap.createDiv({ text: cmd.label || `指令 ${index + 1}`, cls: "vo-actions-compact-title" });
-      
-      textWrap.createDiv({
-        text: cmd.description || "暂无描述",
-        cls: "vo-actions-compact-desc"
-      });
-
-      const right = row.createDiv({ cls: "vo-actions-compact-controls" });
-      
-      // Edit button
-      const editBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "编辑指令" } });
-      setIcon(editBtn, "pencil");
-      editBtn.addEventListener("click", () => {
-        new SmartCommandEditModal(this.app, { ...cmd }, async (saved) => {
-          cmds[index] = saved;
-          this.plugin.settings.smartCommands = cmds;
-          await this.plugin.saveSettings();
-          this.display();
-        }, async () => {
-          cmds.splice(index, 1);
-          this.plugin.settings.smartCommands = cmds;
-          await this.plugin.saveSettings();
-          this.display();
-        }).open();
-      });
-
-      // Delete button
-      const deleteBtn = right.createEl("button", { cls: "clickable-icon", attr: { "aria-label": "删除指令" } });
-      setIcon(deleteBtn, "trash-2");
-      deleteBtn.addEventListener("click", async () => {
-        cmds.splice(index, 1);
-        this.plugin.settings.smartCommands = cmds;
-        await this.plugin.saveSettings();
-        this.display();
-      });
-
-      // Toggle enabled
-      const toggleBtn = right.createEl("button", {
-        cls: "clickable-icon",
-        attr: { "aria-label": cmd.enabled !== false ? "禁用指令" : "启用指令" }
-      });
-      setIcon(toggleBtn, cmd.enabled !== false ? "toggle-right" : "toggle-left");
-      toggleBtn.addEventListener("click", async () => {
-        cmds[index] = { ...cmd, enabled: cmd.enabled === false };
-        this.plugin.settings.smartCommands = cmds;
-        await this.plugin.saveSettings();
-        this.display();
-      });
-    });
-  }
-}
-
-class SmartCommandEditModal extends Modal {
-  private cmd: SmartCommand;
-  private onSave: (cmd: SmartCommand) => Promise<void>;
-  private onDelete?: () => Promise<void>;
-
-  constructor(
-    app: App,
-    cmd: SmartCommand,
-    onSave: (cmd: SmartCommand) => Promise<void>,
-    onDelete?: () => Promise<void>
-  ) {
-    super(app);
-    this.cmd = { ...cmd };
-    this.onSave = onSave;
-    this.onDelete = onDelete;
-  }
-
-  onOpen(): void {
-    const { contentEl } = this;
-    contentEl.empty();
-    let draft: SmartCommand = { ...this.cmd };
-
-    contentEl.createEl("h2", { text: "Edit Smart Action" });
-
-    new Setting(contentEl)
-      .setName("按钮名称")
-      .setDesc("面板中显示的按钮文字")
-      .addText(text => text
-        .setPlaceholder("例如：发芽思考")
-        .setValue(draft.label)
-        .onChange(value => { draft = { ...draft, label: value }; })
-      );
-
-    new Setting(contentEl)
-      .setName("列表描述")
-      .setDesc("显示在外层列表里的一句简短说明")
-      .addText(text => text
-        .setPlaceholder("例如：对选中内容发散延伸")
-        .setValue(draft.description || "")
-        .onChange(value => { draft = { ...draft, description: value }; })
-      );
-
-    new Setting(contentEl)
-      .setName("图标名称")
-      .setDesc("填写 Lucide 图标名称，例如 sprout、book-open、rss")
-      .addText(text => text
-        .setPlaceholder("bot")
-        .setValue(draft.icon)
-        .onChange(value => { draft = { ...draft, icon: value }; })
-      );
-
-    new Setting(contentEl)
-      .setName("出现位置")
-      .setDesc("划线菜单触发时目标为【选中文字】，笔记窗口触发时目标为【原文 + 笔记内容】")
-      .addDropdown(dd => dd
-        .addOption("both", "两者都有")
-        .addOption("selection", "仅划线菜单（选中文字时）")
-        .addOption("note", "仅笔记窗口")
-        .setValue(draft.scope || "both")
-        .onChange(value => { draft = { ...draft, scope: value as SmartCommand["scope"] }; })
-      );
-
-    new Setting(contentEl)
-      .setName("指令来源")
-      .setDesc("模板模式直接发送下方内容；Skill 文件模式会让 Claudian 按路径读取最新的 SKILL.md")
-      .addDropdown(dd => dd
-        .addOption("template", "指令模板")
-        .addOption("skill", "Skill 文件")
-        .setValue(draft.source || "template")
-        .onChange(value => {
-          draft = {
-            ...draft,
-            source: value === "skill" ? "skill" : "template"
-          };
-        })
-      );
-
-    new Setting(contentEl)
-      .setName("Skill 目录")
-      .setDesc("仅用于 Skill 文件模式。填写知识库相对目录，调用时会把对应 SKILL.md 路径交给 Claudian 读取；也可直接填写完整相对路径")
-      .addText(text => text
-        .setPlaceholder("例如：09 Books/skill/fable")
-        .setValue(draft.skillPath || "")
-        .onChange(value => { draft = { ...draft, skillPath: value }; })
-      );
-
-    new Setting(contentEl)
-      .setName("指令内容")
-      .setDesc("模板模式下是完整指令；Skill 文件模式下是可选的任务补充。支持 {{selection}}、{{content}}、{{book_title}}、{{chapter}}")
-      .addTextArea(text => {
-        text
-          .setPlaceholder("请处理以下阅读内容：\n\n{{selection}}")
-          .setValue(draft.prompt)
-          .onChange(value => { draft = { ...draft, prompt: value }; });
-        text.inputEl.rows = 5;
-        text.inputEl.style.width = "100%";
-        text.inputEl.style.fontFamily = "var(--font-monospace)";
-        text.inputEl.style.fontSize = "12px";
-      });
-
-    const footer = contentEl.createDiv({ cls: "jarvis-smartcmd-modal-footer" });
-    const left = footer.createDiv();
-    const right = footer.createDiv();
-
-    if (this.onDelete) {
-      const deleteBtn = left.createEl("button", { text: "Delete", cls: "mod-warning" });
-      deleteBtn.addEventListener("click", () => {
-        void this.onDelete!().then(() => this.close());
-      });
-    }
-
-    right.createEl("button", { text: "Cancel" }).addEventListener("click", () => this.close());
-    const saveBtn = right.createEl("button", { text: "Save", cls: "mod-cta" });
-    saveBtn.style.marginLeft = "8px";
-    saveBtn.addEventListener("click", () => {
-      const source = draft.source === "skill" ? "skill" : "template";
-      const skillPath = (draft.skillPath || "").trim();
-      if (source === "skill") {
-        try {
-          const skillFilePath = resolveSkillFilePath(skillPath);
-          const skillFile = this.app.vault.getAbstractFileByPath(skillFilePath);
-          if (!(skillFile instanceof TFile)) {
-            new Notice(`找不到 Skill 文件：${skillFilePath}`);
-            return;
-          }
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          new Notice(message);
-          return;
-        }
-      }
-      const toSave: SmartCommand = {
-        ...draft,
-        label: draft.label.trim() || "新指令",
-        description: (draft.description || "").trim(),
-        icon: draft.icon.trim() || "bot",
-        prompt: draft.prompt.trim(),
-        scope: draft.scope || "both",
-        enabled: draft.enabled !== false,
-        source,
-        skillPath
-      };
-      void this.onSave(toSave).then(() => this.close());
-    });
-  }
-
-  onClose(): void {
-    this.contentEl.empty();
-  }
 }

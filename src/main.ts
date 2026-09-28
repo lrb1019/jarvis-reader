@@ -4,8 +4,6 @@ import { resolveSyncConflicts } from "./conflict-resolver";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { WordSidebarView, WORD_SIDEBAR_VIEW_TYPE } from "./sidebar/WordSidebarView";
-import { WordBookView, WORD_BOOK_VIEW_TYPE } from "./word-book/WordBookView";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
 import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
@@ -24,6 +22,8 @@ import { CoverCacheService } from "./cover-cache-service";
 import type { BookCoverCache, BookCoverCacheEntry } from "./types";
 import { HighlightTransactionService, writeExistingRecoveryNote } from "./highlight-transaction-service";
 import { SettingsSaveQueue } from "./settings-save-queue";
+import { removeSmartCommandsWithBackup } from "./smart-command-migration";
+import { removeReviewData } from "./review-migration";
 import { BookStateService } from "./book-state-service";
 import {
   readHighlightSidecar,
@@ -39,7 +39,6 @@ export default class JarvisReaderPlugin extends Plugin {
   declare settings: any;
   bookshelfView: any;
   activeReaderView: any;
-  wordSidebarView: any;
   lastIndexCounts: any;
   wordAssetSidecarUnavailable = false;
   wordAssetService = new WordAssetService(this);
@@ -81,6 +80,7 @@ export default class JarvisReaderPlugin extends Plugin {
     addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
+    await this.migrateReviewData();
     const highlightRecovery = await this.highlightTransactionService.recoverPending();
     if (highlightRecovery.finalized || highlightRecovery.rolledBack) {
       new Notice(`已恢复 ${highlightRecovery.finalized + highlightRecovery.rolledBack} 个未完成的高亮操作。`);
@@ -101,14 +101,6 @@ export default class JarvisReaderPlugin extends Plugin {
       const view = new JarvisReaderBookshelfView(leaf, this);
       this.bookshelfView = view;
       return view;
-    });
-    this.registerView(WORD_SIDEBAR_VIEW_TYPE, (leaf) => {
-      const view = new WordSidebarView(leaf, this);
-      this.wordSidebarView = view;
-      return view;
-    });
-    this.registerView(WORD_BOOK_VIEW_TYPE, (leaf) => {
-      return new WordBookView(leaf, this);
     });
     this.registerView(LIBRARY_VIEW_TYPE, (leaf) => {
       return new LibraryView(leaf, this);
@@ -135,20 +127,6 @@ export default class JarvisReaderPlugin extends Plugin {
         this.openBookshelfPane(true);
       }
     });
-    this.addCommand({
-      id: "open-jarvis-reader-word-sidebar",
-      name: "打开词条侧边栏",
-      callback: () => {
-        this.openWordSidebarPane(true);
-      }
-    });
-    this.addCommand({
-      id: "open-jarvis-reader-word-book",
-      name: "打开词条",
-      callback: () => {
-        this.openWordBook();
-      }
-    });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
       if (file instanceof TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
@@ -170,12 +148,6 @@ export default class JarvisReaderPlugin extends Plugin {
              (l.view as any).setActiveReader(view, null);
           }
         });
-        const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-        wordSidebarLeaves.forEach(l => {
-          if (l.view && typeof (l.view as any).setReader === "function") {
-             (l.view as any).setReader(view);
-          }
-        });
       } else if (view instanceof JarvisReaderBookshelfView) {
         this.bookshelfView = view;
         view.render();
@@ -187,9 +159,6 @@ export default class JarvisReaderPlugin extends Plugin {
         if (epubLeaves.length === 0) {
           const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
           bookshelfLeaves.forEach(leaf => leaf.detach());
-          
-          const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-          wordSidebarLeaves.forEach(leaf => leaf.detach());
           
           this.activeReaderView = null;
         }
@@ -227,51 +196,6 @@ export default class JarvisReaderPlugin extends Plugin {
       }, 50);
     }
   }
-  async openWordSidebarPane(reveal = true, targetAsset: any = null) {
-    let leaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-    if (!leaves.length) {
-      const leaf = this.app.workspace.getRightLeaf(false);
-      if (!leaf)
-        return;
-      await leaf.setViewState({ type: WORD_SIDEBAR_VIEW_TYPE, active: true });
-      leaves = [leaf];
-    }
-    const leaf = leaves[0];
-    if (reveal && leaf && typeof this.app.workspace.revealLeaf === "function") {
-      this.app.workspace.revealLeaf(leaf);
-    }
-    const view = leaf == null ? void 0 : leaf.view;
-    if (view instanceof WordSidebarView) {
-      this.wordSidebarView = view;
-      if (this.activeReaderView) view.setReader(this.activeReaderView);
-      if (targetAsset && typeof (view as any).focusAsset === "function") (view as any).focusAsset(targetAsset);
-      view.render();
-    } else if (leaf) {
-      window.setTimeout(() => {
-        const delayedView = leaf.view;
-        if (delayedView instanceof WordSidebarView) {
-          this.wordSidebarView = delayedView;
-          if (this.activeReaderView) delayedView.setReader(this.activeReaderView);
-          if (targetAsset && typeof (delayedView as any).focusAsset === "function") (delayedView as any).focusAsset(targetAsset);
-          delayedView.render();
-        }
-      }, 50);
-    }
-  }
-
-  async openWordBook() {
-    let leaves = this.app.workspace.getLeavesOfType(WORD_BOOK_VIEW_TYPE);
-    if (!leaves.length) {
-      const leaf = this.app.workspace.getLeaf("split", "vertical");
-      await leaf.setViewState({ type: WORD_BOOK_VIEW_TYPE, active: true });
-      leaves = [leaf];
-    }
-    const leaf = leaves[0];
-    if (leaf && typeof this.app.workspace.revealLeaf === "function") {
-      this.app.workspace.revealLeaf(leaf);
-    }
-  }
-
   async openLibrary() {
     let leaves = this.app.workspace.getLeavesOfType(LIBRARY_VIEW_TYPE);
     if (!leaves.length) {
@@ -290,9 +214,6 @@ export default class JarvisReaderPlugin extends Plugin {
     if (this.bookshelfView && typeof this.bookshelfView.setActiveReader === "function") {
       this.bookshelfView.setActiveReader(reader, preferredPanel);
     }
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(reader);
-    }
   }
   refreshReaderSidebar(reader) {
     if (reader) {
@@ -300,11 +221,6 @@ export default class JarvisReaderPlugin extends Plugin {
     }
     if (this.bookshelfView && typeof this.bookshelfView.render === "function") {
       this.bookshelfView.render();
-    }
-  }
-  refreshWordSidebar(reader) {
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(reader || this.activeReaderView);
     }
   }
   revealHighlightInSidebar(reader, highlightId) {
@@ -328,17 +244,11 @@ export default class JarvisReaderPlugin extends Plugin {
     if (this.bookshelfView && typeof this.bookshelfView.clearActiveReader === "function") {
       this.bookshelfView.clearActiveReader(reader);
     }
-    if (this.wordSidebarView && typeof this.wordSidebarView.setReader === "function") {
-      this.wordSidebarView.setReader(null);
-    }
     setTimeout(() => {
         const epubLeaves = this.app.workspace.getLeavesOfType("epub");
         if (epubLeaves.length === 0) {
             const bookshelfLeaves = this.app.workspace.getLeavesOfType(BOOKSHELF_VIEW_TYPE);
             bookshelfLeaves.forEach(leaf => leaf.detach());
-            
-            const wordSidebarLeaves = this.app.workspace.getLeavesOfType(WORD_SIDEBAR_VIEW_TYPE);
-            wordSidebarLeaves.forEach(leaf => leaf.detach());
         }
     }, 50);
   }
@@ -436,7 +346,9 @@ export default class JarvisReaderPlugin extends Plugin {
     for (const [key, asset] of Object.entries(wordAssets || {})) {
       if (!asset)
         continue;
-      const assetKey = getTranslationAssetStorageKey(asset) || key;
+      const legacyAsset = asset as Record<string, unknown>;
+      const isLegacySentence = key.startsWith("sentence-") || legacyAsset.kind === "sentence" || legacyAsset.isWord === false;
+      const assetKey = getTranslationAssetStorageKey(asset) || (isLegacySentence ? key : "");
       if (assetKey) {
         normalized[assetKey] = getLightWordAsset(asset);
       }
@@ -488,6 +400,17 @@ export default class JarvisReaderPlugin extends Plugin {
       throw error;
     }
   }
+  async migrateReviewData(): Promise<void> {
+    const migration = removeReviewData(this.settings.wordAssets || {}, this.settings);
+    if (!migration.changed) return;
+
+    const adapter = this.app.vault.adapter as SidecarFileAdapter;
+    const paths = this.getIndexSidecarPaths();
+    await writeWordAssetSidecar(adapter, paths.wordAssets, migration.wordAssets);
+    this.settings = migration.settings;
+    await this.saveSettingsData();
+    new Notice("已移除旧复习和长句词条数据。", 10000);
+  }
   async persistWordAssetSidecar(reason = "save") {
     if (this.wordAssetSidecarUnavailable) {
       const message = "词条主数据不可用，已停止词条保存以保护损坏文件。请先恢复 word-assets.json。";
@@ -510,7 +433,6 @@ export default class JarvisReaderPlugin extends Plugin {
     await this.logIndexChange(reason);
   }
   onWordAssetsChanged() {
-    this.refreshWordSidebar(this.activeReaderView);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("jarvis-reader-word-assets-changed"));
     }
@@ -560,7 +482,15 @@ export default class JarvisReaderPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const loadedSettings = await this.loadData() || {};
+    let loadedSettings = await this.loadData() || {};
+    let smartCommandsBackupPath = "";
+    const migration = await removeSmartCommandsWithBackup(loadedSettings, async (content) => {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      smartCommandsBackupPath = `.obsidian/plugins/jarvis-reader/backups/migrations/smart-commands-${timestamp}.json`;
+      await this.ensureAdapterFolder(smartCommandsBackupPath.split("/").slice(0, -1).join("/"));
+      await this.app.vault.adapter.write(smartCommandsBackupPath, content);
+    });
+    loadedSettings = migration.settings;
     const legacyCoverCache: BookCoverCache = loadedSettings.bookCoverCache && typeof loadedSettings.bookCoverCache === "object"
       ? loadedSettings.bookCoverCache as BookCoverCache
       : {};
@@ -625,6 +555,10 @@ export default class JarvisReaderPlugin extends Plugin {
     const sidebarPaneSplit = parseFloat(this.settings.sidebarPaneSplit);
     this.settings.sidebarPaneSplit = Number.isFinite(sidebarPaneSplit) ? Math.min(75, Math.max(25, sidebarPaneSplit)) : 48;
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
+    if (migration.migrated) {
+      await this.saveSettingsData();
+      new Notice(`智能指令已移除，旧配置备份位于：${smartCommandsBackupPath}`, 10000);
+    }
   }
   async saveSettings() {
     // Index sidecars have dedicated services; ordinary settings must not rewrite them.

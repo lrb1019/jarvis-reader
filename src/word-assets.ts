@@ -29,7 +29,7 @@ export const JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
 export const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
-export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词句卡片生成器。
+export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词卡生成器。
 
 【核心任务：语境第一】
 你必须深度分析输入词/短语在<上下文>句子中的精确含义。绝不能生搬硬套词典的首选含义，必须结合语境判断其引申义、比喻义或固定搭配。
@@ -59,7 +59,7 @@ JSON 结构要求：
 选择类型：{{selectionType}}
 上下文：{{sentence}}`;
 
-export const TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。word/phrase 输出词句卡片；sentence 只输出译文且 isWord=false。display 换行请写成 \\n。测试会先校验 JSON 示例。";
+export const TRANSLATION_PROMPT_HELP_TEXT = "必需字段：lemma、translation、display、isWord。word/phrase 输出词卡；sentence 只输出译文且 isWord=false。display 换行请写成 \\n。测试会先校验 JSON 示例。";
 
 export const DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
 
@@ -210,7 +210,6 @@ export function normalizeDictionaryEntry(selectedText: string, key: string, entr
       partOfSpeech: "",
       example: "",
       display: `**中文释义**：${translation}`,
-      isWord: true,
       sourceType: "local-dictionary",
     };
   }
@@ -232,7 +231,6 @@ export function normalizeDictionaryEntry(selectedText: string, key: string, entr
       partOfSpeech,
       example: String(entry.example || "").trim(),
       display: display || translation,
-      isWord: entry.isWord !== false,
       tags: Array.isArray(entry.tags) ? entry.tags : (typeof entry.tag === "string" ? entry.tag.split(" ") : []),
       collins: entry.collins,
       oxford: entry.oxford,
@@ -269,41 +267,24 @@ export async function lookupLocalDictionary(settings: any = {}, selectedText: st
 
 
 
-export function getTranslationAssetKind(assetOrText: any, translation: any = null): TranslationAssetKind {
+export function getTranslationAssetKind(assetOrText: any): TranslationAssetKind {
   const explicit = assetOrText && typeof assetOrText === "object" ? assetOrText.kind : "";
-  if (["word", "phrase", "sentence"].includes(explicit))
-    return explicit as TranslationAssetKind;
-  const isWord = translation && typeof translation.isWord === "boolean" ? translation.isWord : assetOrText && typeof assetOrText === "object" && typeof assetOrText.isWord === "boolean" ? assetOrText.isWord : true;
+  if (explicit === "word" || explicit === "phrase")
+    return explicit;
   const text = assetOrText && typeof assetOrText === "object" ? assetOrText.lemma || assetOrText.quote || "" : assetOrText || "";
-  if (!isWord)
-    return "sentence";
-  const normalized = normalizeWordSelection(text || "");
-  if (normalized && normalized.isPhrase)
-    return "phrase";
-  return "word";
+  return normalizeWordSelection(text || "")?.isPhrase ? "phrase" : "word";
 }
 
 export function getTranslationAssetKey(selection: any, translation: any): string {
-  const kind = getTranslationAssetKind(selection?.quote || "", translation);
-  if (kind !== "sentence") {
-    const normalized = normalizeWordSelection(translation?.lemma || selection?.quote || "");
-    return normalized ? normalized.lemma : "";
-  }
-  const source = `${selection?.cfiRange || ""}|${selection?.quote || ""}`;
-  let hash = 0;
-  for (let index = 0; index < source.length; index++) {
-    hash = (hash * 31 + source.charCodeAt(index)) >>> 0;
-  }
-  return `sentence-${hash.toString(36)}`;
+  if (translation?.isWord === false)
+    return "";
+  return normalizeWordSelection(translation?.lemma || selection?.quote || "")?.lemma || "";
 }
 
 export function getTranslationAssetStorageKey(asset: any): string {
-  if (!asset || !asset.lemma)
+  if (!asset || asset.isWord === false)
     return "";
-  if (getTranslationAssetKind(asset) === "sentence")
-    return asset.lemma;
-  const normalized = normalizeWordSelection(asset.lemma || "");
-  return normalized ? normalized.lemma : asset.lemma;
+  return normalizeWordSelection(asset.lemma || "")?.lemma || "";
 }
 
 
@@ -391,34 +372,32 @@ export function findWordAssetBySurface(assetsMap: Record<string, any>, value: st
   if (direct)
     return direct;
   const target = normalized.surface.toLowerCase();
-  return Object.values(assetsMap).find((asset: any) => getTranslationAssetKind(asset) !== "sentence" && (getWordAssetSurfaceForms(asset).some((form: string) => form.toLowerCase() === target) || isWordInflectionOf(target, asset?.lemma))) || null;
+  return Object.values(assetsMap).find((asset: any) => getWordAssetSurfaceForms(asset).some((form: string) => form.toLowerCase() === target) || isWordInflectionOf(target, asset?.lemma)) || null;
 }
 
 export function buildWordAssetFromSelection(file: TFile, selection: any, translation: any, existingAsset: any = null, settings: any = {}): WordAsset | null {
-  const kind = getTranslationAssetKind(selection?.quote || "", translation);
-  const normalized = kind === "sentence" ? null : normalizeWordSelection(translation?.lemma || selection?.quote || "");
-  const assetKey = kind === "sentence" ? getTranslationAssetKey(selection, translation) : normalized?.lemma || "";
-  if (!assetKey || kind !== "sentence" && !normalized)
+  const normalized = normalizeWordSelection(translation?.lemma || selection?.quote || "");
+  if (!normalized || translation?.isWord === false)
     return null;
+  const kind = normalized.isPhrase ? "phrase" : "word";
+  const assetKey = normalized.lemma;
   const selectedSurface = normalizeWordSelection(selection?.quote || "");
   const now = new Date().toISOString();
   const quote = normalizeHighlightQuote(selection?.quote || "");
-  const title = kind === "sentence" ? quote : normalized?.surface || assetKey;
+  const title = normalized.surface || assetKey;
   const source: WordAssetSource = {
     bookPath: file.path,
     bookTitle: file.basename,
     chapterTitle: selection?.chapterTitle || file.basename,
     cfiRange: selection?.cfiRange || "",
     quote,
-    sentence: selection?.sentence || "",
     created: now,
   };
   const asset: WordAsset = {
     lemma: assetKey,
     title,
     kind,
-    isWord: kind !== "sentence",
-    surfaceForms: kind === "sentence" ? [] : mergeStringList(mergeStringList(existingAsset?.surfaceForms, normalized!.surface), selectedSurface?.surface),
+    surfaceForms: mergeStringList(mergeStringList(existingAsset?.surfaceForms, normalized.surface), selectedSurface?.surface),
     translation: (translation?.translation || existingAsset?.translation || "").trim(),
     phonetic: (translation?.phonetic || existingAsset?.phonetic || "").trim(),
     partOfSpeech: (translation?.partOfSpeech || existingAsset?.partOfSpeech || "").trim(),
@@ -427,7 +406,6 @@ export function buildWordAssetFromSelection(file: TFile, selection: any, transla
     tags: translation?.tags || existingAsset?.tags,
     collins: translation?.collins || existingAsset?.collins,
     oxford: translation?.oxford || existingAsset?.oxford,
-    mastered: !!existingAsset?.mastered,
     sources: mergeWordSources(existingAsset?.sources, source),
     created: existingAsset?.created || now,
     updated: now,
@@ -439,7 +417,6 @@ export function buildWordAssetMetadata(asset: any): WordAsset {
     lemma: asset.lemma || "",
     title: asset.title || "",
     kind: getTranslationAssetKind(asset),
-    isWord: asset.isWord !== false && getTranslationAssetKind(asset) !== "sentence",
     surfaceForms: Array.isArray(asset.surfaceForms) ? asset.surfaceForms : [],
     translation: asset.translation || "",
     display: asset.display || "",
@@ -449,13 +426,7 @@ export function buildWordAssetMetadata(asset: any): WordAsset {
     tags: asset.tags,
     collins: asset.collins,
     oxford: asset.oxford,
-    mastered: !!asset.mastered,
     sources: Array.isArray(asset.sources) ? asset.sources : [],
-    nextReviewDate: asset.nextReviewDate,
-    interval: asset.interval,
-    ease: asset.ease,
-    reviews: asset.reviews,
-    reviewTimeMs: asset.reviewTimeMs,
     created: asset.created || "",
     updated: asset.updated || "",
   };
@@ -481,14 +452,13 @@ function isWordAssetRecord(value: unknown): boolean {
   return typeof value.lemma === "string"
     && typeof value.title === "string"
     && ["word", "phrase", "sentence"].includes(String(value.kind || ""))
-    && typeof value.isWord === "boolean"
+    && (typeof value.isWord === "boolean" || value.isWord === undefined)
     && Array.isArray(value.surfaceForms) && value.surfaceForms.every((form) => typeof form === "string")
     && typeof value.translation === "string"
     && typeof value.display === "string"
     && typeof value.phonetic === "string"
     && typeof value.partOfSpeech === "string"
     && typeof value.example === "string"
-    && typeof value.mastered === "boolean"
     && Array.isArray(value.sources) && value.sources.every(isWordAssetSource)
     && typeof value.created === "string"
     && typeof value.updated === "string";

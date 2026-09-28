@@ -23,7 +23,6 @@ export interface ConflictResolutionHost {
     wordAssets?: WordAssetMap;
     bookHighlights?: BookHighlightsMap;
     readingStats?: SettingsConflictState["readingStats"];
-    wordReviewStats?: SettingsConflictState["wordReviewStats"];
     bookProgress?: SettingsConflictState["bookProgress"];
   };
   wordAssetSidecarUnavailable: boolean;
@@ -77,14 +76,12 @@ export async function createConflictBackup(adapter: ConflictAdapter, files: Conf
 function currentSettingsState(host: ConflictResolutionHost): SettingsConflictState {
   return {
     readingStats: structuredClone(host.settings.readingStats || {}),
-    wordReviewStats: structuredClone(host.settings.wordReviewStats || {}),
     bookProgress: structuredClone(host.settings.bookProgress || {}),
   };
 }
 
 function applySettingsState(host: ConflictResolutionHost, state: SettingsConflictState): void {
   host.settings.readingStats = state.readingStats;
-  host.settings.wordReviewStats = state.wordReviewStats;
   host.settings.bookProgress = state.bookProgress;
 }
 
