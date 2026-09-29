@@ -4,6 +4,7 @@ export interface KnowledgeNoteDraft {
   sourceNotePath: string;
   sourceBlockId: string;
   sourceBookTitle: string;
+  sourceLocationLink?: string;
 }
 
 export interface KnowledgeNoteBodyEntry {
@@ -13,9 +14,16 @@ export interface KnowledgeNoteBodyEntry {
 }
 
 export function buildKnowledgeNoteSourceLink(sourceNotePath: string, sourceBlockId: string): string {
-  return sourceBlockId
-    ? `[[${sourceNotePath}#^${sourceBlockId}]]`
-    : `[[${sourceNotePath}]]`;
+  const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
+  return `[[${target}|返回读书笔记]]`;
+}
+
+export function hasKnowledgeNoteSource(content: string, sourceNotePath: string, sourceBlockId: string): boolean {
+  const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
+  const sectionStart = "## 来源\n\n";
+  const normalized = content.replace(/\r\n/g, "\n");
+  return normalized.includes(`${sectionStart}[[${target}|返回读书笔记]]`)
+    || normalized.includes(`${sectionStart}[[${target}]]`);
 }
 
 export function buildKnowledgeNoteBody(quote: string, entries: KnowledgeNoteBodyEntry[]): string {
@@ -39,8 +47,9 @@ export function buildKnowledgeNoteBody(quote: string, entries: KnowledgeNoteBody
 
 export function buildKnowledgeNoteContent(draft: KnowledgeNoteDraft, createdAt: string): string {
   const source = buildKnowledgeNoteSourceLink(draft.sourceNotePath, draft.sourceBlockId);
+  const location = draft.sourceLocationLink ? `\n\n[返回原文](${draft.sourceLocationLink})` : "";
   const escapeYaml = (value: string) => value.replace(/"/g, "\\\"");
-  return `---\ncreated: ${createdAt}\nauthor: "[[Jarvis]]"\nsource_book: "${escapeYaml(draft.sourceBookTitle)}"\nsource_note: "${escapeYaml(draft.sourceNotePath)}"\nsource_block: "${escapeYaml(draft.sourceBlockId)}"\n---\n\n${draft.body.trim()}\n\n## 来源\n\n${source}\n`;
+  return `---\ncreated: ${createdAt}\nauthor: "[[Jarvis]]"\nsource_book: "${escapeYaml(draft.sourceBookTitle)}"\nsource_note: "${escapeYaml(draft.sourceNotePath)}"\nsource_block: "${escapeYaml(draft.sourceBlockId)}"\n---\n\n${draft.body.trim()}\n\n## 来源\n\n${source}${location}\n`;
 }
 
 export function buildKnowledgeNotePath(folder: string, title: string): string {

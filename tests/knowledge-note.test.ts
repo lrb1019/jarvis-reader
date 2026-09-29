@@ -1,12 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildKnowledgeNoteBody, buildKnowledgeNoteContent, buildKnowledgeNotePath } from "../src/knowledge-note.ts";
+import { buildKnowledgeNoteBody, buildKnowledgeNoteContent, buildKnowledgeNotePath, hasKnowledgeNoteSource } from "../src/knowledge-note.ts";
 
 test("builds an independent note that links to the original book block", () => {
   const content = buildKnowledgeNoteContent({ title: "延迟回报", body: "我的判断", sourceNotePath: "阅读/原子习惯", sourceBlockId: "abc", sourceBookTitle: "原子习惯" }, "2026-07-11");
   assert.doesNotMatch(content, /^# 延迟回报$/m);
-  assert.match(content, /\[\[阅读\/原子习惯#\^abc\]\]/);
+  assert.match(content, /\[\[阅读\/原子习惯#\^abc\|返回读书笔记\]\]/);
   assert.match(content, /我的判断/);
+});
+
+test("keeps the source block link and adds a direct EPUB link when available", () => {
+  const location = "obsidian://jarvis-reader?v=1&book=books%2Ftest.epub&highlight=abc&cfi=epubcfi(%2F6%2F2)";
+  const content = buildKnowledgeNoteContent({
+    title: "延迟回报", body: "我的判断", sourceNotePath: "阅读/原子习惯",
+    sourceBlockId: "abc", sourceBookTitle: "原子习惯", sourceLocationLink: location,
+  }, "2026-07-11");
+  assert.match(content, /## 来源\n\n\[\[阅读\/原子习惯#\^abc\|返回读书笔记\]\]\n\n\[返回原文\]/);
+  assert.ok(content.includes(`[返回原文](${location})`));
+});
+
+test("recognizes both named and existing source block links without matching other blocks", () => {
+  assert.ok(hasKnowledgeNoteSource("## 来源\n\n[[阅读/原子习惯#^abc|返回读书笔记]]", "阅读/原子习惯", "abc"));
+  assert.ok(hasKnowledgeNoteSource("## 来源\r\n\r\n[[阅读/原子习惯#^abc]]", "阅读/原子习惯", "abc"));
+  assert.equal(hasKnowledgeNoteSource("## 来源\n\n[[阅读/原子习惯#^other|返回读书笔记]]", "阅读/原子习惯", "abc"), false);
 });
 
 test("builds a knowledge note body with the quote and every reflection", () => {

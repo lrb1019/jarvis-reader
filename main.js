@@ -53674,6 +53674,34 @@ var import_obsidian3 = require("obsidian");
 
 // src/highlight-core.ts
 init_utils_core();
+
+// src/reading-source-link.ts
+var MAX_PARAMETER_LENGTH = 8192;
+function buildReadingSourceLink(highlight) {
+  const bookPath = highlight.bookPath.trim();
+  const highlightId = (highlight.id || highlight.blockId || "").trim();
+  const cfiRange = highlight.cfiRange.trim();
+  if (!bookPath || !highlightId || !cfiRange) return "";
+  const query = [
+    "v=1",
+    `book=${encodeURIComponent(bookPath)}`,
+    `highlight=${encodeURIComponent(highlightId)}`,
+    `cfi=${encodeURIComponent(cfiRange)}`
+  ].join("&");
+  return `obsidian://jarvis-reader?${query}`;
+}
+function parseReadingSourceTarget(parameters) {
+  if (parameters.v !== "1") return null;
+  const bookPath = String(parameters.book || "").replace(/\+/g, " ").trim();
+  const highlightId = String(parameters.highlight || "").trim();
+  const cfiRange = String(parameters.cfi || "").trim();
+  if (!bookPath || !highlightId || !cfiRange) return null;
+  if ([bookPath, highlightId, cfiRange].some((value) => value.length > MAX_PARAMETER_LENGTH)) return null;
+  if (bookPath.startsWith("/") || bookPath.split("/").some((part) => part === "..") || !bookPath.toLowerCase().endsWith(".epub")) return null;
+  return { bookPath, highlightId, cfiRange };
+}
+
+// src/highlight-core.ts
 function formatBlockquote(text) {
   return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
 }
@@ -53728,10 +53756,13 @@ ${formatLocalDateTime(highlight.updated || highlight.created)}`);
 ${formatBlockquote(secContent)}`;
     }).join("\n");
   }
+  const sourceLink = buildReadingSourceLink(highlight);
+  const sourceLine = sourceLink ? `> [\u8FD4\u56DE\u539F\u6587](${sourceLink})
+` : "";
   return `> [!note] ${title}
 ${quote}
 ${commentBlock}${aiBlock ? aiBlock + "\n" : ""}${timestamp}
-^${highlight.blockId}`;
+${sourceLine}^${highlight.blockId}`;
 }
 function isHighlightNoteBlockStart(line) {
   return /^> \[!(?:quote|note)\]/i.test(line || "");
@@ -55619,6 +55650,16 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
   });
 };
 
+// src/epub-annotations-adapter.ts
+function removeEpubAnnotation(store, cfi, type) {
+  store.remove(cfi, type);
+  for (const section of Object.keys(store._annotationsBySectionIndex)) {
+    store._annotationsBySectionIndex[section] = [...new Set(
+      store._annotationsBySectionIndex[section].filter((key) => Object.hasOwn(store._annotations, key))
+    )];
+  }
+}
+
 // src/EpubReader.tsx
 var import_react2 = __toESM(require_react(), 1);
 var import_obsidian5 = require("obsidian");
@@ -55809,8 +55850,8 @@ var ObsidianMarkdown = ({ text, onOpenLink }) => {
     className: "markdown-preview-view clean-markdown-view"
   });
 };
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
-  const [location, setLocation] = (0, import_react2.useState)(initLocation);
+var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
+  const [location, setLocation] = (0, import_react2.useState)(() => shouldSkipInitialLocation?.() ? null : initLocation);
   const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
   const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
   const [highlightList, setHighlightList] = (0, import_react2.useState)(highlights || []);
@@ -55880,8 +55921,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       if (highlightListRef.current) {
         for (const highlight of highlightListRef.current) {
           if (highlight.cfiRange) {
-            rendition.annotations.remove(highlight.cfiRange, "highlight");
-            rendition.annotations.remove(highlight.cfiRange, "underline");
+            removeEpubAnnotation(rendition.annotations, highlight.cfiRange, "highlight");
+            removeEpubAnnotation(rendition.annotations, highlight.cfiRange, "underline");
           }
         }
       }
@@ -56147,34 +56188,23 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   };
   const applyPendingInitLocation = (rendition) => {
     const targetCfi = pendingInitLocationRef.current;
+    if (shouldSkipInitialLocation?.()) {
+      pendingInitLocationRef.current = null;
+      return;
+    }
     if (!targetCfi || !rendition || typeof rendition.display !== "function") {
       return;
     }
     pendingInitLocationRef.current = null;
     let attempts = 0;
     const maxAttempts = 8;
-    let keepRetrying = true;
     const run = () => {
-      if (!keepRetrying) return;
+      if (rendition.__jarvisReaderSkipInitialLocation) return;
       attempts += 1;
-      Promise.resolve(rendition.display(targetCfi)).catch(() => void 0).finally(() => {
-        if (keepRetrying && attempts < maxAttempts) {
-          window.setTimeout(run, 180);
-        }
+      Promise.resolve(rendition.display(targetCfi)).catch(() => {
+        if (attempts < maxAttempts) window.setTimeout(run, 180);
       });
     };
-    const stopRetry = (relocated) => {
-      const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
-      if (relocatedCfi === targetCfi) {
-        keepRetrying = false;
-        rendition.off("relocated", stopRetry);
-      }
-    };
-    rendition.on("relocated", stopRetry);
-    window.setTimeout(() => {
-      keepRetrying = false;
-      rendition.off("relocated", stopRetry);
-    }, 3e3);
     window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
@@ -56200,8 +56230,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!rendition || !cfiRange)
       return;
     try {
-      rendition.annotations?.remove(cfiRange, "highlight");
-      rendition.annotations?.remove(cfiRange, "underline");
+      removeEpubAnnotation(rendition.annotations, cfiRange, "highlight");
+      removeEpubAnnotation(rendition.annotations, cfiRange, "underline");
       const viewsCollection = typeof rendition.views === "function" ? rendition.views() : null;
       const views = viewsCollection ? typeof viewsCollection.all === "function" ? viewsCollection.all() : viewsCollection : [];
       for (const view of views) {
@@ -56802,8 +56832,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (ids && typeof ids.forEach === "function") {
       ids.forEach((cfiRange) => {
         try {
-          rendition.annotations.remove(cfiRange, "underline");
-          rendition.annotations.remove(cfiRange, "highlight");
+          removeEpubAnnotation(rendition.annotations, cfiRange, "underline");
+          removeEpubAnnotation(rendition.annotations, cfiRange, "highlight");
         } catch (error) {
         }
       });
@@ -57007,12 +57037,17 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     highlightListRef.current = highlights || [];
   }, [highlights]);
   (0, import_react2.useEffect)(() => {
+    if (shouldSkipInitialLocation?.()) {
+      pendingInitLocationRef.current = null;
+      setLocation(null);
+      return;
+    }
     pendingInitLocationRef.current = initLocation;
     if (initLocation) {
       setLocation(initLocation);
       currentLocationRef.current = initLocation;
     }
-  }, [initLocation, bookPath]);
+  }, [initLocation, bookPath, shouldSkipInitialLocation]);
   (0, import_react2.useEffect)(() => {
     highlightListRef.current = highlightList;
     applyHighlights(renditionRef.current, highlightList);
@@ -58085,7 +58120,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
             doc.addEventListener("contextmenu", (event) => {
               const win = contents2?.window;
               const selection = win?.getSelection();
-              const selectionText = selection ? selection.toString().trim() : "";
+              const selectionText = normalizeHighlightQuote(selection?.toString() || "");
               if (selectionText) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -58099,7 +58134,14 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
                   menuY = event.clientY + frameRect.top - containerRect.top;
                 }
                 const activeSel = activeSelectionInfoRef.current;
-                const cfiRange = activeSel && activeSel.quote === selectionText ? activeSel.cfiRange : "";
+                let cfiRange = activeSel?.quote === selectionText ? activeSel.cfiRange : "";
+                if (!cfiRange && selection?.rangeCount) {
+                  try {
+                    cfiRange = contents2.cfiFromRange(selection.getRangeAt(0)) || "";
+                  } catch (error) {
+                    console.warn("Jarvis Reader selection location failed.", error);
+                  }
+                }
                 setPendingHighlightMenu({
                   cfiRange,
                   quote: selectionText,
@@ -58760,7 +58802,14 @@ var ReadingStatsService = class {
 
 // src/knowledge-note.ts
 function buildKnowledgeNoteSourceLink(sourceNotePath, sourceBlockId) {
-  return sourceBlockId ? `[[${sourceNotePath}#^${sourceBlockId}]]` : `[[${sourceNotePath}]]`;
+  const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
+  return `[[${target}|\u8FD4\u56DE\u8BFB\u4E66\u7B14\u8BB0]]`;
+}
+function hasKnowledgeNoteSource(content, sourceNotePath, sourceBlockId) {
+  const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
+  const sectionStart = "## \u6765\u6E90\n\n";
+  const normalized = content.replace(/\r\n/g, "\n");
+  return normalized.includes(`${sectionStart}[[${target}|\u8FD4\u56DE\u8BFB\u4E66\u7B14\u8BB0]]`) || normalized.includes(`${sectionStart}[[${target}]]`);
 }
 function buildKnowledgeNoteBody(quote, entries) {
   const sections = [];
@@ -58790,6 +58839,9 @@ ${noteSections.join("\n\n")}`);
 }
 function buildKnowledgeNoteContent(draft, createdAt) {
   const source = buildKnowledgeNoteSourceLink(draft.sourceNotePath, draft.sourceBlockId);
+  const location = draft.sourceLocationLink ? `
+
+[\u8FD4\u56DE\u539F\u6587](${draft.sourceLocationLink})` : "";
   const escapeYaml = (value) => value.replace(/"/g, '\\"');
   return `---
 created: ${createdAt}
@@ -58803,7 +58855,7 @@ ${draft.body.trim()}
 
 ## \u6765\u6E90
 
-${source}
+${source}${location}
 `;
 }
 function buildKnowledgeNotePath(folder, title) {
@@ -58831,6 +58883,24 @@ async function openFileOnceInActiveTab(workspace, file, viewType) {
   return await openFileInActiveTab(workspace, file);
 }
 
+// src/reader-navigation.ts
+async function displayReadingSource(rendition, target, isCurrent = () => true, nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve()))) {
+  await nextFrame();
+  if (!isCurrent()) return false;
+  await rendition.display(target);
+  if (!isCurrent()) return false;
+  await Promise.all(rendition.getContents().map((contents) => contents.document.fonts?.ready));
+  await nextFrame();
+  if (!isCurrent()) return false;
+  const { width, height } = rendition.manager?.viewSettings ?? {};
+  for (const view of rendition.views().all()) {
+    if (width && height) view.size?.(width, height);
+    view.expand();
+  }
+  await rendition.display(target);
+  return isCurrent();
+}
+
 // src/EpubView.ts
 function getWordAssetsMap(settings) {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
@@ -58851,6 +58921,10 @@ var EpubView = class extends import_obsidian6.FileView {
   readingStatsService = new ReadingStatsService();
   interactionCleanup = null;
   reactRoot = null;
+  renditionReadyResolvers = [];
+  renditionFilePath = "";
+  sourceJumpPending = false;
+  sourceJumpSequence = 0;
   constructor(leaf, settings, plugin) {
     super(leaf);
     this.settings = settings;
@@ -58924,6 +58998,7 @@ var EpubView = class extends import_obsidian6.FileView {
         sourceNotePath: highlight.notePath,
         sourceBlockId: highlight.blockId || highlight.id,
         sourceBookTitle: highlight.bookTitle,
+        sourceLocationLink: buildReadingSourceLink(highlight),
         createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
       });
       await openFileInActiveTab(this.app.workspace, file);
@@ -59142,19 +59217,29 @@ var EpubView = class extends import_obsidian6.FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
   }
-  jumpToHighlight(highlight, skipSidebarRender = false) {
-    if (!highlight || !highlight.cfiRange || !this.currentRendition)
-      return;
+  async jumpToHighlight(highlight, skipSidebarRender = false) {
+    if (!highlight?.cfiRange) throw new Error("\u7F3A\u5C11\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
+    const sequence = ++this.sourceJumpSequence;
+    this.sourceJumpPending = true;
+    const filePath = this.file?.path || "";
+    const rendition = this.currentRendition && this.renditionFilePath === filePath ? this.currentRendition : await new Promise((resolve, reject) => {
+      const onReady = (ready) => {
+        window.clearTimeout(timeout);
+        resolve(ready);
+      };
+      const timeout = window.setTimeout(() => {
+        this.renditionReadyResolvers = this.renditionReadyResolvers.filter((callback) => callback !== onReady);
+        reject(new Error("\u9605\u8BFB\u5668\u52A0\u8F7D\u8D85\u65F6\u3002"));
+      }, 1e4);
+      this.renditionReadyResolvers.push(onReady);
+    });
+    const isCurrent = () => sequence === this.sourceJumpSequence && this.file?.path === filePath && this.currentRendition === rendition;
+    if (!isCurrent()) return;
     this.selectedHighlightId = highlight.id;
-    try {
-      this.currentRendition.display(highlight.cfiRange);
-      this.refreshCurrentHighlightPanes();
-      if (!skipSidebarRender) {
-        this.renderHighlightsPane();
-      }
-    } catch (error) {
-      console.warn("Jarvis Reader jump to highlight failed.", error);
-    }
+    rendition.__jarvisReaderSkipInitialLocation = true;
+    if (!await displayReadingSource(rendition, highlight.cfiRange, isCurrent)) return;
+    this.refreshCurrentHighlightPanes();
+    if (!skipSidebarRender) this.renderHighlightsPane();
   }
   async openHighlightsPane() {
     await this.plugin.openHighlightsPane(this);
@@ -59193,6 +59278,7 @@ var EpubView = class extends import_obsidian6.FileView {
     const statsFile = this.statsBookFile;
     this.statsBookFile = null;
     this.currentRendition = null;
+    this.renditionFilePath = "";
     if (this.themeSyncInterval) {
       window.clearInterval(this.themeSyncInterval);
       this.themeSyncInterval = null;
@@ -59212,36 +59298,39 @@ var EpubView = class extends import_obsidian6.FileView {
     if (statsFile) await this.saveReadingStats(statsFile);
   }
   startThemeSync(rendition) {
-    void this.stopThemeSync().catch((error) => this.reportBackgroundSaveError("\u5207\u6362\u9605\u8BFB\u72B6\u6001", error));
-    this.currentRendition = rendition;
-    this.statsBookFile = this.file;
-    this.statsSaveTimer = window.setInterval(() => {
-      if (this.statsBookFile) {
-        void this.saveReadingStats(this.statsBookFile).catch((error) => this.reportBackgroundSaveError("\u9605\u8BFB\u7EDF\u8BA1", error));
+    void this.stopThemeSync().then(() => {
+      this.currentRendition = rendition;
+      this.renditionFilePath = this.file?.path || "";
+      for (const resolve of this.renditionReadyResolvers.splice(0)) resolve(rendition);
+      this.statsBookFile = this.file;
+      this.statsSaveTimer = window.setInterval(() => {
+        if (this.statsBookFile) {
+          void this.saveReadingStats(this.statsBookFile).catch((error) => this.reportBackgroundSaveError("\u9605\u8BFB\u7EDF\u8BA1", error));
+        }
+      }, 3e4);
+      let lastThemeKey = "";
+      const sync = () => {
+        if (Date.now() - this.lastInteractionTime < 12e4) {
+          const bookPath = this.statsBookFile?.path;
+          if (bookPath) this.readingStatsService.add(bookPath);
+        }
+        const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
+        const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
+        const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
+        const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
+        if (nextThemeKey !== lastThemeKey) {
+          applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight);
+          this.refreshCurrentHighlightPanes();
+          lastThemeKey = nextThemeKey;
+        }
+      };
+      sync();
+      this.themeSyncInterval = window.setInterval(sync, 1e3);
+      if (window.visualViewport) {
+        this.themeSyncViewportHandler = sync;
+        window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
       }
-    }, 3e4);
-    let lastThemeKey = "";
-    const sync = () => {
-      if (Date.now() - this.lastInteractionTime < 12e4) {
-        const bookPath = this.statsBookFile?.path;
-        if (bookPath) this.readingStatsService.add(bookPath);
-      }
-      const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
-      const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
-      const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
-      const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
-      if (nextThemeKey !== lastThemeKey) {
-        applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight);
-        this.refreshCurrentHighlightPanes();
-        lastThemeKey = nextThemeKey;
-      }
-    };
-    sync();
-    this.themeSyncInterval = window.setInterval(sync, 1e3);
-    if (window.visualViewport) {
-      this.themeSyncViewportHandler = sync;
-      window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
-    }
+    }).catch((error) => this.reportBackgroundSaveError("\u5207\u6362\u9605\u8BFB\u72B6\u6001", error));
   }
   async saveReadingStats(file) {
     const bookPath = file.path;
@@ -59334,6 +59423,7 @@ var EpubView = class extends import_obsidian6.FileView {
     return location ? location : null;
   }
   async onLoadFile(file) {
+    this.sourceJumpPending = !!this.plugin.sourceJumpPaths?.has(file.path);
     this.setHeaderMenuVisibility(true);
     await this.stopThemeSync();
     if (this.reactRoot) {
@@ -59372,6 +59462,7 @@ var EpubView = class extends import_obsidian6.FileView {
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
       initLocation: await this.getInitLocation(),
+      shouldSkipInitialLocation: () => this.sourceJumpPending,
       saveLocation: (location) => {
         void this.setInitLocation(location).catch((error) => this.reportBackgroundSaveError("\u9605\u8BFB\u4F4D\u7F6E", error));
       },
@@ -64145,12 +64236,9 @@ function createKnowledgeNoteStorage(vault) {
   return {
     exists: (path) => vault.getAbstractFileByPath(path) !== null,
     findBySource: async (sourceNotePath, sourceBlockId) => {
-      const sourceSection = `## \u6765\u6E90
-
-${buildKnowledgeNoteSourceLink(sourceNotePath, sourceBlockId)}`;
       for (const file of vault.getMarkdownFiles()) {
-        const content = (await vault.cachedRead(file)).replace(/\r\n/g, "\n");
-        if (content.includes(sourceSection)) return file;
+        const content = await vault.cachedRead(file);
+        if (hasKnowledgeNoteSource(content, sourceNotePath, sourceBlockId)) return file;
       }
       return null;
     },
@@ -64750,6 +64838,9 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
+    this.registerObsidianProtocolHandler("jarvis-reader", (parameters) => {
+      void this.openReadingSource(parameters);
+    });
     this.addRibbonIcon("library-big", "\u6253\u5F00\u56FE\u4E66\u5E93", () => {
       this.openLibrary();
     });
@@ -64831,6 +64922,36 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
           delayedView.render();
         }
       }, 50);
+    }
+  }
+  sourceJumpPaths = /* @__PURE__ */ new Set();
+  async openReadingSource(parameters) {
+    const target = parseReadingSourceTarget(parameters);
+    if (!target) {
+      new import_obsidian16.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
+      return;
+    }
+    const file = this.app.vault.getAbstractFileByPath(target.bookPath);
+    if (!(file instanceof import_obsidian16.TFile)) {
+      new import_obsidian16.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
+      return;
+    }
+    const indexed = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
+    const cfiRange = indexed?.cfiRange || target.cfiRange;
+    if (!cfiRange) {
+      new import_obsidian16.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
+      return;
+    }
+    this.sourceJumpPaths.add(target.bookPath);
+    try {
+      const leaf = await openFileOnceInActiveTab(this.app.workspace, file, "epub");
+      if (!(leaf.view instanceof EpubView)) throw new Error("\u9605\u8BFB\u5668\u672A\u80FD\u6253\u5F00\u3002");
+      await leaf.view.jumpToHighlight({ id: indexed?.id || target.highlightId, cfiRange });
+    } catch (error) {
+      console.error("Jarvis Reader source navigation failed.", error);
+      new import_obsidian16.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+    } finally {
+      this.sourceJumpPaths.delete(target.bookPath);
     }
   }
   async openLibrary() {

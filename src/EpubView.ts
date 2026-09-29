@@ -17,6 +17,8 @@ import { ReadingStatsService } from "./reading-stats-service";
 import { buildKnowledgeNoteBody } from "./knowledge-note";
 import { HighlightContentConflictError, type HighlightCommentEntry, type HighlightNoteDetails } from "./book-note-document";
 import { openFileInActiveTab } from "./workspace-navigation";
+import { displayReadingSource } from "./reader-navigation";
+import { buildReadingSourceLink } from "./reading-source-link";
 
 function getWordAssetsMap(settings: any): Record<string, any> {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
@@ -40,6 +42,10 @@ export class EpubView extends FileView {
   readingStatsService = new ReadingStatsService();
   interactionCleanup: (() => void) | null = null;
   reactRoot: Root | null = null;
+  renditionReadyResolvers: Array<(rendition: any) => void> = [];
+  renditionFilePath = "";
+  sourceJumpPending = false;
+  sourceJumpSequence = 0;
 
   constructor(leaf: WorkspaceLeaf, settings: any, plugin: any) {
     super(leaf);
@@ -126,6 +132,7 @@ export class EpubView extends FileView {
         sourceNotePath: highlight.notePath,
         sourceBlockId: highlight.blockId || highlight.id,
         sourceBookTitle: highlight.bookTitle,
+        sourceLocationLink: buildReadingSourceLink(highlight),
         createdAt: new Date().toISOString().slice(0, 10),
       });
       await openFileInActiveTab(this.app.workspace, file);
@@ -359,19 +366,28 @@ export class EpubView extends FileView {
     this.renderHighlightsPane();
   }
 
-  jumpToHighlight(highlight: any, skipSidebarRender = false): void {
-    if (!highlight || !highlight.cfiRange || !this.currentRendition)
-      return;
+  async jumpToHighlight(highlight: any, skipSidebarRender = false): Promise<void> {
+    if (!highlight?.cfiRange) throw new Error("缺少原文定位信息。");
+    const sequence = ++this.sourceJumpSequence;
+    this.sourceJumpPending = true;
+    const filePath = this.file?.path || "";
+    const rendition = this.currentRendition && this.renditionFilePath === filePath
+      ? this.currentRendition
+      : await new Promise<any>((resolve, reject) => {
+        const onReady = (ready: unknown) => { window.clearTimeout(timeout); resolve(ready); };
+        const timeout = window.setTimeout(() => {
+          this.renditionReadyResolvers = this.renditionReadyResolvers.filter((callback) => callback !== onReady);
+          reject(new Error("阅读器加载超时。"));
+        }, 10000);
+        this.renditionReadyResolvers.push(onReady);
+      });
+    const isCurrent = () => sequence === this.sourceJumpSequence && this.file?.path === filePath && this.currentRendition === rendition;
+    if (!isCurrent()) return;
     this.selectedHighlightId = highlight.id;
-    try {
-      this.currentRendition.display(highlight.cfiRange);
-      this.refreshCurrentHighlightPanes();
-      if (!skipSidebarRender) {
-        this.renderHighlightsPane();
-      }
-    } catch (error) {
-      console.warn("Jarvis Reader jump to highlight failed.", error);
-    }
+    (rendition as any).__jarvisReaderSkipInitialLocation = true;
+    if (!await displayReadingSource(rendition, highlight.cfiRange, isCurrent)) return;
+    this.refreshCurrentHighlightPanes();
+    if (!skipSidebarRender) this.renderHighlightsPane();
   }
 
   async openHighlightsPane(): Promise<void> {
@@ -416,6 +432,7 @@ export class EpubView extends FileView {
     const statsFile = this.statsBookFile;
     this.statsBookFile = null;
     this.currentRendition = null;
+    this.renditionFilePath = "";
     if (this.themeSyncInterval) {
       window.clearInterval(this.themeSyncInterval);
       this.themeSyncInterval = null;
@@ -436,16 +453,18 @@ export class EpubView extends FileView {
   }
 
   startThemeSync(rendition: any): void {
-    void this.stopThemeSync().catch((error) => this.reportBackgroundSaveError("切换阅读状态", error));
-    this.currentRendition = rendition;
-    this.statsBookFile = this.file;
-    this.statsSaveTimer = window.setInterval(() => {
-      if (this.statsBookFile) {
-        void this.saveReadingStats(this.statsBookFile).catch((error) => this.reportBackgroundSaveError("阅读统计", error));
-      }
-    }, 30000);
-    let lastThemeKey = "";
-    const sync = () => {
+    void this.stopThemeSync().then(() => {
+      this.currentRendition = rendition;
+      this.renditionFilePath = this.file?.path || "";
+      for (const resolve of this.renditionReadyResolvers.splice(0)) resolve(rendition);
+      this.statsBookFile = this.file;
+      this.statsSaveTimer = window.setInterval(() => {
+        if (this.statsBookFile) {
+          void this.saveReadingStats(this.statsBookFile).catch((error) => this.reportBackgroundSaveError("阅读统计", error));
+        }
+      }, 30000);
+      let lastThemeKey = "";
+      const sync = () => {
       if (Date.now() - this.lastInteractionTime < 120000) {
         const bookPath = this.statsBookFile?.path;
         if (bookPath) this.readingStatsService.add(bookPath);
@@ -459,13 +478,14 @@ export class EpubView extends FileView {
         this.refreshCurrentHighlightPanes();
         lastThemeKey = nextThemeKey;
       }
-    };
-    sync();
-    this.themeSyncInterval = window.setInterval(sync, 1000);
-    if (window.visualViewport) {
-      this.themeSyncViewportHandler = sync;
-      window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
-    }
+      };
+      sync();
+      this.themeSyncInterval = window.setInterval(sync, 1000);
+      if (window.visualViewport) {
+        this.themeSyncViewportHandler = sync;
+        window.visualViewport.addEventListener("resize", this.themeSyncViewportHandler);
+      }
+    }).catch((error) => this.reportBackgroundSaveError("切换阅读状态", error));
   }
 
   async saveReadingStats(file: TFile): Promise<void> {
@@ -571,6 +591,7 @@ export class EpubView extends FileView {
   }
 
   async onLoadFile(file: TFile): Promise<void> {
+    this.sourceJumpPending = !!this.plugin.sourceJumpPaths?.has(file.path);
     this.setHeaderMenuVisibility(true);
     await this.stopThemeSync();
     if (this.reactRoot) {
@@ -610,6 +631,7 @@ export class EpubView extends FileView {
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
       initLocation: await this.getInitLocation(),
+      shouldSkipInitialLocation: () => this.sourceJumpPending,
       saveLocation: (location: string) => { void this.setInitLocation(location).catch((error) => this.reportBackgroundSaveError("阅读位置", error)); },
       saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { void this.setBookProgress(relocated, chapterTitle, rendition).catch((error) => this.reportBackgroundSaveError("阅读进度", error)); },
       tocMemo: (toc: any) => { this.fileToc = toc; this.plugin.refreshReaderSidebar(this); },

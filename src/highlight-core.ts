@@ -1,4 +1,5 @@
 import { formatLocalDateTime } from "./utils-core.ts";
+import { buildReadingSourceLink } from "./reading-source-link.ts";
 import type { BookHighlight } from "./types";
 
 export function formatBlockquote(text: string): string {
@@ -46,10 +47,12 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
     }).join("\n");
   }
 
+  const sourceLink = buildReadingSourceLink(highlight);
+  const sourceLine = sourceLink ? `> [返回原文](${sourceLink})\n` : "";
   return `> [!note] ${title}
 ${quote}
 ${commentBlock}${aiBlock ? aiBlock + "\n" : ""}${timestamp}
-^${highlight.blockId}`;
+${sourceLine}^${highlight.blockId}`;
 }
 
 export function isHighlightNoteBlockStart(line: string): boolean {

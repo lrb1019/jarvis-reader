@@ -42,6 +42,7 @@ test("formats highlight note blocks without leaking template placeholders", () =
   assert.match(block, /> First line/);
   assert.match(block, /> \*\*笔记\*\*/);
   assert.match(block, /\^ar-test$/);
+  assert.match(block, /> \[返回原文\]\(obsidian:\/\/jarvis-reader\?v=1&book=Book\.epub&highlight=h1&cfi=epubcfi/);
   assert.doesNotMatch(block, /\{highlight\./);
 });
 

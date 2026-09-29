@@ -1,3 +1,4 @@
+import { removeEpubAnnotation } from "./epub-annotations-adapter";
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
 import { Notice, setIcon, MarkdownRenderer } from "obsidian";
@@ -25,6 +26,7 @@ export interface EpubReaderProps {
   readerLineHeight: number;
   tocOffset: number;
   initLocation: string | null;
+  shouldSkipInitialLocation?: () => boolean;
   saveLocation: (cfi: string) => void;
   saveProgress: (relocated: any, chapterTitle: string, rendition: any) => void;
   tocMemo: (toc: any) => void;
@@ -198,8 +200,8 @@ const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) =
   });
 };
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
-  const [location, setLocation] = useState<any>(initLocation);
+export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
+  const [location, setLocation] = useState<any>(() => shouldSkipInitialLocation?.() ? null : initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
   const [highlightList, setHighlightList] = useState<any[]>(highlights || []);
@@ -273,8 +275,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
       if (highlightListRef.current) {
         for (const highlight of highlightListRef.current) {
           if (highlight.cfiRange) {
-            rendition.annotations.remove(highlight.cfiRange, "highlight");
-            rendition.annotations.remove(highlight.cfiRange, "underline");
+            removeEpubAnnotation(rendition.annotations, highlight.cfiRange, "highlight");
+            removeEpubAnnotation(rendition.annotations, highlight.cfiRange, "underline");
           }
         }
       }
@@ -543,34 +545,23 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   };
   const applyPendingInitLocation = (rendition) => {
     const targetCfi = pendingInitLocationRef.current;
+    if (shouldSkipInitialLocation?.()) {
+      pendingInitLocationRef.current = null;
+      return;
+    }
     if (!targetCfi || !rendition || typeof rendition.display !== "function") {
       return;
     }
     pendingInitLocationRef.current = null;
     let attempts = 0;
     const maxAttempts = 8;
-    let keepRetrying = true;
     const run = () => {
-      if (!keepRetrying) return;
+      if ((rendition as any).__jarvisReaderSkipInitialLocation) return;
       attempts += 1;
-      Promise.resolve(rendition.display(targetCfi)).catch(() => void 0).finally(() => {
-        if (keepRetrying && attempts < maxAttempts) {
-          window.setTimeout(run, 180);
-        }
+      Promise.resolve(rendition.display(targetCfi)).catch(() => {
+        if (attempts < maxAttempts) window.setTimeout(run, 180);
       });
     };
-    const stopRetry = (relocated: any) => {
-      const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
-      if (relocatedCfi === targetCfi) {
-        keepRetrying = false;
-        rendition.off("relocated", stopRetry);
-      }
-    };
-    rendition.on("relocated", stopRetry);
-    window.setTimeout(() => {
-      keepRetrying = false;
-      rendition.off("relocated", stopRetry);
-    }, 3000);
     window.setTimeout(run, 80);
   };
   const refreshHighlightPanes = (rendition) => {
@@ -596,8 +587,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
     if (!rendition || !cfiRange)
       return;
     try {
-      rendition.annotations?.remove(cfiRange, "highlight");
-      rendition.annotations?.remove(cfiRange, "underline");
+      removeEpubAnnotation(rendition.annotations, cfiRange, "highlight");
+      removeEpubAnnotation(rendition.annotations, cfiRange, "underline");
       const viewsCollection = typeof rendition.views === "function" ? rendition.views() : null;
       const views = viewsCollection ? (typeof viewsCollection.all === "function" ? viewsCollection.all() : viewsCollection) : [];
       for (const view of views) {
@@ -1200,8 +1191,8 @@ const showWordHoverCard = (asset, element) => {
     if (ids && typeof ids.forEach === "function") {
       ids.forEach((cfiRange) => {
         try {
-          rendition.annotations.remove(cfiRange, "underline");
-          rendition.annotations.remove(cfiRange, "highlight");
+          removeEpubAnnotation(rendition.annotations, cfiRange, "underline");
+          removeEpubAnnotation(rendition.annotations, cfiRange, "highlight");
         } catch (error) {
         }
       });
@@ -1405,12 +1396,17 @@ const showWordHoverCard = (asset, element) => {
     highlightListRef.current = highlights || [];
   }, [highlights]);
   useEffect(() => {
+    if (shouldSkipInitialLocation?.()) {
+      pendingInitLocationRef.current = null;
+      setLocation(null);
+      return;
+    }
     pendingInitLocationRef.current = initLocation;
     if (initLocation) {
       setLocation(initLocation);
       currentLocationRef.current = initLocation;
     }
-  }, [initLocation, bookPath]);
+  }, [initLocation, bookPath, shouldSkipInitialLocation]);
   useEffect(() => {
     highlightListRef.current = highlightList;
     applyHighlights(renditionRef.current, highlightList);
@@ -2519,7 +2515,7 @@ const showWordHoverCard = (asset, element) => {
             doc.addEventListener("contextmenu", (event: MouseEvent) => {
               const win = contents?.window;
               const selection = win?.getSelection();
-              const selectionText = selection ? selection.toString().trim() : "";
+              const selectionText = normalizeHighlightQuote(selection?.toString() || "");
               if (selectionText) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -2536,7 +2532,14 @@ const showWordHoverCard = (asset, element) => {
                 }
 
                 const activeSel = activeSelectionInfoRef.current;
-                const cfiRange = (activeSel && activeSel.quote === selectionText) ? activeSel.cfiRange : "";
+                let cfiRange = activeSel?.quote === selectionText ? activeSel.cfiRange : "";
+                if (!cfiRange && selection?.rangeCount) {
+                  try {
+                    cfiRange = contents.cfiFromRange(selection.getRangeAt(0)) || "";
+                  } catch (error) {
+                    console.warn("Jarvis Reader selection location failed.", error);
+                  }
+                }
 
                 setPendingHighlightMenu({
                   cfiRange,

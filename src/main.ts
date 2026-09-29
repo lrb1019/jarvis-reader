@@ -6,6 +6,8 @@ import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
+import { openFileOnceInActiveTab } from "./workspace-navigation";
+import { parseReadingSourceTarget } from "./reading-source-link";
 import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
 import { getLightWordAsset } from "./EpubReader";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
@@ -110,6 +112,9 @@ export default class JarvisReaderPlugin extends Plugin {
     } catch (error) {
       console.log(`registerExtensions epub failed.`);
     }
+    this.registerObsidianProtocolHandler("jarvis-reader", (parameters) => {
+      void this.openReadingSource(parameters);
+    });
     this.addRibbonIcon("library-big", "打开图书库", () => {
       this.openLibrary();
     });
@@ -194,6 +199,37 @@ export default class JarvisReaderPlugin extends Plugin {
           delayedView.render();
         }
       }, 50);
+    }
+  }
+  sourceJumpPaths = new Set<string>();
+
+  async openReadingSource(parameters: Record<string, string>): Promise<void> {
+    const target = parseReadingSourceTarget(parameters);
+    if (!target) {
+      new Notice("原文链接无效或版本不受支持。");
+      return;
+    }
+    const file = this.app.vault.getAbstractFileByPath(target.bookPath);
+    if (!(file instanceof TFile)) {
+      new Notice("找不到原书，可能已移动或删除。");
+      return;
+    }
+    const indexed = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
+    const cfiRange = indexed?.cfiRange || target.cfiRange;
+    if (!cfiRange) {
+      new Notice("这条笔记没有可用的原文定位信息。");
+      return;
+    }
+    this.sourceJumpPaths.add(target.bookPath);
+    try {
+      const leaf = await openFileOnceInActiveTab(this.app.workspace, file, "epub");
+      if (!(leaf.view instanceof EpubView)) throw new Error("阅读器未能打开。");
+      await leaf.view.jumpToHighlight({ id: indexed?.id || target.highlightId, cfiRange });
+    } catch (error) {
+      console.error("Jarvis Reader source navigation failed.", error);
+      new Notice(`无法定位原文：${error instanceof Error ? error.message : "未知错误"}`);
+    } finally {
+      this.sourceJumpPaths.delete(target.bookPath);
     }
   }
   async openLibrary() {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { KnowledgeNoteService, type KnowledgeNoteStorage } from "../src/knowledge-note-service.ts";
+import { hasKnowledgeNoteSource } from "../src/knowledge-note.ts";
 
 interface MemoryFile {
   path: string;
@@ -16,7 +17,7 @@ function createStorage(existing: Array<string | MemoryFile> = []): KnowledgeNote
     folders,
     files,
     exists: (path) => paths.has(path),
-    findBySource: async (sourceNotePath, sourceBlockId) => existingFiles.find((file) => file.content.includes(`[[${sourceNotePath}#^${sourceBlockId}]]`)) || null,
+    findBySource: async (sourceNotePath, sourceBlockId) => existingFiles.find((file) => hasKnowledgeNoteSource(file.content, sourceNotePath, sourceBlockId)) || null,
     createFolder: async (path) => { paths.add(path); folders.push(path); },
     createFile: async (path, content) => {
       paths.add(path);
@@ -43,7 +44,7 @@ test("knowledge note service creates missing folders and a linked Markdown note"
 
   assert.deepEqual(storage.folders, ["知识库", "知识库/想法"]);
   assert.equal(file.path, "知识库/想法/读书笔记.md");
-  assert.match(file.content, /\[\[阅读\/原子习惯#\^abc\]\]/);
+  assert.match(file.content, /\[\[阅读\/原子习惯#\^abc\|返回读书笔记\]\]/);
 });
 
 test("knowledge note service adds a suffix instead of overwriting an existing note", async () => {
@@ -57,6 +58,18 @@ test("knowledge note service returns an existing note for the same source block"
   const existing = {
     path: "知识库/想法/旧标题.md",
     content: "## 来源\n\n[[阅读/原子习惯#^abc]]\n",
+  };
+  const storage = createStorage([existing]);
+  const file = await new KnowledgeNoteService(storage).create(request);
+
+  assert.equal(file, existing);
+  assert.equal(storage.files.length, 0);
+});
+
+test("knowledge note service returns an existing note with the named source link", async () => {
+  const existing = {
+    path: "知识库/想法/新标题.md",
+    content: "## 来源\n\n[[阅读/原子习惯#^abc|返回读书笔记]]\n",
   };
   const storage = createStorage([existing]);
   const file = await new KnowledgeNoteService(storage).create(request);
