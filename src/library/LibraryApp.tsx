@@ -1,13 +1,11 @@
 import * as React from "react";
 import type JarvisReaderPlugin from "../main";
-import { TFile, Notice, MarkdownRenderer, moment } from "obsidian";
+import { TFile, Notice, Menu, moment } from "obsidian";
 import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
 import { getHighlightsForBook } from "../highlights";
 import { confirmDestructiveAction, formatDuration, getBookTotalSeconds } from "../utils";
 import type { BookHighlight, BookProgress } from "../types";
-import { BookBookmarksPanel } from "./BookBookmarksPanel";
-import { BookHighlightsPanel } from "./BookHighlightsPanel";
-import type { LibraryHighlight } from "./library-highlight-core";
+import { ReadingStatsService } from "../reading-stats-service";
 import { openFileOnceInActiveTab } from "../workspace-navigation";
 
 export interface LibraryAppProps {
@@ -49,20 +47,9 @@ function formatDate(dateStr?: string | number): string {
   }
 }
 
-function formatDateTime(dateStr?: string | number): string {
-  if (!dateStr) return "";
-  try {
-    const d = new Date(dateStr);
-    if (!Number.isNaN(d.getTime())) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const hours = String(d.getHours()).padStart(2, "0");
-      const minutes = String(d.getMinutes()).padStart(2, "0");
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
-    }
-  } catch (err) {}
-  return String(dateStr);
+function todayDate(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 interface ObsidianIconProps {
@@ -125,29 +112,19 @@ function formatBookStatus(status: "finished" | "reading" | "unread"): string {
   return status === "finished" ? "已读完" : status === "reading" ? "在读" : "未读";
 }
 
-// Simple Markdown previewer
-const MarkdownText = ({ content, plugin }: { content: string; plugin: JarvisReaderPlugin }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (ref.current) {
-      ref.current.empty();
-      MarkdownRenderer.render(plugin.app, content, ref.current, "", plugin as any).catch(console.error);
-    }
-  }, [content, plugin]);
-  return <div ref={ref} className="jarvis-library-markdown" />;
-};
-
 export function LibraryApp({ plugin }: LibraryAppProps) {
   // Navigation & UI States
-  const [currentView, setCurrentView] = React.useState<"home" | "detail" | "stats">("home");
+  const [currentView, setCurrentView] = React.useState<"home" | "stats">("home");
+  const [timeBook, setTimeBook] = React.useState<TFile | null>(null);
+  const [timeDate, setTimeDate] = React.useState(() => todayDate());
+  const [timeMinutes, setTimeMinutes] = React.useState("30");
+  const [savingTime, setSavingTime] = React.useState(false);
+  const manualStats = React.useRef(new ReadingStatsService());
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
-  const [detailHighlights, setDetailHighlights] = React.useState<LibraryHighlight[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
   const [viewLayout, setViewLayout] = React.useState<"grid" | "list">("grid");
-  const [activeTab, setActiveTab] = React.useState<"highlights" | "bookmarks">("highlights");
-  const [descExpanded, setDescExpanded] = React.useState(false);
   const [showFilters, setShowFilters] = React.useState(false);
   const [showLayoutMenu, setShowLayoutMenu] = React.useState(false);
 
@@ -161,7 +138,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     summary: string;
   }>({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
   const [tagInput, setTagInput] = React.useState("");
-  const [isEditingIntro, setIsEditingIntro] = React.useState(false);
   const [gridCols, setGridCols] = React.useState(6);
   const [selectedGridBook, setSelectedGridBook] = React.useState<string | null>(null);
   const [bookNotesMap, setBookNotesMap] = React.useState<Record<string, TFile>>({});
@@ -228,39 +204,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     };
   }, []);
-
-  React.useEffect(() => {
-    if (!activeBook || currentView !== "detail") {
-      setDetailHighlights([]);
-      return;
-    }
-    let cancelled = false;
-
-    const loadHighlightDetails = async () => {
-      const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
-      const highlights: LibraryHighlight[] = await Promise.all(indexHighlights.map(async (highlight) => {
-        const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
-        if (!(noteFile instanceof TFile)) return highlight;
-        try {
-          const details = await plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
-          return {
-            ...highlight,
-            quote: details.quote || highlight.quote,
-            comment: details.comment,
-            commentEntries: details.commentEntries,
-            aiSections: details.aiSections,
-          } as BookHighlight;
-        } catch (error) {
-          console.warn("Jarvis Reader failed to load library highlight details.", error);
-          return highlight;
-        }
-      }));
-      if (!cancelled) setDetailHighlights(highlights);
-    };
-
-    void loadHighlightDetails();
-    return () => { cancelled = true; };
-  }, [activeBook, currentView, plugin, refreshTrigger]);
 
   // Handle active file syncinges
   React.useEffect(() => {
@@ -775,7 +718,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       radarData,
       topPublishers
     };
-  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache]);
+  }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache, refreshTrigger]);
 
   const handlePrevDate = () => {
     setStatsDate((prev) => {
@@ -859,7 +802,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   // Load Metadata when detail view opens
   React.useEffect(() => {
-    if (!activeBook || currentView !== "detail") return;
+    if (!activeBook) return;
 
     const loadMetadata = () => {
       const noteFile = findBookNote(plugin.app, activeBook, plugin.settings);
@@ -941,12 +884,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     plugin.app.workspace.setActiveLeaf(leaf, { focus: true });
   };
 
-  const openNote = async (file: TFile) => {
-    const progress = getProgress(file);
-    const tocMd = progress?.chapterTitle ? `## ${progress.chapterTitle}` : "";
-    await openOrCreateNote(plugin.app, file, tocMd, plugin.settings);
-  };
-
   const deleteBook = async (file: TFile) => {
     const confirmed = await confirmDestructiveAction(
       plugin.app,
@@ -968,13 +905,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         new Notice(`删除或清理失败：${String(err)}`);
       }
     }
-  };
-
-  // Jump to specific highlight in book
-  const jumpToHighlight = async (file: TFile, highlight: BookHighlight) => {
-    plugin.settings.bookInitLocations[file.path] = highlight.cfiRange;
-    await plugin.saveSettings();
-    await openBook(file);
   };
 
   const extractAllImages = async (file: TFile) => {
@@ -1967,92 +1897,32 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           </div>
         ) : viewLayout === "grid" ? (
           <div className="jarvis-library-grid" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
-            {filteredBooks.map((book, i) => {
-              const { title, author } = parseBookInfo(book);
+            {filteredBooks.map((book) => {
+              const { title } = parseBookInfo(book);
               const progress = getProgress(book);
               const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
               const cover = getCover(book);
-              const creator = cover?.creator || author;
-              const highlightsCount = getHighlightsForBook(plugin.settings, book.path).length;
-
-              // Real Metadata from Note
-              const noteFile = bookNotesMap[book.path];
-              let fm: any = {};
-              if (noteFile) {
-                const cache = plugin.app.metadataCache.getFileCache(noteFile);
-                fm = cache?.frontmatter || {};
-              }
-              const bookStatus = formatBookStatus(resolveBookStatus(fm, percentage));
-              const rating = fm.rating ? `评分 ${fm.rating}` : "暂无评分";
-              const tags = Array.isArray(fm.tags) ? fm.tags.slice(0, 3) : [];
-              const startDate = fm.start_date || "";
-              const finishDate = fm.finish_date || "";
-              const displayDate = finishDate ? `读完 ${finishDate}` : startDate ? `开始 ${startDate}` : `加入 ${formatDate(book.stat.ctime).split(' ')[0]}`;
-
               const isSelected = selectedGridBook === book.path;
-              const isLastCol = (i % gridCols) === (gridCols - 1);
-
               return (
-                <div key={book.path} style={{ position: 'relative' }}>
-                  {/* Invisible placeholder to rigidly hold the grid cell size */}
-                  <div className="jarvis-library-book-card" style={{ visibility: 'hidden', pointerEvents: 'none', margin: 0 }}>
-                    <div className="book-card-cover-wrap"></div>
-                    <div className="book-card-title">{title}</div>
-                  </div>
-
-                  {/* Actual interactive card */}
-                  <div 
-                    className={`jarvis-library-book-card ${isSelected ? 'is-selected' : ''}`} 
-                    style={isSelected 
-                      ? { position: 'absolute', top: 0, left: isLastCol ? 'auto' : 0, right: isLastCol ? 0 : 'auto', width: 'calc(200% + 20px)', height: 'max-content' } 
-                      : { position: 'absolute', top: 0, left: 0, width: '100%' }
-                    }
-                    onClick={() => setSelectedGridBook(isSelected ? null : book.path)}
-                    onDoubleClick={() => openBook(book)}
-                    title={isSelected ? "双击直接开始阅读" : "单击查看详情，双击开始阅读"}
-                  >
+                <div key={book.path} className={`jarvis-library-book-card ${isSelected ? 'is-selected' : ''}`}
+                  onClick={() => setSelectedGridBook(book.path)}
+                  onDoubleClick={() => openBook(book)}
+                  onContextMenu={(event) => { event.preventDefault(); showBookMenu(book, event); }}
+                  tabIndex={0} role="button" aria-label={title} aria-pressed={isSelected}
+                  onKeyDown={(event) => { if (event.target !== event.currentTarget) return; if (event.key === "Enter") { event.preventDefault(); void openBook(book); } else if (event.key === " ") { event.preventDefault(); setSelectedGridBook(book.path); } }}>
                   <div className="book-card-cover-wrap">
-                    {cover?.dataUrl ? (
-                      <img src={cover.dataUrl} alt={title} className="book-card-cover" />
-                    ) : (() => {
-                      let hash = 0;
-                      for (let j = 0; j < title.length; j++) hash = title.charCodeAt(j) + ((hash << 5) - hash);
-                      const hue = Math.abs(hash) % 360;
-                      const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-                      return (
-                        <div className="book-card-cover-placeholder" style={{ background: gradientBg }}>
-                          <span className="placeholder-title">{title.substring(0, 8)}</span>
-                        </div>
-                      );
-                    })()}
-                    {!isSelected && percentage > 0 && (
-                      <span className="pure-cover-progress">{percentage}%</span>
+                    {cover?.dataUrl ? <img src={cover.dataUrl} alt={title} className="book-card-cover" /> : (
+                      <div className="book-card-cover-placeholder"><span className="placeholder-title">{title}</span></div>
                     )}
                   </div>
-                  {isSelected && (
-                    <div className="book-card-info" style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-normal)' }}>
-                      <h4 className="book-card-title" title={title} style={{ fontWeight: 'normal', fontSize: '16px', margin: 0 }}>{title}</h4>
-                      <p className="book-card-author" style={{ color: 'var(--text-muted)', margin: 0, fontSize: '13px' }}>{creator}</p>
-                      
-                      <div className="book-card-meta-list" style={{ marginTop: 'auto', fontSize: '12px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <div>状态：{bookStatus}</div>
-                        <div>评分：{rating}</div>
-                        {tags.length > 0 && <div>标签：{tags.map((t: string) => `#${t}`).join(' ')}</div>}
-                        <div>数据：笔记 {highlightsCount} · 时长 {formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))}</div>
-                        <div>时间：{displayDate}</div>
-                      </div>
-
-                      <div className="book-card-grid-actions" style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                        <button className="jarvis-library-btn btn-primary" onClick={(e) => { e.stopPropagation(); openBook(book); }} style={{ flex: 1, padding: "6px 0", fontSize: "12px", justifyContent: 'center' }}>
-                          {percentage > 0 ? "继续阅读" : "开始阅读"}
-                        </button>
-                        <button className="jarvis-library-btn btn-secondary" onClick={(e) => { e.stopPropagation(); setActiveBook(book); setCurrentView("detail"); }} style={{ flex: 1, padding: "6px 0", fontSize: "12px", justifyContent: 'center' }}>
-                          查看详情
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  <div className="book-card-footer">
+                    <span>{percentage}%</span>
+                    <button className="book-card-menu" aria-label={`书籍选项：${title}`}
+                      onClick={(event) => { event.stopPropagation(); showBookMenu(book, event); }}
+                      onDoubleClick={(event) => event.stopPropagation()}>
+                      <ObsidianIcon name="ellipsis" />
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -2117,7 +1987,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                     <tr 
                       key={book.path} 
                       className="jarvis-library-table-row" 
-                      onClick={() => { setActiveBook(book); setCurrentView("detail"); }} 
+                      onClick={() => setSelectedGridBook(book.path)}
+                      onDoubleClick={() => openBook(book)}
+                      onContextMenu={(event) => { event.preventDefault(); showBookMenu(book, event); }}
                       style={{ cursor: 'pointer', borderBottom: '1px solid var(--background-modifier-border)' }}
                     >
                       <td style={{ padding: '12px 8px' }}>
@@ -2164,10 +2036,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     );
   };
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
+  const coverUploadBook = React.useRef<TFile | null>(null);
 
   const handleCustomCoverUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !activeBook) return;
+    const uploadBook = coverUploadBook.current;
+    if (!file || !uploadBook) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -2198,7 +2072,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           if (!folderAbstract) {
              try { await plugin.app.vault.createFolder(targetFolder); } catch (e) {}
           }
-          const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
+          const baseName = uploadBook.basename.replace(/[\\/:*?"<>|]/g, "_");
           const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
           
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
@@ -2214,7 +2088,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           }
           
           if (targetFile instanceof TFile) {
-            const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
+            const key = `${uploadBook.path}|${uploadBook.stat?.mtime || 0}|${uploadBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
             const nextEntry = {
               ...existingCache,
@@ -2235,112 +2109,30 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     }
   };
 
-  // Render Detail
-  const renderDetail = () => {
-    if (!activeBook) return null;
-    const { title, author } = parseBookInfo(activeBook);
-    const progress = getProgress(activeBook);
-    const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-    const cover = getCover(activeBook);
-    const highlights = detailHighlights;
-    const bookmarks = plugin.settings.bookBookmarks?.[activeBook.path] || [];
+  const showBookMenu = (book: TFile, event: React.MouseEvent) => {
+    setSelectedGridBook(book.path);
+    const menu = new Menu();
+    menu.addItem(item => item.setTitle("编辑阅读资料").setIcon("sliders-horizontal").onClick(() => setActiveBook(book)));
+    menu.addItem(item => item.setTitle("更换封面").setIcon("image").onClick(() => {
+      coverUploadBook.current = book;
+      hiddenFileInput.current?.click();
+    }));
+    menu.addItem(item => item.setTitle("补录阅读时长").setIcon("clock").onClick(() => {
+      setTimeDate(todayDate());
+      setTimeMinutes("30");
+      setTimeBook(book);
+    }));
+    menu.addSeparator();
+    menu.addItem(item => item.setTitle("删除").setIcon("trash").onClick(() => { void deleteBook(book); }));
+    const rect = event.currentTarget.getBoundingClientRect();
+    menu.showAtPosition({ x: event.type === "contextmenu" ? event.clientX : rect.left, y: event.type === "contextmenu" ? event.clientY : rect.bottom });
+  };
 
-    // Placeholder gradient
-    let hash = 0;
-    for (let i = 0; i < title.length; i++) {
-      hash = title.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const hue = Math.abs(hash) % 360;
-    const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-
-    // Strip/display description
-    const rawDesc = cover?.description || "";
-    const description = rawDesc ? stripHtml(rawDesc) : "暂无书籍简介。可在阅读过程中自动拉取或更新简介。";
-    const creator = cover?.creator || author;
-    const publisher = cover?.publisher || "";
-    const pubdateRaw = cover?.pubdate || "";
-    const pubdate = pubdateRaw ? pubdateRaw.split('T')[0] : "";
-
-    return (
-      <div className="jarvis-library-detail">
-        {/* Navigation / Back Header */}
-        <div className="jarvis-library-detail-nav">
-          <button className="jarvis-library-back-btn" onClick={() => { setCurrentView("home"); setActiveBook(null); }}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            返回书架
-          </button>
-          <div className="jarvis-library-detail-actions">
-            <button className="jarvis-library-btn btn-warning" onClick={() => deleteBook(activeBook)}>
-              删除图书
-            </button>
-          </div>
-        </div>
-
-        {/* Top Info section */}
-        <div className="jarvis-library-detail-header">
-          <div className="detail-header-cover-side" style={{ position: "relative" }} onClick={() => hiddenFileInput.current?.click()}>
-            <input type="file" accept="image/*" ref={hiddenFileInput} onChange={handleCustomCoverUpload} style={{ display: "none" }} />
-            <div className="cover-hover-overlay" style={{
-              position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-              background: "rgba(0,0,0,0.5)", color: "white",
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              opacity: 0, transition: "opacity 0.2s", cursor: "pointer", borderRadius: "8px", zIndex: 10
-            }} onMouseEnter={(e) => e.currentTarget.style.opacity = "1"} onMouseLeave={(e) => e.currentTarget.style.opacity = "0"}>
-               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: "8px" }}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-               <span style={{ fontWeight: 600 }}>更换封面</span>
-               <span style={{ fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }}>
-                 推荐比例 2:3<br/>
-                 (建议 600×900 及以上)
-               </span>
-            </div>
-            {cover?.dataUrl ? (
-              <img src={cover.dataUrl} alt={title} className="detail-cover" />
-            ) : (
-              <div className="detail-cover-placeholder" style={{ background: gradientBg }}>
-                <span className="placeholder-title">{title}</span>
-                <span className="placeholder-format">{activeBook.extension.toUpperCase()}</span>
-              </div>
-            )}
-          </div>
-          <div className="detail-header-info-side">
-            <h2 className="detail-book-title">{title}</h2>
-            <div className="detail-book-meta-row">
-              <span className={`book-format-badge format-${activeBook.extension.toLowerCase()}`}>
-                {activeBook.extension.toUpperCase()}
-              </span>
-              <span className="detail-meta-text">作者: {creator}</span>
-              {publisher && <span className="detail-meta-text">出版社: {publisher}</span>}
-              {pubdate && <span className="detail-meta-text">出版日期: {pubdate}</span>}
-            </div>
-
-            {/* Reading progress board */}
-            <div className="detail-progress-board">
-              <div className="detail-progress-stat">
-                <span className="progress-stat-value">{percentage}%</span>
-                <span className="progress-stat-label">
-                  {percentage >= 99 ? "已读完" : "当前位置"}
-                </span>
-              </div>
-              <div className="detail-progress-divider" />
-              <div className="detail-progress-stat">
-                <span className="progress-stat-value">{highlights.length}</span>
-                <span className="progress-stat-label">笔记</span>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="detail-action-buttons" style={{ display: 'flex', gap: '12px', width: '100%', flexWrap: 'wrap' }}>
-              <button className="jarvis-library-btn btn-primary" onClick={() => openBook(activeBook)} style={{ flex: 1, minWidth: '120px' }}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                {percentage > 0 ? "继续阅读" : "开始阅读"}
-              </button>
-              <button className="jarvis-library-btn btn-secondary" onClick={() => openOrCreateNote(plugin.app, activeBook, "", plugin.settings)} style={{ flex: 1, minWidth: '120px' }}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
-                打开笔记文件
-              </button>
-            </div>
-
-            {/* Interactive Metadata Editor */}
+  const renderBookEditor = () => activeBook ? (
+    <div className="jarvis-book-editor-backdrop" onClick={() => setActiveBook(null)}>
+      <div className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="编辑阅读资料"
+        onClick={event => event.stopPropagation()} onKeyDown={event => { if (event.key === "Escape") setActiveBook(null); }}>
+        <div className="jarvis-book-editor-header"><h3>编辑阅读资料</h3><button aria-label="关闭" onClick={() => setActiveBook(null)}>×</button></div>
             <div className="detail-metadata-editor">
               <div className="metadata-row">
                 <span className="metadata-label">状态</span>
@@ -2409,72 +2201,40 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Book introduction (Right column) */}
-          <div className="detail-header-intro-side" onDoubleClick={() => setIsEditingIntro(true)}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h4 style={{ margin: 0 }}>书籍简介</h4>
-              {!isEditingIntro && (
-                <span style={{ fontSize: '12px', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setIsEditingIntro(true)}>
-                  ✏️ 自定义
-                </span>
-              )}
-            </div>
-            <div className="detail-intro-scroll">
-              {isEditingIntro ? (
-                <textarea
-                  className="metadata-textarea"
-                  defaultValue={bookMetadata.summary || (rawDesc ? stripHtml(rawDesc) : "")}
-                  autoFocus
-                  onBlur={(e) => {
-                    handleUpdateMetadata("summary", e.target.value);
-                    setIsEditingIntro(false);
-                  }}
-                  placeholder="在这里输入您自己的简介或笔记摘要..."
-                />
-              ) : (
-                <p style={{ cursor: 'pointer' }} onClick={() => setIsEditingIntro(true)} title="点击或双击编辑简介">
-                  {bookMetadata.summary || description || "暂无书籍简介"}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Tab switcher */}
-        <div className="jarvis-library-detail-tabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="detail-tab-group">
-            <button className={`detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`} onClick={() => setActiveTab("highlights")}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"></path><polyline points="15 3 15 9 21 9"></polyline></svg>
-              笔记 ({highlights.length})
-            </button>
-            <button className={`detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`} onClick={() => setActiveTab("bookmarks")}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
-              书签 ({bookmarks.length})
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom Tab Content */}
-        <div className="jarvis-library-detail-content">
-          {activeTab === "highlights" ? (
-            <BookHighlightsPanel plugin={plugin} book={activeBook} title={title} highlights={highlights} onJump={jumpToHighlight} />
-          ) : <BookBookmarksPanel plugin={plugin} book={activeBook} bookmarks={bookmarks} />}
-        </div>
       </div>
-    );
-  };
+    </div>
+  ) : null;
 
   return (
     <div className="jarvis-library-app">
       {currentView === "home" ? (
         renderHome()
-      ) : currentView === "detail" ? (
-        renderDetail()
       ) : (
         renderStatsView()
       )}
+      <input type="file" accept="image/*" ref={hiddenFileInput} onChange={handleCustomCoverUpload} style={{ display: "none" }} />
+      {renderBookEditor()}
+      {timeBook && <div className="jarvis-book-editor-backdrop" onClick={() => { if (!savingTime) setTimeBook(null); }}>
+        <form className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="补录阅读时长"
+          onClick={event => event.stopPropagation()} onSubmit={async event => {
+            event.preventDefault();
+            if (savingTime) return;
+            setSavingTime(true);
+            try {
+              const stats = plugin.settings.readingStats || (plugin.settings.readingStats = {});
+              await manualStats.current.recordManual(timeBook.path, timeDate, Number(timeMinutes), stats, () => plugin.saveSettings());
+              setRefreshTrigger(value => value + 1);
+              setTimeBook(null);
+              new Notice("阅读时长已补录");
+            } catch (error) { new Notice(`补录失败：${String(error)}`); }
+            finally { setSavingTime(false); }
+          }}>
+          <h3>补录阅读时长</h3>
+          <div className="metadata-row"><label htmlFor="jr-reading-date">日期</label><input id="jr-reading-date" type="date" required value={timeDate} onChange={event => setTimeDate(event.target.value)} /></div>
+          <div className="metadata-row"><label htmlFor="jr-reading-minutes">分钟</label><input id="jr-reading-minutes" type="number" min="1" max="1440" step="1" required value={timeMinutes} onChange={event => setTimeMinutes(event.target.value)} /></div>
+          <div className="jarvis-book-editor-header"><button type="button" disabled={savingTime} onClick={() => setTimeBook(null)}>取消</button><button type="submit" disabled={savingTime}>保存</button></div>
+        </form>
+      </div>}
       {renderDebugModal()}
     </div>
   );

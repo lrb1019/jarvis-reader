@@ -2152,6 +2152,19 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   mix-blend-mode: multiply;
 }
 
+/* Screen keeps theme text readable while colored marks stand out on dark pages. */
+.theme-dark .jarvis-reader-epub .epub-view > svg {
+  mix-blend-mode: screen;
+}
+
+.theme-dark .jarvis-reader-epub g.jarvis-reader-highlight rect {
+  fill-opacity: 0.48;
+}
+
+.theme-dark .jarvis-reader-epub g.jarvis-reader-highlight-with-comment-bg rect {
+  fill-opacity: 0.35;
+}
+
 .jarvis-reader-epub g.jarvis-reader-highlight rect,
 .jarvis-reader-epub g.jarvis-reader-highlight-with-comment-bg rect {
   rx: 3px;
@@ -2179,6 +2192,7 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-library-app {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -2464,6 +2478,7 @@ g.jarvis-reader-highlight-with-comment line {
 
 .jarvis-library-book-card {
   display: flex;
+  align-self: start;
   flex-direction: column;
   width: 100%;
   cursor: pointer;
@@ -2476,20 +2491,89 @@ g.jarvis-reader-highlight-with-comment line {
 }
 
 .jarvis-library-book-card:hover {
-  transform: translateY(-4px);
+  border-color: var(--background-modifier-border-hover);
 }
 
 .jarvis-library-book-card.is-selected {
-  flex-direction: row;
-  z-index: 50;
-  background-color: var(--background-secondary);
-  border: 1px solid var(--interactive-accent);
-  border-radius: 12px;
-  padding: 14px;
-  gap: 16px;
-  transform: none !important; /* Reset hover transform */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: var(--interactive-accent);
 }
+
+.book-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.book-card-menu {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0;
+  padding: 2px 4px;
+  color: var(--text-muted);
+}
+
+.book-card-menu svg { width: 18px; height: 18px; }
+
+.jarvis-book-editor-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jarvis-book-editor {
+  box-sizing: border-box;
+  width: min(280px, calc(100% - 24px));
+  min-width: 0;
+  max-height: 85%;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  background: var(--background-primary);
+}
+
+.jarvis-book-editor-header { display: flex; align-items: center; justify-content: space-between; }
+.jarvis-book-editor h3 { margin: 0 0 8px; font-size: 14px; }
+.jarvis-book-editor-header h3 { margin: 0; }
+.jarvis-book-editor button { height: 26px; padding: 3px 8px; font-size: 12px; box-shadow: none; }
+.jarvis-book-editor-header button[aria-label="关闭"] { width: 24px; height: 24px; padding: 0; }
+
+.jarvis-book-editor .detail-metadata-editor {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 0;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+}
+
+.jarvis-book-editor .metadata-row { min-width: 0; gap: 8px; }
+.jarvis-book-editor .metadata-label,
+.jarvis-book-editor .metadata-row > label { width: 28px; flex-shrink: 0; font-size: 12px; text-align: left; }
+form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
+
+.jarvis-book-editor .metadata-row input,
+.jarvis-book-editor .metadata-row select {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 0;
+  max-width: 100%;
+  flex: 1 1 0;
+  height: 26px;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
+.jarvis-book-editor .metadata-stars { flex-wrap: wrap; gap: 4px; }
+.jarvis-book-editor .metadata-star { font-size: 16px; line-height: 24px; }
+.jarvis-book-editor .metadata-value { height: 24px !important; font-size: 12px !important; }
 
 .book-card-cover-wrap {
   position: relative;
@@ -2503,11 +2587,6 @@ g.jarvis-reader-highlight-with-comment line {
   transition: all 0.2s ease;
 }
 
-.jarvis-library-book-card.is-selected .book-card-cover-wrap {
-  width: calc(50% - 8px);
-  height: auto;
-  aspect-ratio: 2 / 3;
-}
 
 .jarvis-library-book-card:hover .book-card-cover-wrap {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);

@@ -1,12 +1,21 @@
 # Jarvis Reader
 
-Current version: 1.4.0
+Current version: 1.4.1
 
 [中文说明](./README.md) | English
 
 Jarvis Reader connects EPUB reading with Obsidian knowledge: keep highlights and reflections in Markdown, link them to other notes, and return from notes to the source text. Offline definitions, AI translation, and word or phrase collection support this reading workflow.
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
+## v1.4.1
+
+- Single-click selects a book; double-click opens it. Removed expanded cards and the separate detail page; progress and a management menu sit below each cover.
+- The menu offers reading metadata, cover replacement, manual reading time, and deletion, with compact editing dialogs.
+- Manual minutes are added to the selected date, rolled back on save failure, and serialized with automatic recording.
+- Improved dark-theme annotation visibility while keeping reading text and background consistent with the theme; removed redundant bookmark hover tips.
+
+**Upgrade impact:** No new migration or cleanup of existing notes, bookmarks, progress, or statistics. Manual time changes statistics only after saving. The full theme matrix and BRAT clean installation/upgrade have not been tested in Obsidian.
 
 ## v1.4.0
 
@@ -96,7 +105,7 @@ See the [acceptance record](./docs/plans/2026-09-30%20阅读体验收尾验收.m
 - **Frontmatter status sync**: Reading status, rating, and tags align with the corresponding Markdown book note.
 - **Immersive EPUB reading**: Central controls for font size, line height, character and word spacing, indentation, and width; one or two paginated columns, single-column scrolling, contents, and location recovery.
 - **Highlights and notes**: Create plain highlights, write notes, append notes, open the corresponding Markdown block, filter in the sidebar, and jump back to the source text.
-- **Reading bookmarks**: Add bookmarks in the reader and jump back to precise EPUB CFI locations from the reading sidebar or book detail page.
+- **Reading bookmarks**: Add bookmarks in the reader and jump back to precise EPUB CFI locations from the reading sidebar.
 - **Offline lookup and AI translation**: Single words are looked up through bundled ECDICT first; phrases, sentences, and misses require explicit AI translation.
 - **Lightweight vocabulary collection**: Explicitly save words and phrases with definitions and sources; no review system or standalone word book.
 - **Markdown word recognition**: Saved words can be recognized in the current CodeMirror viewport of normal Markdown notes.

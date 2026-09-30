@@ -197,7 +197,6 @@ export class JarvisReaderBookshelfView extends ItemView {
       const item = list.createDiv({ cls: "jarvis-reader-bookmark-item" });
       item.setAttribute("role", "button");
       item.setAttribute("tabindex", "0");
-      item.setAttribute("aria-label", `跳转到书签：${bookmark.title}`);
       const content = item.createDiv({ cls: "jarvis-reader-bookmark-content" });
       content.createDiv({ cls: "jarvis-reader-bookmark-title", text: bookmark.title || "未知章节" });
       content.createDiv({ cls: "jarvis-reader-bookmark-meta", text: new Date(bookmark.created).toLocaleString() });
