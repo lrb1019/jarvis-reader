@@ -1,6 +1,6 @@
 # Jarvis Reader
 
-Latest published version: 1.3.4. The feature guide below describes the unpublished `main` development branch.
+Current version: 1.4.0
 
 [中文说明](./README.md) | English
 
@@ -8,7 +8,7 @@ Jarvis Reader connects EPUB reading with Obsidian knowledge: keep highlights and
 
 Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
-## Development branch (unreleased)
+## v1.4.0
 
 - Central reading settings cover font size, line height, character and word spacing, paragraph indentation, content width, one or two columns, and pagination or scrolling. Narrow views fall back to one column; sidebar changes trigger pagination resizing.
 - Three reader shortcuts for bookmarks, book notes, and settings appear on hover and hide when idle. Page-turn controls appear at the left and right edges on hover.
@@ -17,9 +17,9 @@ Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works w
 - Book notes and newly created knowledge notes include EPUB source links; knowledge notes use concise source labels.
 - Smart commands, review and mastery state, the standalone word book, and the vocabulary sidebar have been removed. Only explicitly collected words and phrases are saved; sentences can be translated but are not vocabulary assets.
 
-**Upgrade impact:** the development branch removes legacy review fields, mastery state, and sentence assets. Legacy smart-command settings are backed up before removal. Back up plugin data and vocabulary indexes before upgrading. Book Markdown, knowledge notes, and retained words and phrases are outside this cleanup.
+**Upgrade impact:** 1.4.0 removes legacy review fields, mastery state, and sentence assets. Legacy smart-command settings are backed up before removal. Back up plugin data and vocabulary indexes before upgrading. Book Markdown, knowledge notes, and retained words and phrases are outside this cleanup.
 
-See the [acceptance record](./docs/plans/2026-09-30%20阅读体验收尾验收.md) for coverage and limitations. The published version remains 1.3.4; pushing source does not deliver a BRAT update.
+See the [acceptance record](./docs/plans/2026-09-30%20阅读体验收尾验收.md) for coverage and limitations. This version is published for everyday reading at the user’s request. Clean installation, full BRAT upgrade acceptance, and real API calls have not been fully verified.
 
 ## v1.3.4
 
