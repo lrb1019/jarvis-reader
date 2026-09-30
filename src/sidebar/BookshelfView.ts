@@ -1,8 +1,7 @@
-import { ItemView, WorkspaceLeaf, TFile, Notice } from "obsidian";
+import { ItemView, WorkspaceLeaf, TFile, Notice, setIcon, Menu } from "obsidian";
 import { EpubView } from "../EpubView";
 import { HighlightsPanelController } from "./HighlightsView";
 import type { BookBookmark } from "../types";
-import { confirmDestructiveAction } from "../utils";
 import type JarvisReaderPlugin from "../main";
 
 declare global {
@@ -20,8 +19,6 @@ export function isReadableBook(file: any) {
 export class JarvisReaderBookshelfView extends ItemView {
   plugin: JarvisReaderPlugin;
   activePanel: string;
-  activeNavigationPanel: "toc" | "bookmarks";
-  dualHighlightsMode: boolean;
   panelScroll: Record<string, number>;
   pendingRevealHighlightId: string | null;
   highlightsPanel: HighlightsPanelController | null;
@@ -34,8 +31,6 @@ export class JarvisReaderBookshelfView extends ItemView {
     super(leaf);
     this.plugin = plugin;
     this.activePanel = "toc";
-    this.activeNavigationPanel = "toc";
-    this.dualHighlightsMode = false;
     this.panelScroll = { toc: 0, bookmarks: 0, highlights: 0 };
     this.pendingRevealHighlightId = null;
     this.highlightsPanel = null;
@@ -56,7 +51,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     return "阅读辅助边栏";
   }
   getIcon() {
-    return "jarvis-library-big";
+    return "library-big";
   }
   async onOpen() {
     window.addEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
@@ -65,52 +60,6 @@ export class JarvisReaderBookshelfView extends ItemView {
   async onClose() {
     window.removeEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
     this.clearSidebarWidthGuard();
-  }
-
-  getLayoutMode() {
-    return this.plugin.settings.sidebarLayoutMode === "dual" ? "dual" : "single";
-  }
-  getSidebarPaneSplit() {
-    const parsed = parseFloat(this.plugin.settings.sidebarPaneSplit);
-    return Number.isFinite(parsed) ? Math.min(75, Math.max(25, parsed)) : 48;
-  }
-  applySidebarPaneSplit(first: HTMLElement, second: HTMLElement, value: number) {
-    const split = Math.min(75, Math.max(25, value));
-    first.style.flex = `0 0 ${split}%`;
-    second.style.flex = "1 1 0";
-  }
-  attachSidebarSplitter(splitter: HTMLElement, body: HTMLElement, first: HTMLElement, second: HTMLElement) {
-    splitter.onpointerdown = (event) => {
-      event.preventDefault();
-      const pointerId = event.pointerId;
-      let latestSplit = this.getSidebarPaneSplit();
-      body.classList.add("is-resizing");
-      splitter.classList.add("is-dragging");
-      if (typeof splitter.setPointerCapture === "function") {
-        splitter.setPointerCapture(pointerId);
-      }
-      const onPointerMove = (moveEvent: PointerEvent) => {
-        const rect = body.getBoundingClientRect();
-        if (!rect.width) return;
-        latestSplit = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-        this.applySidebarPaneSplit(first, second, latestSplit);
-      };
-      const onPointerUp = async () => {
-        document.removeEventListener("pointermove", onPointerMove);
-        document.removeEventListener("pointerup", onPointerUp);
-        body.classList.remove("is-resizing");
-        splitter.classList.remove("is-dragging");
-        if (typeof splitter.releasePointerCapture === "function") {
-          try {
-            splitter.releasePointerCapture(pointerId);
-          } catch (error) {}
-        }
-        this.plugin.settings.sidebarPaneSplit = Math.min(75, Math.max(25, latestSplit));
-        await this.plugin.saveSettings();
-      };
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    };
   }
 
   getActiveEpubView() {
@@ -129,7 +78,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (reader) {
       this.plugin.activeReaderView = reader;
     }
-    if (this.getLayoutMode() === "single" && preferredPanel) {
+    if (preferredPanel) {
       this.activePanel = preferredPanel;
     }
     this.render();
@@ -138,7 +87,6 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (reader && this.plugin.activeReaderView !== reader) return;
     this.plugin.activeReaderView = null;
     this.activePanel = "toc";
-    this.dualHighlightsMode = false;
     if (this.highlightsPanel) {
       this.highlightsPanel.reader = null;
       this.highlightsPanel.pendingRevealHighlightId = null;
@@ -147,9 +95,7 @@ export class JarvisReaderBookshelfView extends ItemView {
   }
   revealHighlight(highlightId: string) {
     this.pendingRevealHighlightId = highlightId || null;
-    if (this.getLayoutMode() === "single") {
-      this.activePanel = "highlights";
-    }
+    this.activePanel = "highlights";
     this.render();
   }
 
@@ -157,10 +103,11 @@ export class JarvisReaderBookshelfView extends ItemView {
     const button = container.createEl("button", {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
-        "aria-label": label
+        "aria-label": label,
+        "aria-pressed": String(active)
       }
     });
-    button.innerHTML = icon;
+    setIcon(button, icon);
     button.disabled = !!disabled;
     button.onclick = (event) => {
       event.preventDefault();
@@ -172,51 +119,22 @@ export class JarvisReaderBookshelfView extends ItemView {
     };
     return button;
   }
-  async toggleLayoutMode() {
-    this.plugin.settings.sidebarLayoutMode = this.getLayoutMode() === "single" ? "dual" : "single";
-    await this.plugin.saveSettings();
-    this.render();
-  }
-  renderToolbar(container: HTMLElement, activeEpub: any) {
-    const mode = this.getLayoutMode();
-    const hasReader = !!activeEpub;
+  renderToolbar(container: HTMLElement, activeEpub: EpubView | null) {
     const toolbar = container.createDiv({ cls: "jarvis-reader-sidebar-toolbar" });
-    const layoutButton = toolbar.createEl("button", {
-      cls: "jarvis-reader-sidebar-tab jarvis-reader-sidebar-layout-toggle",
-      attr: {
-        "aria-label": mode === "single" ? "切换到双栏" : "切换到单栏"
-      }
-    });
-    layoutButton.innerHTML = mode === "single" 
-      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M12 4v16"></path></svg>' 
-      : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M9 4v16"></path><path d="m14 9-3 3 3 3"></path></svg>';
-    layoutButton.onclick = () => this.toggleLayoutMode();
-    
     const panelActions = toolbar.createDiv({ cls: "jarvis-reader-sidebar-panel-actions" });
-    
-    if (mode === "single") {
-      this.makePanelButton(panelActions, "导航", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
-        this.activePanel = "toc";
+    const panels = [
+      { id: "toc", label: "目录导航", icon: "list" },
+      { id: "bookmarks", label: "已保存的书签", icon: "book-marked" },
+      { id: "highlights", label: "笔记高亮", icon: "file-text" },
+    ] as const;
+    for (const panel of panels) {
+      this.makePanelButton(panelActions, panel.label, panel.icon, this.activePanel === panel.id, !activeEpub, () => {
+        this.activePanel = panel.id;
         this.render();
       });
-      this.makePanelButton(panelActions, "读书笔记", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"></path><polyline points="15 3 15 9 21 9"></polyline></svg>', this.activePanel === "highlights", !hasReader, () => {
-        this.activePanel = "highlights";
-        this.render();
-      });
-    } else {
-      // In dual mode, both are shown side-by-side, so the tab buttons are less necessary to act as switches.
-      // But we can show them as purely visual indicators, or we can just hide them.
-      // For simplicity, we just won't show the panel switchers in dual mode.
     }
   }
 
-  getDisplayBookTitle(activeEpub: any) {
-    const bookTitle = activeEpub && activeEpub.file ? activeEpub.file.basename : "";
-    let displayTitle = bookTitle;
-    const m = displayTitle.match(/^(.*?)(?:[?(](.*?)[?)])?(?:\s*[-_]\s*.*)?$/);
-    if (m && m[1]) displayTitle = m[1].trim();
-    return displayTitle;
-  }
   renderPaneHeader(container: HTMLElement, title: string, subtitle = "", action: any = null) {
     const header = container.createDiv({ cls: "jarvis-reader-bookshelf-header" });
     const titleWrap = header.createDiv({ cls: "jarvis-reader-bookshelf-header-row" });
@@ -253,30 +171,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     });
   }
 
-  renderNavigationTabs(container: HTMLElement) {
-    const tabs = container.createDiv({ cls: "jarvis-reader-navigation-tabs" });
-    const items: Array<{ key: "toc" | "bookmarks"; label: string }> = [
-      { key: "toc", label: "目录" },
-      { key: "bookmarks", label: "书签" },
-    ];
-    for (const item of items) {
-      const button = tabs.createEl("button", {
-        cls: this.activeNavigationPanel === item.key
-          ? "jarvis-reader-navigation-tab is-active"
-          : "jarvis-reader-navigation-tab",
-        text: item.label,
-        attr: { "aria-pressed": String(this.activeNavigationPanel === item.key) },
-      });
-      button.onclick = () => {
-        this.activeNavigationPanel = item.key;
-        this.render();
-      };
-    }
-  }
-
   async removeBookmark(activeEpub: any, bookmark: BookBookmark) {
-    const confirmed = await confirmDestructiveAction(this.app, "删除书签", `确认删除书签“${bookmark.title}”吗？`);
-    if (!confirmed) return;
     try {
       const removed = await this.plugin.bookStateService.removeBookmark(activeEpub.file.path, bookmark);
       if (!removed) return;
@@ -291,7 +186,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (!bookmarks.length) {
       container.createEl("div", {
         cls: "jarvis-reader-bookshelf-empty",
-        text: "本书暂无书签。点击阅读器侧边的书签按钮即可保存当前位置。",
+        text: "本书暂无书签。点击阅读页右上角的添加书签按钮即可保存当前位置。",
       });
       return;
     }
@@ -306,14 +201,12 @@ export class JarvisReaderBookshelfView extends ItemView {
       const content = item.createDiv({ cls: "jarvis-reader-bookmark-content" });
       content.createDiv({ cls: "jarvis-reader-bookmark-title", text: bookmark.title || "未知章节" });
       content.createDiv({ cls: "jarvis-reader-bookmark-meta", text: new Date(bookmark.created).toLocaleString() });
-      const deleteButton = item.createEl("button", {
-        cls: "jarvis-reader-bookmark-delete",
-        attr: { "aria-label": `删除书签：${bookmark.title}`, title: "删除书签" },
-      });
-      deleteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
-      deleteButton.onclick = (event) => {
+      item.oncontextmenu = (event) => {
+        event.preventDefault();
         event.stopPropagation();
-        void this.removeBookmark(activeEpub, bookmark);
+        const menu = new Menu();
+        menu.addItem(entry => entry.setTitle("删除").setIcon("trash").onClick(() => this.removeBookmark(activeEpub, bookmark)));
+        menu.showAtMouseEvent(event);
       };
       item.onclick = () => activeEpub.jumpToCfi(bookmark.cfi);
       item.onkeydown = (event) => {
@@ -331,9 +224,8 @@ export class JarvisReaderBookshelfView extends ItemView {
     const bookmarks = activeEpub?.file
       ? this.plugin.settings.bookBookmarks?.[activeEpub.file.path] || []
       : [];
-    this.renderPaneHeader(container, "导航", this.getDisplayBookTitle(activeEpub));
-    this.renderNavigationTabs(container);
-    if (this.activeNavigationPanel === "bookmarks") {
+    this.renderPaneHeader(container, this.activePanel === "bookmarks" ? "书签" : "目录导航");
+    if (this.activePanel === "bookmarks") {
       this.renderBookmarksList(container, activeEpub, bookmarks);
       return;
     }
@@ -458,14 +350,13 @@ export class JarvisReaderBookshelfView extends ItemView {
     const container = this.contentEl;
     if (!container) return;
     const activeEpub = this.getActiveEpubView();
-    const mode = this.getLayoutMode();
     if (!activeEpub) {
       this.activePanel = "toc";
     }
     container.empty();
     container.className = "view-content jarvis-reader-bookshelf-view jarvis-reader-sidebar-view";
     this.renderToolbar(container, activeEpub);
-    const body = container.createDiv({ cls: mode === "dual" && activeEpub ? "jarvis-reader-sidebar-body is-dual" : "jarvis-reader-sidebar-body is-single" });
+    const body = container.createDiv({ cls: "jarvis-reader-sidebar-body is-single" });
     
     if (!activeEpub) {
       const pane = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
@@ -474,26 +365,6 @@ export class JarvisReaderBookshelfView extends ItemView {
       return;
     }
 
-    if (mode === "dual") {
-      this.updateSidebarWidthGuard(activeEpub, body);
-      const first = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      const splitter = body.createDiv({
-        cls: "jarvis-reader-sidebar-splitter",
-        attr: {
-          role: "separator",
-          "aria-orientation": "vertical",
-          title: "拖动调整宽度"
-        }
-      });
-      const second = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      this.applySidebarPaneSplit(first, second, this.getSidebarPaneSplit());
-      this.attachSidebarSplitter(splitter, body, first, second);
-      
-      this.renderNavigationPanel(first, activeEpub);
-      this.renderHighlightsPanel(second, activeEpub);
-      return;
-    }
-    
     this.clearSidebarWidthGuard();
     const pane = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
     if (this.activePanel === "highlights") {

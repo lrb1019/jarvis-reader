@@ -1,6 +1,6 @@
-import { Menu, type App } from "obsidian";
+import { Menu, setIcon, type App } from "obsidian";
+import { EpubCFI } from "epubjs";
 import type JarvisReaderPlugin from "../main";
-import { confirmDestructiveAction } from "../utils";
 
 export class HighlightsPanelController {
   app: App;
@@ -9,10 +9,10 @@ export class HighlightsPanelController {
   reader: any;
   searchQuery: string;
   typeFilter: string;
-  linksOnly: boolean;
   currentChapterOnly: boolean;
   sortMode: string;
   focusSearchOnRender: boolean;
+  filtersExpanded: boolean;
   listScrollTop: number;
   pendingRevealHighlightId: string | null;
 
@@ -23,9 +23,9 @@ export class HighlightsPanelController {
     this.reader = null;
     this.searchQuery = "";
     this.typeFilter = "all";
-    this.linksOnly = false;
     this.currentChapterOnly = false;
     this.sortMode = "chapter";
+    this.filtersExpanded = false;
     this.focusSearchOnRender = false;
     this.listScrollTop = 0;
     this.pendingRevealHighlightId = null;
@@ -144,71 +144,39 @@ export class HighlightsPanelController {
         return false;
       if (this.typeFilter === "note" && !hasComment)
         return false;
-      if (this.linksOnly && !this.getWikiLinks(highlight.comment).length)
-        return false;
       if (this.currentChapterOnly && (!currentChapter || (highlight.chapterTitle || "").trim() !== currentChapter))
         return false;
       return true;
     });
     if (this.sortMode === "time") {
       result = [...result].sort((a, b) => new Date(b.updated || b.created || 0).getTime() - new Date(a.updated || a.created || 0).getTime());
+    } else {
+      const cfi = new EpubCFI();
+      result = [...result].sort((a, b) => {
+        if (!a.cfiRange || !b.cfiRange) return 0;
+        try { return cfi.compare(a.cfiRange, b.cfiRange); }
+        catch { return 0; }
+      });
     }
     return result;
   }
-  renderFilterButton(container, mode, label) {
-    const button = container.createEl("button", {
-      cls: this.typeFilter === mode ? "jarvis-reader-highlights-filter is-active" : "jarvis-reader-highlights-filter",
-      text: label
-    });
-    button.onclick = () => {
-      this.typeFilter = mode;
-      this.render();
-    };
-  }
-  renderMoreMenu(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const menu = new Menu();
-    menu.addItem((item) => {
-      item.setTitle("\u5f53\u524d\u7ae0\u8282").setIcon(this.currentChapterOnly ? "check" : "list").onClick(() => {
-        this.currentChapterOnly = !this.currentChapterOnly;
-        this.render();
+  renderChoiceGroup(container: HTMLElement, label: string, choices: { label: string; selected: boolean; choose: () => void }[]) {
+    const group = container.createDiv({ cls: "jarvis-reader-highlights-option-group", attr: { role: "group", "aria-label": label } });
+    group.createDiv({ cls: "jarvis-reader-highlights-option-label", text: label });
+    const buttons = group.createDiv({ cls: "jarvis-reader-highlights-filters" });
+    for (const choice of choices) {
+      const button = buttons.createEl("button", {
+        cls: `jarvis-reader-highlights-filter${choice.selected ? " is-active" : ""}`,
+        text: choice.label,
+        attr: { "aria-pressed": String(choice.selected) }
       });
-    });
-    menu.addItem((item) => {
-      item.setTitle("\u6709\u94fe\u63a5").setIcon(this.linksOnly ? "check" : "link").onClick(() => {
-        this.linksOnly = !this.linksOnly;
-        this.render();
-      });
-    });
-    menu.addSeparator();
-    menu.addItem((item) => {
-      item.setTitle("\u7ae0\u8282\u987a\u5e8f").setIcon(this.sortMode === "chapter" ? "check" : "list-ordered").onClick(() => {
-        this.sortMode = "chapter";
-        this.render();
-      });
-    });
-    menu.addItem((item) => {
-      item.setTitle("\u65f6\u95f4\u987a\u5e8f").setIcon(this.sortMode === "time" ? "check" : "clock").onClick(() => {
-        this.sortMode = "time";
-        this.render();
-      });
-    });
-    if (this.linksOnly || this.currentChapterOnly) {
-      menu.addSeparator();
-      menu.addItem((item) => {
-        item.setTitle("\u6e05\u9664\u8f85\u52a9\u7b5b\u9009").setIcon("x").onClick(() => {
-          this.linksOnly = false;
-          this.currentChapterOnly = false;
-          this.render();
-        });
-      });
+      button.onclick = () => { choice.choose(); this.render(); };
     }
-    menu.showAtMouseEvent(event);
   }
   renderControls(container) {
     const controls = container.createDiv({ cls: "jarvis-reader-highlights-controls" });
-    const search = controls.createEl("input", {
+    const searchRow = controls.createDiv({ cls: "jarvis-reader-highlights-search-row" });
+    const search = searchRow.createEl("input", {
       cls: "jarvis-reader-highlights-search",
       attr: {
         type: "search",
@@ -241,17 +209,43 @@ export class HighlightsPanelController {
       this.render();
     };
     search.onclick = (event) => event.stopPropagation();
-    const filters = controls.createDiv({ cls: "jarvis-reader-highlights-filters" });
-    this.renderFilterButton(filters, "all", "\u5168\u90e8");
-    this.renderFilterButton(filters, "highlight", "\u9ad8\u4eae");
-    this.renderFilterButton(filters, "note", "笔记");
-    const more = filters.createEl("button", {
-      cls: this.linksOnly || this.currentChapterOnly || this.sortMode === "time" ? "jarvis-reader-highlights-filter jarvis-reader-highlights-more is-active" : "jarvis-reader-highlights-filter jarvis-reader-highlights-more",
-      text: "..."
+    const hasFilters = this.typeFilter !== "all" || this.currentChapterOnly || this.sortMode !== "chapter";
+    const toggle = searchRow.createEl("button", {
+      cls: `jarvis-reader-highlights-filter-toggle clickable-icon${hasFilters ? " is-active" : ""}`,
+      attr: { "aria-label": "筛选与排序", "aria-expanded": String(this.filtersExpanded), title: "筛选与排序" }
     });
-    more.setAttr("aria-label", "\u66f4\u591a\u7b5b\u9009\u4e0e\u6392\u5e8f");
-    more.onclick = (event) => this.renderMoreMenu(event);
+    setIcon(toggle, "sliders-horizontal");
+    const options = controls.createDiv({ cls: "jarvis-reader-highlights-filter-options" });
+    options.hidden = !this.filtersExpanded;
+    toggle.onclick = () => {
+      this.filtersExpanded = !this.filtersExpanded;
+      options.hidden = !this.filtersExpanded;
+      toggle.setAttr("aria-expanded", String(this.filtersExpanded));
+    };
+    this.renderChoiceGroup(options, "内容", [
+      { label: "全部", selected: this.typeFilter === "all", choose: () => { this.typeFilter = "all"; } },
+      { label: "仅高亮", selected: this.typeFilter === "highlight", choose: () => { this.typeFilter = "highlight"; } },
+      { label: "含笔记", selected: this.typeFilter === "note", choose: () => { this.typeFilter = "note"; } }
+    ]);
+    this.renderChoiceGroup(options, "范围", [
+      { label: "全书", selected: !this.currentChapterOnly, choose: () => { this.currentChapterOnly = false; } },
+      { label: "当前章节", selected: this.currentChapterOnly, choose: () => { this.currentChapterOnly = true; } }
+    ]);
+    this.renderChoiceGroup(options, "排序", [
+      { label: "原文顺序", selected: this.sortMode === "chapter", choose: () => { this.sortMode = "chapter"; } },
+      { label: "最近修改", selected: this.sortMode === "time", choose: () => { this.sortMode = "time"; } }
+    ]);
+    if (hasFilters) {
+      const reset = options.createEl("button", { cls: "jarvis-reader-highlights-reset", text: "重置" });
+      reset.onclick = () => {
+        this.typeFilter = "all";
+        this.currentChapterOnly = false;
+        this.sortMode = "chapter";
+        this.render();
+      };
+    }
   }
+
   renderWikiLinks(container, links) {
     if (!links.length)
       return;
@@ -295,7 +289,6 @@ export class HighlightsPanelController {
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
     header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "笔记" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: reader.file ? reader.file.basename : "" });
     const list = await reader.getBookHighlightsForReader();
     if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {
@@ -335,14 +328,7 @@ export class HighlightsPanelController {
         event.preventDefault();
         const menu = new Menu();
         menu.addItem((item) => {
-          item.setTitle("删除笔记").setIcon("trash").onClick(async () => {
-            const confirmed = await confirmDestructiveAction(
-              this.app,
-              "删除划线与笔记",
-              "确定要删除这条划线及其所有笔记吗？这会清除阅读器中的原文标记和书籍笔记中的对应内容，此操作不可恢复。"
-            );
-            if (!confirmed)
-              return;
+          item.setTitle("删除").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
           });
         });

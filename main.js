@@ -1092,7 +1092,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState3(initialState) {
+        function useState5(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1100,11 +1100,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef4(initialValue) {
+        function useRef6(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect4(create, deps) {
+        function useEffect6(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1116,7 +1116,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useLayoutEffect(create, deps);
         }
-        function useCallback3(callback, deps) {
+        function useCallback4(callback, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
@@ -1142,7 +1142,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useDeferredValue(value);
         }
-        function useId() {
+        function useId2() {
           var dispatcher = resolveDispatcher();
           return dispatcher.useId();
         }
@@ -1882,19 +1882,19 @@ var require_react_development = __commonJS({
         exports.memo = memo;
         exports.startTransition = startTransition;
         exports.unstable_act = act;
-        exports.useCallback = useCallback3;
+        exports.useCallback = useCallback4;
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect4;
-        exports.useId = useId;
+        exports.useEffect = useEffect6;
+        exports.useId = useId2;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect2;
         exports.useMemo = useMemo3;
         exports.useReducer = useReducer;
-        exports.useRef = useRef4;
-        exports.useState = useState3;
+        exports.useRef = useRef6;
+        exports.useState = useState5;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2390,9 +2390,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React8 = require_react();
+        var React10 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React8.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React10.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -3999,7 +3999,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React8.Children.forEach(props.children, function(child) {
+                React10.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -12472,7 +12472,7 @@ var require_react_dom_development = __commonJS({
           }
         }
         var fakeInternalInstance = {};
-        var emptyRefsObject = new React8.Component().refs;
+        var emptyRefsObject = new React10.Component().refs;
         var didWarnAboutStateAssignmentForComponent;
         var didWarnAboutUninitializedState;
         var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -23633,6 +23633,7 @@ function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8B
       resolve(value);
     };
     const modal = new import_obsidian.Modal(app);
+    modal.shouldRestoreSelection = false;
     modal.titleEl.setText(title);
     modal.contentEl.createEl("p", { text: message });
     new import_obsidian.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u53D6\u6D88").onClick(() => finish(false))).addButton((button) => button.setButtonText(confirmText).setWarning().onClick(() => finish(true)));
@@ -30883,7 +30884,7 @@ var require_epubcfi = __commonJS({
     var ELEMENT_NODE = 1;
     var TEXT_NODE = 3;
     var DOCUMENT_NODE = 9;
-    var EpubCFI = class _EpubCFI {
+    var EpubCFI2 = class _EpubCFI {
       constructor(cfiFrom, base, ignoreClass) {
         var type;
         this.str = "";
@@ -31649,7 +31650,7 @@ var require_epubcfi = __commonJS({
         }
       }
     };
-    var _default = EpubCFI;
+    var _default = EpubCFI2;
     exports.default = _default;
   }
 });
@@ -51949,7 +51950,7 @@ var require_react_swipeable_umd = __commonJS({
   "node_modules/react-swipeable/dist/react-swipeable.umd.js"(exports, module2) {
     (function(global2, factory) {
       typeof exports === "object" && typeof module2 !== "undefined" ? factory(exports, require_react()) : typeof define === "function" && define.amd ? define(["exports", "react"], factory) : (global2 = global2 || self, factory(global2.swipeable = {}, global2.react));
-    })(exports, (function(exports2, React8) {
+    })(exports, (function(exports2, React10) {
       function _interopNamespace(e) {
         if (e && e.__esModule) return e;
         var n = /* @__PURE__ */ Object.create(null);
@@ -51969,7 +51970,7 @@ var require_react_swipeable_umd = __commonJS({
         n["default"] = e;
         return n;
       }
-      var React__namespace = /* @__PURE__ */ _interopNamespace(React8);
+      var React__namespace = /* @__PURE__ */ _interopNamespace(React10);
       function _extends() {
         _extends = Object.assign || function(target) {
           for (var i = 1; i < arguments.length; i++) {
@@ -52771,7 +52772,7 @@ var require_react_jsx_runtime_development = __commonJS({
     if (true) {
       (function() {
         "use strict";
-        var React8 = require_react();
+        var React10 = require_react();
         var REACT_ELEMENT_TYPE = Symbol.for("react.element");
         var REACT_PORTAL_TYPE = Symbol.for("react.portal");
         var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -52797,7 +52798,7 @@ var require_react_jsx_runtime_development = __commonJS({
           }
           return null;
         }
-        var ReactSharedInternals = React8.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React10.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function error(format) {
           {
             {
@@ -53632,11 +53633,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx5 = jsxWithValidationDynamic;
-        var jsxs5 = jsxWithValidationStatic;
+        var jsx6 = jsxWithValidationDynamic;
+        var jsxs6 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx5;
-        exports.jsxs = jsxs5;
+        exports.jsx = jsx6;
+        exports.jsxs = jsxs6;
       })();
     }
   }
@@ -53660,12 +53661,93 @@ __export(main_exports, {
   default: () => JarvisReaderPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian16 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 
 // src/EpubView.ts
-var import_react3 = __toESM(require_react(), 1);
+var import_react5 = __toESM(require_react(), 1);
+
+// src/reader-settings.ts
+var READER_ZOOM_LIMITS = Object.freeze({
+  min: 0.6,
+  max: 2,
+  step: 0.05,
+  defaultValue: 1
+});
+var READER_LINE_HEIGHT_LIMITS = Object.freeze({
+  min: 1.1,
+  max: 2.4,
+  step: 0.05,
+  defaultValue: 1.6
+});
+var READER_LETTER_SPACING_LIMITS = Object.freeze({
+  min: -5,
+  max: 20,
+  step: 1,
+  defaultValue: 0
+});
+var READER_WORD_SPACING_LIMITS = Object.freeze({
+  min: -20,
+  max: 50,
+  step: 1,
+  defaultValue: 0
+});
+function clampReaderLetterSpacing(value) {
+  return clampReaderNumber(value, READER_LETTER_SPACING_LIMITS);
+}
+function clampReaderWordSpacing(value) {
+  return clampReaderNumber(value, READER_WORD_SPACING_LIMITS);
+}
+function clampReaderNumber(value, limits) {
+  const parsed = typeof value === "number" ? value : typeof value === "string" ? parseFloat(value) : NaN;
+  const number = Number.isFinite(parsed) ? parsed : limits.defaultValue;
+  const scale = 1 / limits.step;
+  return Math.min(limits.max, Math.max(limits.min, Math.round(number * scale) / scale));
+}
+function clampReaderZoom(value) {
+  return clampReaderNumber(value, READER_ZOOM_LIMITS);
+}
+function clampReaderLineHeight(value) {
+  return clampReaderNumber(value, READER_LINE_HEIGHT_LIMITS);
+}
+var READER_WIDTH_LIMITS = Object.freeze({
+  min: 480,
+  max: 1600,
+  step: 40,
+  defaultValue: 760
+});
+function clampReaderWidth(value) {
+  return clampReaderNumber(value, READER_WIDTH_LIMITS);
+}
+function normalizeReaderParagraphIndent(value) {
+  return value === "two-chars" || value === "none" ? value : "original";
+}
+var DEFAULT_READER_PREFERENCES = Object.freeze({
+  readerLetterSpacing: 0,
+  readerWordSpacing: 0,
+  readerParagraphIndent: "original",
+  readerWidth: READER_WIDTH_LIMITS.defaultValue,
+  readerZoom: READER_ZOOM_LIMITS.defaultValue,
+  readerLineHeight: READER_LINE_HEIGHT_LIMITS.defaultValue,
+  singlePageView: false,
+  scrolledView: false
+});
+function resolveReaderPreferences(current, patch) {
+  const next = { ...current, ...patch };
+  return {
+    readerLetterSpacing: clampReaderLetterSpacing(next.readerLetterSpacing),
+    readerWordSpacing: clampReaderWordSpacing(next.readerWordSpacing),
+    readerParagraphIndent: normalizeReaderParagraphIndent(next.readerParagraphIndent),
+    readerWidth: clampReaderWidth(next.readerWidth),
+    readerZoom: clampReaderZoom(next.readerZoom),
+    readerLineHeight: clampReaderLineHeight(next.readerLineHeight),
+    singlePageView: next.singlePageView,
+    scrolledView: next.singlePageView && next.scrolledView
+  };
+}
+
+// src/EpubView.ts
 var import_client = __toESM(require_client(), 1);
-var import_obsidian6 = require("obsidian");
+var import_obsidian8 = require("obsidian");
 init_utils();
 init_book_notes();
 
@@ -54974,6 +55056,90 @@ async function translateSelectionWithApi(settings = {}, selectedText, sentence =
   return result;
 }
 
+// src/reader-text-spacing.ts
+var STYLE_ID = "jarvis-reader-text-spacing";
+function getReaderTextSpacingCss(letterSpacing, wordSpacing) {
+  const letter = clampReaderLetterSpacing(letterSpacing);
+  const word = clampReaderWordSpacing(wordSpacing);
+  const rules = [
+    letter ? `letter-spacing: ${letter / 100}em !important;` : "",
+    word ? `word-spacing: ${word / 100}em !important;` : ""
+  ].filter(Boolean).join(" ");
+  return rules ? `body, p, div, span, li, blockquote, section, article { ${rules} }` : "";
+}
+function applyReaderTextSpacing(doc, letter, word) {
+  const css = getReaderTextSpacingCss(letter, word);
+  let style = doc.getElementById(STYLE_ID);
+  if (!css) {
+    style?.remove();
+    return;
+  }
+  if (!style) {
+    style = doc.createElement("style");
+    style.id = STYLE_ID;
+    doc.head.appendChild(style);
+  }
+  if (style.textContent !== css) style.textContent = css;
+}
+var preferences = /* @__PURE__ */ new WeakMap();
+function syncReaderTextSpacing(rendition, letter, word) {
+  if (!preferences.has(rendition)) {
+    rendition.hooks.content.register((contents) => {
+      const value = preferences.get(rendition);
+      if (value) applyReaderTextSpacing(contents.document, value.letter, value.word);
+    });
+  }
+  preferences.set(rendition, { letter: clampReaderLetterSpacing(letter), word: clampReaderWordSpacing(word) });
+  rendition.getContents().forEach((contents) => applyReaderTextSpacing(contents.document, letter, word));
+}
+
+// src/reader-paragraphs.ts
+var MARKER = "data-jarvis-reader-paragraph";
+var originalIndents = /* @__PURE__ */ new WeakMap();
+var EXCLUDED_CONTEXT = "blockquote, li, figure, figcaption, table, pre, nav, aside, h1, h2, h3, h4, h5, h6, [role='heading'], [role='doc-footnote'], [role='doc-endnote'], .caption, .image-caption, .poem, .poetry, .verse, .title, .subtitle";
+var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["footnote", "endnote", "titlepage", "dedication", "poem", "verse", "caption"]);
+function isReaderBodyParagraph(paragraph) {
+  if (paragraph.localName !== "p" || !paragraph.textContent?.trim() || paragraph.closest(EXCLUDED_CONTEXT)) return false;
+  if (paragraph.querySelector("img, svg, video, audio, canvas, math, table")) return false;
+  for (let ancestor = paragraph; ancestor; ancestor = ancestor.parentElement) {
+    if ((ancestor.getAttribute("epub:type") || "").split(/\s+/).some((type) => EXCLUDED_TYPES.has(type))) return false;
+  }
+  const alignment = paragraph.ownerDocument.defaultView?.getComputedStyle(paragraph).textAlign;
+  return alignment !== "center" && alignment !== "right" && alignment !== "end";
+}
+function applyReaderParagraphIndent(doc, mode) {
+  doc.querySelectorAll(`[${MARKER}]`).forEach((element) => {
+    const original = originalIndents.get(element);
+    if (original) {
+      if (original.value) element.style.setProperty("text-indent", original.value, original.priority);
+      else element.style.removeProperty("text-indent");
+      if (!original.hadStyle && !element.style.length) element.removeAttribute("style");
+      originalIndents.delete(element);
+    }
+    element.removeAttribute(MARKER);
+  });
+  if (mode === "original") return;
+  doc.querySelectorAll("p").forEach((paragraph) => {
+    if (!isReaderBodyParagraph(paragraph)) return;
+    originalIndents.set(paragraph, {
+      value: paragraph.style.getPropertyValue("text-indent"),
+      priority: paragraph.style.getPropertyPriority("text-indent"),
+      hadStyle: paragraph.hasAttribute("style")
+    });
+    paragraph.setAttribute(MARKER, "");
+    paragraph.style.setProperty("text-indent", mode === "two-chars" ? "2em" : "0", "important");
+  });
+}
+var indentModes = /* @__PURE__ */ new WeakMap();
+function syncReaderParagraphIndent(rendition, value) {
+  const mode = normalizeReaderParagraphIndent(value);
+  if (!indentModes.has(rendition)) {
+    rendition.hooks.content.register((contents) => applyReaderParagraphIndent(contents.document, indentModes.get(rendition) || "original"));
+  }
+  indentModes.set(rendition, mode);
+  rendition.getContents().forEach((contents) => applyReaderParagraphIndent(contents.document, mode));
+}
+
 // src/theme.ts
 function getObsidianCssVar(name, fallback = "") {
   const el = document.querySelector(".app-container") || document.body;
@@ -54983,16 +55149,6 @@ function getObsidianCssVar(name, fallback = "") {
 function getCssPixelValue(value) {
   const parsed = parseFloat(value || "");
   return Number.isFinite(parsed) && parsed > 0 ? `${parsed}px` : "";
-}
-function clampReaderZoom(value) {
-  const parsed = parseFloat(value);
-  const zoom = Number.isFinite(parsed) ? parsed : 1;
-  return Math.min(2, Math.max(0.6, Math.round(zoom * 20) / 20));
-}
-function clampReaderLineHeight(value) {
-  const parsed = parseFloat(value);
-  const lineHeight = Number.isFinite(parsed) ? parsed : 1.6;
-  return Math.min(2.4, Math.max(1.1, Math.round(lineHeight * 20) / 20));
 }
 function scaleCssPixelValue(value, scale) {
   const parsed = parseFloat(value || "");
@@ -55012,7 +55168,7 @@ function getObsidianTextFontSize() {
   }
   return getCssPixelValue(getComputedStyle(document.body).fontSize) || "18px";
 }
-function getJarvisReaderTheme(readerZoom = 1, readerLineHeight = 1.6) {
+function getJarvisReaderTheme(readerZoom = READER_ZOOM_LIMITS.defaultValue, readerLineHeight = READER_LINE_HEIGHT_LIMITS.defaultValue) {
   const baseFontSize = getObsidianTextFontSize();
   return {
     background: getObsidianCssVar("--background-primary", "#ffffff"),
@@ -55027,7 +55183,7 @@ function getJarvisReaderTheme(readerZoom = 1, readerLineHeight = 1.6) {
     interactiveAccent: getObsidianCssVar("--interactive-accent", "#4dabf7")
   };
 }
-function applyObsidianThemeToRendition(rendition, readerZoom = 1, readerLineHeight = 1.6) {
+function applyObsidianThemeToRendition(rendition, readerZoom = READER_ZOOM_LIMITS.defaultValue, readerLineHeight = READER_LINE_HEIGHT_LIMITS.defaultValue, paragraphIndent = "original", letterSpacing = 0, wordSpacing = 0) {
   const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
   try {
     rendition.themes.register("obsidian", {
@@ -55073,6 +55229,8 @@ function applyObsidianThemeToRendition(rendition, readerZoom = 1, readerLineHeig
     rendition.themes.override("font-family", theme.fontFamily, true);
     rendition.themes.override("font-size", theme.fontSize, true);
     rendition.themes.override("line-height", theme.lineHeight, true);
+    syncReaderParagraphIndent(rendition, paragraphIndent);
+    syncReaderTextSpacing(rendition, letterSpacing, wordSpacing);
   } catch (error) {
     console.warn("Jarvis Reader theme sync failed.", error);
   }
@@ -55650,6 +55808,46 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
   });
 };
 
+// src/reader-resize.ts
+var browserEnvironment = {
+  observe(host, callback) {
+    const observer = new ResizeObserver(callback);
+    observer.observe(host);
+    return () => observer.disconnect();
+  },
+  delay(callback) {
+    const timer = window.setTimeout(callback, 100);
+    return () => window.clearTimeout(timer);
+  }
+};
+function bindReaderContainerResize(host, rendition, environment = browserEnvironment) {
+  let attached = false;
+  let disposed = false;
+  let cancelPending;
+  const schedule = () => {
+    if (disposed || !attached) return;
+    cancelPending?.();
+    cancelPending = environment.delay(() => {
+      cancelPending = void 0;
+      if (!disposed && host.clientWidth > 0 && host.clientHeight > 0) {
+        rendition.resize();
+      }
+    });
+  };
+  const onAttached = () => {
+    attached = true;
+    schedule();
+  };
+  rendition.on("attached", onAttached);
+  const disconnect = environment.observe(host, schedule);
+  return () => {
+    disposed = true;
+    cancelPending?.();
+    disconnect();
+    rendition.off("attached", onAttached);
+  };
+}
+
 // src/epub-annotations-adapter.ts
 function removeEpubAnnotation(store, cfi, type) {
   store.remove(cfi, type);
@@ -55661,53 +55859,255 @@ function removeEpubAnnotation(store, cfi, type) {
 }
 
 // src/EpubReader.tsx
-var import_react2 = __toESM(require_react(), 1);
-var import_obsidian5 = require("obsidian");
+var import_react4 = __toESM(require_react(), 1);
+var import_obsidian7 = require("obsidian");
 var import_react_reader = __toESM(require_lib3(), 1);
 var ReactReaderModule = __toESM(require_lib3(), 1);
 init_utils();
 init_utils_core();
 
 // src/reader/ReaderSideControls.tsx
+var import_obsidian6 = require("obsidian");
+var import_react3 = __toESM(require_react(), 1);
+
+// src/reader/ReaderSettingsPanel.tsx
+var import_obsidian5 = require("obsidian");
+var import_react2 = __toESM(require_react(), 1);
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var ICONS = {
-  bookmark: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>',
-  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>',
-  zoomIn: '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>',
-  zoomOut: '<svg viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>',
-  lineTight: '<svg viewBox="0 0 24 24"><path d="M8 6h8"></path><path d="M8 12h8"></path><path d="M8 18h8"></path><path d="M4 9l2-2 2 2"></path><path d="M4 15l2 2 2-2"></path></svg>',
-  lineLoose: '<svg viewBox="0 0 24 24"><path d="M8 6h8"></path><path d="M8 12h8"></path><path d="M8 18h8"></path><path d="M4 6l2-2 2 2"></path><path d="M4 18l2 2 2-2"></path></svg>',
-  paged: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path></svg>',
-  scroll: '<svg viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"></path><path d="M4 7h10a6 6 0 0 1 0 12H6"></path></svg>',
-  dual: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1"></rect><rect x="13" y="5" width="8" height="14" rx="1"></rect></svg>',
-  single: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2"></rect></svg>'
-};
-function IconButton({ label, icon, className = "", onClick }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: `jarvis-reader-side-button ${className}`.trim(), title: label, "aria-label": label, onClick, dangerouslySetInnerHTML: { __html: icon } });
+function RangeSetting({ label, value, limits, busy, change, format, icon }) {
+  const [draft, setDraft] = (0, import_react2.useState)(value);
+  (0, import_react2.useEffect)(() => setDraft(value), [value]);
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "jarvis-reader-settings-range", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-reader-settings-range-label", children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-reader-settings-range-control", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { "aria-hidden": "true", className: "jarvis-reader-settings-range-icon", dangerouslySetInnerHTML: { __html: (0, import_obsidian5.getIcon)(icon)?.outerHTML || "" } }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "input",
+        {
+          "aria-label": label,
+          type: "range",
+          min: limits.min,
+          max: limits.max,
+          step: limits.step,
+          value: draft,
+          "aria-busy": busy,
+          onChange: (e) => setDraft(Number(e.currentTarget.value)),
+          onPointerUp: (e) => change(Number(e.currentTarget.value)),
+          onKeyUp: (e) => {
+            if (e.key.startsWith("Arrow") || ["Home", "End", "PageUp", "PageDown"].includes(e.key)) change(Number(e.currentTarget.value));
+          }
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("output", { children: format(draft) })
+    ] })
+  ] });
+}
+function IconChoice({ label, value, options, disabled, change }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-choice", role: "group", "aria-label": label, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: label }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-reader-settings-icon-options", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+      "button",
+      {
+        type: "button",
+        "aria-label": option.label,
+        title: option.label,
+        "aria-pressed": value === option.value,
+        disabled,
+        onClick: () => change(option.value),
+        dangerouslySetInnerHTML: { __html: (0, import_obsidian5.getIcon)(option.icon)?.outerHTML || "" }
+      },
+      option.value
+    )) })
+  ] });
+}
+function ReaderSettingsPanel({ getPreferences, onPreferencesChange, onClose, id }) {
+  const [values, setValues] = (0, import_react2.useState)(getPreferences);
+  const [busy, setBusy] = (0, import_react2.useState)(false);
+  const [error, setError] = (0, import_react2.useState)("");
+  const panelRef = (0, import_react2.useRef)(null);
+  (0, import_react2.useEffect)(() => {
+    panelRef.current?.querySelector("button")?.focus();
+    const outside = (event) => {
+      if (!panelRef.current?.contains(event.target)) onClose();
+    };
+    const key = (event) => {
+      event.stopPropagation();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+      if (event.key === "Tab") {
+        const items = panelRef.current?.querySelectorAll("button:not(:disabled), input:not(:disabled), select:not(:disabled)");
+        if (!items?.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (!first || !last) return;
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("pointerdown", outside);
+    panelRef.current?.addEventListener("keydown", key);
+    const wheel = (event) => event.stopPropagation();
+    panelRef.current?.addEventListener("wheel", wheel);
+    const panel = panelRef.current;
+    const iframeDocuments = /* @__PURE__ */ new Set();
+    const sync = () => {
+      setValues(getPreferences());
+      panel?.closest(".jarvis-reader-epub")?.querySelectorAll("iframe").forEach((frame) => {
+        const doc = frame.contentDocument;
+        if (doc && !iframeDocuments.has(doc)) {
+          doc.addEventListener("pointerdown", onClose);
+          iframeDocuments.add(doc);
+        }
+      });
+    };
+    sync();
+    const timer = window.setInterval(sync, 300);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      panel?.removeEventListener("keydown", key);
+      panel?.removeEventListener("wheel", wheel);
+      window.clearInterval(timer);
+      iframeDocuments.forEach((doc) => doc.removeEventListener("pointerdown", onClose));
+    };
+  }, [getPreferences, onClose]);
+  const change = async (patch) => {
+    setBusy(true);
+    setError("");
+    try {
+      await onPreferencesChange(patch);
+      setValues(getPreferences());
+    } catch {
+      setError("\u9605\u8BFB\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u3002");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+    "div",
+    {
+      ref: panelRef,
+      id,
+      role: "dialog",
+      "aria-label": "\u9605\u8BFB\u8BBE\u7F6E",
+      "aria-busy": busy,
+      className: "jarvis-reader-settings-panel",
+      onClick: (e) => e.stopPropagation(),
+      onPointerDown: (e) => e.stopPropagation(),
+      onWheel: (e) => e.stopPropagation(),
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "\u9605\u8BFB\u8BBE\u7F6E" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { "aria-label": "\u5173\u95ED\u9605\u8BFB\u8BBE\u7F6E", onClick: onClose, children: "\xD7" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { className: "jarvis-reader-settings-group", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("legend", { children: "\u6587\u5B57\u6392\u7248" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-group-body", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "type", label: "\u5B57\u53F7", value: values.readerZoom, limits: READER_ZOOM_LIMITS, busy, format: (value) => `${Math.round(value * 100)}%`, change: (value) => void change({ readerZoom: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "list", label: "\u884C\u8DDD", value: values.readerLineHeight, limits: READER_LINE_HEIGHT_LIMITS, busy, format: (value) => value.toFixed(2), change: (value) => void change({ readerLineHeight: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "move-horizontal", label: "\u5B57\u7B26\u95F4\u8DDD", value: values.readerLetterSpacing, limits: READER_LETTER_SPACING_LIMITS, busy, format: (value) => `${value > 0 ? "+" : ""}${value}%`, change: (value) => void change({ readerLetterSpacing: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "space", label: "\u8BCD\u95F4\u8DDD", value: values.readerWordSpacing, limits: READER_WORD_SPACING_LIMITS, busy, format: (value) => `${value > 0 ? "+" : ""}${value}%`, change: (value) => void change({ readerWordSpacing: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u9996\u884C\u7F29\u8FDB", value: values.readerParagraphIndent, disabled: busy, options: [
+              { value: "original", label: "\u9075\u5FAA\u539F\u4E66\u7F29\u8FDB", icon: "book-open" },
+              { value: "two-chars", label: "\u9996\u884C\u7F29\u8FDB\u4E24\u5B57", icon: "indent-increase" },
+              { value: "none", label: "\u4E0D\u7F29\u8FDB", icon: "align-left" }
+            ], change: (value) => void change({ readerParagraphIndent: value }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { className: "jarvis-reader-settings-group", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("legend", { children: "\u9605\u8BFB\u5E03\u5C40" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-group-body", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "panel-top", label: "\u6B63\u6587\u5BBD\u5EA6", value: values.readerWidth, limits: READER_WIDTH_LIMITS, busy, format: (value) => `${value}px`, change: (value) => void change({ readerWidth: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u680F\u6570", value: values.singlePageView ? "single" : "dual", disabled: busy, options: [
+              { value: "single", label: "1 \u680F", icon: "square" },
+              { value: "dual", label: "2 \u680F", icon: "columns-2" }
+            ], change: (value) => void change({ singlePageView: value === "single" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u9605\u8BFB\u65B9\u5F0F", value: values.scrolledView ? "scroll" : "paged", disabled: busy || !values.singlePageView, options: [
+              { value: "paged", label: "\u5206\u9875\u9605\u8BFB", icon: "book-open" },
+              { value: "scroll", label: "\u6EDA\u52A8\u9605\u8BFB", icon: "scroll-text" }
+            ], change: (value) => void change({ scrolledView: value === "scroll" }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-reader-settings-reset", disabled: busy, title: "\u53EA\u6062\u590D\u9605\u8BFB\u6392\u7248\u4E0E\u6A21\u5F0F\uFF0C\u4FDD\u7559\u9605\u8BFB\u8FDB\u5EA6\u3001\u4E66\u7B7E\u548C\u7B14\u8BB0\u3002", onClick: () => void change({ ...DEFAULT_READER_PREFERENCES }), children: "\u6062\u590D\u9605\u8BFB\u9ED8\u8BA4\u503C" }),
+        error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { role: "alert", children: error })
+      ]
+    }
+  );
+}
+
+// src/reader/ReaderSideControls.tsx
+var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+function IconButton({ label, icon, className = "", disabled = false, onClick }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-reader-side-button ${className}`.trim(), "aria-label": label, disabled, onClick, dangerouslySetInnerHTML: { __html: icon } });
 }
 function ReaderSideControls(props) {
+  const [open, setOpen] = (0, import_react3.useState)(props.getPanelOpen);
+  const [active, setActive] = (0, import_react3.useState)(false);
+  const zoneRef = (0, import_react3.useRef)(null);
+  const idleTimer = (0, import_react3.useRef)(void 0);
+  const reveal = (0, import_react3.useCallback)(() => {
+    setActive(true);
+    window.clearTimeout(idleTimer.current);
+    idleTimer.current = window.setTimeout(() => setActive(false), 2500);
+  }, []);
+  (0, import_react3.useEffect)(() => {
+    const zone = zoneRef.current;
+    const reader = zone?.closest(".jarvis-reader-epub");
+    if (!zone || !reader) return;
+    const previousHeight = reader.style.getPropertyValue("--jarvis-reader-height");
+    const resize = new ResizeObserver(() => {
+      reader.style.setProperty("--jarvis-reader-height", `${reader.clientHeight}px`);
+    });
+    resize.observe(reader);
+    return () => {
+      resize.disconnect();
+      if (previousHeight) reader.style.setProperty("--jarvis-reader-height", previousHeight);
+      else reader.style.removeProperty("--jarvis-reader-height");
+    };
+  }, []);
+  (0, import_react3.useEffect)(() => () => window.clearTimeout(idleTimer.current), []);
+  const buttonRef = (0, import_react3.useRef)(null);
+  const panelId = (0, import_react3.useId)();
+  const close = (0, import_react3.useCallback)(() => {
+    setOpen(false);
+    props.onPanelOpenChange(false);
+    buttonRef.current?.focus();
+  }, [props.onPanelOpenChange]);
   const {
     location,
     chapterTitle,
-    singlePage,
-    scrolled,
     onAddBookmark,
-    onOpenBookNote,
-    onZoom,
-    onLineHeight,
-    onScrolledChange,
-    onSinglePageChange
+    onOpenBookNote
   } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-reader-side-hover-zone", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-side-controls", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u6DFB\u52A0\u4E66\u7B7E", icon: ICONS.bookmark, onClick: () => location && chapterTitle && onAddBookmark?.(location, chapterTitle) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u521B\u5EFA\u6216\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6", icon: ICONS.note, onClick: onOpenBookNote }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u653E\u5927", icon: ICONS.zoomIn, onClick: () => onZoom(0.05) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u7F29\u5C0F", icon: ICONS.zoomOut, onClick: () => onZoom(-0.05) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u51CF\u5C0F\u884C\u8DDD", icon: ICONS.lineTight, onClick: () => onLineHeight(-0.05) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { label: "\u589E\u5927\u884C\u8DDD", icon: ICONS.lineLoose, onClick: () => onLineHeight(0.05) }),
-    singlePage && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { className: "jarvis-reader-side-mode-button", label: scrolled ? "\u5207\u6362\u5230\u5206\u9875" : "\u5207\u6362\u5230\u6EDA\u52A8", icon: scrolled ? ICONS.paged : ICONS.scroll, onClick: () => onScrolledChange(!scrolled) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconButton, { className: "jarvis-reader-side-mode-button", label: singlePage ? "\u5207\u6362\u5230\u53CC\u9875" : "\u5207\u6362\u5230\u5355\u9875", icon: singlePage ? ICONS.dual : ICONS.single, onClick: () => onSinglePageChange(!singlePage) })
-  ] }) });
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { ref: zoneRef, className: `jarvis-reader-side-hover-zone${open ? " is-open" : ""}${active ? " is-active" : ""}`, onPointerEnter: reveal, onPointerMove: reveal, onPointerDown: reveal, onClick: (e) => e.stopPropagation(), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-reader-side-controls", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6DFB\u52A0\u4E66\u7B7E", disabled: !location || !chapterTitle || !onAddBookmark, icon: (0, import_obsidian6.getIcon)("bookmark")?.outerHTML || "", onClick: () => location && chapterTitle && onAddBookmark?.(location, chapterTitle) }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6253\u5F00\u672C\u4E66\u7B14\u8BB0", icon: (0, import_obsidian6.getIcon)("file-text")?.outerHTML || "", onClick: onOpenBookNote }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { ref: buttonRef, className: "jarvis-reader-side-button jarvis-reader-settings-button", "aria-label": "\u9605\u8BFB\u8BBE\u7F6E", "aria-expanded": open, "aria-controls": panelId, onClick: () => {
+        setOpen(!open);
+        props.onPanelOpenChange(!open);
+      }, dangerouslySetInnerHTML: { __html: (0, import_obsidian6.getIcon)("settings")?.outerHTML || "" } })
+    ] }),
+    open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ReaderSettingsPanel, { id: panelId, getPreferences: props.getPreferences, onPreferencesChange: props.onPreferencesChange, onClose: close, getPanelOpen: props.getPanelOpen, onPanelOpenChange: props.onPanelOpenChange })
+  ] });
+}
+
+// src/reader-selection.ts
+function getSelectionTranslationOptions(kind) {
+  return kind === "offline" ? { localOnly: true } : { forceAi: true };
+}
+function clampSelectionMenuPosition(x, y, width, height, boundsWidth, boundsHeight) {
+  const margin = 8;
+  return {
+    left: Math.max(margin, Math.min(x, boundsWidth - width - margin)),
+    top: Math.max(margin, Math.min(y, boundsHeight - height - margin))
+  };
 }
 
 // src/floating-card-core.ts
@@ -55721,19 +56121,6 @@ function moveFloatingCardRect(startRect, startPointer, currentPointer) {
 
 // src/EpubReader.tsx
 var ReactReaderStyle2 = ReactReaderModule.ReactReaderStyle;
-function getWordLookupResultFromAsset(asset, selectedText = "") {
-  if (!asset)
-    return null;
-  return {
-    lemma: asset.lemma || "",
-    surface: selectedText || asset.title || asset.lemma || "",
-    translation: asset.translation || "",
-    phonetic: asset.phonetic || "",
-    partOfSpeech: asset.partOfSpeech || "",
-    example: asset.example || "",
-    display: asset.display || ""
-  };
-}
 function getLightWordAsset(asset) {
   if (!asset)
     return asset;
@@ -55761,7 +56148,7 @@ function renderWordCardDisplayText(text) {
     if (match.index > lastIndex) {
       parts.push(value.slice(lastIndex, match.index));
     }
-    parts.push(import_react2.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
+    parts.push(import_react4.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
     lastIndex = pattern.lastIndex;
   }
   if (lastIndex < value.length) {
@@ -55814,14 +56201,14 @@ function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
   };
 }
 var ObsidianMarkdown = ({ text, onOpenLink }) => {
-  const containerRef = (0, import_react2.useRef)(null);
-  (0, import_react2.useEffect)(() => {
+  const containerRef = (0, import_react4.useRef)(null);
+  (0, import_react4.useEffect)(() => {
     const el = containerRef.current;
     if (!el) return;
     el.empty();
     const globalApp = window.app;
     if (globalApp) {
-      import_obsidian5.MarkdownRenderer.render(
+      import_obsidian7.MarkdownRenderer.render(
         globalApp,
         text || "",
         el,
@@ -55844,56 +56231,58 @@ var ObsidianMarkdown = ({ text, onOpenLink }) => {
       }
     }
   };
-  return import_react2.default.createElement("div", {
+  return import_react4.default.createElement("div", {
     ref: containerRef,
     onClick: handleClick,
     className: "markdown-preview-view clean-markdown-view"
   });
 };
-var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
-  const [location, setLocation] = (0, import_react2.useState)(() => shouldSkipInitialLocation?.() ? null : initLocation);
-  const [readerTitle, setReaderTitle] = (0, import_react2.useState)(title);
-  const [progressLabel, setProgressLabel] = (0, import_react2.useState)("");
-  const [highlightList, setHighlightList] = (0, import_react2.useState)(highlights || []);
-  const [pendingSelection, setPendingSelection] = (0, import_react2.useState)(null);
-  const [highlightComment, setHighlightComment] = (0, import_react2.useState)("");
-  const [highlightCommentMode, setHighlightCommentMode] = (0, import_react2.useState)("edit");
-  const [editingNoteIndex, setEditingNoteIndex] = (0, import_react2.useState)(null);
-  const [highlightContentTab, setHighlightContentTab] = (0, import_react2.useState)("notes");
-  const [showAssocDropdown, setShowAssocDropdown] = (0, import_react2.useState)(false);
-  const [assocSearchQuery, setAssocSearchQuery] = (0, import_react2.useState)("");
-  const [activeFileContent, setActiveFileContent] = (0, import_react2.useState)("");
-  const [activeFileCachePath, setActiveFileCachePath] = (0, import_react2.useState)("");
-  const [currentWordAssets, setCurrentWordAssets] = (0, import_react2.useState)(wordAssets || {});
-  const [pendingWordSelection, setPendingWordSelection] = (0, import_react2.useState)(null);
-  const [wordLookupState, setWordLookupState] = (0, import_react2.useState)({ status: "idle", result: null, error: "", savedLemma: "" });
-  const [activeWordHover, setActiveWordHover] = (0, import_react2.useState)(null);
-  const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = (0, import_react2.useState)(wikiLinkCandidates || []);
-  const [pendingHighlightMenu, setPendingHighlightMenu] = (0, import_react2.useState)(null);
-  const [wikiSuggest, setWikiSuggest] = (0, import_react2.useState)(null);
-  const [wikiEditRange, setWikiEditRange] = (0, import_react2.useState)(null);
-  const [highlightPopoverRect, setHighlightPopoverRect] = (0, import_react2.useState)(null);
-  const [wordTranslationRect, setWordTranslationRect] = (0, import_react2.useState)(null);
-  const containerRef = (0, import_react2.useRef)(null);
-  const highlightInputRef = (0, import_react2.useRef)(null);
-  const highlightPopoverRectRef = (0, import_react2.useRef)(null);
-  const suppressHighlightPopoverResizeClickRef = (0, import_react2.useRef)(false);
-  const wordTranslationRectRef = (0, import_react2.useRef)(null);
-  const renditionRef = (0, import_react2.useRef)(null);
-  const currentLocationRef = (0, import_react2.useRef)(initLocation);
-  const pendingInitLocationRef = (0, import_react2.useRef)(initLocation);
-  const highlightListRef = (0, import_react2.useRef)(highlights || []);
-  const wordAssetsRef = (0, import_react2.useRef)(wordAssets || {});
-  const wordDisplayCacheRef = (0, import_react2.useRef)(/* @__PURE__ */ new Map());
-  const pendingWordLookupRef = (0, import_react2.useRef)(0);
-  const [theme, setTheme] = (0, import_react2.useState)(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
-  const [currentColors, setCurrentColors] = (0, import_react2.useState)(highlightColors);
-  const [activeSelectionInfo, setActiveSelectionInfo] = (0, import_react2.useState)(null);
-  const activeSelectionInfoRef = (0, import_react2.useRef)(null);
-  (0, import_react2.useEffect)(() => {
+var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferencesChange, contents, title, bookPath, scrolled, singlePage, readerWidth, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
+  const [location, setLocation] = (0, import_react4.useState)(() => shouldSkipInitialLocation?.() ? null : initLocation);
+  const [readerTitle, setReaderTitle] = (0, import_react4.useState)(title);
+  const [progressLabel, setProgressLabel] = (0, import_react4.useState)("");
+  const [highlightList, setHighlightList] = (0, import_react4.useState)(highlights || []);
+  const [pendingSelection, setPendingSelection] = (0, import_react4.useState)(null);
+  const [highlightComment, setHighlightComment] = (0, import_react4.useState)("");
+  const [highlightCommentMode, setHighlightCommentMode] = (0, import_react4.useState)("edit");
+  const [editingNoteIndex, setEditingNoteIndex] = (0, import_react4.useState)(null);
+  const [highlightContentTab, setHighlightContentTab] = (0, import_react4.useState)("notes");
+  const [showAssocDropdown, setShowAssocDropdown] = (0, import_react4.useState)(false);
+  const [assocSearchQuery, setAssocSearchQuery] = (0, import_react4.useState)("");
+  const [activeFileContent, setActiveFileContent] = (0, import_react4.useState)("");
+  const [activeFileCachePath, setActiveFileCachePath] = (0, import_react4.useState)("");
+  const [currentWordAssets, setCurrentWordAssets] = (0, import_react4.useState)(wordAssets || {});
+  const [pendingWordSelection, setPendingWordSelection] = (0, import_react4.useState)(null);
+  const [wordLookupState, setWordLookupState] = (0, import_react4.useState)({ status: "idle", result: null, error: "", savedLemma: "" });
+  const [activeWordHover, setActiveWordHover] = (0, import_react4.useState)(null);
+  const [currentWikiLinkCandidates, setCurrentWikiLinkCandidates] = (0, import_react4.useState)(wikiLinkCandidates || []);
+  const [pendingHighlightMenu, setPendingHighlightMenu] = (0, import_react4.useState)(null);
+  const [wikiSuggest, setWikiSuggest] = (0, import_react4.useState)(null);
+  const [wikiEditRange, setWikiEditRange] = (0, import_react4.useState)(null);
+  const [highlightPopoverRect, setHighlightPopoverRect] = (0, import_react4.useState)(null);
+  const [wordTranslationRect, setWordTranslationRect] = (0, import_react4.useState)(null);
+  const containerRef = (0, import_react4.useRef)(null);
+  const highlightInputRef = (0, import_react4.useRef)(null);
+  const highlightPopoverRectRef = (0, import_react4.useRef)(null);
+  const suppressHighlightPopoverResizeClickRef = (0, import_react4.useRef)(false);
+  const wordTranslationRectRef = (0, import_react4.useRef)(null);
+  const renditionRef = (0, import_react4.useRef)(null);
+  const resizeCleanupRef = (0, import_react4.useRef)(null);
+  (0, import_react4.useEffect)(() => () => resizeCleanupRef.current?.(), []);
+  const currentLocationRef = (0, import_react4.useRef)(initLocation);
+  const pendingInitLocationRef = (0, import_react4.useRef)(initLocation);
+  const highlightListRef = (0, import_react4.useRef)(highlights || []);
+  const wordAssetsRef = (0, import_react4.useRef)(wordAssets || {});
+  const wordDisplayCacheRef = (0, import_react4.useRef)(/* @__PURE__ */ new Map());
+  const pendingWordLookupRef = (0, import_react4.useRef)(0);
+  const [theme, setTheme] = (0, import_react4.useState)(() => getJarvisReaderTheme(readerZoom, readerLineHeight));
+  const [currentColors, setCurrentColors] = (0, import_react4.useState)(highlightColors);
+  const [activeSelectionInfo, setActiveSelectionInfo] = (0, import_react4.useState)(null);
+  const activeSelectionInfoRef = (0, import_react4.useRef)(null);
+  (0, import_react4.useEffect)(() => {
     setCurrentColors(highlightColors);
   }, [highlightColors]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const handleColorChange = (e) => {
       if (e.detail) {
         setCurrentColors(e.detail);
@@ -55902,7 +56291,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     window.addEventListener("jarvis-reader-colors-changed", handleColorChange);
     return () => window.removeEventListener("jarvis-reader-colors-changed", handleColorChange);
   }, []);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     let lastThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
     const intervalId = setInterval(() => {
       const nextTheme = getJarvisReaderTheme(readerZoom, readerLineHeight);
@@ -55914,7 +56303,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }, 1e3);
     return () => clearInterval(intervalId);
   }, [readerZoom, readerLineHeight]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (!renditionRef.current || !currentColors) return;
     try {
       const rendition = renditionRef.current;
@@ -55936,13 +56325,14 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       console.warn("Jarvis Reader: Failed to redraw annotations on color change", e);
     }
   }, [currentColors]);
-  const wordHoverHideTimerRef = (0, import_react2.useRef)(null);
-  const pendingHighlightMenuRef = (0, import_react2.useRef)(null);
-  const pendingWordSelectionRef = (0, import_react2.useRef)(null);
-  const readerTitleRef = (0, import_react2.useRef)(title);
-  const tocRef = (0, import_react2.useRef)([]);
+  const wordHoverHideTimerRef = (0, import_react4.useRef)(null);
+  const pendingHighlightMenuRef = (0, import_react4.useRef)(null);
+  const selectionMenuRef = (0, import_react4.useRef)(null);
+  const pendingWordSelectionRef = (0, import_react4.useRef)(null);
+  const readerTitleRef = (0, import_react4.useRef)(title);
+  const tocRef = (0, import_react4.useRef)([]);
   const effectiveScrolled = scrolled && singlePage;
-  const maxReaderWidth = !effectiveScrolled && singlePage ? 760 : 1120;
+  const maxReaderWidth = readerWidth;
   const getHighlightPopoverBounds = () => {
     const rect = containerRef.current && typeof containerRef.current.getBoundingClientRect === "function" ? containerRef.current.getBoundingClientRect() : null;
     return {
@@ -56171,8 +56561,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   } : {
     allowPopups: false
   };
-  if (!effectiveScrolled && singlePage) {
-    epubOptions.spread = "none";
+  if (!effectiveScrolled) {
+    epubOptions.spread = singlePage ? "none" : "auto";
+    epubOptions.minSpreadWidth = 600;
   }
   const locationChanged = (epubcifi) => {
     const pendingInitLocation = pendingInitLocationRef.current;
@@ -56284,7 +56675,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         const commentColor = currentColors?.comment || "#f97316";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
           fill: commentColor,
-          "fill-opacity": "0.15",
+          "fill-opacity": "0.45",
           "mix-blend-mode": "multiply"
         });
         rendition.annotations.underline(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment", {
@@ -56297,7 +56688,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         const normalColor = currentColors?.normal || "#ffeb3b";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight", {
           fill: normalColor,
-          "fill-opacity": "0.24",
+          "fill-opacity": "0.75",
           "mix-blend-mode": "multiply"
         });
       }
@@ -56547,124 +56938,31 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     setPendingWordSelection(null);
     setWordLookupState({ status: "idle", result: null, error: "", savedLemma: "" });
   };
-  const openWordTranslator = async (item, options = {}) => {
-    if (!item || typeof translateSelection !== "function")
-      return false;
+  const openWordTranslator = async (item, kind) => {
+    if (!item || typeof translateSelection !== "function") return;
+    const normalized = normalizeWordSelection(item.quote || "");
+    if (kind === "offline" && !normalized?.isSingleWord) return;
+    const requestId = ++pendingWordLookupRef.current;
     wordTranslationRectRef.current = null;
     setWordTranslationRect(null);
-    const normalized = normalizeWordSelection(item.quote || "");
-    if (options.autoLocalOnly) {
-      if (!normalized || !normalized.isSingleWord)
-        return false;
-      const requestId2 = pendingWordLookupRef.current + 1;
-      pendingWordLookupRef.current = requestId2;
-      setPendingHighlightMenu(null);
-      setPendingWordSelection({
-        ...item,
-        normalized
-      });
-      setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
-      try {
-        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
-        if (pendingWordLookupRef.current !== requestId2)
-          return true;
-        if (!localDictionaryResult)
-          return false;
-        setPendingSelection(null);
-        setPendingHighlightMenu(null);
-        setHighlightComment("");
-        setWikiSuggest(null);
-        setWikiEditRange(null);
-        setPendingWordSelection({
-          ...item,
-          normalized
-        });
-        setWordLookupState({
-          status: "ready",
-          result: localDictionaryResult,
-          error: "",
-          savedLemma: ""
-        });
-        return true;
-      } catch (error) {
-        if (pendingWordLookupRef.current !== requestId2)
-          return true;
-        console.warn("Jarvis Reader automatic local dictionary lookup failed.", error);
-        return false;
-      }
-    }
     setPendingSelection(null);
     setPendingHighlightMenu(null);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
-    setPendingWordSelection({
-      ...item,
-      normalized
-    });
+    setPendingWordSelection({ ...item, normalized, translationKind: kind });
     setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
-    if (normalized && normalized.isSingleWord) {
-      try {
-        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
-        if (localDictionaryResult) {
-          setWordLookupState({
-            status: "ready",
-            result: localDictionaryResult,
-            error: "",
-            savedLemma: ""
-          });
-          return true;
-        }
-      } catch (error) {
-        console.warn("Jarvis Reader local dictionary lookup failed; trying saved card or AI.", error);
-      }
-    }
-    const existingWordAsset = normalized ? findWordAssetBySurface(wordAssetsRef.current, normalized.surface) : null;
-    if (existingWordAsset) {
-      setWordLookupState({
-        status: "ready",
-        result: getWordLookupResultFromAsset(existingWordAsset, item.quote || normalized.surface),
-        error: "",
-        savedLemma: normalized.lemma
-      });
-      if (!existingWordAsset.display && typeof loadWordDisplay === "function") {
-        Promise.resolve(loadWordDisplay(existingWordAsset)).then((display) => {
-          const nextDisplay = truncateWordDisplay(display);
-          if (!nextDisplay)
-            return;
-          setWordLookupState((current) => current.savedLemma === normalized.lemma && current.result ? {
-            ...current,
-            result: {
-              ...current.result,
-              display: nextDisplay
-            }
-          } : current);
-        }).catch(() => {
-        });
-      }
-      return true;
-    }
-    const requestId = pendingWordLookupRef.current + 1;
-    pendingWordLookupRef.current = requestId;
     try {
-      const result = await translateSelection(item.quote || "", item.sentence || "");
-      if (pendingWordLookupRef.current !== requestId)
+      const result = await translateSelection(item.quote || "", item.sentence || "", getSelectionTranslationOptions(kind));
+      if (pendingWordLookupRef.current !== requestId) return;
+      if (!result) {
+        setWordLookupState({ status: "error", result: null, error: "\u79BB\u7EBF\u8BCD\u5178\u672A\u6536\u5F55\u8FD9\u4E2A\u5355\u8BCD\uFF0C\u53EF\u4E3B\u52A8\u9009\u62E9 AI \u7FFB\u8BD1\u3002", savedLemma: "" });
         return;
-      setWordLookupState({
-        status: "ready",
-        result,
-        error: "",
-        savedLemma: ""
-      });
+      }
+      setWordLookupState({ status: "ready", result, error: "", savedLemma: "" });
     } catch (error) {
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "error",
-        result: null,
-        error: error && error.message ? error.message : String(error || "Translation failed."),
-        savedLemma: ""
-      });
+      if (pendingWordLookupRef.current !== requestId) return;
+      setWordLookupState({ status: "error", result: null, error: error instanceof Error ? error.message : String(error), savedLemma: "" });
     }
   };
   const persistPendingWordAsset = async () => {
@@ -56705,41 +57003,11 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         window.setTimeout(() => syncAutoWordHighlights(renditionRef.current), 0);
       }
     } catch (error) {
-      new import_obsidian5.Notice(error && error.message ? error.message : "Failed to save translation.");
+      new import_obsidian7.Notice(error && error.message ? error.message : "Failed to save translation.");
     }
   };
   const translatePendingWordWithAi = async () => {
-    if (!pendingWordSelection || typeof translateSelection !== "function")
-      return;
-    const requestId = pendingWordLookupRef.current + 1;
-    pendingWordLookupRef.current = requestId;
-    setWordLookupState((current) => ({
-      ...current,
-      status: "loading",
-      error: ""
-    }));
-    try {
-      const result = await translateSelection(pendingWordSelection.quote || "", pendingWordSelection.sentence || "", { forceAi: true });
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "ready",
-        result,
-        error: "",
-        savedLemma: ""
-      });
-      return true;
-    } catch (error) {
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "error",
-        result: null,
-        error: error && error.message ? error.message : String(error || "Translation failed."),
-        savedLemma: ""
-      });
-      return true;
-    }
+    if (pendingWordSelection) await openWordTranslator(pendingWordSelection, "ai");
   };
   const deleteActiveWordAsset = async () => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
@@ -56748,7 +57016,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     const effectiveApp = app || window.app;
     if (!effectiveApp) {
-      new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+      new import_obsidian7.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
       return;
     }
     const confirmed = await confirmDestructiveAction(
@@ -56775,7 +57043,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       clearAutoWordHighlights(renditionRef.current);
       syncAutoWordHighlights(renditionRef.current);
     } catch (error) {
-      new import_obsidian5.Notice(error && error.message ? error.message : "Failed to delete translation card.");
+      new import_obsidian7.Notice(error && error.message ? error.message : "Failed to delete translation card.");
     }
   };
   const translateActiveWordWithAi = async () => {
@@ -56783,7 +57051,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const assetKey = getTranslationAssetStorageKey(asset);
     if (!asset || !assetKey || typeof translateSelection !== "function" || typeof saveWordAsset !== "function")
       return;
-    new import_obsidian5.Notice("\u6B63\u5728\u4F7F\u7528AI\u7FFB\u8BD1...");
+    new import_obsidian7.Notice("\u6B63\u5728\u4F7F\u7528AI\u7FFB\u8BD1...");
     try {
       const quote = asset.title || asset.lemma || "";
       const sentence = asset.sources && asset.sources[0] && asset.sources[0].sentence || asset.sources && asset.sources[0] && asset.sources[0].quote || "";
@@ -56802,9 +57070,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         return next;
       });
       setActiveWordHover((current) => current ? { ...current, asset: updatedAsset } : null);
-      new import_obsidian5.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
+      new import_obsidian7.Notice("AI\u7FFB\u8BD1\u5B8C\u6210\u5E76\u5DF2\u66F4\u65B0\u8BCD\u5361");
     } catch (error) {
-      new import_obsidian5.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
+      new import_obsidian7.Notice(error && error.message ? error.message : "AI\u7FFB\u8BD1\u5931\u8D25");
     }
   };
   const clearAutoWordHighlights = (rendition) => {
@@ -57016,27 +57284,27 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }
     refreshHighlightPanes(rendition);
   };
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     highlightPopoverRectRef.current = highlightPopoverRect;
   }, [highlightPopoverRect]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     wordTranslationRectRef.current = wordTranslationRect;
   }, [wordTranslationRect]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     pendingHighlightMenuRef.current = pendingHighlightMenu;
   }, [pendingHighlightMenu]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     pendingWordSelectionRef.current = pendingWordSelection;
   }, [pendingWordSelection]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     setCurrentWordAssets(wordAssets || {});
     wordAssetsRef.current = wordAssets || {};
   }, [wordAssets]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     setHighlightList(highlights || []);
     highlightListRef.current = highlights || [];
   }, [highlights]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (shouldSkipInitialLocation?.()) {
       pendingInitLocationRef.current = null;
       setLocation(null);
@@ -57048,15 +57316,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       currentLocationRef.current = initLocation;
     }
   }, [initLocation, bookPath, shouldSkipInitialLocation]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     highlightListRef.current = highlightList;
     applyHighlights(renditionRef.current, highlightList);
   }, [highlightList]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     wordAssetsRef.current = currentWordAssets || {};
     syncAutoWordHighlights(renditionRef.current);
   }, [currentWordAssets, autoWordHighlight]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     return () => {
       clearWordHoverHideTimer();
       if (typeof speechSynthesis !== "undefined") {
@@ -57065,7 +57333,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       clearAutoWordHighlights(renditionRef.current);
     };
   }, []);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (typeof registerHighlightEditor !== "function")
       return;
     registerHighlightEditor((highlight) => {
@@ -57086,7 +57354,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       registerHighlightEditor(null);
     };
   }, [registerHighlightEditor, selectHighlight]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (typeof registerHighlightDeleted !== "function")
       return;
     registerHighlightDeleted((highlight) => {
@@ -57102,7 +57370,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       registerHighlightDeleted(null);
     };
   }, [registerHighlightDeleted]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const container = containerRef.current;
     if (!container)
       return;
@@ -57110,17 +57378,18 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       if (!event.ctrlKey)
         return;
       event.preventDefault();
-      setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
+      setReaderZoom(event.deltaY < 0 ? READER_ZOOM_LIMITS.step : -READER_ZOOM_LIMITS.step);
     };
     container.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       container.removeEventListener("wheel", onWheel);
     };
   }, [setReaderZoom]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const container = containerRef.current;
     if (!container)
       return;
+    const hoverCleanup = /* @__PURE__ */ new Map();
     const decoratePageButtons = () => {
       const buttons = Array.from(container.querySelectorAll("button"));
       for (const button of buttons) {
@@ -57130,17 +57399,31 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           continue;
         const direction = isPrevious ? "prev" : "next";
         const iconClass = `jarvis-reader-page-button-${direction}`;
+        if (!hoverCleanup.has(button)) {
+          let idleTimer;
+          const reveal = () => {
+            button.setAttribute("data-active", "true");
+            window.clearTimeout(idleTimer);
+            idleTimer = window.setTimeout(() => button.removeAttribute("data-active"), 2500);
+          };
+          const events = ["pointerenter", "pointermove", "pointerdown"];
+          events.forEach((event) => button.addEventListener(event, reveal));
+          hoverCleanup.set(button, () => {
+            window.clearTimeout(idleTimer);
+            events.forEach((event) => button.removeEventListener(event, reveal));
+          });
+        }
         if (button.classList.contains(iconClass) && button.querySelector("svg"))
           continue;
         button.classList.add("jarvis-reader-page-button", iconClass);
         button.setAttribute("aria-label", direction === "prev" ? "\u4E0A\u4E00\u9875" : "\u4E0B\u4E00\u9875");
-        button.setAttribute("title", direction === "prev" ? "\u4E0A\u4E00\u9875" : "\u4E0B\u4E00\u9875");
+        button.removeAttribute("title");
         button.replaceChildren();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("viewBox", "0 0 12 36");
         svg.setAttribute("aria-hidden", "true");
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", direction === "prev" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6");
+        path.setAttribute("d", direction === "prev" ? "m9 4-6 14 6 14" : "m3 4 6 14-6 14");
         svg.appendChild(path);
         button.appendChild(svg);
       }
@@ -57148,9 +57431,12 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     decoratePageButtons();
     const observer = new MutationObserver(decoratePageButtons);
     observer.observe(container, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      hoverCleanup.forEach((cleanup) => cleanup());
+    };
   }, []);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
       return;
     const rendition = renditionRef.current;
@@ -57187,6 +57473,30 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         doc.removeEventListener("mouseup", closeIfSelectionGone);
         doc.removeEventListener("keyup", closeIfSelectionGone);
       }
+    };
+  }, [pendingHighlightMenu]);
+  (0, import_react4.useLayoutEffect)(() => {
+    const menu = selectionMenuRef.current;
+    const container = containerRef.current;
+    if (!menu || !container || !pendingHighlightMenu) return;
+    const place = () => {
+      const rect = menu.getBoundingClientRect();
+      const bounds = container.getBoundingClientRect();
+      const position = clampSelectionMenuPosition(pendingHighlightMenu.rect?.x || 8, pendingHighlightMenu.rect?.y || 8, rect.width, rect.height, bounds.width, bounds.height);
+      menu.style.left = `${position.left}px`;
+      menu.style.top = `${position.top}px`;
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(container);
+    const documents = [document, ...(renditionRef.current?.getContents() || []).map((content) => content.document)];
+    const escape = (event) => {
+      if (event.key === "Escape") setPendingHighlightMenu(null);
+    };
+    documents.forEach((doc) => doc.addEventListener("keydown", escape));
+    return () => {
+      observer.disconnect();
+      documents.forEach((doc) => doc.removeEventListener("keydown", escape));
     };
   }, [pendingHighlightMenu]);
   const updateReaderTitle = (relocated) => {
@@ -57234,6 +57544,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     if (!selectedText) {
       setActiveSelectionInfo(null);
       activeSelectionInfoRef.current = null;
+      setPendingHighlightMenu(null);
       return;
     }
     const selectionItem = {
@@ -57244,19 +57555,12 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       rect: getSelectionHighlightMenuRect(contents2),
       contents2
     };
+    const previousSelection = activeSelectionInfoRef.current;
     setActiveSelectionInfo(selectionItem);
     activeSelectionInfoRef.current = selectionItem;
-    const existingHighlight = (highlightListRef.current || []).find((highlight) => highlight.cfiRange === cfiRange);
     clearWordLookup();
     setPendingSelection(null);
-    if (existingHighlight) {
-      return;
-    }
-    Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
-      if (!opened) {
-        clearWordLookup();
-      }
-    });
+    if (previousSelection?.cfiRange !== cfiRange) setPendingHighlightMenu(null);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
@@ -57401,16 +57705,16 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       const start = match.index;
       const end = start + match[0].length;
       if (start > lastIndex) {
-        nodes.push(import_react2.default.createElement("span", { key: `t-${lastIndex}` }, text.slice(lastIndex, start)));
+        nodes.push(import_react4.default.createElement("span", { key: `t-${lastIndex}` }, text.slice(lastIndex, start)));
       }
       const active = wikiEditRange && wikiEditRange.start === start && wikiEditRange.end === end;
       if (active) {
-        nodes.push(import_react2.default.createElement("span", { key: `r-${start}` }, match[0]));
+        nodes.push(import_react4.default.createElement("span", { key: `r-${start}` }, match[0]));
       } else {
         const raw = match[1] || "";
         const parts = raw.split("|");
         const target = (parts[0] || raw).trim();
-        nodes.push(import_react2.default.createElement("span", {
+        nodes.push(import_react4.default.createElement("span", {
           key: `l-${start}`,
           className: "jarvis-reader-highlight-input-wikilink",
           onMouseDown: (event) => {
@@ -57425,9 +57729,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       lastIndex = end;
     }
     if (lastIndex < text.length) {
-      nodes.push(import_react2.default.createElement("span", { key: `t-${lastIndex}` }, text.slice(lastIndex)));
+      nodes.push(import_react4.default.createElement("span", { key: `t-${lastIndex}` }, text.slice(lastIndex)));
     }
-    return nodes.length ? nodes : import_react2.default.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "\u5199\u4E0B\u4F60\u7684\u7B14\u8BB0\u4E0E\u601D\u8003");
+    return nodes.length ? nodes : import_react4.default.createElement("span", { className: "jarvis-reader-highlight-input-placeholder" }, "\u5199\u4E0B\u4F60\u7684\u7B14\u8BB0\u4E0E\u601D\u8003");
   };
   const clearHighlightUi = () => {
     pendingWordLookupRef.current += 1;
@@ -57445,10 +57749,10 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     try {
       await navigator.clipboard.writeText(item.quote);
-      new import_obsidian5.Notice("\u5DF2\u590D\u5236");
+      new import_obsidian7.Notice("\u5DF2\u590D\u5236");
     } catch (error) {
       console.warn("Jarvis Reader copy highlight failed.", error);
-      new import_obsidian5.Notice("\u590D\u5236\u5931\u8D25");
+      new import_obsidian7.Notice("\u590D\u5236\u5931\u8D25");
     }
   };
   const openHighlightCommentEditor = (item) => {
@@ -57487,13 +57791,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       return;
     const effectiveApp = app || window.app;
     if (!effectiveApp) {
-      new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+      new import_obsidian7.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
       return;
     }
     const confirmed = await confirmDestructiveAction(
       effectiveApp,
-      "\u5220\u9664\u5212\u7EBF\u4E0E\u7B14\u8BB0",
-      "\u786E\u5B9A\u8981\u5220\u9664\u8FD9\u6761\u5212\u7EBF\u53CA\u5176\u6240\u6709\u7B14\u8BB0\u5417\uFF1F\u8FD9\u4F1A\u6E05\u9664\u9605\u8BFB\u5668\u4E2D\u7684\u539F\u6587\u6807\u8BB0\u548C\u4E66\u7C4D\u7B14\u8BB0\u4E2D\u7684\u5BF9\u5E94\u5185\u5BB9\uFF0C\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002"
+      "\u5220\u9664\u9AD8\u4EAE\u4E0E\u7B14\u8BB0",
+      "\u786E\u5B9A\u8981\u5220\u9664\u8FD9\u6761\u9AD8\u4EAE\u53CA\u5176\u6240\u6709\u7B14\u8BB0\u5417\uFF1F\u8FD9\u4F1A\u6E05\u9664\u9605\u8BFB\u5668\u4E2D\u7684\u539F\u6587\u6807\u8BB0\u548C\u4E66\u7C4D\u7B14\u8BB0\u4E2D\u7684\u5BF9\u5E94\u5185\u5BB9\uFF0C\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002"
     );
     if (!confirmed)
       return;
@@ -57525,7 +57829,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian5.Notice("\u5DF2\u5220\u9664\u8BE5\u6761\u7B14\u8BB0\u3002");
+      new import_obsidian7.Notice("\u5DF2\u5220\u9664\u8BE5\u6761\u7B14\u8BB0\u3002");
     }
   };
   const confirmHighlight = async () => {
@@ -57645,27 +57949,27 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const section = highlightAiSections.find((item) => item.title === "\u5173\u8054\u6587\u7AE0");
     return section ? new Set(section.links || []).size : 0;
   })();
-  const renderHighlightNotes = () => highlightNoteEntries.length ? import_react2.default.createElement("div", {
+  const renderHighlightNotes = () => highlightNoteEntries.length ? import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-note-list"
-  }, highlightNoteEntries.map((entry, index) => import_react2.default.createElement(
+  }, highlightNoteEntries.map((entry, index) => import_react4.default.createElement(
     "div",
     {
       className: "jarvis-reader-highlight-note-card",
       key: `${entry.label || "note"}-${index}`,
       style: { display: "flex", flexDirection: "column", gap: "4px" }
     },
-    import_react2.default.createElement(
+    import_react4.default.createElement(
       "div",
       {
         style: { display: "flex", alignItems: "center", justifyContent: "space-between" }
       },
-      import_react2.default.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "\u7B14\u8BB0"),
-      import_react2.default.createElement(
+      import_react4.default.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "\u7B14\u8BB0"),
+      import_react4.default.createElement(
         "div",
         {
           style: { display: "flex", gap: "6px" }
         },
-        import_react2.default.createElement("button", {
+        import_react4.default.createElement("button", {
           className: "jarvis-reader-highlight-icon-button",
           type: "button",
           title: "\u7F16\u8F91\u7B14\u8BB0",
@@ -57675,14 +57979,14 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
             setHighlightCommentMode("edit");
           }
         }, renderObsidianIcon("pencil")),
-        import_react2.default.createElement("button", {
+        import_react4.default.createElement("button", {
           className: "jarvis-reader-highlight-icon-button",
           type: "button",
           title: "\u5220\u9664\u7B14\u8BB0",
           onClick: async () => {
             const effectiveApp = app || window.app;
             if (!effectiveApp) {
-              new import_obsidian5.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
+              new import_obsidian7.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
               return;
             }
             const confirmed = await confirmDestructiveAction(
@@ -57697,15 +58001,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         }, renderObsidianIcon("trash-2"))
       )
     ),
-    import_react2.default.createElement("div", {
+    import_react4.default.createElement("div", {
       className: "jarvis-reader-highlight-note-card-text",
       style: { marginTop: "2px" }
-    }, import_react2.default.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
-    import_react2.default.createElement("div", {
+    }, import_react4.default.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
+    import_react4.default.createElement("div", {
       className: "jarvis-reader-highlight-note-card-time",
       style: { marginTop: "2px" }
     }, formatHighlightNoteTime(entry.created))
-  ))) : import_react2.default.createElement("div", {
+  ))) : import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-empty"
   }, "\u6682\u65E0\u7B14\u8BB0");
   const addAssociatedLink = async (fileName) => {
@@ -57719,7 +58023,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     const currentLinks = assocSec.links || [];
     const linkNames = currentLinks.map((l) => l.split("|")[0]);
     if (linkNames.includes(fileName)) {
-      new import_obsidian5.Notice("\u5DF2\u7ECF\u5173\u8054\u4E86\u8BE5\u6587\u4EF6\u3002");
+      new import_obsidian7.Notice("\u5DF2\u7ECF\u5173\u8054\u4E86\u8BE5\u6587\u4EF6\u3002");
       return;
     }
     const nowStr = formatLocalDateTime(/* @__PURE__ */ new Date());
@@ -57735,7 +58039,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian5.Notice("\u5DF2\u5173\u8054\u6587\u7AE0\u3002");
+      new import_obsidian7.Notice("\u5DF2\u5173\u8054\u6587\u7AE0\u3002");
     }
     setShowAssocDropdown(false);
   };
@@ -57756,7 +58060,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         ...updated,
         chapterTitle: updated.chapterTitle || readerTitleRef.current
       });
-      new import_obsidian5.Notice("\u5DF2\u53D6\u6D88\u5173\u8054\u3002");
+      new import_obsidian7.Notice("\u5DF2\u53D6\u6D88\u5173\u8054\u3002");
     }
   };
   const renderHighlightAiSections = () => {
@@ -57862,18 +58166,18 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         }
       }
     }
-    return import_react2.default.createElement(
+    return import_react4.default.createElement(
       "div",
       {
         className: "jarvis-reader-highlight-ai-list",
         style: { display: "flex", flex: "1 1 0%", flexDirection: "column", minHeight: 0, overflow: "hidden" }
       },
-      import_react2.default.createElement(
+      import_react4.default.createElement(
         "div",
         {
           style: { flex: "0 0 auto", position: "relative", zIndex: 10008, width: "80%", maxWidth: "360px", margin: "0 auto 12px auto" }
         },
-        import_react2.default.createElement("input", {
+        import_react4.default.createElement("input", {
           className: "jarvis-reader-assoc-search-input",
           type: "text",
           placeholder: "\u641C\u7D22\u5E76\u5173\u8054\u6587\u7AE0...",
@@ -57894,18 +58198,18 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
             fontSize: "13px"
           }
         }),
-        showAssocDropdown ? import_react2.default.createElement(
+        showAssocDropdown ? import_react4.default.createElement(
           "div",
           {
             className: "jarvis-reader-highlight-menu jarvis-reader-assoc-recent-menu",
             style: { position: "absolute", left: 0, right: 0, top: "34px", zIndex: 10008, maxHeight: "250px", overflowY: "auto", display: "flex", flexDirection: "column", background: "var(--background-primary)", border: "1px solid var(--background-modifier-border)", borderRadius: "6px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", padding: 0 },
             onMouseDown: (e) => e.preventDefault()
           },
-          import_react2.default.createElement(
+          import_react4.default.createElement(
             "div",
             { style: { flex: "1 1 auto", overflowY: "auto", padding: "6px" } },
             suggestions.length > 0 ? suggestions.map(
-              (item) => import_react2.default.createElement(
+              (item) => import_react4.default.createElement(
                 "div",
                 {
                   key: item.insertValue,
@@ -57918,17 +58222,17 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
                   },
                   style: { display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "6px 12px", gap: "2px" }
                 },
-                import_react2.default.createElement(
+                import_react4.default.createElement(
                   "div",
                   { style: { display: "flex", alignItems: "center", gap: "6px", width: "100%" } },
                   renderObsidianIcon(item.icon),
-                  import_react2.default.createElement("span", { style: { fontWeight: "500", fontSize: "13px", color: "var(--text-normal)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, item.displayName)
+                  import_react4.default.createElement("span", { style: { fontWeight: "500", fontSize: "13px", color: "var(--text-normal)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, item.displayName)
                 ),
-                item.subtext ? import_react2.default.createElement("span", { style: { fontSize: "11px", color: "var(--text-muted)", paddingLeft: "20px" } }, item.subtext) : null
+                item.subtext ? import_react4.default.createElement("span", { style: { fontSize: "11px", color: "var(--text-muted)", paddingLeft: "20px" } }, item.subtext) : null
               )
-            ) : import_react2.default.createElement("div", { className: "jarvis-reader-context-menu-item-disabled", style: { padding: "6px 12px", color: "var(--text-muted)", fontSize: "12px" } }, "\u672A\u627E\u5230\u5339\u914D\u5185\u5BB9")
+            ) : import_react4.default.createElement("div", { className: "jarvis-reader-context-menu-item-disabled", style: { padding: "6px 12px", color: "var(--text-muted)", fontSize: "12px" } }, "\u672A\u627E\u5230\u5339\u914D\u5185\u5BB9")
           ),
-          import_react2.default.createElement("div", {
+          import_react4.default.createElement("div", {
             className: "jarvis-reader-assoc-dropdown-footer",
             style: {
               padding: "6px 12px",
@@ -57944,13 +58248,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           }, "\u8F93\u5165 # \u53EF\u4EE5\u94FE\u63A5\u5230\u6807\u9898   \u8F93\u5165 ^ \u94FE\u63A5\u6587\u672C\u5757   \u8F93\u5165 | \u6307\u5B9A\u663E\u793A\u7684\u6587\u672C")
         ) : null
       ),
-      import_react2.default.createElement(
+      import_react4.default.createElement(
         "div",
         {
           className: "jarvis-reader-highlight-ai-section",
           style: { display: "flex", flexDirection: "column", flex: "1 1 0%", overflow: "hidden", minHeight: 0 }
         },
-        assocLinks.length > 0 ? import_react2.default.createElement("div", {
+        assocLinks.length > 0 ? import_react4.default.createElement("div", {
           className: "jarvis-reader-highlight-note-list jarvis-reader-highlight-assoc-list",
           style: { display: "flex", flex: "1 1 0%", flexDirection: "column", gap: "8px", minHeight: 0, overflowY: "auto" }
         }, assocLinks.map((link, linkIndex) => {
@@ -57963,24 +58267,24 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
             const parts = linkPath.split("#");
             displayText = `${parts[0]} > ${parts[1]}`;
           }
-          return import_react2.default.createElement(
+          return import_react4.default.createElement(
             "div",
             {
               className: "jarvis-reader-highlight-note-card is-assoc",
               key: `${linkPath}-${linkIndex}`,
               style: { display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", height: "28px", minHeight: "28px" }
             },
-            import_react2.default.createElement("span", { style: { color: "var(--text-muted)", fontSize: "14px", display: "inline-flex", alignItems: "center", userSelect: "none" } }, "\u2022"),
-            import_react2.default.createElement("a", {
+            import_react4.default.createElement("span", { style: { color: "var(--text-muted)", fontSize: "14px", display: "inline-flex", alignItems: "center", userSelect: "none" } }, "\u2022"),
+            import_react4.default.createElement("a", {
               className: "internal-link",
               style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
               onClick: () => openWikiLink(linkPath)
             }, displayText),
-            linkTime ? import_react2.default.createElement("span", {
+            linkTime ? import_react4.default.createElement("span", {
               className: "jarvis-reader-highlight-note-card-time",
               style: { margin: "0 12px 0 auto", fontSize: "11px", color: "var(--text-muted)", opacity: 0.8, flexShrink: 0 }
             }, formatHighlightNoteTime(linkTime)) : null,
-            import_react2.default.createElement("button", {
+            import_react4.default.createElement("button", {
               className: "jarvis-reader-highlight-icon-button",
               type: "button",
               title: "\u53D6\u6D88\u5173\u8054",
@@ -57988,7 +58292,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
               style: { flexShrink: 0 }
             }, renderObsidianIcon("trash-2"))
           );
-        })) : import_react2.default.createElement("div", {
+        })) : import_react4.default.createElement("div", {
           className: "jarvis-reader-highlight-empty",
           style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "13px" }
         }, "\u6682\u65E0\u5173\u8054\u6587\u7AE0")
@@ -58006,7 +58310,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
-  const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
+  const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status !== "loading" && (wordLookupState.status === "error" || wordLookupState.result?.sourceType));
   const persistPendingLabel = normalizedPendingWord?.isPhrase ? "\u4FDD\u5B58\u77ED\u8BED" : "\u4FDD\u5B58\u5355\u8BCD";
   const pendingWordTags = (() => {
     const result = wordLookupState.result;
@@ -58022,7 +58326,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
     }
     return tags;
   })();
-  const renderObsidianIcon = (name) => import_react2.default.createElement("span", {
+  const renderObsidianIcon = (name) => import_react4.default.createElement("span", {
     "aria-hidden": "true",
     className: "jarvis-reader-word-card-action-icon",
     ref: (element) => {
@@ -58031,21 +58335,21 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       while (element.firstChild) {
         element.removeChild(element.firstChild);
       }
-      if (typeof import_obsidian5.setIcon === "function") {
-        (0, import_obsidian5.setIcon)(element, name);
+      if (typeof import_obsidian7.setIcon === "function") {
+        (0, import_obsidian7.setIcon)(element, name);
       }
     }
   });
-  const renderWordDisplayContent = (display) => import_react2.default.createElement("div", {
+  const renderWordDisplayContent = (display) => import_react4.default.createElement("div", {
     className: "jarvis-reader-word-card-display"
   }, truncateWordDisplay(display || "").split(/\r?\n/).filter((line) => line.trim()).map((line, index) => {
     const meta = getWordCardDisplayLineMeta(line);
-    return import_react2.default.createElement("div", {
+    return import_react4.default.createElement("div", {
       className: meta.className,
       key: index
     }, renderWordCardDisplayText(meta.text));
   }));
-  return import_react2.default.createElement("div", {
+  return import_react4.default.createElement("div", {
     className: "jarvis-reader-epub",
     ref: containerRef,
     style: { border: "none", height: "100%", width: "100%", overflow: "hidden" },
@@ -58068,19 +58372,21 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       clearHighlightUi();
       hideWordHoverCard();
     }
-  }, import_react2.default.createElement(ReaderSideControls, {
+  }, import_react4.default.createElement(ReaderSideControls, {
     location: currentLocationRef.current,
     chapterTitle: readerTitleRef.current,
-    singlePage,
-    scrolled: effectiveScrolled,
     onAddBookmark: addBookmark,
     onOpenBookNote: createBookNote,
-    onZoom: setReaderZoom,
-    onLineHeight: setReaderLineHeight,
-    onScrolledChange: setScrolled,
-    onSinglePageChange: setSinglePage
-  }), import_react2.default.createElement(import_react_reader.ReactReader, {
+    getPanelOpen,
+    onPanelOpenChange,
+    getPreferences,
+    onPreferencesChange
+  }), import_react4.default.createElement("div", {
+    className: "jarvis-reader-reading-title",
     title: readerTitle,
+    style: { color: theme.muted, fontFamily: theme.fontFamily, fontSize: theme.fontSize }
+  }, readerTitle), import_react4.default.createElement(import_react_reader.ReactReader, {
+    title: "",
     showToc: false,
     location,
     locationChanged,
@@ -58091,6 +58397,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       tocMemo(toc);
     },
     getRendition: (rendition) => {
+      resizeCleanupRef.current?.();
+      resizeCleanupRef.current = containerRef.current ? bindReaderContainerResize(containerRef.current, {
+        on: (event, callback) => rendition.on(event, callback),
+        off: (event, callback) => rendition.off(event, callback),
+        // Bundled epub.js accepts omitted dimensions; its declarations require them.
+        resize: () => rendition.resize.call(rendition)
+      }) : null;
       renditionRef.current = rendition;
       applyPendingInitLocation(rendition);
       syncRenditionTheme(rendition);
@@ -58115,7 +58428,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
             doc.addEventListener("wheel", (event) => {
               if (!event.ctrlKey) return;
               event.preventDefault();
-              setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
+              setReaderZoom(event.deltaY < 0 ? READER_ZOOM_LIMITS.step : -READER_ZOOM_LIMITS.step);
             }, { passive: false });
             doc.addEventListener("contextmenu", (event) => {
               const win = contents2?.window;
@@ -58142,7 +58455,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
                     console.warn("Jarvis Reader selection location failed.", error);
                   }
                 }
+                const existingHighlight = (highlightListRef.current || []).find((highlight) => highlight.cfiRange === cfiRange);
                 setPendingHighlightMenu({
+                  ...existingHighlight,
                   cfiRange,
                   quote: selectionText,
                   sentence: getSelectionContextSentence(contents2, selectionText),
@@ -58157,6 +58472,7 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
           }
         });
         rendition.on("relocated", (relocated) => {
+          setPendingHighlightMenu(null);
           const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
           if (pendingInitLocationRef.current && relocatedCfi === pendingInitLocationRef.current) {
             pendingInitLocationRef.current = null;
@@ -58224,19 +58540,19 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       },
       prev: {
         ...ReactReaderStyle2.prev,
-        left: "calc(50% - 44px)",
+        left: 8,
         right: "auto",
-        top: "auto",
-        bottom: 20,
-        transform: "none",
+        top: "50%",
+        bottom: "auto",
+        transform: "translateY(-50%)",
         marginTop: 0,
         width: 36,
         height: 36,
-        background: "var(--interactive-normal)",
-        borderRadius: "50%",
-        border: "1px solid var(--background-modifier-border)",
+        background: "transparent",
+        borderRadius: 6,
+        border: "none",
         color: "var(--text-normal)",
-        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -58244,19 +58560,19 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       },
       next: {
         ...ReactReaderStyle2.next,
-        left: "calc(50% + 8px)",
-        right: "auto",
-        top: "auto",
-        bottom: 20,
-        transform: "none",
+        left: "auto",
+        right: 8,
+        top: "50%",
+        bottom: "auto",
+        transform: "translateY(-50%)",
         marginTop: 0,
         width: 36,
         height: 36,
-        background: "var(--interactive-normal)",
-        borderRadius: "50%",
-        border: "1px solid var(--background-modifier-border)",
+        background: "transparent",
+        borderRadius: 6,
+        border: "none",
         color: "var(--text-normal)",
-        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -58265,8 +58581,8 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       arrow: {
         ...ReactReaderStyle2.arrow,
         alignItems: "center",
-        top: "auto",
-        bottom: 20,
+        top: "50%",
+        bottom: "auto",
         boxSizing: "border-box",
         display: "flex",
         width: 36,
@@ -58354,59 +58670,67 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       }
     }
   }), pendingHighlightMenu ? (() => {
-    const containsEnglish = /[a-zA-Z]{2,}/.test(pendingHighlightMenu.quote || "");
-    return import_react2.default.createElement(
+    const canLookupOffline = !!normalizeWordSelection(pendingHighlightMenu.quote || "")?.isSingleWord;
+    return import_react4.default.createElement(
       "div",
       {
-        className: "jarvis-reader-highlight-menu",
+        ref: selectionMenuRef,
+        role: "toolbar",
+        "aria-label": "\u9009\u6587\u64CD\u4F5C",
+        className: "jarvis-reader-highlight-menu jarvis-reader-selection-toolbar",
+        onMouseDown: (event) => event.preventDefault(),
         style: pendingHighlightMenu.rect ? {
           left: pendingHighlightMenu.rect.x,
           top: pendingHighlightMenu.rect.y
         } : void 0,
         onClick: (event) => event.stopPropagation()
       },
-      import_react2.default.createElement("div", {
+      import_react4.default.createElement("button", {
         className: "jarvis-reader-context-menu-item",
         role: "button",
         onClick: () => {
           copyHighlightQuote(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("copy"), import_react2.default.createElement("span", null, "\u590D\u5236")),
-      containsEnglish ? import_react2.default.createElement("div", {
+      }, renderObsidianIcon("copy"), import_react4.default.createElement("span", null, "\u590D\u5236")),
+      canLookupOffline ? import_react4.default.createElement("button", {
         className: "jarvis-reader-context-menu-item",
-        role: "button",
         onClick: () => {
-          openWordTranslator(pendingHighlightMenu);
-          setPendingHighlightMenu(null);
+          void openWordTranslator(pendingHighlightMenu, "offline");
         }
-      }, renderObsidianIcon("languages"), import_react2.default.createElement("span", null, "\u7FFB\u8BD1")) : null,
-      pendingHighlightMenu.id ? null : import_react2.default.createElement("div", {
+      }, renderObsidianIcon("book-open"), import_react4.default.createElement("span", null, "\u79BB\u7EBF\u67E5\u8BCD")) : null,
+      import_react4.default.createElement("button", {
+        className: "jarvis-reader-context-menu-item",
+        onClick: () => {
+          void openWordTranslator(pendingHighlightMenu, "ai");
+        }
+      }, renderObsidianIcon("languages"), import_react4.default.createElement("span", null, "AI \u7FFB\u8BD1")),
+      pendingHighlightMenu.id ? null : import_react4.default.createElement("button", {
         className: "jarvis-reader-context-menu-item",
         role: "button",
         onClick: () => {
           savePlainHighlight(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("highlighter"), import_react2.default.createElement("span", null, "\u9AD8\u4EAE")),
-      import_react2.default.createElement("div", {
+      }, renderObsidianIcon("highlighter"), import_react4.default.createElement("span", null, "\u9AD8\u4EAE")),
+      import_react4.default.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-highlight-menu-button-primary",
         role: "button",
         onClick: () => {
           openHighlightCommentEditor(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("pencil"), import_react2.default.createElement("span", null, "\u7B14\u8BB0")),
-      pendingHighlightMenu.id ? import_react2.default.createElement("div", {
+      }, renderObsidianIcon("pencil"), import_react4.default.createElement("span", null, "\u7B14\u8BB0")),
+      pendingHighlightMenu.id ? import_react4.default.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-context-menu-item-danger",
         role: "button",
         onClick: () => {
           deleteExistingHighlight(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("trash"), import_react2.default.createElement("span", null, "\u5220\u9664\u9AD8\u4EAE")) : null
+      }, renderObsidianIcon("trash"), import_react4.default.createElement("span", null, "\u5220\u9664\u9AD8\u4EAE")) : null
     );
-  })() : null, pendingWordSelection ? import_react2.default.createElement("div", {
+  })() : null, pendingWordSelection ? import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
     style: visibleWordPopoverRect ? {
       left: visibleWordPopoverRect.x,
@@ -58414,59 +58738,59 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       width: visibleWordPopoverRect.width
     } : void 0,
     onClick: (event) => event.stopPropagation()
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-word-card-head",
     style: { cursor: "grab" },
     onPointerDown: beginWordTranslationMove,
     onDoubleClick: resetWordTranslationRect
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-word-card-head-row"
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-title"
-  }, "\u7FFB\u8BD1"), import_react2.default.createElement("div", {
+  }, pendingWordSelection.translationKind === "offline" ? "\u79BB\u7EBF\u67E5\u8BCD" : "AI \u7FFB\u8BD1"), import_react4.default.createElement("div", {
     style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
-  }), import_react2.default.createElement("div", {
+  }), import_react4.default.createElement("div", {
     className: "jarvis-reader-word-card-actions",
     onPointerDown: (event) => event.stopPropagation()
-  }, canSwitchPendingWordToAi ? import_react2.default.createElement("button", {
+  }, canSwitchPendingWordToAi ? import_react4.default.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
     title: "AI \u7FFB\u8BD1",
     onClick: translatePendingWordWithAi
-  }, renderObsidianIcon("bot")) : null, canPersistPendingWord && !savedWordAsset ? import_react2.default.createElement("button", {
+  }, renderObsidianIcon("bot")) : null, canPersistPendingWord && !savedWordAsset ? import_react4.default.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-save",
     title: persistPendingLabel,
     onClick: persistPendingWordAsset
-  }, renderObsidianIcon("bookmark-plus")) : null, import_react2.default.createElement("button", {
+  }, renderObsidianIcon("bookmark-plus")) : null, import_react4.default.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
     title: "\u5173\u95ED",
     onClick: clearHighlightUi
-  }, renderObsidianIcon("x"))))), import_react2.default.createElement("div", {
+  }, renderObsidianIcon("x"))))), import_react4.default.createElement("div", {
     className: "jarvis-reader-word-panel"
-  }, wordLookupState.status === "loading" ? import_react2.default.createElement("div", {
+  }, wordLookupState.status === "loading" ? import_react4.default.createElement("div", {
     className: "jarvis-reader-word-muted"
-  }, "\u6B63\u5728\u7FFB\u8BD1...") : null, wordLookupState.status === "error" ? import_react2.default.createElement("div", {
+  }, "\u6B63\u5728\u7FFB\u8BD1...") : null, wordLookupState.status === "error" ? import_react4.default.createElement("div", {
     className: "jarvis-reader-word-error"
-  }, wordLookupState.error || "\u7FFB\u8BD1\u5931\u8D25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? import_react2.default.createElement(
-    import_react2.default.Fragment,
+  }, wordLookupState.error || "\u7FFB\u8BD1\u5931\u8D25\u3002") : null, wordLookupState.status === "ready" && wordLookupState.result ? import_react4.default.createElement(
+    import_react4.default.Fragment,
     null,
-    wordLookupState.result.isWord !== false ? import_react2.default.createElement("div", {
+    wordLookupState.result.isWord !== false ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-head"
-    }, import_react2.default.createElement("button", {
+    }, import_react4.default.createElement("button", {
       className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button jarvis-reader-word-translate-lemma",
       title: "\u70B9\u51FB\u53D1\u97F3",
       onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
       disabled: !enableWordAudio
-    }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? import_react2.default.createElement("div", {}, wordLookupState.result.phonetic) : null) : null,
-    pendingWordTags.length ? import_react2.default.createElement(
+    }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ? import_react4.default.createElement("div", {}, wordLookupState.result.phonetic) : null) : null,
+    pendingWordTags.length ? import_react4.default.createElement(
       "div",
       { className: "jarvis-reader-word-tags" },
-      pendingWordTags.slice(0, 3).map((tag) => import_react2.default.createElement("span", { key: tag.label, className: `jarvis-reader-word-tag is-${tag.tone}` }, tag.label)),
-      pendingWordTags.length > 3 ? import_react2.default.createElement("span", { className: "jarvis-reader-word-tag is-more" }, `+${pendingWordTags.length - 3}`) : null
+      pendingWordTags.slice(0, 3).map((tag) => import_react4.default.createElement("span", { key: tag.label, className: `jarvis-reader-word-tag is-${tag.tone}` }, tag.label)),
+      pendingWordTags.length > 3 ? import_react4.default.createElement("span", { className: "jarvis-reader-word-tag is-more" }, `+${pendingWordTags.length - 3}`) : null
     ) : null,
-    import_react2.default.createElement("div", { className: "jarvis-reader-word-definition-card" }, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react2.default.createElement("div", {
+    import_react4.default.createElement("div", { className: "jarvis-reader-word-definition-card" }, wordLookupState.result.display ? renderWordDisplayContent(wordLookupState.result.display) : import_react4.default.createElement("div", {
       className: "jarvis-reader-word-translation"
     }, wordLookupState.result.translation))
-  ) : null)) : null, pendingSelection ? import_react2.default.createElement("div", {
+  ) : null)) : null, pendingSelection ? import_react4.default.createElement("div", {
     className: isWikiSuggestOpen ? "jarvis-reader-highlight-popover is-floating is-suggesting" : "jarvis-reader-highlight-popover is-floating",
     style: visibleHighlightPopoverRect ? {
       left: visibleHighlightPopoverRect.x,
@@ -58474,25 +58798,25 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       width: visibleHighlightPopoverRect.width,
       height: visibleHighlightPopoverRect.height
     } : void 0
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-title-row",
     onPointerDown: beginHighlightPopoverMove,
     onDoubleClick: resetHighlightPopoverRect
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-title"
-  }, "\u7B14\u8BB0"), import_react2.default.createElement(
+  }, "\u7B14\u8BB0"), import_react4.default.createElement(
     "div",
     {
       className: "jarvis-reader-highlight-header-actions",
       onPointerDown: (event) => event.stopPropagation()
     },
-    isExistingHighlightComment && pendingSelection.notePath ? import_react2.default.createElement("button", {
+    isExistingHighlightComment && pendingSelection.notePath ? import_react4.default.createElement("button", {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
       title: "\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6",
       onClick: openHighlightNoteBlock
     }, renderObsidianIcon("file-text")) : null,
-    isReadingHighlightComment ? import_react2.default.createElement("button", {
+    isReadingHighlightComment ? import_react4.default.createElement("button", {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
       title: "\u8FFD\u52A0\u7B14\u8BB0",
@@ -58502,53 +58826,53 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         setHighlightContentTab("notes");
       }
     }, renderObsidianIcon("file-pen-line")) : null,
-    isExistingHighlightComment && hasPromotableHighlightNote && typeof promoteHighlight === "function" ? import_react2.default.createElement("button", {
+    isExistingHighlightComment && hasPromotableHighlightNote && typeof promoteHighlight === "function" ? import_react4.default.createElement("button", {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
       title: "\u63D0\u5347\u4E3A\u77E5\u8BC6\u7B14\u8BB0",
       onClick: () => promoteHighlight(pendingSelection)
     }, renderObsidianIcon("file-plus-2")) : null,
-    import_react2.default.createElement("button", {
+    import_react4.default.createElement("button", {
       className: "jarvis-reader-highlight-icon-button",
       type: "button",
       title: "\u5173\u95ED",
       onClick: clearHighlightUi
     }, renderObsidianIcon("x"))
-  )), import_react2.default.createElement("div", {
+  )), import_react4.default.createElement("div", {
     className: highlightContentTab === "ai" ? "jarvis-reader-highlight-content-frame is-association-view" : "jarvis-reader-highlight-content-frame"
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-quote"
-  }, pendingSelection.quote), isReadingHighlightComment ? import_react2.default.createElement(import_react2.default.Fragment, null, import_react2.default.createElement("div", {
+  }, pendingSelection.quote), isReadingHighlightComment ? import_react4.default.createElement(import_react4.default.Fragment, null, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-subtabs"
-  }, import_react2.default.createElement("button", {
+  }, import_react4.default.createElement("button", {
     className: highlightContentTab === "notes" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("notes")
-  }, renderObsidianIcon("sticky-note"), "\u7B14\u8BB0"), import_react2.default.createElement("button", {
+  }, renderObsidianIcon("sticky-note"), "\u7B14\u8BB0"), import_react4.default.createElement("button", {
     className: highlightContentTab === "ai" ? "jarvis-reader-highlight-subtab is-active" : "jarvis-reader-highlight-subtab",
     type: "button",
     onClick: () => setHighlightContentTab("ai")
-  }, renderObsidianIcon("link"), "\u5173\u8054", associatedLinkCount > 0 ? import_react2.default.createElement("span", {
+  }, renderObsidianIcon("link"), "\u5173\u8054", associatedLinkCount > 0 ? import_react4.default.createElement("span", {
     className: "jarvis-reader-highlight-subtab-count",
     title: `\u5171 ${associatedLinkCount} \u6761\u5173\u8054`
-  }, associatedLinkCount) : null)), import_react2.default.createElement("div", {
+  }, associatedLinkCount) : null)), import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-section"
-  }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : import_react2.default.createElement(import_react2.default.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? import_react2.default.createElement("div", {
+  }, highlightContentTab === "ai" ? renderHighlightAiSections() : renderHighlightNotes())) : import_react4.default.createElement(import_react4.default.Fragment, null, isExistingHighlightComment && highlightNoteEntries.length ? import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-note-list is-compact"
-  }, highlightNoteEntries.map((entry, index) => import_react2.default.createElement("div", {
+  }, highlightNoteEntries.map((entry, index) => import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-note-card",
     key: `${entry.label || "note"}-${index}`
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-note-card-text"
-  }, entry.text), import_react2.default.createElement("div", {
+  }, entry.text), import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-note-card-time"
-  }, formatHighlightNoteTime(entry.created))))) : null, import_react2.default.createElement(WikiLinkCodeMirrorEditor, {
+  }, formatHighlightNoteTime(entry.created))))) : null, import_react4.default.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
     onChange: (value) => setHighlightComment(value),
     candidates: currentWikiLinkCandidates,
     onOpenLink: openWikiLink,
     placeholder: highlightCommentPlaceholder
-  }), import_react2.default.createElement("div", {
+  }), import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-input-shell",
     onMouseDown: (event) => {
       const target = event.target;
@@ -58556,9 +58880,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       event.preventDefault();
       highlightInputRef.current?.focus();
     }
-  }, import_react2.default.createElement("div", {
+  }, import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-input-preview"
-  }, renderWikiInputPreview(highlightComment)), import_react2.default.createElement("textarea", {
+  }, renderWikiInputPreview(highlightComment)), import_react4.default.createElement("textarea", {
     className: "jarvis-reader-highlight-input",
     ref: highlightInputRef,
     value: highlightComment,
@@ -58639,9 +58963,9 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
         updateWikiEditRange(event.currentTarget.value, event.currentTarget.selectionStart || 0);
       }
     }
-  }))), wikiSuggest && wikiSuggest.items && wikiSuggest.items.length ? import_react2.default.createElement("div", {
+  }))), wikiSuggest && wikiSuggest.items && wikiSuggest.items.length ? import_react4.default.createElement("div", {
     className: "jarvis-reader-wikilink-suggest"
-  }, wikiSuggest.items.map((item, index) => import_react2.default.createElement("button", {
+  }, wikiSuggest.items.map((item, index) => import_react4.default.createElement("button", {
     key: `${item.path}-${index}`,
     type: "button",
     className: index === wikiSuggest.activeIndex ? "jarvis-reader-wikilink-suggest-item is-active" : "jarvis-reader-wikilink-suggest-item",
@@ -58649,13 +58973,13 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       event.preventDefault();
       insertWikiCandidate(item);
     }
-  }, import_react2.default.createElement("span", {
+  }, import_react4.default.createElement("span", {
     className: "jarvis-reader-wikilink-suggest-title"
-  }, item.title), import_react2.default.createElement("span", {
+  }, item.title), import_react4.default.createElement("span", {
     className: "jarvis-reader-wikilink-suggest-path"
-  }, item.path)))) : null, isReadingHighlightComment ? null : import_react2.default.createElement("div", {
+  }, item.path)))) : null, isReadingHighlightComment ? null : import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-actions"
-  }, import_react2.default.createElement("button", {
+  }, import_react4.default.createElement("button", {
     className: "jarvis-reader-highlight-button",
     onClick: () => {
       if (isExistingHighlightComment) {
@@ -58672,15 +58996,15 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       setWikiSuggest(null);
       setWikiEditRange(null);
     }
-  }, "\u53D6\u6D88"), import_react2.default.createElement("button", {
+  }, "\u53D6\u6D88"), import_react4.default.createElement("button", {
     className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
     onClick: confirmHighlight
-  }, isExistingHighlightComment ? "\u4FDD\u5B58\u7B14\u8BB0" : "\u4FDD\u5B58")), import_react2.default.createElement("div", {
+  }, isExistingHighlightComment ? "\u4FDD\u5B58\u7B14\u8BB0" : "\u4FDD\u5B58")), import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
     title: "\u62D6\u52A8\u53F3\u4E0B\u89D2\u8C03\u6574\u7A97\u4F53\u5927\u5C0F",
     "aria-label": "\u62D6\u52A8\u53F3\u4E0B\u89D2\u8C03\u6574\u7A97\u4F53\u5927\u5C0F"
-  }))) : null, activeWordHover ? import_react2.default.createElement(
+  }))) : null, activeWordHover ? import_react4.default.createElement(
     "div",
     {
       className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
@@ -58691,72 +59015,72 @@ var EpubReader = ({ contents, title, bookPath, scrolled, singlePage, readerZoom,
       onMouseEnter: clearWordHoverHideTimer,
       onMouseLeave: scheduleHideWordHoverCard
     },
-    import_react2.default.createElement("div", {
+    import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-head",
       style: { cursor: "grab" },
       onPointerDown: beginWordHoverCardMove,
       onDoubleClick: resetWordHoverCardPosition
-    }, import_react2.default.createElement("div", {
+    }, import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-head-row"
-    }, import_react2.default.createElement("button", {
+    }, import_react4.default.createElement("button", {
       className: "jarvis-reader-word-card-lemma",
       title: "\u70B9\u51FB\u53D1\u97F3",
       style: { flex: "0 0 auto", cursor: "pointer" },
       onPointerDown: (e) => e.stopPropagation(),
       onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
-    }, activeWordHover.asset.title || activeWordHover.asset.lemma), import_react2.default.createElement("div", {
+    }, activeWordHover.asset.title || activeWordHover.asset.lemma), import_react4.default.createElement("div", {
       style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
-    }), import_react2.default.createElement("div", {
+    }), import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-actions",
       onPointerDown: (e) => e.stopPropagation()
-    }, import_react2.default.createElement("button", {
+    }, import_react4.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
       title: "AI\u7FFB\u8BD1",
       onClick: translateActiveWordWithAi
-    }, renderObsidianIcon("bot")), import_react2.default.createElement("button", {
+    }, renderObsidianIcon("bot")), import_react4.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
       title: "\u5220\u9664\u8BCD\u6761",
       onClick: deleteActiveWordAsset
-    }, renderObsidianIcon("trash")), import_react2.default.createElement("button", {
+    }, renderObsidianIcon("trash")), import_react4.default.createElement("button", {
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
       title: "\u5173\u95ED\u5361\u7247",
       onClick: hideWordHoverCard
-    }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react2.default.createElement("div", {}, activeWordHover.asset.phonetic) : null),
-    activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford ? import_react2.default.createElement(
+    }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react4.default.createElement("div", {}, activeWordHover.asset.phonetic) : null),
+    activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford ? import_react4.default.createElement(
       "div",
       { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
-      activeWordHover.asset.oxford === 1 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
-      activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? import_react2.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(activeWordHover.asset.collins)) : null,
-      activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag) => import_react2.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+      activeWordHover.asset.oxford === 1 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
+      activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(activeWordHover.asset.collins)) : null,
+      activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag) => import_react4.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
     ) : null,
-    import_react2.default.createElement("div", {
+    import_react4.default.createElement("div", {
       className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
-    }, (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react2.default.createElement("div", {
+    }, (activeWordHover.asset.title || activeWordHover.asset.lemma || "").length > 30 ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-original-sentence",
       style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
-    }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react2.default.createElement("div", {
+    }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react4.default.createElement("div", {
       style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
-    }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? import_react2.default.createElement("div", {
+    }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-translation"
-    }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? import_react2.default.createElement("div", {
+    }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-pos"
-    }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? import_react2.default.createElement("div", {
+    }, activeWordHover.asset.partOfSpeech) : null, !activeWordHover.asset.display && activeWordHover.asset.example ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-example"
     }, activeWordHover.asset.example) : null)),
-    activeWordHover.asset.sources && activeWordHover.asset.sources.length ? import_react2.default.createElement("div", {
+    activeWordHover.asset.sources && activeWordHover.asset.sources.length ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-sources"
-    }, import_react2.default.createElement("div", {
+    }, import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-section-title"
-    }, "\u6765\u6E90"), activeWordHover.asset.sources.slice(0, 3).map((source, index) => import_react2.default.createElement("div", {
+    }, "\u6765\u6E90"), activeWordHover.asset.sources.slice(0, 3).map((source, index) => import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-source",
       key: `${source.bookPath || ""}-${source.cfiRange || index}`
-    }, source.bookTitle || source.bookPath || "", source.chapterTitle ? ` \xB7 ${source.chapterTitle}` : "", source.quote ? import_react2.default.createElement("div", {
+    }, source.bookTitle || source.bookPath || "", source.chapterTitle ? ` \xB7 ${source.chapterTitle}` : "", source.quote ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-source-quote"
     }, source.quote) : null))) : null,
-    activeWordHover.asset.updated ? import_react2.default.createElement("div", {
+    activeWordHover.asset.updated ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-card-updated"
     }, `Updated ${formatLocalDate(activeWordHover.asset.updated)}`) : null
-  ) : null, progressLabel ? import_react2.default.createElement("div", {
+  ) : null, progressLabel ? import_react4.default.createElement("div", {
     className: "jarvis-reader-progress-label"
   }, progressLabel) : null);
 };
@@ -58905,7 +59229,7 @@ async function displayReadingSource(rendition, target, isCurrent = () => true, n
 function getWordAssetsMap(settings) {
   return settings.wordAssets && typeof settings.wordAssets === "object" ? settings.wordAssets : {};
 }
-var EpubView = class extends import_obsidian6.FileView {
+var EpubView = class extends import_obsidian8.FileView {
   settings;
   plugin;
   fileToc = null;
@@ -58950,17 +59274,17 @@ var EpubView = class extends import_obsidian6.FileView {
     const assetMap = getWordAssetsMap(this.plugin.settings);
     const assetKey = getTranslationAssetKey(selection, translation);
     if (!assetKey) {
-      new import_obsidian6.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
+      new import_obsidian8.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
       return null;
     }
     const existing = assetMap[assetKey];
     const asset = buildWordAssetFromSelection(this.file, selection, translation, existing, this.plugin.settings);
     if (!asset) {
-      new import_obsidian6.Notice("Failed to build word asset.");
+      new import_obsidian8.Notice("Failed to build word asset.");
       return null;
     }
     await this.plugin.wordAssetService.save(getLightWordAsset(asset));
-    new import_obsidian6.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u5B57\u5178");
+    new import_obsidian8.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u5B57\u5178");
     return asset;
   }
   async deleteWordAsset(asset) {
@@ -58968,7 +59292,7 @@ var EpubView = class extends import_obsidian6.FileView {
     if (!assetKey)
       return false;
     await this.plugin.wordAssetService.delete(assetKey);
-    new import_obsidian6.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+    new import_obsidian8.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
     return true;
   }
   async loadWordDisplay(asset) {
@@ -58984,8 +59308,8 @@ var EpubView = class extends import_obsidian6.FileView {
     if (!highlight.notePath) return;
     try {
       const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
-      if (!(noteFile instanceof import_obsidian6.TFile)) {
-        new import_obsidian6.Notice("\u627E\u4E0D\u5230\u8FD9\u6761\u5212\u7EBF\u5BF9\u5E94\u7684\u4E66\u7C4D\u7B14\u8BB0\u3002");
+      if (!(noteFile instanceof import_obsidian8.TFile)) {
+        new import_obsidian8.Notice("\u627E\u4E0D\u5230\u8FD9\u6761\u5212\u7EBF\u5BF9\u5E94\u7684\u4E66\u7C4D\u7B14\u8BB0\u3002");
         return;
       }
       const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
@@ -59002,10 +59326,10 @@ var EpubView = class extends import_obsidian6.FileView {
         createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
       });
       await openFileInActiveTab(this.app.workspace, file);
-      new import_obsidian6.Notice("\u5DF2\u6253\u5F00\u77E5\u8BC6\u7B14\u8BB0\u3002");
+      new import_obsidian8.Notice("\u5DF2\u6253\u5F00\u77E5\u8BC6\u7B14\u8BB0\u3002");
     } catch (error) {
       console.error("Jarvis Reader knowledge note creation failed.", error);
-      new import_obsidian6.Notice(`\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u5931\u8D25\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+      new import_obsidian8.Notice(`\u521B\u5EFA\u77E5\u8BC6\u7B14\u8BB0\u5931\u8D25\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
     }
   }
   async runHighlightTransaction(notePath, previousHighlights, nextHighlights, reason, applyMarkdown) {
@@ -59022,9 +59346,9 @@ var EpubView = class extends import_obsidian6.FileView {
     } catch (error) {
       console.error("Jarvis Reader highlight transaction failed.", error);
       if (error instanceof HighlightContentConflictError) {
-        new import_obsidian6.Notice(error.message, 0);
+        new import_obsidian8.Notice(error.message, 0);
       } else {
-        new import_obsidian6.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+        new import_obsidian8.Notice(`\u9AD8\u4EAE\u64CD\u4F5C\u5931\u8D25\uFF0C\u7CFB\u7EDF\u5DF2\u5C1D\u8BD5\u6062\u590D\u64CD\u4F5C\u524D\u72B6\u6001\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
       }
       return false;
     }
@@ -59038,7 +59362,7 @@ var EpubView = class extends import_obsidian6.FileView {
         continue;
       }
       const noteFile = this.app.vault.getAbstractFileByPath(highlight.notePath);
-      if (!(noteFile instanceof import_obsidian6.TFile)) {
+      if (!(noteFile instanceof import_obsidian8.TFile)) {
         enriched.push(highlight);
         continue;
       }
@@ -59075,7 +59399,7 @@ var EpubView = class extends import_obsidian6.FileView {
   async createHighlight(selection) {
     const quote = normalizeHighlightQuote(selection?.quote);
     if (!quote || !selection?.cfiRange) {
-      new import_obsidian6.Notice("\u672A\u9009\u4E2D\u6587\u672C");
+      new import_obsidian8.Notice("\u672A\u9009\u4E2D\u6587\u672C");
       return null;
     }
     const noteFile = await getOrCreateBookNote(this.app, this.file, getEpubTocMd(this.fileToc), this.plugin.settings);
@@ -59107,7 +59431,7 @@ var EpubView = class extends import_obsidian6.FileView {
     this.selectedHighlightId = highlight.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(highlight.id);
-    new import_obsidian6.Notice(highlight.comment ? "\u7B14\u8BB0\u5DF2\u4FDD\u5B58" : "\u9AD8\u4EAE\u5DF2\u4FDD\u5B58");
+    new import_obsidian8.Notice(highlight.comment ? "\u7B14\u8BB0\u5DF2\u4FDD\u5B58" : "\u9AD8\u4EAE\u5DF2\u4FDD\u5B58");
     return highlight;
   }
   async updateHighlight(highlight) {
@@ -59133,8 +59457,8 @@ var EpubView = class extends import_obsidian6.FileView {
       updated.commentEntries = highlight.commentEntries;
     }
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath);
-    if (!(noteFile instanceof import_obsidian6.TFile)) {
-      new import_obsidian6.Notice(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${updated.notePath || "\u672A\u77E5\u8DEF\u5F84"}`);
+    if (!(noteFile instanceof import_obsidian8.TFile)) {
+      new import_obsidian8.Notice(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${updated.notePath || "\u672A\u77E5\u8DEF\u5F84"}`);
       return null;
     }
     const nextHighlights = list.map((item) => item.id === updated.id ? updated : item);
@@ -59159,7 +59483,7 @@ var EpubView = class extends import_obsidian6.FileView {
     this.selectedHighlightId = updated.id;
     this.renderHighlightsPane();
     this.revealHighlightInPane(updated.id);
-    new import_obsidian6.Notice(updated.comment ? "\u7B14\u8BB0\u5DF2\u66F4\u65B0" : "\u9AD8\u4EAE\u5DF2\u66F4\u65B0");
+    new import_obsidian8.Notice(updated.comment ? "\u7B14\u8BB0\u5DF2\u66F4\u65B0" : "\u9AD8\u4EAE\u5DF2\u66F4\u65B0");
     return updated;
   }
   async deleteHighlight(highlight) {
@@ -59170,7 +59494,7 @@ var EpubView = class extends import_obsidian6.FileView {
     if (!existing)
       return false;
     const noteFile = this.app.vault.getAbstractFileByPath(existing.notePath);
-    if (noteFile instanceof import_obsidian6.TFile) {
+    if (noteFile instanceof import_obsidian8.TFile) {
       if (!await this.runHighlightTransaction(
         noteFile.path,
         list,
@@ -59189,7 +59513,7 @@ var EpubView = class extends import_obsidian6.FileView {
         );
       } catch (error) {
         console.error("Jarvis Reader orphan highlight delete failed.", error);
-        new import_obsidian6.Notice("\u4E66\u7C4D\u7B14\u8BB0\u5DF2\u4E0D\u5B58\u5728\uFF0C\u4F46\u9AD8\u4EAE\u7D22\u5F15\u5220\u9664\u5931\u8D25\uFF1B\u7D22\u5F15\u4FDD\u6301\u539F\u6837\u3002", 0);
+        new import_obsidian8.Notice("\u4E66\u7C4D\u7B14\u8BB0\u5DF2\u4E0D\u5B58\u5728\uFF0C\u4F46\u9AD8\u4EAE\u7D22\u5F15\u5220\u9664\u5931\u8D25\uFF1B\u7D22\u5F15\u4FDD\u6301\u539F\u6837\u3002", 0);
         return false;
       }
     }
@@ -59208,7 +59532,7 @@ var EpubView = class extends import_obsidian6.FileView {
     }
     this.renderHighlightsPane();
     this.refreshCurrentHighlightPanes();
-    new import_obsidian6.Notice("\u6807\u6CE8\u5DF2\u5220\u9664");
+    new import_obsidian8.Notice("\u6807\u6CE8\u5DF2\u5220\u9664");
     return true;
   }
   selectHighlight(highlight) {
@@ -59316,10 +59640,13 @@ var EpubView = class extends import_obsidian6.FileView {
         }
         const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
         const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
+        const letterSpacing = clampReaderLetterSpacing(this.plugin.settings.readerLetterSpacing);
+        const wordSpacing = clampReaderWordSpacing(this.plugin.settings.readerWordSpacing);
+        const paragraphIndent = normalizeReaderParagraphIndent(this.plugin.settings.readerParagraphIndent);
         const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
-        const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
+        const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}|${paragraphIndent}|${letterSpacing}|${wordSpacing}`;
         if (nextThemeKey !== lastThemeKey) {
-          applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight);
+          applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight, paragraphIndent, letterSpacing, wordSpacing);
           this.refreshCurrentHighlightPanes();
           lastThemeKey = nextThemeKey;
         }
@@ -59364,44 +59691,54 @@ var EpubView = class extends import_obsidian6.FileView {
   }
   reportBackgroundSaveError(context, error) {
     console.error(`Jarvis Reader ${context}\u4FDD\u5B58\u5931\u8D25\u3002`, error);
-    new import_obsidian6.Notice(`${context}\u4FDD\u5B58\u5931\u8D25\uFF0C\u5C06\u5728\u4E0B\u6B21\u64CD\u4F5C\u65F6\u91CD\u8BD5\u3002`);
+    new import_obsidian8.Notice(`${context}\u4FDD\u5B58\u5931\u8D25\uFF0C\u5C06\u5728\u4E0B\u6B21\u64CD\u4F5C\u65F6\u91CD\u8BD5\u3002`);
   }
-  async setReaderZoom(delta) {
-    const nextZoom = clampReaderZoom(clampReaderZoom(this.plugin.settings.readerZoom) + delta);
-    this.plugin.settings.readerZoom = nextZoom;
-    await this.plugin.saveSettings();
-    if (this.currentRendition) {
-      applyObsidianThemeToRendition(this.currentRendition, nextZoom, this.plugin.settings.readerLineHeight);
-      if (typeof this.currentRendition.resize === "function") {
-        this.currentRendition.resize();
-      }
+  renderedReaderLayout = null;
+  readerSettingsOpen = false;
+  getReaderSettingsOpen = () => this.readerSettingsOpen;
+  setReaderSettingsOpen = (open) => {
+    this.readerSettingsOpen = open;
+  };
+  getReaderPreferences = () => ({
+    readerLetterSpacing: clampReaderLetterSpacing(this.plugin.settings.readerLetterSpacing),
+    readerWordSpacing: clampReaderWordSpacing(this.plugin.settings.readerWordSpacing),
+    readerParagraphIndent: normalizeReaderParagraphIndent(this.plugin.settings.readerParagraphIndent),
+    readerWidth: clampReaderWidth(this.plugin.settings.readerWidth),
+    readerZoom: clampReaderZoom(this.plugin.settings.readerZoom),
+    readerLineHeight: clampReaderLineHeight(this.plugin.settings.readerLineHeight),
+    singlePageView: this.plugin.settings.singlePageView,
+    scrolledView: this.plugin.settings.singlePageView && this.plugin.settings.scrolledView
+  });
+  updateReaderPreferences = async (patch) => {
+    const before = this.getReaderPreferences();
+    const next = resolveReaderPreferences(before, patch);
+    Object.assign(this.plugin.settings, next);
+    try {
+      await this.plugin.saveSettings();
+    } catch (error) {
+      this.reportBackgroundSaveError("\u9605\u8BFB\u8BBE\u7F6E", error);
+      throw error;
+    }
+    const rendered = this.renderedReaderLayout || before;
+    if (rendered.readerWidth !== next.readerWidth || rendered.singlePageView !== next.singlePageView || rendered.scrolledView !== next.scrolledView) {
+      await this.onLoadFile(this.file);
+    } else if (this.currentRendition) {
+      applyObsidianThemeToRendition(this.currentRendition, next.readerZoom, next.readerLineHeight, next.readerParagraphIndent, next.readerLetterSpacing, next.readerWordSpacing);
+      this.currentRendition.resize?.();
       this.refreshCurrentHighlightPanes();
     }
+  };
+  async setReaderZoom(delta) {
+    await this.updateReaderPreferences({ readerZoom: this.getReaderPreferences().readerZoom + delta });
   }
   async setReaderLineHeight(delta) {
-    const nextLineHeight = clampReaderLineHeight(clampReaderLineHeight(this.plugin.settings.readerLineHeight) + delta);
-    this.plugin.settings.readerLineHeight = nextLineHeight;
-    await this.plugin.saveSettings();
-    if (this.currentRendition) {
-      applyObsidianThemeToRendition(this.currentRendition, this.plugin.settings.readerZoom, nextLineHeight);
-      if (typeof this.currentRendition.resize === "function") {
-        this.currentRendition.resize();
-      }
-      this.refreshCurrentHighlightPanes();
-    }
+    await this.updateReaderPreferences({ readerLineHeight: this.getReaderPreferences().readerLineHeight + delta });
   }
   async setScrolledView(value) {
-    this.plugin.settings.scrolledView = value;
-    await this.plugin.saveSettings();
-    await this.onLoadFile(this.file);
+    await this.updateReaderPreferences({ scrolledView: value });
   }
   async setSinglePageView(value) {
-    this.plugin.settings.singlePageView = value;
-    if (!value) {
-      this.plugin.settings.scrolledView = false;
-    }
-    await this.plugin.saveSettings();
-    await this.onLoadFile(this.file);
+    await this.updateReaderPreferences({ singlePageView: value });
   }
   async setInitLocation(initLocation) {
     this.plugin.settings.bookInitLocations[this.file.path] = initLocation;
@@ -59451,13 +59788,15 @@ var EpubView = class extends import_obsidian6.FileView {
     const contents = await this.app.vault.adapter.readBinary(file.path);
     this.plugin.activeReaderView = this;
     await this.plugin.setActiveReader(this, "toc");
+    this.renderedReaderLayout = { readerWidth: clampReaderWidth(this.settings.readerWidth), singlePageView: this.settings.singlePageView, scrolledView: this.settings.singlePageView && this.settings.scrolledView };
     this.reactRoot = (0, import_client.createRoot)(this.contentEl);
-    this.reactRoot.render(import_react3.default.createElement(EpubReader, {
+    this.reactRoot.render(import_react5.default.createElement(EpubReader, {
       contents,
       title: file.basename,
       bookPath: file.path,
       scrolled: this.settings.scrolledView,
       singlePage: this.settings.singlePageView,
+      readerWidth: clampReaderWidth(this.settings.readerWidth),
       readerZoom: clampReaderZoom(this.settings.readerZoom),
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
@@ -59489,17 +59828,25 @@ var EpubView = class extends import_obsidian6.FileView {
       registerHighlightDeleted: (callback) => {
         this.registerHighlightDeleted(callback);
       },
+      getPreferences: this.getReaderPreferences,
+      getPanelOpen: this.getReaderSettingsOpen,
+      onPanelOpenChange: this.setReaderSettingsOpen,
+      onPreferencesChange: this.updateReaderPreferences,
       setScrolled: (value) => {
-        this.setScrolledView(value);
+        void this.setScrolledView(value).catch(() => {
+        });
       },
       setSinglePage: (value) => {
-        this.setSinglePageView(value);
+        void this.setSinglePageView(value).catch(() => {
+        });
       },
       setReaderZoom: (delta) => {
-        this.setReaderZoom(delta);
+        void this.setReaderZoom(delta).catch(() => {
+        });
       },
       setReaderLineHeight: (delta) => {
-        this.setReaderLineHeight(delta);
+        void this.setReaderLineHeight(delta).catch(() => {
+        });
       },
       syncRenditionTheme: (rendition) => {
         this.startThemeSync(rendition);
@@ -59565,15 +59912,15 @@ var EpubView = class extends import_obsidian6.FileView {
         created: Date.now()
       });
       if (!added) {
-        new import_obsidian6.Notice("\u8BE5\u4F4D\u7F6E\u5DF2\u5B58\u5728\u4E66\u7B7E");
+        new import_obsidian8.Notice("\u8BE5\u4F4D\u7F6E\u5DF2\u5B58\u5728\u4E66\u7B7E");
         return;
       }
-      new import_obsidian6.Notice("\u4E66\u7B7E\u5DF2\u6DFB\u52A0");
+      new import_obsidian8.Notice("\u4E66\u7B7E\u5DF2\u6DFB\u52A0");
       const event = new CustomEvent("jarvis-reader-bookmarks-updated", { detail: path });
       window.dispatchEvent(event);
     } catch (error) {
       console.error("Failed to add bookmark", error);
-      new import_obsidian6.Notice("\u4E66\u7B7E\u4FDD\u5B58\u5931\u8D25\uFF0C\u672A\u4FDD\u7559\u672C\u6B21\u66F4\u6539\u3002");
+      new import_obsidian8.Notice("\u4E66\u7B7E\u4FDD\u5B58\u5931\u8D25\uFF0C\u672A\u4FDD\u7559\u672C\u6B21\u66F4\u6539\u3002");
     }
   }
   canAcceptExtension(extension) {
@@ -59585,7 +59932,7 @@ var EpubView = class extends import_obsidian6.FileView {
 };
 
 // src/conflict-resolver.ts
-var import_obsidian7 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 
 // src/conflict-resolution-core.ts
 function isRecord2(value) {
@@ -59832,7 +60179,7 @@ async function mergeConfirmedConflicts(host, files) {
 // src/conflict-resolver.ts
 function confirmConflictResolution(app, files) {
   return new Promise((resolve) => {
-    const modal = new import_obsidian7.Modal(app);
+    const modal = new import_obsidian9.Modal(app);
     let settled = false;
     const finish = (value) => {
       if (settled) return;
@@ -59849,7 +60196,7 @@ function confirmConflictResolution(app, files) {
     modal.contentEl.createEl("p", {
       text: `\u5171 ${allConflictPaths(files).length} \u4E2A\u6587\u4EF6\u3002\u9009\u62E9\u201C\u7A0D\u540E\u5904\u7406\u201D\u5C06\u4FDD\u6301\u6240\u6709\u6587\u4EF6\u539F\u6837\u3002`
     });
-    new import_obsidian7.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u7A0D\u540E\u5904\u7406").onClick(() => finish(false))).addButton((button) => button.setButtonText("\u5907\u4EFD\u5E76\u5408\u5E76").setWarning().onClick(() => finish(true)));
+    new import_obsidian9.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u7A0D\u540E\u5904\u7406").onClick(() => finish(false))).addButton((button) => button.setButtonText("\u5907\u4EFD\u5E76\u5408\u5E76").setWarning().onClick(() => finish(true)));
     modal.onClose = () => finish(false);
     modal.open();
   });
@@ -59860,23 +60207,23 @@ async function resolveSyncConflicts(plugin) {
     if (!hasConflictFiles(files)) return;
     const confirmed = await confirmConflictResolution(plugin.app, files);
     if (!confirmed) {
-      new import_obsidian7.Notice("\u540C\u6B65\u51B2\u7A81\u526F\u672C\u4FDD\u6301\u539F\u6837\uFF0C\u53EF\u5728\u4E0B\u6B21\u542F\u52A8\u65F6\u7EE7\u7EED\u5904\u7406\u3002");
+      new import_obsidian9.Notice("\u540C\u6B65\u51B2\u7A81\u526F\u672C\u4FDD\u6301\u539F\u6837\uFF0C\u53EF\u5728\u4E0B\u6B21\u542F\u52A8\u65F6\u7EE7\u7EED\u5904\u7406\u3002");
       return;
     }
     const backupRoot = await mergeConfirmedConflicts(plugin, files);
-    new import_obsidian7.Notice(`\u540C\u6B65\u51B2\u7A81\u5DF2\u5907\u4EFD\u5E76\u5408\u5E76\u3002\u5907\u4EFD\u4F4D\u7F6E\uFF1A${backupRoot}`, 1e4);
+    new import_obsidian9.Notice(`\u540C\u6B65\u51B2\u7A81\u5DF2\u5907\u4EFD\u5E76\u5408\u5E76\u3002\u5907\u4EFD\u4F4D\u7F6E\uFF1A${backupRoot}`, 1e4);
   } catch (error) {
     console.error("Jarvis Reader conflict resolution failed.", error);
-    new import_obsidian7.Notice(`\u540C\u6B65\u51B2\u7A81\u5904\u7406\u5931\u8D25\uFF0C\u51B2\u7A81\u526F\u672C\u672A\u5220\u9664\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
+    new import_obsidian9.Notice(`\u540C\u6B65\u51B2\u7A81\u5904\u7406\u5931\u8D25\uFF0C\u51B2\u7A81\u526F\u672C\u672A\u5220\u9664\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`, 0);
   }
 }
 
 // src/sidebar/BookshelfView.ts
-var import_obsidian9 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 
 // src/sidebar/HighlightsView.ts
-var import_obsidian8 = require("obsidian");
-init_utils();
+var import_obsidian10 = require("obsidian");
+var import_epubjs = __toESM(require_lib2(), 1);
 var HighlightsPanelController = class {
   app;
   contentEl;
@@ -59884,10 +60231,10 @@ var HighlightsPanelController = class {
   reader;
   searchQuery;
   typeFilter;
-  linksOnly;
   currentChapterOnly;
   sortMode;
   focusSearchOnRender;
+  filtersExpanded;
   listScrollTop;
   pendingRevealHighlightId;
   constructor(plugin) {
@@ -59897,9 +60244,9 @@ var HighlightsPanelController = class {
     this.reader = null;
     this.searchQuery = "";
     this.typeFilter = "all";
-    this.linksOnly = false;
     this.currentChapterOnly = false;
     this.sortMode = "chapter";
+    this.filtersExpanded = false;
     this.focusSearchOnRender = false;
     this.listScrollTop = 0;
     this.pendingRevealHighlightId = null;
@@ -60016,71 +60363,45 @@ var HighlightsPanelController = class {
         return false;
       if (this.typeFilter === "note" && !hasComment)
         return false;
-      if (this.linksOnly && !this.getWikiLinks(highlight.comment).length)
-        return false;
       if (this.currentChapterOnly && (!currentChapter || (highlight.chapterTitle || "").trim() !== currentChapter))
         return false;
       return true;
     });
     if (this.sortMode === "time") {
       result = [...result].sort((a, b) => new Date(b.updated || b.created || 0).getTime() - new Date(a.updated || a.created || 0).getTime());
+    } else {
+      const cfi = new import_epubjs.EpubCFI();
+      result = [...result].sort((a, b) => {
+        if (!a.cfiRange || !b.cfiRange) return 0;
+        try {
+          return cfi.compare(a.cfiRange, b.cfiRange);
+        } catch {
+          return 0;
+        }
+      });
     }
     return result;
   }
-  renderFilterButton(container, mode, label) {
-    const button = container.createEl("button", {
-      cls: this.typeFilter === mode ? "jarvis-reader-highlights-filter is-active" : "jarvis-reader-highlights-filter",
-      text: label
-    });
-    button.onclick = () => {
-      this.typeFilter = mode;
-      this.render();
-    };
-  }
-  renderMoreMenu(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const menu = new import_obsidian8.Menu();
-    menu.addItem((item) => {
-      item.setTitle("\u5F53\u524D\u7AE0\u8282").setIcon(this.currentChapterOnly ? "check" : "list").onClick(() => {
-        this.currentChapterOnly = !this.currentChapterOnly;
+  renderChoiceGroup(container, label, choices) {
+    const group = container.createDiv({ cls: "jarvis-reader-highlights-option-group", attr: { role: "group", "aria-label": label } });
+    group.createDiv({ cls: "jarvis-reader-highlights-option-label", text: label });
+    const buttons = group.createDiv({ cls: "jarvis-reader-highlights-filters" });
+    for (const choice of choices) {
+      const button = buttons.createEl("button", {
+        cls: `jarvis-reader-highlights-filter${choice.selected ? " is-active" : ""}`,
+        text: choice.label,
+        attr: { "aria-pressed": String(choice.selected) }
+      });
+      button.onclick = () => {
+        choice.choose();
         this.render();
-      });
-    });
-    menu.addItem((item) => {
-      item.setTitle("\u6709\u94FE\u63A5").setIcon(this.linksOnly ? "check" : "link").onClick(() => {
-        this.linksOnly = !this.linksOnly;
-        this.render();
-      });
-    });
-    menu.addSeparator();
-    menu.addItem((item) => {
-      item.setTitle("\u7AE0\u8282\u987A\u5E8F").setIcon(this.sortMode === "chapter" ? "check" : "list-ordered").onClick(() => {
-        this.sortMode = "chapter";
-        this.render();
-      });
-    });
-    menu.addItem((item) => {
-      item.setTitle("\u65F6\u95F4\u987A\u5E8F").setIcon(this.sortMode === "time" ? "check" : "clock").onClick(() => {
-        this.sortMode = "time";
-        this.render();
-      });
-    });
-    if (this.linksOnly || this.currentChapterOnly) {
-      menu.addSeparator();
-      menu.addItem((item) => {
-        item.setTitle("\u6E05\u9664\u8F85\u52A9\u7B5B\u9009").setIcon("x").onClick(() => {
-          this.linksOnly = false;
-          this.currentChapterOnly = false;
-          this.render();
-        });
-      });
+      };
     }
-    menu.showAtMouseEvent(event);
   }
   renderControls(container) {
     const controls = container.createDiv({ cls: "jarvis-reader-highlights-controls" });
-    const search = controls.createEl("input", {
+    const searchRow = controls.createDiv({ cls: "jarvis-reader-highlights-search-row" });
+    const search = searchRow.createEl("input", {
       cls: "jarvis-reader-highlights-search",
       attr: {
         type: "search",
@@ -60113,16 +60434,55 @@ var HighlightsPanelController = class {
       this.render();
     };
     search.onclick = (event) => event.stopPropagation();
-    const filters = controls.createDiv({ cls: "jarvis-reader-highlights-filters" });
-    this.renderFilterButton(filters, "all", "\u5168\u90E8");
-    this.renderFilterButton(filters, "highlight", "\u9AD8\u4EAE");
-    this.renderFilterButton(filters, "note", "\u7B14\u8BB0");
-    const more = filters.createEl("button", {
-      cls: this.linksOnly || this.currentChapterOnly || this.sortMode === "time" ? "jarvis-reader-highlights-filter jarvis-reader-highlights-more is-active" : "jarvis-reader-highlights-filter jarvis-reader-highlights-more",
-      text: "..."
+    const hasFilters = this.typeFilter !== "all" || this.currentChapterOnly || this.sortMode !== "chapter";
+    const toggle = searchRow.createEl("button", {
+      cls: `jarvis-reader-highlights-filter-toggle clickable-icon${hasFilters ? " is-active" : ""}`,
+      attr: { "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F", "aria-expanded": String(this.filtersExpanded), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F" }
     });
-    more.setAttr("aria-label", "\u66F4\u591A\u7B5B\u9009\u4E0E\u6392\u5E8F");
-    more.onclick = (event) => this.renderMoreMenu(event);
+    (0, import_obsidian10.setIcon)(toggle, "sliders-horizontal");
+    const options = controls.createDiv({ cls: "jarvis-reader-highlights-filter-options" });
+    options.hidden = !this.filtersExpanded;
+    toggle.onclick = () => {
+      this.filtersExpanded = !this.filtersExpanded;
+      options.hidden = !this.filtersExpanded;
+      toggle.setAttr("aria-expanded", String(this.filtersExpanded));
+    };
+    this.renderChoiceGroup(options, "\u5185\u5BB9", [
+      { label: "\u5168\u90E8", selected: this.typeFilter === "all", choose: () => {
+        this.typeFilter = "all";
+      } },
+      { label: "\u4EC5\u9AD8\u4EAE", selected: this.typeFilter === "highlight", choose: () => {
+        this.typeFilter = "highlight";
+      } },
+      { label: "\u542B\u7B14\u8BB0", selected: this.typeFilter === "note", choose: () => {
+        this.typeFilter = "note";
+      } }
+    ]);
+    this.renderChoiceGroup(options, "\u8303\u56F4", [
+      { label: "\u5168\u4E66", selected: !this.currentChapterOnly, choose: () => {
+        this.currentChapterOnly = false;
+      } },
+      { label: "\u5F53\u524D\u7AE0\u8282", selected: this.currentChapterOnly, choose: () => {
+        this.currentChapterOnly = true;
+      } }
+    ]);
+    this.renderChoiceGroup(options, "\u6392\u5E8F", [
+      { label: "\u539F\u6587\u987A\u5E8F", selected: this.sortMode === "chapter", choose: () => {
+        this.sortMode = "chapter";
+      } },
+      { label: "\u6700\u8FD1\u4FEE\u6539", selected: this.sortMode === "time", choose: () => {
+        this.sortMode = "time";
+      } }
+    ]);
+    if (hasFilters) {
+      const reset = options.createEl("button", { cls: "jarvis-reader-highlights-reset", text: "\u91CD\u7F6E" });
+      reset.onclick = () => {
+        this.typeFilter = "all";
+        this.currentChapterOnly = false;
+        this.sortMode = "chapter";
+        this.render();
+      };
+    }
   }
   renderWikiLinks(container, links) {
     if (!links.length)
@@ -60167,7 +60527,6 @@ var HighlightsPanelController = class {
     }
     const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
     header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u7B14\u8BB0" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-book", text: reader.file ? reader.file.basename : "" });
     const list = await reader.getBookHighlightsForReader();
     if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {
@@ -60205,16 +60564,9 @@ var HighlightsPanelController = class {
       };
       card.oncontextmenu = (event) => {
         event.preventDefault();
-        const menu = new import_obsidian8.Menu();
+        const menu = new import_obsidian10.Menu();
         menu.addItem((item) => {
-          item.setTitle("\u5220\u9664\u7B14\u8BB0").setIcon("trash").onClick(async () => {
-            const confirmed = await confirmDestructiveAction(
-              this.app,
-              "\u5220\u9664\u5212\u7EBF\u4E0E\u7B14\u8BB0",
-              "\u786E\u5B9A\u8981\u5220\u9664\u8FD9\u6761\u5212\u7EBF\u53CA\u5176\u6240\u6709\u7B14\u8BB0\u5417\uFF1F\u8FD9\u4F1A\u6E05\u9664\u9605\u8BFB\u5668\u4E2D\u7684\u539F\u6587\u6807\u8BB0\u548C\u4E66\u7C4D\u7B14\u8BB0\u4E2D\u7684\u5BF9\u5E94\u5185\u5BB9\uFF0C\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002"
-            );
-            if (!confirmed)
-              return;
+          item.setTitle("\u5220\u9664").setIcon("trash").onClick(async () => {
             await this.reader.deleteHighlight(highlight);
           });
         });
@@ -60253,13 +60605,10 @@ var HighlightsPanelController = class {
 };
 
 // src/sidebar/BookshelfView.ts
-init_utils();
 var BOOKSHELF_VIEW_TYPE = "jarvis-reader-bookshelf";
-var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
+var JarvisReaderBookshelfView = class extends import_obsidian11.ItemView {
   plugin;
   activePanel;
-  activeNavigationPanel;
-  dualHighlightsMode;
   panelScroll;
   pendingRevealHighlightId;
   highlightsPanel;
@@ -60271,8 +60620,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     super(leaf);
     this.plugin = plugin;
     this.activePanel = "toc";
-    this.activeNavigationPanel = "toc";
-    this.dualHighlightsMode = false;
     this.panelScroll = { toc: 0, bookmarks: 0, highlights: 0 };
     this.pendingRevealHighlightId = null;
     this.highlightsPanel = null;
@@ -60293,7 +60640,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     return "\u9605\u8BFB\u8F85\u52A9\u8FB9\u680F";
   }
   getIcon() {
-    return "jarvis-library-big";
+    return "library-big";
   }
   async onOpen() {
     window.addEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
@@ -60302,52 +60649,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
   async onClose() {
     window.removeEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
     this.clearSidebarWidthGuard();
-  }
-  getLayoutMode() {
-    return this.plugin.settings.sidebarLayoutMode === "dual" ? "dual" : "single";
-  }
-  getSidebarPaneSplit() {
-    const parsed = parseFloat(this.plugin.settings.sidebarPaneSplit);
-    return Number.isFinite(parsed) ? Math.min(75, Math.max(25, parsed)) : 48;
-  }
-  applySidebarPaneSplit(first, second, value) {
-    const split = Math.min(75, Math.max(25, value));
-    first.style.flex = `0 0 ${split}%`;
-    second.style.flex = "1 1 0";
-  }
-  attachSidebarSplitter(splitter, body, first, second) {
-    splitter.onpointerdown = (event) => {
-      event.preventDefault();
-      const pointerId = event.pointerId;
-      let latestSplit = this.getSidebarPaneSplit();
-      body.classList.add("is-resizing");
-      splitter.classList.add("is-dragging");
-      if (typeof splitter.setPointerCapture === "function") {
-        splitter.setPointerCapture(pointerId);
-      }
-      const onPointerMove = (moveEvent) => {
-        const rect = body.getBoundingClientRect();
-        if (!rect.width) return;
-        latestSplit = (moveEvent.clientX - rect.left) / rect.width * 100;
-        this.applySidebarPaneSplit(first, second, latestSplit);
-      };
-      const onPointerUp = async () => {
-        document.removeEventListener("pointermove", onPointerMove);
-        document.removeEventListener("pointerup", onPointerUp);
-        body.classList.remove("is-resizing");
-        splitter.classList.remove("is-dragging");
-        if (typeof splitter.releasePointerCapture === "function") {
-          try {
-            splitter.releasePointerCapture(pointerId);
-          } catch (error) {
-          }
-        }
-        this.plugin.settings.sidebarPaneSplit = Math.min(75, Math.max(25, latestSplit));
-        await this.plugin.saveSettings();
-      };
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    };
   }
   getActiveEpubView() {
     const activeView = this.app.workspace.activeLeaf?.view;
@@ -60365,7 +60666,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     if (reader) {
       this.plugin.activeReaderView = reader;
     }
-    if (this.getLayoutMode() === "single" && preferredPanel) {
+    if (preferredPanel) {
       this.activePanel = preferredPanel;
     }
     this.render();
@@ -60374,7 +60675,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     if (reader && this.plugin.activeReaderView !== reader) return;
     this.plugin.activeReaderView = null;
     this.activePanel = "toc";
-    this.dualHighlightsMode = false;
     if (this.highlightsPanel) {
       this.highlightsPanel.reader = null;
       this.highlightsPanel.pendingRevealHighlightId = null;
@@ -60383,66 +60683,43 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
   }
   revealHighlight(highlightId) {
     this.pendingRevealHighlightId = highlightId || null;
-    if (this.getLayoutMode() === "single") {
-      this.activePanel = "highlights";
-    }
+    this.activePanel = "highlights";
     this.render();
   }
   makePanelButton(container, label, icon, active, disabled, onClick) {
     const button = container.createEl("button", {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
-        "aria-label": label
+        "aria-label": label,
+        "aria-pressed": String(active)
       }
     });
-    button.innerHTML = icon;
+    (0, import_obsidian11.setIcon)(button, icon);
     button.disabled = !!disabled;
     button.onclick = (event) => {
       event.preventDefault();
       if (disabled) {
-        new import_obsidian9.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
+        new import_obsidian11.Notice("\u8BF7\u5148\u6253\u5F00 EPUB");
         return;
       }
       onClick();
     };
     return button;
   }
-  async toggleLayoutMode() {
-    this.plugin.settings.sidebarLayoutMode = this.getLayoutMode() === "single" ? "dual" : "single";
-    await this.plugin.saveSettings();
-    this.render();
-  }
   renderToolbar(container, activeEpub) {
-    const mode = this.getLayoutMode();
-    const hasReader = !!activeEpub;
     const toolbar = container.createDiv({ cls: "jarvis-reader-sidebar-toolbar" });
-    const layoutButton = toolbar.createEl("button", {
-      cls: "jarvis-reader-sidebar-tab jarvis-reader-sidebar-layout-toggle",
-      attr: {
-        "aria-label": mode === "single" ? "\u5207\u6362\u5230\u53CC\u680F" : "\u5207\u6362\u5230\u5355\u680F"
-      }
-    });
-    layoutButton.innerHTML = mode === "single" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M12 4v16"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M9 4v16"></path><path d="m14 9-3 3 3 3"></path></svg>';
-    layoutButton.onclick = () => this.toggleLayoutMode();
     const panelActions = toolbar.createDiv({ cls: "jarvis-reader-sidebar-panel-actions" });
-    if (mode === "single") {
-      this.makePanelButton(panelActions, "\u5BFC\u822A", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4h4l1 16H4z"></path><path d="M11 20V4h3v16h-3z"></path><path d="M16 4h4v16h-4l-1-16z"></path></svg>', this.activePanel === "toc", !hasReader, () => {
-        this.activePanel = "toc";
+    const panels = [
+      { id: "toc", label: "\u76EE\u5F55\u5BFC\u822A", icon: "list" },
+      { id: "bookmarks", label: "\u5DF2\u4FDD\u5B58\u7684\u4E66\u7B7E", icon: "book-marked" },
+      { id: "highlights", label: "\u7B14\u8BB0\u9AD8\u4EAE", icon: "file-text" }
+    ];
+    for (const panel of panels) {
+      this.makePanelButton(panelActions, panel.label, panel.icon, this.activePanel === panel.id, !activeEpub, () => {
+        this.activePanel = panel.id;
         this.render();
       });
-      this.makePanelButton(panelActions, "\u8BFB\u4E66\u7B14\u8BB0", '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z"></path><polyline points="15 3 15 9 21 9"></polyline></svg>', this.activePanel === "highlights", !hasReader, () => {
-        this.activePanel = "highlights";
-        this.render();
-      });
-    } else {
     }
-  }
-  getDisplayBookTitle(activeEpub) {
-    const bookTitle = activeEpub && activeEpub.file ? activeEpub.file.basename : "";
-    let displayTitle = bookTitle;
-    const m = displayTitle.match(/^(.*?)(?:[?(](.*?)[?)])?(?:\s*[-_]\s*.*)?$/);
-    if (m && m[1]) displayTitle = m[1].trim();
-    return displayTitle;
   }
   renderPaneHeader(container, title, subtitle = "", action = null) {
     const header = container.createDiv({ cls: "jarvis-reader-bookshelf-header" });
@@ -60479,41 +60756,21 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
       this.panelScroll[key] = listEl.scrollTop;
     });
   }
-  renderNavigationTabs(container) {
-    const tabs = container.createDiv({ cls: "jarvis-reader-navigation-tabs" });
-    const items = [
-      { key: "toc", label: "\u76EE\u5F55" },
-      { key: "bookmarks", label: "\u4E66\u7B7E" }
-    ];
-    for (const item of items) {
-      const button = tabs.createEl("button", {
-        cls: this.activeNavigationPanel === item.key ? "jarvis-reader-navigation-tab is-active" : "jarvis-reader-navigation-tab",
-        text: item.label,
-        attr: { "aria-pressed": String(this.activeNavigationPanel === item.key) }
-      });
-      button.onclick = () => {
-        this.activeNavigationPanel = item.key;
-        this.render();
-      };
-    }
-  }
   async removeBookmark(activeEpub, bookmark) {
-    const confirmed = await confirmDestructiveAction(this.app, "\u5220\u9664\u4E66\u7B7E", `\u786E\u8BA4\u5220\u9664\u4E66\u7B7E\u201C${bookmark.title}\u201D\u5417\uFF1F`);
-    if (!confirmed) return;
     try {
       const removed = await this.plugin.bookStateService.removeBookmark(activeEpub.file.path, bookmark);
       if (!removed) return;
       window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated", { detail: activeEpub.file.path }));
     } catch (error) {
       console.error("Failed to remove bookmark", error);
-      new import_obsidian9.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
+      new import_obsidian11.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
     }
   }
   renderBookmarksList(container, activeEpub, bookmarks) {
     if (!bookmarks.length) {
       container.createEl("div", {
         cls: "jarvis-reader-bookshelf-empty",
-        text: "\u672C\u4E66\u6682\u65E0\u4E66\u7B7E\u3002\u70B9\u51FB\u9605\u8BFB\u5668\u4FA7\u8FB9\u7684\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u4FDD\u5B58\u5F53\u524D\u4F4D\u7F6E\u3002"
+        text: "\u672C\u4E66\u6682\u65E0\u4E66\u7B7E\u3002\u70B9\u51FB\u9605\u8BFB\u9875\u53F3\u4E0A\u89D2\u7684\u6DFB\u52A0\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u4FDD\u5B58\u5F53\u524D\u4F4D\u7F6E\u3002"
       });
       return;
     }
@@ -60528,14 +60785,12 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
       const content = item.createDiv({ cls: "jarvis-reader-bookmark-content" });
       content.createDiv({ cls: "jarvis-reader-bookmark-title", text: bookmark.title || "\u672A\u77E5\u7AE0\u8282" });
       content.createDiv({ cls: "jarvis-reader-bookmark-meta", text: new Date(bookmark.created).toLocaleString() });
-      const deleteButton = item.createEl("button", {
-        cls: "jarvis-reader-bookmark-delete",
-        attr: { "aria-label": `\u5220\u9664\u4E66\u7B7E\uFF1A${bookmark.title}`, title: "\u5220\u9664\u4E66\u7B7E" }
-      });
-      deleteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
-      deleteButton.onclick = (event) => {
+      item.oncontextmenu = (event) => {
+        event.preventDefault();
         event.stopPropagation();
-        void this.removeBookmark(activeEpub, bookmark);
+        const menu = new import_obsidian11.Menu();
+        menu.addItem((entry) => entry.setTitle("\u5220\u9664").setIcon("trash").onClick(() => this.removeBookmark(activeEpub, bookmark)));
+        menu.showAtMouseEvent(event);
       };
       item.onclick = () => activeEpub.jumpToCfi(bookmark.cfi);
       item.onkeydown = (event) => {
@@ -60550,9 +60805,8 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     container.className = "jarvis-reader-sidebar-pane jarvis-reader-sidebar-toc-pane";
     container.empty();
     const bookmarks = activeEpub?.file ? this.plugin.settings.bookBookmarks?.[activeEpub.file.path] || [] : [];
-    this.renderPaneHeader(container, "\u5BFC\u822A", this.getDisplayBookTitle(activeEpub));
-    this.renderNavigationTabs(container);
-    if (this.activeNavigationPanel === "bookmarks") {
+    this.renderPaneHeader(container, this.activePanel === "bookmarks" ? "\u4E66\u7B7E" : "\u76EE\u5F55\u5BFC\u822A");
+    if (this.activePanel === "bookmarks") {
       this.renderBookmarksList(container, activeEpub, bookmarks);
       return;
     }
@@ -60675,36 +60929,17 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
     const container = this.contentEl;
     if (!container) return;
     const activeEpub = this.getActiveEpubView();
-    const mode = this.getLayoutMode();
     if (!activeEpub) {
       this.activePanel = "toc";
     }
     container.empty();
     container.className = "view-content jarvis-reader-bookshelf-view jarvis-reader-sidebar-view";
     this.renderToolbar(container, activeEpub);
-    const body = container.createDiv({ cls: mode === "dual" && activeEpub ? "jarvis-reader-sidebar-body is-dual" : "jarvis-reader-sidebar-body is-single" });
+    const body = container.createDiv({ cls: "jarvis-reader-sidebar-body is-single" });
     if (!activeEpub) {
       const pane2 = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
       this.renderPaneHeader(pane2, "\u8F85\u52A9\u8FB9\u680F", "");
       pane2.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "\u8BF7\u6253\u5F00\u4E00\u672C\u56FE\u4E66\u4EE5\u67E5\u770B\u76EE\u5F55\u548C\u7B14\u8BB0" });
-      return;
-    }
-    if (mode === "dual") {
-      this.updateSidebarWidthGuard(activeEpub, body);
-      const first = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      const splitter = body.createDiv({
-        cls: "jarvis-reader-sidebar-splitter",
-        attr: {
-          role: "separator",
-          "aria-orientation": "vertical",
-          title: "\u62D6\u52A8\u8C03\u6574\u5BBD\u5EA6"
-        }
-      });
-      const second = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      this.applySidebarPaneSplit(first, second, this.getSidebarPaneSplit());
-      this.attachSidebarSplitter(splitter, body, first, second);
-      this.renderNavigationPanel(first, activeEpub);
-      this.renderHighlightsPanel(second, activeEpub);
       return;
     }
     this.clearSidebarWidthGuard();
@@ -60718,23 +60953,23 @@ var JarvisReaderBookshelfView = class extends import_obsidian9.ItemView {
 };
 
 // src/library/LibraryView.ts
-var import_obsidian13 = require("obsidian");
-var React6 = __toESM(require_react(), 1);
+var import_obsidian15 = require("obsidian");
+var React8 = __toESM(require_react(), 1);
 var ReactDOM = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
-var React5 = __toESM(require_react(), 1);
-var import_obsidian12 = require("obsidian");
+var React7 = __toESM(require_react(), 1);
+var import_obsidian14 = require("obsidian");
 init_book_notes();
 init_utils();
 
 // src/library/BookBookmarksPanel.tsx
-var import_obsidian10 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 init_utils();
-var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 function BookBookmarksPanel({ plugin, book, bookmarks }) {
   if (!bookmarks.length) {
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u4FDD\u5B58\u7684\u4E66\u7B7E\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u70B9\u51FB\u53F3\u4FA7\u60AC\u6D6E\u680F\u7684\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u6DFB\u52A0\u3002" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u4FDD\u5B58\u7684\u4E66\u7B7E\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u70B9\u51FB\u53F3\u4FA7\u60AC\u6D6E\u680F\u7684\u4E66\u7B7E\u6309\u94AE\u5373\u53EF\u6DFB\u52A0\u3002" }) });
   }
   const removeBookmark = async (bookmark) => {
     const confirmed = await confirmDestructiveAction(plugin.app, "\u5220\u9664\u4E66\u7B7E", `\u786E\u8BA4\u5220\u9664\u4E66\u7B7E\u201C${bookmark.title}\u201D\u5417\uFF1F`);
@@ -60744,7 +60979,7 @@ function BookBookmarksPanel({ plugin, book, bookmarks }) {
       window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
     } catch (error) {
       console.error("Failed to remove bookmark", error);
-      new import_obsidian10.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
+      new import_obsidian12.Notice("\u4E66\u7B7E\u5220\u9664\u5931\u8D25\uFF0C\u539F\u4E66\u7B7E\u5DF2\u4FDD\u7559\u3002");
     }
   };
   const jumpToBookmark = async (bookmark) => {
@@ -60762,24 +60997,24 @@ function BookBookmarksPanel({ plugin, book, bookmarks }) {
     await leaf.openFile(book, { eState: { epubcifi: bookmark.cfi } });
     await plugin.openBookshelfPane(true);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-library-bookmarks-list", style: { display: "flex", flexDirection: "column", gap: "12px" }, children: [...bookmarks].sort((a, b) => b.created - a.created).map((bookmark) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-library-bookmark-card hl-card", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-content", style: { paddingBottom: "12px" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.1em", marginBottom: "4px", color: "var(--text-normal)" }, children: bookmark.title }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: new Date(bookmark.created).toLocaleString() })
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-bookmarks-list", style: { display: "flex", flexDirection: "column", gap: "12px" }, children: [...bookmarks].sort((a, b) => b.created - a.created).map((bookmark) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-bookmark-card hl-card", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-content", style: { paddingBottom: "12px" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontWeight: "bold", fontSize: "1.1em", marginBottom: "4px", color: "var(--text-normal)" }, children: bookmark.title }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "0.85em", color: "var(--text-muted)" }, children: new Date(bookmark.created).toLocaleString() })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hl-card-actions", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn", onClick: (event) => {
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-actions", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn", onClick: (event) => {
         event.stopPropagation();
         void removeBookmark(bookmark);
       }, children: "\u5220\u9664" }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => void jumpToBookmark(bookmark), children: "\u8DF3\u8F6C\u4F4D\u7F6E \u2192" })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => void jumpToBookmark(bookmark), children: "\u8DF3\u8F6C\u4F4D\u7F6E \u2192" })
     ] })
   ] }, `${bookmark.cfi}-${bookmark.created}`)) });
 }
 
 // src/library/BookHighlightsPanel.tsx
-var import_react4 = __toESM(require_react(), 1);
-var import_obsidian11 = require("obsidian");
+var import_react6 = __toESM(require_react(), 1);
+var import_obsidian13 = require("obsidian");
 
 // src/library/library-highlight-core.ts
 function getLibraryHighlightNoteEntries(highlight) {
@@ -60799,7 +61034,7 @@ function getLibraryHighlightLinks(highlight) {
 }
 
 // src/library/BookHighlightsPanel.tsx
-var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
 function formatDate(value) {
   if (!value) return "";
   const date = new Date(value);
@@ -60813,33 +61048,33 @@ function formatDateTime(value) {
   return `${parts.join("-")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 function ObsidianIcon({ name }) {
-  const ref = import_react4.default.useRef(null);
-  import_react4.default.useEffect(() => {
-    if (ref.current) (0, import_obsidian11.setIcon)(ref.current, name);
+  const ref = import_react6.default.useRef(null);
+  import_react6.default.useEffect(() => {
+    if (ref.current) (0, import_obsidian13.setIcon)(ref.current, name);
   }, [name]);
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { ref, style: { width: "13px", height: "13px", display: "inline-flex" } });
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { ref, style: { width: "13px", height: "13px", display: "inline-flex" } });
 }
 function MarkdownText({ content, plugin }) {
-  const ref = import_react4.default.useRef(null);
-  import_react4.default.useEffect(() => {
+  const ref = import_react6.default.useRef(null);
+  import_react6.default.useEffect(() => {
     const element = ref.current;
     if (!element) return;
     element.empty();
-    void import_obsidian11.MarkdownRenderer.render(plugin.app, content, element, "", plugin).catch(console.error);
+    void import_obsidian13.MarkdownRenderer.render(plugin.app, content, element, "", plugin).catch(console.error);
   }, [content, plugin]);
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { ref, className: "jarvis-library-markdown" });
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { ref, className: "jarvis-library-markdown" });
 }
 function BookHighlightsPanel({ plugin, book, title, highlights, onJump }) {
   if (!highlights.length) {
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5212\u7EBF\u6216\u7B14\u8BB0\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u9009\u4E2D\u6587\u672C\u5373\u53EF\u6DFB\u52A0\u3002" }) });
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-tab-empty", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: "\u672C\u4E66\u6682\u65E0\u5212\u7EBF\u6216\u7B14\u8BB0\u3002\u5728\u9605\u8BFB\u5668\u4E2D\u9009\u4E2D\u6587\u672C\u5373\u53EF\u6DFB\u52A0\u3002" }) });
   }
   const normalColor = plugin.settings.highlightColors?.normal || "#ffeb3b";
   const openLink = async (linkPath) => {
     const file = plugin.app.metadataCache.getFirstLinkpathDest(linkPath, "");
-    if (file instanceof import_obsidian11.TFile) await plugin.app.workspace.getLeaf(false).openFile(file);
-    else new import_obsidian11.Notice(`\u672A\u627E\u5230\u6587\u4EF6: ${linkPath}`);
+    if (file instanceof import_obsidian13.TFile) await plugin.app.workspace.getLeaf(false).openFile(file);
+    else new import_obsidian13.Notice(`\u672A\u627E\u5230\u6587\u4EF6: ${linkPath}`);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-highlights-list", children: highlights.map((highlight) => {
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-highlights-list", children: highlights.map((highlight) => {
     const notes = getLibraryHighlightNoteEntries(highlight);
     const links = getLibraryHighlightLinks(highlight);
     const hasDetails = notes.length > 0 || links.length > 0;
@@ -60857,45 +61092,45 @@ function BookHighlightsPanel({ plugin, book, title, highlights, onJump }) {
       borderLeftWidth: "3px",
       borderLeftStyle: "solid"
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-highlight-card", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "hl-card-chapter", children: highlight.chapterTitle || "\u6B63\u6587\u7AE0\u8282" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "hl-card-date", children: formatDate(highlight.updated || highlight.created) })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-highlight-card", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "hl-card-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "hl-card-chapter", children: highlight.chapterTitle || "\u6B63\u6587\u7AE0\u8282" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "hl-card-date", children: formatDate(highlight.updated || highlight.created) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-body", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("blockquote", { className: "hl-card-quote", style: quoteStyle, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: highlight.quote || "\u539F\u6587\u5185\u5BB9\u6682\u65F6\u4E0D\u53EF\u7528" }) }),
-        !!notes.length && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "hl-card-notes-container", style: { marginTop: "10px", display: "flex", flexDirection: "column", gap: "8px" }, children: notes.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-reader-highlight-note-card", style: { padding: "8px 10px", marginTop: "4px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", fontWeight: 600, color: "var(--text-normal)", marginBottom: "4px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "sticky-note" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: entry.label }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { marginLeft: "auto", fontWeight: "normal", fontSize: "11px", color: "var(--text-muted)" }, children: formatDateTime(entry.created) })
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "hl-card-body", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("blockquote", { className: "hl-card-quote", style: quoteStyle, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: highlight.quote || "\u539F\u6587\u5185\u5BB9\u6682\u65F6\u4E0D\u53EF\u7528" }) }),
+        !!notes.length && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hl-card-notes-container", style: { marginTop: "10px", display: "flex", flexDirection: "column", gap: "8px" }, children: notes.map((entry, index) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-reader-highlight-note-card", style: { padding: "8px 10px", marginTop: "4px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", fontWeight: 600, color: "var(--text-normal)", marginBottom: "4px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ObsidianIcon, { name: "sticky-note" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: entry.label }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { marginLeft: "auto", fontWeight: "normal", fontSize: "11px", color: "var(--text-muted)" }, children: formatDateTime(entry.created) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { fontSize: "13px", color: "var(--text-normal)" }, children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(MarkdownText, { content: entry.text, plugin }) })
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { fontSize: "13px", color: "var(--text-normal)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(MarkdownText, { content: entry.text, plugin }) })
         ] }, `${entry.created}-${index}`)) }),
-        !!links.length && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "hl-card-assoc-container", style: { marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px", borderTop: "1px solid var(--background-modifier-border)", paddingTop: "8px" }, children: links.map((link, index) => {
+        !!links.length && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "hl-card-assoc-container", style: { marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px", borderTop: "1px solid var(--background-modifier-border)", paddingTop: "8px" }, children: links.map((link, index) => {
           const [linkPath = "", linkTime] = link.split("|");
           const displayText = linkPath.includes("#^") ? linkPath.replace("#^", " > ^") : linkPath.replace("#", " > ");
-          return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0", minHeight: "28px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { color: "var(--text-muted)" }, children: "\u2022" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "link" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { className: "internal-link", style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, onClick: () => void openLink(linkPath), children: displayText }),
-            linkTime && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { style: { marginLeft: "auto", fontSize: "11px", color: "var(--text-muted)", opacity: 0.8 }, children: formatDateTime(linkTime) })
+          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px", padding: "2px 0", minHeight: "28px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { color: "var(--text-muted)" }, children: "\u2022" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ObsidianIcon, { name: "link" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("a", { className: "internal-link", style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }, onClick: () => void openLink(linkPath), children: displayText }),
+            linkTime && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { marginLeft: "auto", fontSize: "11px", color: "var(--text-muted)", opacity: 0.8 }, children: formatDateTime(linkTime) })
           ] }, `${link}-${index}`);
         }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hl-card-actions", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "hl-card-actions", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "hl-card-action-btn", onClick: () => {
           const note = highlight.comment ? `\uFF08\u7B14\u8BB0\uFF1A${highlight.comment}\uFF09` : "";
-          void navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${highlight.quote || ""}\u300D${note}`).then(() => new import_obsidian11.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F"));
+          void navigator.clipboard.writeText(`\u300A${title}\u300B\uFF1A\u300C${highlight.quote || ""}\u300D${note}`).then(() => new import_obsidian13.Notice("\u9AD8\u4EAE\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F"));
         }, children: "\u590D\u5236\u5185\u5BB9" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => onJump(book, highlight), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "hl-card-action-btn action-jump", onClick: () => onJump(book, highlight), children: "\u8DF3\u8F6C\u539F\u6587 \u2192" })
       ] })
     ] }, highlight.id || highlight.blockId);
   }) });
 }
 
 // src/library/LibraryApp.tsx
-var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
+var import_jsx_runtime5 = __toESM(require_jsx_runtime(), 1);
 function formatDate2(dateStr) {
   if (!dateStr) return "";
   try {
@@ -60935,25 +61170,25 @@ function formatBookStatus(status) {
   return status === "finished" ? "\u5DF2\u8BFB\u5B8C" : status === "reading" ? "\u5728\u8BFB" : "\u672A\u8BFB";
 }
 function LibraryApp({ plugin }) {
-  const [currentView, setCurrentView] = React5.useState("home");
-  const [activeBook, setActiveBook] = React5.useState(null);
-  const [detailHighlights, setDetailHighlights] = React5.useState([]);
-  const [searchQuery, setSearchQuery] = React5.useState("");
-  const [filterStatus, setFilterStatus] = React5.useState("all");
-  const [sortBy, setSortBy] = React5.useState("recent");
-  const [viewLayout, setViewLayout] = React5.useState("grid");
-  const [activeTab, setActiveTab] = React5.useState("highlights");
-  const [descExpanded, setDescExpanded] = React5.useState(false);
-  const [showFilters, setShowFilters] = React5.useState(false);
-  const [showLayoutMenu, setShowLayoutMenu] = React5.useState(false);
-  const [bookMetadata, setBookMetadata] = React5.useState({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
-  const [tagInput, setTagInput] = React5.useState("");
-  const [isEditingIntro, setIsEditingIntro] = React5.useState(false);
-  const [gridCols, setGridCols] = React5.useState(6);
-  const [selectedGridBook, setSelectedGridBook] = React5.useState(null);
-  const [bookNotesMap, setBookNotesMap] = React5.useState({});
-  const homeRef = React5.useRef(null);
-  React5.useEffect(() => {
+  const [currentView, setCurrentView] = React7.useState("home");
+  const [activeBook, setActiveBook] = React7.useState(null);
+  const [detailHighlights, setDetailHighlights] = React7.useState([]);
+  const [searchQuery, setSearchQuery] = React7.useState("");
+  const [filterStatus, setFilterStatus] = React7.useState("all");
+  const [sortBy, setSortBy] = React7.useState("recent");
+  const [viewLayout, setViewLayout] = React7.useState("grid");
+  const [activeTab, setActiveTab] = React7.useState("highlights");
+  const [descExpanded, setDescExpanded] = React7.useState(false);
+  const [showFilters, setShowFilters] = React7.useState(false);
+  const [showLayoutMenu, setShowLayoutMenu] = React7.useState(false);
+  const [bookMetadata, setBookMetadata] = React7.useState({ status: "unread", rating: 0, tags: [], startDate: "", finishDate: "", summary: "" });
+  const [tagInput, setTagInput] = React7.useState("");
+  const [isEditingIntro, setIsEditingIntro] = React7.useState(false);
+  const [gridCols, setGridCols] = React7.useState(6);
+  const [selectedGridBook, setSelectedGridBook] = React7.useState(null);
+  const [bookNotesMap, setBookNotesMap] = React7.useState({});
+  const homeRef = React7.useRef(null);
+  React7.useEffect(() => {
     if (currentView !== "home" || viewLayout !== "grid" || !selectedGridBook) return;
     const ownerDocument = homeRef.current?.ownerDocument;
     if (!ownerDocument) return;
@@ -60964,23 +61199,23 @@ function LibraryApp({ plugin }) {
     ownerDocument.addEventListener("pointerdown", collapseOutsideBook, true);
     return () => ownerDocument.removeEventListener("pointerdown", collapseOutsideBook, true);
   }, [currentView, viewLayout, selectedGridBook]);
-  const [books, setBooks] = React5.useState([]);
-  const [booksLoaded, setBooksLoaded] = React5.useState(false);
-  const [coverCache, setCoverCache] = React5.useState(plugin.settings.bookCoverCache || {});
-  const [statsTab, setStatsTab] = React5.useState("week");
-  const [statsDate, setStatsDate] = React5.useState(() => /* @__PURE__ */ new Date());
-  const [statsChartType, setStatsChartType] = React5.useState("bar");
-  const [debugImages, setDebugImages] = React5.useState(null);
-  const [refreshTrigger, setRefreshTrigger] = React5.useState(0);
-  const loadBooks = React5.useCallback(() => {
+  const [books, setBooks] = React7.useState([]);
+  const [booksLoaded, setBooksLoaded] = React7.useState(false);
+  const [coverCache, setCoverCache] = React7.useState(plugin.settings.bookCoverCache || {});
+  const [statsTab, setStatsTab] = React7.useState("week");
+  const [statsDate, setStatsDate] = React7.useState(() => /* @__PURE__ */ new Date());
+  const [statsChartType, setStatsChartType] = React7.useState("bar");
+  const [debugImages, setDebugImages] = React7.useState(null);
+  const [refreshTrigger, setRefreshTrigger] = React7.useState(0);
+  const loadBooks = React7.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof import_obsidian12.TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof import_obsidian14.TFile && file.extension.toLowerCase() === "epub"
     );
     setBooks(filtered);
     setBooksLoaded(true);
   }, [plugin]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     loadBooks();
     const onCreate = () => loadBooks();
     const onDelete = () => loadBooks();
@@ -60994,12 +61229,12 @@ function LibraryApp({ plugin }) {
       plugin.app.vault.off("rename", onRename);
     };
   }, [plugin, loadBooks]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     const handleUpdate = () => setBooks([...books]);
     window.addEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
     return () => window.removeEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
   }, [books]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     const handleAssetOrHighlightChange = () => setRefreshTrigger((value) => value + 1);
     window.addEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
     window.addEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
@@ -61008,7 +61243,7 @@ function LibraryApp({ plugin }) {
       window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     };
   }, []);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     if (!activeBook || currentView !== "detail") {
       setDetailHighlights([]);
       return;
@@ -61018,7 +61253,7 @@ function LibraryApp({ plugin }) {
       const indexHighlights = getHighlightsForBook(plugin.settings, activeBook.path);
       const highlights = await Promise.all(indexHighlights.map(async (highlight) => {
         const noteFile = plugin.app.vault.getAbstractFileByPath(highlight.notePath);
-        if (!(noteFile instanceof import_obsidian12.TFile)) return highlight;
+        if (!(noteFile instanceof import_obsidian14.TFile)) return highlight;
         try {
           const details = await plugin.bookNoteService.readHighlightDetails(noteFile, highlight);
           return {
@@ -61040,10 +61275,10 @@ function LibraryApp({ plugin }) {
       cancelled = true;
     };
   }, [activeBook, currentView, plugin, refreshTrigger]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     setCoverCache(plugin.settings.bookCoverCache || {});
   }, [plugin.settings.bookCoverCache]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     if (books.length === 0) return;
     const notesMap = {};
     let changedNotes = false;
@@ -61058,7 +61293,7 @@ function LibraryApp({ plugin }) {
       setBookNotesMap(notesMap);
     }
   }, [books, coverCache, plugin.app, plugin.settings]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     const home = homeRef.current;
     if (!home) return;
     let lastWheelTime = 0;
@@ -61077,7 +61312,7 @@ function LibraryApp({ plugin }) {
     home.addEventListener("wheel", onWheel, { passive: false });
     return () => home.removeEventListener("wheel", onWheel);
   }, []);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     if (!booksLoaded) return;
     let cancelled = false;
     const runCoverCacheQueue = async () => {
@@ -61236,7 +61471,7 @@ function LibraryApp({ plugin }) {
     const cached = coverCache[key];
     if (cached?.vaultPath) {
       const coverFile = plugin.app.vault.getAbstractFileByPath(cached.vaultPath);
-      if (coverFile instanceof import_obsidian12.TFile) {
+      if (coverFile instanceof import_obsidian14.TFile) {
         return { ...cached, dataUrl: plugin.app.vault.getResourcePath(coverFile) };
       }
     }
@@ -61246,7 +61481,7 @@ function LibraryApp({ plugin }) {
   const getProgress = (file) => {
     return plugin.settings.bookProgress?.[file.path] || null;
   };
-  const stats = React5.useMemo(() => {
+  const stats = React7.useMemo(() => {
     const total = books.length;
     let readingCount = 0;
     let finishedCount = 0;
@@ -61283,8 +61518,8 @@ function LibraryApp({ plugin }) {
       highlights: totalHighlights
     };
   }, [books, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache, plugin.settings.bookProgress, refreshTrigger]);
-  const selectedStats = React5.useMemo(() => {
-    const today = (0, import_obsidian12.moment)(statsDate);
+  const selectedStats = React7.useMemo(() => {
+    const today = (0, import_obsidian14.moment)(statsDate);
     let startDate;
     let endDate;
     let prevStartDate;
@@ -61305,10 +61540,10 @@ function LibraryApp({ plugin }) {
       prevStartDate = startDate.clone().subtract(1, "year");
       prevEndDate = endDate.clone().subtract(1, "year");
     } else {
-      startDate = (0, import_obsidian12.moment)(0);
-      endDate = (0, import_obsidian12.moment)().endOf("day");
-      prevStartDate = (0, import_obsidian12.moment)(0);
-      prevEndDate = (0, import_obsidian12.moment)().endOf("day");
+      startDate = (0, import_obsidian14.moment)(0);
+      endDate = (0, import_obsidian14.moment)().endOf("day");
+      prevStartDate = (0, import_obsidian14.moment)(0);
+      prevEndDate = (0, import_obsidian14.moment)().endOf("day");
     }
     const statsData = plugin.settings.readingStats || {};
     let totalSeconds = 0;
@@ -61319,7 +61554,7 @@ function LibraryApp({ plugin }) {
     const yearlySecondsMap = {};
     const readDays = /* @__PURE__ */ new Set();
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian12.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian14.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       const isPrevRange = dateVal.isBetween(prevStartDate, prevEndDate, "day", "[]");
@@ -61358,8 +61593,8 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           finishedBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian12.moment)(prog.updated) : (0, import_obsidian12.moment)(0);
-          const finishDateVal = fm.finish_date ? (0, import_obsidian12.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian12.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian14.moment)(prog.updated) : (0, import_obsidian14.moment)(0);
+          const finishDateVal = fm.finish_date ? (0, import_obsidian14.moment)(fm.finish_date, "YYYY-MM-DD") : (0, import_obsidian14.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const isFinishDateInRange = finishDateVal.isValid() && finishDateVal.isBetween(startDate, endDate, "day", "[]");
           if (isUpdatedInRange || isFinishDateInRange) {
@@ -61370,7 +61605,7 @@ function LibraryApp({ plugin }) {
         if (statsTab === "all") {
           readBookPaths.add(b.path);
         } else {
-          const updatedVal = prog ? (0, import_obsidian12.moment)(prog.updated) : (0, import_obsidian12.moment)(0);
+          const updatedVal = prog ? (0, import_obsidian14.moment)(prog.updated) : (0, import_obsidian14.moment)(0);
           const isUpdatedInRange = updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]");
           const hasTimeSecs = (bookSecondsMap[b.path] || 0) > 0;
           if (isUpdatedInRange || hasTimeSecs) {
@@ -61385,7 +61620,7 @@ function LibraryApp({ plugin }) {
     Object.values(plugin.settings.bookHighlights || {}).forEach((list) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian12.moment)(hl.created);
+          const createdVal = (0, import_obsidian14.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             newHighlightsCount++;
           }
@@ -61472,7 +61707,7 @@ function LibraryApp({ plugin }) {
   }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache]);
   const handlePrevDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian12.moment)(prev);
+      const m = (0, import_obsidian14.moment)(prev);
       if (statsTab === "week") return m.subtract(1, "week").toDate();
       if (statsTab === "month") return m.subtract(1, "month").toDate();
       if (statsTab === "year") return m.subtract(1, "year").toDate();
@@ -61481,14 +61716,14 @@ function LibraryApp({ plugin }) {
   };
   const handleNextDate = () => {
     setStatsDate((prev) => {
-      const m = (0, import_obsidian12.moment)(prev);
+      const m = (0, import_obsidian14.moment)(prev);
       if (statsTab === "week") return m.add(1, "week").toDate();
       if (statsTab === "month") return m.add(1, "month").toDate();
       if (statsTab === "year") return m.add(1, "year").toDate();
       return prev;
     });
   };
-  const filteredBooks = React5.useMemo(() => {
+  const filteredBooks = React7.useMemo(() => {
     return books.filter((b) => {
       const { title, author } = parseBookInfo(b);
       const text = `${title} ${author} ${b.basename}`.toLowerCase();
@@ -61536,7 +61771,7 @@ function LibraryApp({ plugin }) {
       }
     });
   }, [books, searchQuery, filterStatus, sortBy, plugin.settings.bookProgress, bookNotesMap, plugin.app.metadataCache]);
-  React5.useEffect(() => {
+  React7.useEffect(() => {
     if (!activeBook || currentView !== "detail") return;
     const loadMetadata = () => {
       const noteFile = findBookNote(plugin.app, activeBook, plugin.settings);
@@ -61548,7 +61783,7 @@ function LibraryApp({ plugin }) {
       let summary = "";
       const progress = getProgress(activeBook);
       const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
-      if (noteFile instanceof import_obsidian12.TFile) {
+      if (noteFile instanceof import_obsidian14.TFile) {
         const cache = plugin.app.metadataCache.getFileCache(noteFile);
         if (cache && cache.frontmatter) {
           const fm = cache.frontmatter;
@@ -61595,7 +61830,7 @@ function LibraryApp({ plugin }) {
       }
     } catch (e) {
       console.error("Failed to update frontmatter", e);
-      new import_obsidian12.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
+      new import_obsidian14.Notice("\u4FDD\u5B58\u5143\u6570\u636E\u5931\u8D25");
     }
   };
   const openBook = async (file) => {
@@ -61620,7 +61855,7 @@ function LibraryApp({ plugin }) {
       try {
         await plugin.app.vault.delete(file);
         await plugin.bookStateService.clearRuntimeState(file.path);
-        new import_obsidian12.Notice(`\u5DF2\u5220\u9664\u7535\u5B50\u4E66\u6587\u4EF6\uFF1A${file.basename}`);
+        new import_obsidian14.Notice(`\u5DF2\u5220\u9664\u7535\u5B50\u4E66\u6587\u4EF6\uFF1A${file.basename}`);
         if (activeBook?.path === file.path) {
           setCurrentView("home");
           setActiveBook(null);
@@ -61628,7 +61863,7 @@ function LibraryApp({ plugin }) {
         loadBooks();
       } catch (err) {
         console.error("Failed to delete book or clean runtime state", err);
-        new import_obsidian12.Notice(`\u5220\u9664\u6216\u6E05\u7406\u5931\u8D25\uFF1A${String(err)}`);
+        new import_obsidian14.Notice(`\u5220\u9664\u6216\u6E05\u7406\u5931\u8D25\uFF1A${String(err)}`);
       }
     }
   };
@@ -61639,7 +61874,7 @@ function LibraryApp({ plugin }) {
   };
   const extractAllImages = async (file) => {
     try {
-      new import_obsidian12.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
+      new import_obsidian14.Notice("\u6B63\u5728\u63D0\u53D6\u4E66\u7C4D\u4E2D\u7684\u6240\u6709\u56FE\u7247...");
       const buffer = await plugin.app.vault.readBinary(file);
       let epubFn = window.JarvisReader_ePub;
       if (!epubFn) {
@@ -61668,27 +61903,27 @@ function LibraryApp({ plugin }) {
       }
       imagesList.sort((a, b) => b.size - a.size);
       setDebugImages(imagesList);
-      new import_obsidian12.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
+      new import_obsidian14.Notice(`\u63D0\u53D6\u5B8C\u6210\uFF0C\u5171 ${imagesList.length} \u5F20\u56FE\u7247`);
     } catch (err) {
-      new import_obsidian12.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
+      new import_obsidian14.Notice("\u63D0\u53D6\u5931\u8D25: " + err);
     }
   };
   const renderDebugModal = () => {
     if (!debugImages) return null;
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-stats-modal-overlay", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-stats-modal", onClick: (e) => e.stopPropagation(), style: { width: "80%", height: "80%", maxWidth: "none", overflowY: "auto" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-stats-modal-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h3", { children: "\u56FE\u7247\u63D0\u53D6\u8C03\u8BD5" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-stats-close-btn", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M18 6 6 18M6 6l12 12" }) }) })
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-stats-modal-overlay", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-stats-modal", onClick: (e) => e.stopPropagation(), style: { width: "80%", height: "80%", maxWidth: "none", overflowY: "auto" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-stats-modal-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { children: "\u56FE\u7247\u63D0\u53D6\u8C03\u8BD5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-stats-close-btn", onClick: () => setDebugImages(null), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M18 6 6 18M6 6l12 12" }) }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "16px", padding: "20px" }, children: debugImages.map((img) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { border: "1px solid var(--background-modifier-border)", padding: "12px", borderRadius: "8px", background: "var(--background-secondary)" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("img", { src: img.dataUrl, style: { maxWidth: "240px", maxHeight: "340px", display: "block", objectFit: "contain" } }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { marginTop: "12px", fontSize: "12px", wordBreak: "break-all", maxWidth: "240px", color: "var(--text-normal)" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: "\u5927\u5C0F:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "16px", padding: "20px" }, children: debugImages.map((img) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { border: "1px solid var(--background-modifier-border)", padding: "12px", borderRadius: "8px", background: "var(--background-secondary)" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("img", { src: img.dataUrl, style: { maxWidth: "240px", maxHeight: "340px", display: "block", objectFit: "contain" } }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { marginTop: "12px", fontSize: "12px", wordBreak: "break-all", maxWidth: "240px", color: "var(--text-normal)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: "\u5927\u5C0F:" }),
           " ",
           Math.round(img.size / 1024),
           " KB",
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("br", {}),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: "\u8DEF\u5F84:" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("br", {}),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: "\u8DEF\u5F84:" }),
           " ",
           img.href
         ] })
@@ -61715,43 +61950,43 @@ function LibraryApp({ plugin }) {
     } = selectedStats;
     const statsData = plugin.settings.readingStats || {};
     const sortedDates = Object.keys(statsData).sort();
-    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian12.moment)().format("YYYY-MM-DD");
+    const firstDateStr = sortedDates.length > 0 ? sortedDates[0] : (0, import_obsidian14.moment)().format("YYYY-MM-DD");
     const earliestYearStr = sortedDates.length > 0 ? sortedDates[0] : null;
     let dateRangeStr = "";
     if (statsTab === "week") {
-      const start = (0, import_obsidian12.moment)(startDate);
-      const end = (0, import_obsidian12.moment)(endDate);
+      const start = (0, import_obsidian14.moment)(startDate);
+      const end = (0, import_obsidian14.moment)(endDate);
       dateRangeStr = `${start.format("YYYY \xB7 M/D")} - ${end.format("M/D")}`;
     } else if (statsTab === "month") {
-      dateRangeStr = (0, import_obsidian12.moment)(startDate).format("YYYY\u5E74M\u6708");
+      dateRangeStr = (0, import_obsidian14.moment)(startDate).format("YYYY\u5E74M\u6708");
     } else if (statsTab === "year") {
-      dateRangeStr = (0, import_obsidian12.moment)(startDate).format("YYYY\u5E74");
+      dateRangeStr = (0, import_obsidian14.moment)(startDate).format("YYYY\u5E74");
     }
     const renderLargeDuration = (secs) => {
       if (secs <= 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
           "0",
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5206\u949F" })
         ] });
       }
       const h = Math.floor(secs / 3600);
       const m = Math.round(secs % 3600 / 60);
       if (h > 0 && m > 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
           h,
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C0F\u65F6" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5C0F\u65F6" }),
           m,
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5206\u949F" })
         ] });
       } else if (h > 0) {
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
           h,
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C0F\u65F6" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5C0F\u65F6" })
         ] });
       } else {
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
           m,
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5206\u949F" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5206\u949F" })
         ] });
       }
     };
@@ -61783,7 +62018,7 @@ function LibraryApp({ plugin }) {
     const bookDailyMaxSecs = {};
     const bookRangeHighlightsCount = {};
     Object.entries(statsData).forEach(([dateStr, dailyData]) => {
-      const dateVal = (0, import_obsidian12.moment)(dateStr, "YYYY-MM-DD");
+      const dateVal = (0, import_obsidian14.moment)(dateStr, "YYYY-MM-DD");
       if (!dateVal.isValid()) return;
       const isCurrentRange = dateVal.isBetween(startDate, endDate, "day", "[]");
       if (isCurrentRange) {
@@ -61797,7 +62032,7 @@ function LibraryApp({ plugin }) {
     Object.entries(plugin.settings.bookHighlights || {}).forEach(([bookPath, list]) => {
       if (Array.isArray(list)) {
         list.forEach((hl) => {
-          const createdVal = (0, import_obsidian12.moment)(hl.created);
+          const createdVal = (0, import_obsidian14.moment)(hl.created);
           if (createdVal.isValid() && createdVal.isBetween(startDate, endDate, "day", "[]")) {
             bookRangeHighlightsCount[bookPath] = (bookRangeHighlightsCount[bookPath] || 0) + 1;
           }
@@ -61828,7 +62063,7 @@ function LibraryApp({ plugin }) {
           if (statsTab === "all") {
             progRankList.push([bookPath, prog.percentage]);
           } else {
-            const updatedVal = (0, import_obsidian12.moment)(prog.updated);
+            const updatedVal = (0, import_obsidian14.moment)(prog.updated);
             if (updatedVal.isValid() && updatedVal.isBetween(startDate, endDate, "day", "[]")) {
               progRankList.push([bookPath, prog.percentage]);
             }
@@ -61840,124 +62075,124 @@ function LibraryApp({ plugin }) {
     }
     const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
     const isReadable = plugin.app.vault.getConfig ? plugin.app.vault.getConfig("readableLineLength") : true;
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "12 19 5 12 12 5" })
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-stats-view", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-stats-view-header", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => setCurrentView("home"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "12 19 5 12 12 5" })
           ] }),
           "\u8FD4\u56DE\u4E66\u67B6"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u9605\u8BFB\u7EDF\u8BA1" })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h2", { style: { margin: 0, fontSize: "18px", fontWeight: 700 }, children: "\u9605\u8BFB\u7EDF\u8BA1" })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-header-wrap", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-nav-tabs", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`, onClick: () => setStatsTab("week"), children: "\u5468" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`, onClick: () => setStatsTab("month"), children: "\u6708" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`, onClick: () => setStatsTab("year"), children: "\u5E74" }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`, onClick: () => setStatsTab("all"), children: "\u5168\u90E8" })
         ] }),
-        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-date-picker", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handlePrevDate, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "m15 18-6-6 6-6" }) }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-date-text", children: dateRangeStr }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-stats-date-btn", onClick: handleNextDate, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "m9 18 6-6-6-6" }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-main-card", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-main-card", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-main-time", children: renderLargeDuration(totalSeconds) }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-main-sub", children: [
           mainCardSub,
-          statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: trendClass, children: trendText })
+          statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: trendClass, children: trendText })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-grid", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-grid", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
             ] }),
             readDaysCount,
             "\u5929"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u9605\u8BFB\u5929\u6570" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u9605\u8BFB\u5929\u6570" })
         ] }),
-        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "17 6 23 6 23 12" })
+        statsTab !== "all" && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "23 6 13.5 15.5 8.5 10.5 1 18" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "17 6 23 6 23 12" })
             ] }),
             formatDuration(avgSecs),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: trendClass, style: { fontSize: "9px", padding: "1px 3px", borderRadius: "4px", background: trendPercent > 0 ? "#E5F5F1" : trendPercent < 0 ? "#FCE8E6" : "var(--background-modifier-border)" }, children: trendText })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u65E5\u5747\u65F6\u957F" })
         ] }),
-        statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+        statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
               ] }),
               booksReadCount,
               "\u672C"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5728\u8BFB" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5728\u8BFB" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "2" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "10" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "2" })
               ] }),
               finishedBooksCount,
               "\u672C"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u8BFB\u5B8C" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u5DF2\u8BFB\u5B8C" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "15 3 15 9 21 9" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-mini-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-mini-val", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "15 3 15 9 21 9" })
               ] }),
               newHighlightsCount,
               "\u6761"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-mini-label", children: "\u7B14\u8BB0" })
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-chart-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-chart-header", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-chart-title", children: [
             activeChart === "bar" && (statsTab === "week" || statsTab === "month" ? "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F" : statsTab === "year" ? "\u6BCF\u6708\u9605\u8BFB\u65F6\u957F" : "\u6BCF\u5E74\u9605\u8BFB\u65F6\u957F"),
             activeChart === "calendar" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F",
             activeChart === "heatmap" && "\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F"
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
-            statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-chart-toggles", children: [
+            statsTab === "month" && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`, onClick: () => setStatsChartType("calendar"), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "16", y1: "2", x2: "16", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "8", y1: "2", x2: "8", y2: "6" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "3", y1: "10", x2: "21", y2: "10" })
               ] }) })
             ] }),
-            (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+            (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`, onClick: () => setStatsChartType("heatmap"), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
               ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`, onClick: () => setStatsChartType("bar"), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M18 20V10M12 20V4M6 20v-6" }) }) })
             ] })
           ] })
         ] }),
@@ -61966,29 +62201,29 @@ function LibraryApp({ plugin }) {
           if (statsTab === "week") {
             const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
             data = Array.from({ length: 7 }).map((_, i) => {
-              const day = (0, import_obsidian12.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian14.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: weekdays[i], secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "month") {
-            const daysInMonth = (0, import_obsidian12.moment)(startDate).daysInMonth();
+            const daysInMonth = (0, import_obsidian14.moment)(startDate).daysInMonth();
             data = Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = (0, import_obsidian12.moment)(startDate).add(i, "days");
+              const day = (0, import_obsidian14.moment)(startDate).add(i, "days");
               const dateStr = day.format("YYYY-MM-DD");
               const secs = dailySecondsMap[dateStr] || 0;
               return { label: String(i + 1), secs, tooltip: `${day.format("M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else if (statsTab === "year") {
             data = Array.from({ length: 12 }).map((_, i) => {
-              const month = (0, import_obsidian12.moment)(startDate).add(i, "months");
+              const month = (0, import_obsidian14.moment)(startDate).add(i, "months");
               const monthStr = month.format("YYYY-MM");
               const secs = monthlySecondsMap[monthStr] || 0;
               return { label: `${i + 1}\u6708`, secs, tooltip: `${month.format("YYYY\u5E74M\u6708")} \u9605\u8BFB ${formatDuration(secs)}` };
             });
           } else {
-            const currentYear = (0, import_obsidian12.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian12.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
+            const currentYear = (0, import_obsidian14.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian14.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear - 4;
             const yearsCount = Math.max(currentYear - startYear + 1, 1);
             data = Array.from({ length: yearsCount }).map((_, i) => {
               const year = String(startYear + i);
@@ -62013,10 +62248,10 @@ function LibraryApp({ plugin }) {
             yAxisTicks.push(tick);
           }
           if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
-          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "relative" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", pointerEvents: "none", zIndex: 1 }, children: yAxisTicks.map((tick) => {
+          return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { position: "relative" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { position: "absolute", left: 0, right: 0, top: "20px", bottom: "38px", pointerEvents: "none", zIndex: 1 }, children: yAxisTicks.map((tick) => {
               const ratio = maxVal > 0 ? tick / maxVal : 0;
-              return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 "div",
                 {
                   style: {
@@ -62029,48 +62264,48 @@ function LibraryApp({ plugin }) {
                     display: "flex",
                     justifyContent: "flex-start"
                   },
-                  children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: tick === 0 ? "0" : formatDuration(tick) })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "9px", color: "var(--text-muted)", transform: "translateY(-100%)" }, children: tick === 0 ? "0" : formatDuration(tick) })
                 },
                 tick
               );
             }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-bar-chart-container", style: { position: "relative", zIndex: 2 }, children: data.map((item, idx) => {
               const heightPx = item.secs > 0 ? Math.max(item.secs / maxVal * chartHeightPx, 6) : 0;
-              return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPx}px` } }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
+              return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-bar-column", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-bar-tooltip", children: item.tooltip }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-bar", style: { height: `${heightPx}px` } }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-bar-label", children: item.label })
               ] }, idx);
             }) })
           ] });
         })(),
         activeChart === "calendar" && (() => {
-          const daysInMonth = (0, import_obsidian12.moment)(startDate).daysInMonth();
-          const firstDayOffset = ((0, import_obsidian12.moment)(startDate).clone().startOf("month").day() + 6) % 7;
+          const daysInMonth = (0, import_obsidian14.moment)(startDate).daysInMonth();
+          const firstDayOffset = ((0, import_obsidian14.moment)(startDate).clone().startOf("month").day() + 6) % 7;
           const weekdays = ["\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D", "\u65E5"];
           const cells = [];
           for (let i = 0; i < firstDayOffset; i++) {
-            cells.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
+            cells.push(/* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-calendar-cell is-empty" }, `empty-start-${i}`));
           }
           for (let d = 1; d <= daysInMonth; d++) {
-            const day = (0, import_obsidian12.moment)(startDate).clone().date(d);
+            const day = (0, import_obsidian14.moment)(startDate).clone().date(d);
             const dateStr = day.format("YYYY-MM-DD");
             const secs = dailySecondsMap[dateStr] || 0;
             cells.push(
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
-                secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `jarvis-stats-calendar-cell ${secs > 0 ? "has-read" : ""}`, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontWeight: secs > 0 ? 700 : 500 }, children: d }),
+                secs > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-calendar-cell-time", children: formatDuration(secs) })
               ] }, `day-${d}`)
             );
           }
-          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
+          return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-calendar-grid", style: { marginBottom: "8px" }, children: weekdays.map((wd) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-calendar-weekday", children: wd }, wd)) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-calendar-grid", children: cells })
           ] });
         })(),
         activeChart === "heatmap" && (() => {
           const renderHeatmapWall = (yearStr) => {
-            const startOfYear = (0, import_obsidian12.moment)(`${yearStr}-01-01`);
+            const startOfYear = (0, import_obsidian14.moment)(`${yearStr}-01-01`);
             const gridStart = startOfYear.clone().startOf("isoWeek");
             const weeksCount = 53;
             const columns = [];
@@ -62097,71 +62332,71 @@ function LibraryApp({ plugin }) {
                 else if (mins > 45) level = 4;
                 const tooltipText = isTargetYear ? `${cellDate.format("YYYY\u5E74M\u6708D\u65E5")} \u9605\u8BFB ${formatDuration(secs)}` : "";
                 colCells.push(
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: `jarvis-stats-heatmap-cell level-${level}`, children: tooltipText && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-cell-tooltip", children: tooltipText }) }, `d-${d}`)
                 );
               }
               columns.push(
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-col", children: colCells }, `w-${w}`)
               );
             }
             const yearsTotalDays = Object.entries(dailySecondsMap).filter(([dateStr, secs]) => {
               return dateStr.startsWith(yearStr) && secs > 0;
             }).length;
             const yearsTotalSecs = Object.entries(dailySecondsMap).filter(([dateStr]) => dateStr.startsWith(yearStr)).reduce((acc, entry) => acc + entry[1], 0);
-            return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { marginBottom: "24px" }, children: [
-              statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E00" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E09" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u4E94" })
+            return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { marginBottom: "24px" }, children: [
+              statsTab === "all" && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h4", { style: { fontSize: "13px", margin: "0 0 10px 0", fontWeight: "700" }, children: yearStr }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-heatmap-wrapper", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "grid", gridTemplateColumns: "repeat(53, 1fr)", gap: "3px", fontSize: "9px", color: "var(--text-muted)", marginBottom: "4px", paddingLeft: "15px" }, children: monthLabels.map((ml) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { gridColumnStart: ml.colIndex + 1, whiteSpace: "nowrap" }, children: ml.label }, ml.label)) }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", gap: "8px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "9px", color: "var(--text-muted)", height: "88px", padding: "2px 0" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u4E00" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u4E09" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u4E94" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", gap: "3px" }, children: columns })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-heatmap-footer", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
                   yearStr,
                   "\u5E74\u5171\u9605\u8BFB ",
                   yearsTotalDays,
                   "\u5929\uFF0C\u7D2F\u8BA1 ",
                   formatDuration(yearsTotalSecs)
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u5C11" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u591A" })
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-heatmap-legend", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u5C11" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-0" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-1" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-2" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-3" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-heatmap-legend-box level-4" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u591A" })
                 ] })
               ] })
             ] }, yearStr);
           };
           if (statsTab === "year") {
-            const yearStr = (0, import_obsidian12.moment)(startDate).format("YYYY");
+            const yearStr = (0, import_obsidian14.moment)(startDate).format("YYYY");
             return renderHeatmapWall(yearStr);
           } else {
-            const currentYear = (0, import_obsidian12.moment)().year();
-            const startYear = earliestYearStr ? (0, import_obsidian12.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
+            const currentYear = (0, import_obsidian14.moment)().year();
+            const startYear = earliestYearStr ? (0, import_obsidian14.moment)(earliestYearStr, "YYYY-MM-DD").year() : currentYear;
             const yearsList = [];
             for (let y = currentYear; y >= startYear; y--) {
               yearsList.push(String(y));
             }
-            return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
+            return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { children: yearsList.map((y) => renderHeatmapWall(y)) });
           }
         })()
       ] }),
-      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-section", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-title", children: [
+      statsTab !== "week" && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-section", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-title", children: [
           isTimeRank ? "\u9605\u8BFB\u65F6\u957F" : "\u9605\u8BFB\u8FDB\u5EA6",
           " TOP ",
           sortedRankBooks.length
         ] }),
-        sortedRankBooks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-list", children: sortedRankBooks.map(([bookPath, val], idx) => {
+        sortedRankBooks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-list", children: sortedRankBooks.map(([bookPath, val], idx) => {
           const book = books.find((b) => b.path === bookPath);
           const cover = book ? getCover(book) : null;
           const { title, author } = book ? parseBookInfo(book) : { title: bookPath.split("/").pop() || "\u672A\u77E5", author: "\u672A\u77E5" };
@@ -62175,37 +62410,37 @@ function LibraryApp({ plugin }) {
           const progressPct = isTimeRank ? maxRankSecs > 0 ? val / maxRankSecs * 100 : 0 : val * 100;
           const isSingleDayMax = bookPath === maxSingleDayBook && maxSingleDaySecs > 0;
           const isMostNotes = bookPath === maxHighlightsBook && maxHighlightsCount > 0;
-          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-item", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
-            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url("${cover.dataUrl}")` } }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-info", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-top-author", children: displayAuthor }),
-                isSingleDayMax && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-top-badge", children: "\u5355\u65E5\u9605\u8BFB\u6700\u4E45" }),
-                isMostNotes && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-top-badge", style: { background: "rgba(45, 140, 240, 0.08)", color: "var(--text-accent)", border: "1px solid rgba(45, 140, 240, 0.2)" }, children: "\u7B14\u8BB0\u6700\u591A" })
+          return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-item", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-rank", children: idx + 1 }),
+            cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-cover", style: { backgroundImage: `url("${cover.dataUrl}")` } }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-cover", style: { background: "#E6E6E6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", textAlign: "center", padding: "2px", color: "var(--text-muted)" }, children: title.slice(0, 4) }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-info", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-top-bookname", children: title }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-author-row", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-top-author", children: displayAuthor }),
+                isSingleDayMax && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-top-badge", children: "\u5355\u65E5\u9605\u8BFB\u6700\u4E45" }),
+                isMostNotes && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-top-badge", style: { background: "rgba(45, 140, 240, 0.08)", color: "var(--text-accent)", border: "1px solid rgba(45, 140, 240, 0.2)" }, children: "\u7B14\u8BB0\u6700\u591A" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-top-time-col", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-top-time", children: isTimeRank ? formatDuration(val) : `\u5DF2\u8BFB ${Math.round(val * 100)}%` }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-progress-bg", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-progress-bar", style: { width: `${progressPct}%` } }) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-top-time-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-top-time", children: isTimeRank ? formatDuration(val) : `\u5DF2\u8BFB ${Math.round(val * 100)}%` }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-progress-bg", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-progress-bar", style: { width: `${progressPct}%` } }) })
             ] })
           ] }, bookPath);
-        }) }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "12px" }, children: "\u6682\u65E0\u4E66\u7C4D\u9605\u8BFB\u8BB0\u5F55" })
+        }) }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "12px" }, children: "\u6682\u65E0\u4E66\u7C4D\u9605\u8BFB\u8BB0\u5F55" })
       ] }),
-      (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-top-title", style: { marginTop: "24px", marginBottom: "12px" }, children: "\u504F\u597D\u5206\u6790" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-pref-section", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" })
+      (statsTab === "year" || statsTab === "all") && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-top-title", style: { marginTop: "24px", marginBottom: "12px" }, children: "\u504F\u597D\u5206\u6790" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-pref-section", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" })
               ] }),
               "\u5206\u7C7B\u504F\u597D"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-pref-sub", children: radarData.length > 0 ? `\u504F\u597D\u9605\u8BFB ${radarData[0].dimension}` : "\u6682\u65E0\u5206\u7C7B\u504F\u597D\u8BB0\u5F55" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-radar-container", children: radarData.length > 0 ? (() => {
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-pref-sub", children: radarData.length > 0 ? `\u504F\u597D\u9605\u8BFB ${radarData[0].dimension}` : "\u6682\u65E0\u5206\u7C7B\u504F\u597D\u8BB0\u5F55" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-radar-container", children: radarData.length > 0 ? (() => {
               const CX = 75;
               const CY = 75;
               const R = 45;
@@ -62235,8 +62470,8 @@ function LibraryApp({ plugin }) {
                 };
               });
               const polygonPointsStr = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
-              return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { width: "150", height: "150", viewBox: "0 0 150 150", children: [
-                pentagons.map((points, idx) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { width: "150", height: "150", viewBox: "0 0 150 150", children: [
+                pentagons.map((points, idx) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   "polygon",
                   {
                     points: points.map((p) => `${p.x},${p.y}`).join(" "),
@@ -62246,7 +62481,7 @@ function LibraryApp({ plugin }) {
                   },
                   `p-${idx}`
                 )),
-                axes.map((axis, idx) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                axes.map((axis, idx) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   "line",
                   {
                     x1: axis.x1,
@@ -62258,7 +62493,7 @@ function LibraryApp({ plugin }) {
                   },
                   `line-${idx}`
                 )),
-                dataPoints.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                dataPoints.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   "polygon",
                   {
                     points: polygonPointsStr,
@@ -62267,7 +62502,7 @@ function LibraryApp({ plugin }) {
                     strokeWidth: "1.5"
                   }
                 ),
-                dataPoints.map((p, idx) => p.value > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                dataPoints.map((p, idx) => p.value > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   "circle",
                   {
                     cx: p.x,
@@ -62294,7 +62529,7 @@ function LibraryApp({ plugin }) {
                   } else if (angle > 0 && angle < Math.PI) {
                     dy = "7px";
                   }
-                  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+                  return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                     "text",
                     {
                       x: tx,
@@ -62309,21 +62544,21 @@ function LibraryApp({ plugin }) {
                   );
                 })
               ] });
-            })() : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { fontSize: "11px", color: "var(--text-muted)" }, children: "\u6682\u65E0\u5206\u6790\u6570\u636E" }) })
+            })() : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { fontSize: "11px", color: "var(--text-muted)" }, children: "\u6682\u65E0\u5206\u6790\u6570\u636E" }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "4", y: "2", width: "16", height: "20", rx: "2", ry: "2" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "9", y1: "22", x2: "9", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "15", y1: "22", x2: "15", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "9", y1: "16", x2: "15", y2: "16" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M8 6h8M8 10h8M8 14h8" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-stats-pref-card", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "jarvis-stats-pref-title", style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { color: "var(--text-muted)" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "4", y: "2", width: "16", height: "20", rx: "2", ry: "2" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "9", y1: "22", x2: "9", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "15", y1: "22", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "9", y1: "16", x2: "15", y2: "16" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M8 6h8M8 10h8M8 14h8" })
               ] }),
               "\u504F\u597D\u51FA\u7248\u65B9"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "jarvis-stats-pref-sub", children: "\u504F\u597D\u51FA\u7248\u65B9\u6392\u884C" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-publishers-list", children: topPublishers.length > 0 ? topPublishers.map((pub, idx) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-stats-publisher-item", children: pub }, pub)) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "11px" }, children: "\u6682\u65E0\u51FA\u7248\u65B9\u4FE1\u606F" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "jarvis-stats-pref-sub", children: "\u504F\u597D\u51FA\u7248\u65B9\u6392\u884C" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-publishers-list", children: topPublishers.length > 0 ? topPublishers.map((pub, idx) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-stats-publisher-item", children: pub }, pub)) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "11px" }, children: "\u6682\u65E0\u51FA\u7248\u65B9\u4FE1\u606F" }) })
           ] })
         ] })
       ] })
@@ -62338,15 +62573,15 @@ function LibraryApp({ plugin }) {
         }
       }
     }
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { flex: 1 } }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { flex: 1 } }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { className: "jarvis-search-icon", viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "11", cy: "11", r: "8" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "input",
             {
               type: "text",
@@ -62356,85 +62591,85 @@ function LibraryApp({ plugin }) {
               className: "jarvis-library-search-input"
             }
           ),
-          searchQuery && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+          searchQuery && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
           ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }) }),
-            showFilters && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }) }) }),
+            showFilters && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "recent", children: "\u6700\u8FD1\u9605\u8BFB/\u4FEE\u6539" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "rating", children: "\u8BC4\u5206\u6700\u9AD8" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "start", children: "\u5F00\u59CB\u65F6\u95F4\u6392\u5E8F" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "end", children: "\u8BFB\u5B8C\u65F6\u95F4\u6392\u5E8F" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "name", children: "\u4E66\u540D\u6392\u5E8F" })
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value), className: "jarvis-library-select", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "recent", children: "\u6700\u8FD1\u9605\u8BFB/\u4FEE\u6539" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "rating", children: "\u8BC4\u5206\u6700\u9AD8" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "start", children: "\u5F00\u59CB\u65F6\u95F4\u6392\u5E8F" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "end", children: "\u8BFB\u5B8C\u65F6\u95F4\u6392\u5E8F" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "name", children: "\u4E66\u540D\u6392\u5E8F" })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-layout-toggle", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`, onClick: () => setViewLayout("grid"), title: "\u7F51\u683C\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-layout-toggle", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`, onClick: () => setViewLayout("grid"), title: "\u7F51\u683C\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "14", y: "3", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "14", y: "14", width: "7", height: "7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("rect", { x: "3", y: "14", width: "7", height: "7" })
             ] }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`, onClick: () => setViewLayout("list"), title: "\u5217\u8868\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "6", x2: "21", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "12", x2: "21", y2: "12" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "8", y1: "18", x2: "21", y2: "18" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "3", y1: "18", x2: "3.01", y2: "18" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`, onClick: () => setViewLayout("list"), title: "\u5217\u8868\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "8", y1: "6", x2: "21", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "8", y1: "12", x2: "21", y2: "12" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "8", y1: "18", x2: "21", y2: "18" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "3", y1: "18", x2: "3.01", y2: "18" })
             ] }) })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-header-actions", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-action-icon-btn", title: "\u63D2\u4EF6\u8BBE\u7F6E", onClick: () => {
             const setting = plugin.app.setting;
             setting.open();
             setting.openTabById(plugin.manifest.id);
-          }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
+          }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "20", height: "20", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "12", r: "3" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })
           ] }) }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-stats-container", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "flex", alignItems: "center", opacity: 0.6 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-stats-container", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "flex", alignItems: "center", opacity: 0.6 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
             "\u603B\u4E66\u7C4D ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.total })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: stats.total })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
             "\u5728\u8BFB ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.reading })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: stats.reading })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
             "\u5DF2\u8BFB\u5B8C ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.finished })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: stats.finished })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
             "\u7B14\u8BB0 ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: stats.highlights })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: stats.highlights })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "stats-strip-item", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { children: [
             "\u603B\u9605\u8BFB\u65F6\u957F ",
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("b", { children: formatDuration(totalAppReadingTime) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("b", { children: formatDuration(totalAppReadingTime) })
           ] }) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
           "button",
           {
             className: "jarvis-library-back-btn",
@@ -62442,17 +62677,17 @@ function LibraryApp({ plugin }) {
             title: "\u67E5\u770B\u6570\u636E\u7EDF\u8BA1",
             style: { padding: "4px 12px !important" },
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "4px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "18", y1: "20", x2: "18", y2: "10" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "12", y1: "20", x2: "12", y2: "4" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "6", y1: "20", x2: "6", y2: "14" })
               ] }),
               "\u8BE6\u7EC6\u7EDF\u8BA1"
             ]
           }
         )
       ] }),
-      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
+      filteredBooks.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-empty-state", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { children: "\u6CA1\u6709\u627E\u5230\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E66\u7C4D" }) }) : viewLayout === "grid" ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-grid", style: { gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }, children: filteredBooks.map((book, i) => {
         const { title, author } = parseBookInfo(book);
         const progress = getProgress(book);
         const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
@@ -62473,12 +62708,12 @@ function LibraryApp({ plugin }) {
         const displayDate = finishDate ? `\u8BFB\u5B8C ${finishDate}` : startDate ? `\u5F00\u59CB ${startDate}` : `\u52A0\u5165 ${formatDate2(book.stat.ctime).split(" ")[0]}`;
         const isSelected = selectedGridBook === book.path;
         const isLastCol = i % gridCols === gridCols - 1;
-        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { position: "relative" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-book-card", style: { visibility: "hidden", pointerEvents: "none", margin: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "book-card-cover-wrap" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "book-card-title", children: title })
+        return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { position: "relative" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-book-card", style: { visibility: "hidden", pointerEvents: "none", margin: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "book-card-cover-wrap" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "book-card-title", children: title })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
             "div",
             {
               className: `jarvis-library-book-card ${isSelected ? "is-selected" : ""}`,
@@ -62487,52 +62722,52 @@ function LibraryApp({ plugin }) {
               onDoubleClick: () => openBook(book),
               title: isSelected ? "\u53CC\u51FB\u76F4\u63A5\u5F00\u59CB\u9605\u8BFB" : "\u5355\u51FB\u67E5\u770B\u8BE6\u60C5\uFF0C\u53CC\u51FB\u5F00\u59CB\u9605\u8BFB",
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "book-card-cover-wrap", children: [
-                  cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("img", { src: cover.dataUrl, alt: title, className: "book-card-cover" }) : (() => {
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "book-card-cover-wrap", children: [
+                  cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("img", { src: cover.dataUrl, alt: title, className: "book-card-cover" }) : (() => {
                     let hash = 0;
                     for (let j = 0; j < title.length; j++) hash = title.charCodeAt(j) + ((hash << 5) - hash);
                     const hue = Math.abs(hash) % 360;
                     const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 65%), hsl(${(hue + 40) % 360}, 55%, 45%))`;
-                    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "book-card-cover-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "placeholder-title", children: title.substring(0, 8) }) });
+                    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "book-card-cover-placeholder", style: { background: gradientBg }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "placeholder-title", children: title.substring(0, 8) }) });
                   })(),
-                  !isSelected && percentage > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "pure-cover-progress", children: [
+                  !isSelected && percentage > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "pure-cover-progress", children: [
                     percentage,
                     "%"
                   ] })
                 ] }),
-                isSelected && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "book-card-info", style: { display: "flex", flexDirection: "column", gap: "6px", color: "var(--text-normal)" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h4", { className: "book-card-title", title, style: { fontWeight: "normal", fontSize: "16px", margin: 0 }, children: title }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "book-card-author", style: { color: "var(--text-muted)", margin: 0, fontSize: "13px" }, children: creator }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "auto", fontSize: "12px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+                isSelected && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "book-card-info", style: { display: "flex", flexDirection: "column", gap: "6px", color: "var(--text-normal)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h4", { className: "book-card-title", title, style: { fontWeight: "normal", fontSize: "16px", margin: 0 }, children: title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "book-card-author", style: { color: "var(--text-muted)", margin: 0, fontSize: "13px" }, children: creator }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "book-card-meta-list", style: { marginTop: "auto", fontSize: "12px", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
                       "\u72B6\u6001\uFF1A",
                       bookStatus
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
                       "\u8BC4\u5206\uFF1A",
                       rating
                     ] }),
-                    tags.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+                    tags.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
                       "\u6807\u7B7E\uFF1A",
                       tags.map((t) => `#${t}`).join(" ")
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
                       "\u6570\u636E\uFF1A\u7B14\u8BB0 ",
                       highlightsCount,
                       " \xB7 \u65F6\u957F ",
                       formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { children: [
                       "\u65F6\u95F4\uFF1A",
                       displayDate
                     ] })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "book-card-grid-actions", style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: (e) => {
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "book-card-grid-actions", style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-btn btn-primary", onClick: (e) => {
                       e.stopPropagation();
                       openBook(book);
                     }, style: { flex: 1, padding: "6px 0", fontSize: "12px", justifyContent: "center" }, children: percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: (e) => {
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-btn btn-secondary", onClick: (e) => {
                       e.stopPropagation();
                       setActiveBook(book);
                       setCurrentView("detail");
@@ -62545,30 +62780,30 @@ function LibraryApp({ plugin }) {
         ] }, book.path);
       }) }) : (
         /* List layout - HTML Table */
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-list", style: { padding: "0 20px 20px 20px", overflowX: "auto", flex: 1, minHeight: 0, overflowY: "auto" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("colgroup", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "28%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "16%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "70px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "90px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "50px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "14%" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "110px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "90px" } }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("col", { style: { width: "90px" } })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-list", style: { padding: "0 20px 20px 20px", overflowX: "auto", flex: 1, minHeight: 0, overflowY: "auto" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("table", { className: "jarvis-library-table", style: { width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "13px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("colgroup", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "28%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "16%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "70px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "90px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "50px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "14%" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "110px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "90px" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("col", { style: { width: "90px" } })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 10 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4E66\u540D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4F5C\u8005" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u72B6\u6001" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u65F6\u957F)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("thead", { style: { position: "sticky", top: 0, background: "var(--background-primary)", zIndex: 10 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("tr", { style: { borderBottom: "1px solid var(--background-modifier-border)", color: "var(--text-muted)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4E66\u540D" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u4F5C\u8005" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u72B6\u6001" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8FDB\u5EA6" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BC4\u5206" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6807\u7B7E" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u6570\u636E (\u7B14\u8BB0/\u65F6\u957F)" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u5F00\u59CB\u65F6\u95F4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("th", { style: { padding: "12px 8px", fontWeight: "normal" }, children: "\u8BFB\u5B8C\u65F6\u95F4" })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("tbody", { children: filteredBooks.map((book) => {
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("tbody", { children: filteredBooks.map((book) => {
             const { title, author } = parseBookInfo(book);
             const progress = getProgress(book);
             const percentage = progress ? Math.round((progress.percentage || 0) * 100) : 0;
@@ -62592,7 +62827,7 @@ function LibraryApp({ plugin }) {
             }
             const hue = Math.abs(hash) % 360;
             const gradientBg = `linear-gradient(135deg, hsl(${hue}, 45%, 60%), hsl(${(hue + 40) % 360}, 50%, 45%))`;
-            return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+            return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
               "tr",
               {
                 className: "jarvis-library-table-row",
@@ -62602,28 +62837,28 @@ function LibraryApp({ plugin }) {
                 },
                 style: { cursor: "pointer", borderBottom: "1px solid var(--background-modifier-border)" },
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
-                    cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("img", { src: cover.dataUrl, alt: title, style: { width: "28px", height: "42px", objectFit: "cover", borderRadius: "4px", flexShrink: 0 } }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { width: "28px", height: "42px", background: gradientBg, borderRadius: "4px", flexShrink: 0 } }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { color: "var(--text-normal)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title, children: title })
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "12px" }, children: [
+                    cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("img", { src: cover.dataUrl, alt: title, style: { width: "28px", height: "42px", objectFit: "cover", borderRadius: "4px", flexShrink: 0 } }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { width: "28px", height: "42px", background: gradientBg, borderRadius: "4px", flexShrink: 0 } }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { color: "var(--text-normal)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title, children: title })
                   ] }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title: creator, children: creator }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: bookStatus }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { width: "40px", height: "4px", background: "var(--background-modifier-border)", borderRadius: "2px", overflow: "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { width: `${percentage}%`, height: "100%", background: "var(--interactive-accent)" } }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { style: { fontSize: "11px" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, title: creator, children: creator }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: bookStatus }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "6px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { width: "40px", height: "4px", background: "var(--background-modifier-border)", borderRadius: "2px", overflow: "hidden" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { width: `${percentage}%`, height: "100%", background: "var(--interactive-accent)" } }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { style: { fontSize: "11px" }, children: [
                       percentage,
                       "%"
                     ] })
                   ] }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: rating }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, children: tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "-" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: rating }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", whiteSpace: "normal", wordBreak: "break-word" }, children: tags.length > 0 ? tags.map((t) => `#${t}`).join(" ") : "-" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: [
                     highlightsCount,
                     " / ",
                     formatDuration(getBookTotalSeconds(plugin.settings.readingStats, book.path))
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: startDate }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: finishDate })
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: startDate }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("td", { style: { padding: "12px 8px", color: "var(--text-muted)" }, children: finishDate })
                 ]
               },
               book.path
@@ -62633,7 +62868,7 @@ function LibraryApp({ plugin }) {
       )
     ] });
   };
-  const hiddenFileInput = React5.useRef(null);
+  const hiddenFileInput = React7.useRef(null);
   const handleCustomCoverUpload = (event) => {
     const file = event.target.files?.[0];
     if (!file || !activeBook) return;
@@ -62671,7 +62906,7 @@ function LibraryApp({ plugin }) {
           const baseName = activeBook.basename.replace(/[\\/:*?"<>|]/g, "_");
           const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
-          if (targetFile instanceof import_obsidian12.TFile) {
+          if (targetFile instanceof import_obsidian14.TFile) {
             await plugin.app.vault.modifyBinary(targetFile, buffer);
           } else {
             try {
@@ -62681,7 +62916,7 @@ function LibraryApp({ plugin }) {
               return;
             }
           }
-          if (targetFile instanceof import_obsidian12.TFile) {
+          if (targetFile instanceof import_obsidian14.TFile) {
             const key = `${activeBook.path}|${activeBook.stat?.mtime || 0}|${activeBook.stat?.size || 0}`;
             const existingCache = coverCache[key] || {};
             const nextEntry = {
@@ -62722,24 +62957,24 @@ function LibraryApp({ plugin }) {
     const publisher = cover?.publisher || "";
     const pubdateRaw = cover?.pubdate || "";
     const pubdate = pubdateRaw ? pubdateRaw.split("T")[0] : "";
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-detail", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-detail-nav", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-detail", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-detail-nav", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: "jarvis-library-back-btn", onClick: () => {
           setCurrentView("home");
           setActiveBook(null);
         }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "12 19 5 12 12 5" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "19", y1: "12", x2: "5", y2: "12" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "12 19 5 12 12 5" })
           ] }),
           "\u8FD4\u56DE\u4E66\u67B6"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-detail-actions", children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "jarvis-library-btn btn-warning", onClick: () => deleteBook(activeBook), children: "\u5220\u9664\u56FE\u4E66" }) })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-detail-actions", children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "jarvis-library-btn btn-warning", onClick: () => deleteBook(activeBook), children: "\u5220\u9664\u56FE\u4E66" }) })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-detail-header", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-header-cover-side", style: { position: "relative" }, onClick: () => hiddenFileInput.current?.click(), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("input", { type: "file", accept: "image/*", ref: hiddenFileInput, onChange: handleCustomCoverUpload, style: { display: "none" } }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "cover-hover-overlay", style: {
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-detail-header", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-header-cover-side", style: { position: "relative" }, onClick: () => hiddenFileInput.current?.click(), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "file", accept: "image/*", ref: hiddenFileInput, onChange: handleCustomCoverUpload, style: { display: "none" } }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "cover-hover-overlay", style: {
             position: "absolute",
             top: 0,
             left: 0,
@@ -62757,92 +62992,92 @@ function LibraryApp({ plugin }) {
             borderRadius: "8px",
             zIndex: 10
           }, onMouseEnter: (e) => e.currentTarget.style.opacity = "1", onMouseLeave: (e) => e.currentTarget.style.opacity = "0", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginBottom: "8px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("circle", { cx: "12", cy: "13", r: "4" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "24", height: "24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginBottom: "8px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("circle", { cx: "12", cy: "13", r: "4" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontWeight: 600 }, children: "\u66F4\u6362\u5C01\u9762" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { style: { fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontWeight: 600 }, children: "\u66F4\u6362\u5C01\u9762" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { style: { fontSize: "12px", opacity: 0.8, marginTop: "8px", textAlign: "center", padding: "0 12px", lineHeight: 1.4 }, children: [
               "\u63A8\u8350\u6BD4\u4F8B 2:3",
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("br", {}),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("br", {}),
               "(\u5EFA\u8BAE 600\xD7900 \u53CA\u4EE5\u4E0A)"
             ] })
           ] }),
-          cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "placeholder-title", children: title }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
+          cover?.dataUrl ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("img", { src: cover.dataUrl, alt: title, className: "detail-cover" }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-cover-placeholder", style: { background: gradientBg }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "placeholder-title", children: title }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "placeholder-format", children: activeBook.extension.toUpperCase() })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-header-info-side", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { className: "detail-book-title", children: title }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-book-meta-row", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: `book-format-badge format-${activeBook.extension.toLowerCase()}`, children: activeBook.extension.toUpperCase() }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "detail-meta-text", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-header-info-side", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h2", { className: "detail-book-title", children: title }),
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-book-meta-row", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: `book-format-badge format-${activeBook.extension.toLowerCase()}`, children: activeBook.extension.toUpperCase() }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "detail-meta-text", children: [
               "\u4F5C\u8005: ",
               creator
             ] }),
-            publisher && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "detail-meta-text", children: [
+            publisher && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "detail-meta-text", children: [
               "\u51FA\u7248\u793E: ",
               publisher
             ] }),
-            pubdate && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "detail-meta-text", children: [
+            pubdate && /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "detail-meta-text", children: [
               "\u51FA\u7248\u65E5\u671F: ",
               pubdate
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-progress-board", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "progress-stat-value", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-progress-board", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-progress-stat", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "progress-stat-value", children: [
                 percentage,
                 "%"
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-label", children: percentage >= 99 ? "\u5DF2\u8BFB\u5B8C" : "\u5F53\u524D\u4F4D\u7F6E" })
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "progress-stat-label", children: percentage >= 99 ? "\u5DF2\u8BFB\u5B8C" : "\u5F53\u524D\u4F4D\u7F6E" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "detail-progress-divider" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-progress-stat", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "detail-progress-divider" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-progress-stat", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "progress-stat-value", children: highlights.length }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "progress-stat-label", children: "\u7B14\u8BB0" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%", flexWrap: "wrap" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeBook), style: { flex: 1, minWidth: "120px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-action-buttons", style: { display: "flex", gap: "12px", width: "100%", flexWrap: "wrap" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: "jarvis-library-btn btn-primary", onClick: () => openBook(activeBook), style: { flex: 1, minWidth: "120px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" })
               ] }),
               percentage > 0 ? "\u7EE7\u7EED\u9605\u8BFB" : "\u5F00\u59CB\u9605\u8BFB"
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => openOrCreateNote(plugin.app, activeBook, "", plugin.settings), style: { flex: 1, minWidth: "120px" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "14 2 14 8 20 8" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "13", x2: "8", y2: "13" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "16", y1: "17", x2: "8", y2: "17" }),
-                /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("line", { x1: "10", y1: "9", x2: "8", y2: "9" })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: "jarvis-library-btn btn-secondary", onClick: () => openOrCreateNote(plugin.app, activeBook, "", plugin.settings), style: { flex: 1, minWidth: "120px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "16", height: "16", fill: "none", stroke: "currentColor", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: "6px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "14 2 14 8 20 8" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "16", y1: "13", x2: "8", y2: "13" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "16", y1: "17", x2: "8", y2: "17" }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("line", { x1: "10", y1: "9", x2: "8", y2: "9" })
               ] }),
               "\u6253\u5F00\u7B14\u8BB0\u6587\u4EF6"
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-metadata-editor", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u72B6\u6001" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-metadata-editor", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u72B6\u6001" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
                 "select",
                 {
                   className: "metadata-select",
                   value: bookMetadata.status,
                   onChange: (e) => handleUpdateMetadata("status", e.target.value),
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "unread", children: "\u672A\u8BFB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "reading", children: "\u5728\u8BFB" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("option", { value: "finished", children: "\u5DF2\u8BFB\u5B8C" })
                   ]
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u8BC4\u5206" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "metadata-stars", children: [1, 2, 3, 4, 5].map((star) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u8BC4\u5206" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "metadata-stars", children: [1, 2, 3, 4, 5].map((star) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 "span",
                 {
                   className: `metadata-star ${bookMetadata.rating >= star ? "is-filled" : ""}`,
@@ -62852,9 +63087,9 @@ function LibraryApp({ plugin }) {
                 star
               )) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u5F00\u59CB" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u5F00\u59CB" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 "input",
                 {
                   type: "date",
@@ -62864,9 +63099,9 @@ function LibraryApp({ plugin }) {
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u7ED3\u675F" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u7ED3\u675F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 "input",
                 {
                   type: "date",
@@ -62876,13 +63111,13 @@ function LibraryApp({ plugin }) {
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u65F6\u957F" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-value", style: { fontSize: "13px", display: "inline-flex", alignItems: "center", height: "30px", color: "var(--text-muted)" }, children: formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path)) })
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u65F6\u957F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-value", style: { fontSize: "13px", display: "inline-flex", alignItems: "center", height: "30px", color: "var(--text-muted)" }, children: formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path)) })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "metadata-row full-width", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "metadata-label", children: "\u6807\u7B7E" }),
-              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "metadata-row full-width", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "metadata-label", children: "\u6807\u7B7E" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                 "input",
                 {
                   type: "text",
@@ -62901,12 +63136,12 @@ function LibraryApp({ plugin }) {
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-header-intro-side", onDoubleClick: () => setIsEditingIntro(true), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h4", { style: { margin: 0 }, children: "\u4E66\u7C4D\u7B80\u4ECB" }),
-            !isEditingIntro && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: { fontSize: "12px", cursor: "pointer", color: "var(--text-muted)" }, onClick: () => setIsEditingIntro(true), children: "\u270F\uFE0F \u81EA\u5B9A\u4E49" })
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-header-intro-side", onDoubleClick: () => setIsEditingIntro(true), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h4", { style: { margin: 0 }, children: "\u4E66\u7C4D\u7B80\u4ECB" }),
+            !isEditingIntro && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontSize: "12px", cursor: "pointer", color: "var(--text-muted)" }, onClick: () => setIsEditingIntro(true), children: "\u270F\uFE0F \u81EA\u5B9A\u4E49" })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "detail-intro-scroll", children: isEditingIntro ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "detail-intro-scroll", children: isEditingIntro ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "textarea",
             {
               className: "metadata-textarea",
@@ -62918,30 +63153,30 @@ function LibraryApp({ plugin }) {
               },
               placeholder: "\u5728\u8FD9\u91CC\u8F93\u5165\u60A8\u81EA\u5DF1\u7684\u7B80\u4ECB\u6216\u7B14\u8BB0\u6458\u8981..."
             }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { style: { cursor: "pointer" }, onClick: () => setIsEditingIntro(true), title: "\u70B9\u51FB\u6216\u53CC\u51FB\u7F16\u8F91\u7B80\u4ECB", children: bookMetadata.summary || description || "\u6682\u65E0\u4E66\u7C4D\u7B80\u4ECB" }) })
+          ) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { style: { cursor: "pointer" }, onClick: () => setIsEditingIntro(true), title: "\u70B9\u51FB\u6216\u53CC\u51FB\u7F16\u8F91\u7B80\u4ECB", children: bookMetadata.summary || description || "\u6682\u65E0\u4E66\u7C4D\u7B80\u4ECB" }) })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-detail-tabs", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "detail-tab-group", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: `detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`, onClick: () => setActiveTab("highlights"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z" }),
-            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("polyline", { points: "15 3 15 9 21 9" })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-detail-tabs", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "detail-tab-group", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: `detail-tab-btn ${activeTab === "highlights" ? "is-active" : ""}`, onClick: () => setActiveTab("highlights"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3z" }),
+            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("polyline", { points: "15 3 15 9 21 9" })
           ] }),
           "\u7B14\u8BB0 (",
           highlights.length,
           ")"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
-          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("button", { className: `detail-tab-btn ${activeTab === "bookmarks" ? "is-active" : ""}`, onClick: () => setActiveTab("bookmarks"), children: [
+          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { flexShrink: 0 }, children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("path", { d: "m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" }) }),
           "\u4E66\u7B7E (",
           bookmarks.length,
           ")"
         ] })
       ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookHighlightsPanel, { plugin, book: activeBook, title, highlights, onJump: jumpToHighlight }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(BookBookmarksPanel, { plugin, book: activeBook, bookmarks }) })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "jarvis-library-detail-content", children: activeTab === "highlights" ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BookHighlightsPanel, { plugin, book: activeBook, title, highlights, onJump: jumpToHighlight }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(BookBookmarksPanel, { plugin, book: activeBook, bookmarks }) })
     ] });
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "jarvis-library-app", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "jarvis-library-app", children: [
     currentView === "home" ? renderHome() : currentView === "detail" ? renderDetail() : renderStatsView(),
     renderDebugModal()
   ] });
@@ -62949,7 +63184,7 @@ function LibraryApp({ plugin }) {
 
 // src/library/LibraryView.ts
 var LIBRARY_VIEW_TYPE = "jarvis-reader-library";
-var LibraryView = class extends import_obsidian13.ItemView {
+var LibraryView = class extends import_obsidian15.ItemView {
   plugin;
   root = null;
   constructor(leaf, plugin) {
@@ -62963,14 +63198,14 @@ var LibraryView = class extends import_obsidian13.ItemView {
     return "\u56FE\u4E66\u5E93";
   }
   getIcon() {
-    return "jarvis-logo";
+    return "library-big";
   }
   async onOpen() {
     const container = this.contentEl;
     container.empty();
     container.addClass("jarvis-reader-library-view");
     this.root = ReactDOM.createRoot(container);
-    this.root.render(React6.createElement(LibraryApp, { plugin: this.plugin }));
+    this.root.render(React8.createElement(LibraryApp, { plugin: this.plugin }));
   }
   async onClose() {
     if (this.root) {
@@ -62982,7 +63217,7 @@ var LibraryView = class extends import_obsidian13.ItemView {
 };
 
 // src/settings.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 init_utils();
 var DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -62996,10 +63231,15 @@ created: {{created}}
 
 {{toc}}`;
 var DEFAULT_SETTINGS = {
+  readerLetterSpacing: 0,
+  readerWordSpacing: 0,
+  readerParagraphIndent: "original",
+  readerWidth: READER_WIDTH_LIMITS.defaultValue,
   scrolledView: false,
   singlePageView: false,
-  readerZoom: 1,
-  readerLineHeight: 1.6,
+  readerZoom: READER_ZOOM_LIMITS.defaultValue,
+  readerLineHeight: READER_LINE_HEIGHT_LIMITS.defaultValue,
+  readerQuickActions: ["bookmark", "note"],
   bookNoteFolder: "",
   knowledgeNoteFolder: "\u77E5\u8BC6\u5E93/\u60F3\u6CD5",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
@@ -63034,13 +63274,13 @@ var DEFAULT_SETTINGS = {
   },
   readingStats: {}
 };
-var JarvisReaderFolderSuggestModal = class extends import_obsidian14.FuzzySuggestModal {
+var JarvisReaderFolderSuggestModal = class extends import_obsidian16.FuzzySuggestModal {
   onChoose;
   folders;
   constructor(app, onChoose) {
     super(app);
     this.onChoose = onChoose;
-    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian14.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
+    this.folders = app.vault.getAllLoadedFiles().filter((file) => file instanceof import_obsidian16.TFolder).map((folder) => folder.path).filter((path) => path && path !== "/").sort((a, b) => a.localeCompare(b));
     this.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939");
   }
   getItems() {
@@ -63053,7 +63293,7 @@ var JarvisReaderFolderSuggestModal = class extends import_obsidian14.FuzzySugges
     this.onChoose(path);
   }
 };
-var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
+var JarvisReaderSettingTab = class extends import_obsidian16.PluginSettingTab {
   plugin;
   activeTab = "storage";
   constructor(app, plugin) {
@@ -63109,9 +63349,9 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
     });
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
       let bookFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
         bookFolderText = text;
         text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
@@ -63132,9 +63372,9 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
           bookFolderText.setValue("");
         }
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
       let knowledgeFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
         knowledgeFolderText = text;
         text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
           this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
@@ -63147,9 +63387,9 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
           knowledgeFolderText?.setValue(path);
         }).open();
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
       let customCoverFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
         customCoverFolderText = text;
         text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
           this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
@@ -63170,7 +63410,7 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
           customCoverFolderText.setValue("");
         }
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
         text.setPlaceholder(`---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -63192,7 +63432,7 @@ created: {{created}}
       let translationBaseUrlText = null;
       let translationModelText = null;
       let translationPromptText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
         dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
           const provider = value;
           const defaults = getTranslationProviderDefaults(provider);
@@ -63214,7 +63454,7 @@ created: {{created}}
           }
         });
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
         translationBaseUrlText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
@@ -63223,7 +63463,7 @@ created: {{created}}
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
         text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
           this.plugin.settings.translationApi.apiKey = value.trim();
           await this.plugin.saveSettings();
@@ -63231,7 +63471,7 @@ created: {{created}}
         text.inputEl.type = "password";
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
         translationModelText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
         text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
@@ -63243,20 +63483,20 @@ created: {{created}}
         try {
           const promptCheck = validateTranslationPromptJsonTemplate(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
           if (!promptCheck.ok) {
-            new import_obsidian14.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
+            new import_obsidian16.Notice(`\u63D0\u793A\u8BCD JSON \u6A21\u677F\u65E0\u6548\uFF1A${promptCheck.error}`);
             return;
           }
           await translateSelectionWithApi(this.plugin.settings, "test");
-          new import_obsidian14.Notice("\u6D4B\u8BD5\u6210\u529F");
+          new import_obsidian16.Notice("\u6D4B\u8BD5\u6210\u529F");
         } catch (error) {
-          new import_obsidian14.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
+          new import_obsidian16.Notice(`\u7FFB\u8BD1\u6D4B\u8BD5\u5931\u8D25\uFF1A${error.message || error}`);
         }
       }));
       contentDiv.createDiv({
         cls: "jarvis-reader-translation-prompt-help",
         text: TRANSLATION_PROMPT_HELP_TEXT
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
         translationPromptText = text;
         text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
           this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
@@ -63265,48 +63505,48 @@ created: {{created}}
         text.inputEl.rows = 6;
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian14.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
+      new import_obsidian16.Setting(contentDiv).setName("").setDesc("").addButton((button) => button.setButtonText("\u6062\u590D\u9ED8\u8BA4\u63D0\u793A\u8BCD").onClick(async () => {
         this.plugin.settings.translationPrompt = DEFAULT_TRANSLATION_PROMPT;
         await this.plugin.saveSettings();
         if (translationPromptText) {
           translationPromptText.setValue(DEFAULT_TRANSLATION_PROMPT);
         }
-        new import_obsidian14.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
+        new import_obsidian16.Notice("\u5DF2\u6062\u590D\u9ED8\u8BA4\u7FFB\u8BD1\u63D0\u793A\u8BCD\u3002");
       }));
     }
     if (this.activeTab === "words") {
-      new import_obsidian14.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u5361\u7684\u6807\u8BB0").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u5361").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u548C\u77ED\u8BED\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u5361\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u5361\u7684\u6807\u8BB0").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u5361").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u548C\u77ED\u8BED\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u5361\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
         await this.plugin.saveSettings();
       }));
       this.createColorPicker(contentDiv, "\u5355\u8BCD\u989C\u8272", "\u5DF2\u4FDD\u5B58\u5355\u8BCD\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "word");
       this.createColorPicker(contentDiv, "\u77ED\u8BED\u989C\u8272", "\u5DF2\u4FDD\u5B58\u77ED\u8BED\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "phrase");
-      new import_obsidian14.Setting(contentDiv).setName("\u8BCD\u5361").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u8BCD\u5361").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
         this.plugin.settings.blurWordCardBody = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
         this.plugin.settings.enableWordAudio = value;
         await this.plugin.saveSettings();
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
         text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
           this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
         dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
           this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
           this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
+      new import_obsidian16.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
         text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
           this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
           await this.plugin.saveSettings();
@@ -63314,25 +63554,29 @@ created: {{created}}
       });
     }
     if (this.activeTab === "appearance") {
-      new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
-        slider.setLimits(0.5, 3, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
-          this.plugin.settings.readerZoom = value;
+      new import_obsidian16.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
+        slider.setLimits(READER_ZOOM_LIMITS.min, READER_ZOOM_LIMITS.max, READER_ZOOM_LIMITS.step).setValue(clampReaderZoom(this.plugin.settings.readerZoom)).setDynamicTooltip().onChange(async (value) => {
+          const nextValue = clampReaderZoom(value);
+          slider.setValue(nextValue);
+          this.plugin.settings.readerZoom = nextValue;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
-        slider.setLimits(1, 3, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
-          this.plugin.settings.readerLineHeight = value;
+      new import_obsidian16.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
+        slider.setLimits(READER_LINE_HEIGHT_LIMITS.min, READER_LINE_HEIGHT_LIMITS.max, READER_LINE_HEIGHT_LIMITS.step).setValue(clampReaderLineHeight(this.plugin.settings.readerLineHeight)).setDynamicTooltip().onChange(async (value) => {
+          const nextValue = clampReaderLineHeight(value);
+          slider.setValue(nextValue);
+          this.plugin.settings.readerLineHeight = nextValue;
           await this.plugin.saveSettings();
         });
       });
-      new import_obsidian14.Setting(contentDiv).setName("\u5212\u7EBF\u989C\u8272").setHeading();
+      new import_obsidian16.Setting(contentDiv).setName("\u5212\u7EBF\u989C\u8272").setHeading();
       this.createColorPicker(contentDiv, "\u5E26\u7B14\u8BB0\u5212\u7EBF\u989C\u8272", "\u7ED9\u5212\u7EBF\u6DFB\u52A0\u7B14\u8BB0\u540E\u663E\u793A\u7684\u989C\u8272", "comment");
       this.createColorPicker(contentDiv, "\u666E\u901A\u5212\u7EBF\u989C\u8272", "\u672A\u6DFB\u52A0\u7B14\u8BB0\u7684\u666E\u901A\u5212\u7EBF\u989C\u8272", "normal");
     }
   }
   createColorPicker(containerEl, name, desc, key) {
-    new import_obsidian14.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+    new import_obsidian16.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
       this.plugin.settings.highlightColors = {
         ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
         [key]: value
@@ -63348,9 +63592,9 @@ init_book_notes();
 init_utils();
 
 // src/global-markdown.ts
-var import_react5 = __toESM(require_react(), 1);
+var import_react7 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
-var import_obsidian15 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 init_utils();
 function truncateWordDisplay2(value) {
   const raw = String(value || "");
@@ -63367,7 +63611,7 @@ function renderWordCardDisplayText2(text) {
     if (match.index > lastIndex) {
       parts.push(value.slice(lastIndex, match.index));
     }
-    parts.push(import_react5.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
+    parts.push(import_react7.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
     lastIndex = pattern.lastIndex;
   }
   if (lastIndex < value.length) {
@@ -63409,14 +63653,14 @@ var GlobalTranslationCard = ({
   onClose,
   hoverMode = false
 }) => {
-  const [status, setStatus] = import_react5.default.useState("loading");
-  const [result, setResult] = import_react5.default.useState(null);
-  const [error, setError] = import_react5.default.useState("");
-  const [isSaved, setIsSaved] = import_react5.default.useState(false);
-  const cardRef = import_react5.default.useRef(null);
+  const [status, setStatus] = import_react7.default.useState("loading");
+  const [result, setResult] = import_react7.default.useState(null);
+  const [error, setError] = import_react7.default.useState("");
+  const [isSaved, setIsSaved] = import_react7.default.useState(false);
+  const cardRef = import_react7.default.useRef(null);
   const canSave = !!getTranslationAssetKey({ quote: word, sentence }, result);
   const renderObsidianIcon = (name) => {
-    return import_react5.default.createElement("span", {
+    return import_react7.default.createElement("span", {
       "aria-hidden": "true",
       className: "jarvis-reader-word-card-action-icon",
       ref: (element) => {
@@ -63424,8 +63668,8 @@ var GlobalTranslationCard = ({
         while (element.firstChild) {
           element.removeChild(element.firstChild);
         }
-        if (typeof import_obsidian15.setIcon === "function") {
-          (0, import_obsidian15.setIcon)(element, name);
+        if (typeof import_obsidian17.setIcon === "function") {
+          (0, import_obsidian17.setIcon)(element, name);
         }
       }
     });
@@ -63493,7 +63737,7 @@ var GlobalTranslationCard = ({
       setStatus("error");
     }
   };
-  import_react5.default.useEffect(() => {
+  import_react7.default.useEffect(() => {
     loadTranslation();
   }, [word]);
   const handleSave = async () => {
@@ -63501,7 +63745,7 @@ var GlobalTranslationCard = ({
     try {
       const assetKey = getTranslationAssetKey({ quote: word, sentence }, result);
       if (!assetKey) {
-        new import_obsidian15.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
+        new import_obsidian17.Notice("\u53EA\u80FD\u4FDD\u5B58\u82F1\u6587\u5355\u8BCD\u6216\u77ED\u8BED\u3002");
         return;
       }
       const existing = (plugin.settings.wordAssets || {})[assetKey];
@@ -63515,19 +63759,19 @@ var GlobalTranslationCard = ({
         plugin.settings
       );
       if (!asset) {
-        new import_obsidian15.Notice("Failed to build word asset.");
+        new import_obsidian17.Notice("Failed to build word asset.");
         return;
       }
       await plugin.wordAssetService.save(asset);
       setIsSaved(true);
-      new import_obsidian15.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
+      new import_obsidian17.Notice("\u5DF2\u4FDD\u5B58\u5230\u5168\u5C40\u8BCD\u5E93");
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
           leaf.view.editor.cm.dispatch({});
         }
       });
     } catch (err) {
-      new import_obsidian15.Notice("Save failed.");
+      new import_obsidian17.Notice("Save failed.");
     }
   };
   const handleAiTranslate = async () => {
@@ -63555,7 +63799,7 @@ var GlobalTranslationCard = ({
     if (!confirmed) return;
     try {
       await plugin.wordAssetService.delete(word.toLowerCase());
-      new import_obsidian15.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
+      new import_obsidian17.Notice("\u8BCD\u6761\u5DF2\u5F7B\u5E95\u5220\u9664\u3002");
       onClose();
       plugin.app.workspace.iterateAllLeaves((leaf) => {
         if (leaf.view && leaf.view.editor && leaf.view.editor.cm) {
@@ -63563,7 +63807,7 @@ var GlobalTranslationCard = ({
         }
       });
     } catch (err) {
-      new import_obsidian15.Notice("\u5220\u9664\u5931\u8D25\u3002");
+      new import_obsidian17.Notice("\u5220\u9664\u5931\u8D25\u3002");
     }
   };
   const handlePlayAudio = () => {
@@ -63582,7 +63826,7 @@ var GlobalTranslationCard = ({
     if (!audioUrl) return speak();
     new Audio(audioUrl).play().catch(speak);
   };
-  import_react5.default.useEffect(() => {
+  import_react7.default.useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
     const width = 360;
@@ -63602,18 +63846,18 @@ var GlobalTranslationCard = ({
     card.style.width = `${width}px`;
   }, [rect, hoverMode]);
   const renderWordDisplayContent = (display) => {
-    return import_react5.default.createElement("div", {
+    return import_react7.default.createElement("div", {
       className: "jarvis-reader-word-card-display"
     }, truncateWordDisplay2(display || "").split(/\r?\n/).filter((line) => line.trim()).map((line, index) => {
       const meta = getWordCardDisplayLineMeta2(line);
-      return import_react5.default.createElement("div", {
+      return import_react7.default.createElement("div", {
         className: meta.className,
         key: index
       }, renderWordCardDisplayText2(meta.text));
     }));
   };
   if (hoverMode) {
-    return import_react5.default.createElement(
+    return import_react7.default.createElement(
       "div",
       {
         className: "jarvis-reader-word-card",
@@ -63621,42 +63865,42 @@ var GlobalTranslationCard = ({
         style: { position: "fixed" },
         onClick: (e) => e.stopPropagation()
       },
-      import_react5.default.createElement(
+      import_react7.default.createElement(
         "div",
         { className: "jarvis-reader-word-card-head" },
-        import_react5.default.createElement(
+        import_react7.default.createElement(
           "div",
           { className: "jarvis-reader-word-card-head-row" },
-          import_react5.default.createElement("button", {
+          import_react7.default.createElement("button", {
             className: "jarvis-reader-word-card-lemma",
             onClick: handlePlayAudio,
             title: "\u70B9\u51FB\u53D1\u97F3",
             style: { color: "#c62828", background: "none", border: "none", cursor: "pointer", fontWeight: "bold", padding: 0 }
           }, word),
           // Drag spacer handle
-          import_react5.default.createElement("div", {
+          import_react7.default.createElement("div", {
             style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" },
             onPointerDown: handleDragStart
           }),
-          import_react5.default.createElement(
+          import_react7.default.createElement(
             "div",
             { className: "jarvis-reader-word-card-actions" },
-            import_react5.default.createElement("button", {
+            import_react7.default.createElement("button", {
               className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
               title: "\u5220\u9664\u8BCD\u6761",
               onClick: handleDeleteWord
             }, renderObsidianIcon("trash"))
           )
         ),
-        result && import_react5.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, result.phonetic ? `/${result.phonetic}/` : "")
+        result && import_react7.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, result.phonetic ? `/${result.phonetic}/` : "")
       ),
-      import_react5.default.createElement(
+      import_react7.default.createElement(
         "div",
         {
           className: plugin.settings.blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body",
           style: { marginTop: "4px" }
         },
-        import_react5.default.createElement(
+        import_react7.default.createElement(
           "div",
           {
             style: {
@@ -63669,16 +63913,16 @@ var GlobalTranslationCard = ({
               gap: "6px"
             }
           },
-          result?.display ? renderWordDisplayContent(result.display) : import_react5.default.createElement("div", { className: "jarvis-reader-word-translation" }, result?.translation || "")
+          result?.display ? renderWordDisplayContent(result.display) : import_react7.default.createElement("div", { className: "jarvis-reader-word-translation" }, result?.translation || "")
         )
       ),
-      result?.sources && result.sources.length > 0 && import_react5.default.createElement(
+      result?.sources && result.sources.length > 0 && import_react7.default.createElement(
         "div",
         {
           className: "jarvis-reader-word-card-sources",
           style: { fontSize: "11px", color: "var(--text-faint)", marginTop: "6px" }
         },
-        import_react5.default.createElement(
+        import_react7.default.createElement(
           "div",
           { className: "jarvis-reader-word-card-source" },
           "\u6765\u6E90: ",
@@ -63688,7 +63932,7 @@ var GlobalTranslationCard = ({
       )
     );
   }
-  return import_react5.default.createElement(
+  return import_react7.default.createElement(
     "div",
     {
       className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",
@@ -63696,75 +63940,75 @@ var GlobalTranslationCard = ({
       style: { position: "fixed" },
       onClick: (e) => e.stopPropagation()
     },
-    import_react5.default.createElement(
+    import_react7.default.createElement(
       "div",
       {
         className: "jarvis-reader-highlight-title",
         style: { display: "flex", justifyContent: "space-between", alignItems: "center" },
         onPointerDown: handleDragStart
       },
-      import_react5.default.createElement("span", null, "\u7FFB\u8BD1"),
-      import_react5.default.createElement("button", {
+      import_react7.default.createElement("span", null, "\u7FFB\u8BD1"),
+      import_react7.default.createElement("button", {
         className: "jarvis-reader-word-card-action",
         onClick: onClose,
         onPointerDown: (e) => e.stopPropagation(),
         style: { border: "none", background: "transparent", cursor: "pointer" }
       }, "\u2715")
     ),
-    sentence && import_react5.default.createElement("div", {
+    sentence && import_react7.default.createElement("div", {
       className: "jarvis-reader-highlight-quote",
       style: { fontSize: "0.9em", color: "var(--text-muted)", background: "var(--background-secondary)", borderRadius: "8px", padding: "6px 8px", maxHeight: "60px", overflowY: "auto" }
     }, sentence),
-    import_react5.default.createElement(
+    import_react7.default.createElement(
       "div",
       {
         className: "jarvis-reader-word-panel",
         style: { marginTop: "8px" }
       },
-      status === "loading" && import_react5.default.createElement("div", { className: "jarvis-reader-word-muted" }, "\u6B63\u5728\u7FFB\u8BD1..."),
-      status === "error" && import_react5.default.createElement(
+      status === "loading" && import_react7.default.createElement("div", { className: "jarvis-reader-word-muted" }, "\u6B63\u5728\u7FFB\u8BD1..."),
+      status === "error" && import_react7.default.createElement(
         "div",
         {
           className: "jarvis-reader-word-error",
           style: { display: "flex", flexDirection: "column", gap: "8px" }
         },
-        import_react5.default.createElement("span", null, error),
-        import_react5.default.createElement("button", {
+        import_react7.default.createElement("span", null, error),
+        import_react7.default.createElement("button", {
           className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
           onClick: handleAiTranslate,
           style: { alignSelf: "flex-start" }
         }, "AI\u7FFB\u8BD1")
       ),
-      status === "ready" && result && import_react5.default.createElement(
-        import_react5.default.Fragment,
+      status === "ready" && result && import_react7.default.createElement(
+        import_react7.default.Fragment,
         null,
-        result.isWord !== false && import_react5.default.createElement(
+        result.isWord !== false && import_react7.default.createElement(
           "div",
           { className: "jarvis-reader-word-head" },
-          import_react5.default.createElement("button", {
+          import_react7.default.createElement("button", {
             className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button",
             title: "\u70B9\u51FB\u53D1\u97F3",
             onClick: handlePlayAudio,
             style: { color: "var(--text-error)", fontWeight: "bold" }
           }, word),
-          result.phonetic && import_react5.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, `[${result.phonetic}]`)
+          result.phonetic && import_react7.default.createElement("div", { className: "jarvis-reader-word-phonetic" }, `[${result.phonetic}]`)
         ),
-        result.isWord !== false && (result.tags || result.collins || result.oxford) ? import_react5.default.createElement(
+        result.isWord !== false && (result.tags || result.collins || result.oxford) ? import_react7.default.createElement(
           "div",
           { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
-          result.oxford === 1 ? import_react5.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
-          result.collins && result.collins > 0 ? import_react5.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(result.collins)) : null,
-          result.tags ? result.tags.map((tag) => import_react5.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+          result.oxford === 1 ? import_react7.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
+          result.collins && result.collins > 0 ? import_react7.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(result.collins)) : null,
+          result.tags ? result.tags.map((tag) => import_react7.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
         ) : null,
-        result.display ? renderWordDisplayContent(result.display) : import_react5.default.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
+        result.display ? renderWordDisplayContent(result.display) : import_react7.default.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
     ),
-    import_react5.default.createElement(
+    import_react7.default.createElement(
       "div",
       { className: "jarvis-reader-highlight-actions", style: { marginTop: "10px" } },
-      import_react5.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: onClose }, "\u53D6\u6D88"),
-      status === "ready" && import_react5.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: handleAiTranslate }, "AI\u7FFB\u8BD1"),
-      canSave && (isSaved ? import_react5.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react5.default.createElement("button", {
+      import_react7.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: onClose }, "\u53D6\u6D88"),
+      status === "ready" && import_react7.default.createElement("button", { className: "jarvis-reader-highlight-button", onClick: handleAiTranslate }, "AI\u7FFB\u8BD1"),
+      canSave && (isSaved ? import_react7.default.createElement("div", { className: "jarvis-reader-word-saved", style: { display: "flex", alignItems: "center" } }, "\u2713 \u5DF2\u52A0\u5165\u8BCD\u5E93") : import_react7.default.createElement("button", {
         className: "jarvis-reader-highlight-button jarvis-reader-highlight-button-primary",
         onClick: handleSave,
         disabled: status !== "ready"
@@ -63797,7 +64041,7 @@ var GlobalTranslationManager = class {
     this.ensureContainer();
     import_react_dom.default.unmountComponentAtNode(this.containerEl);
     import_react_dom.default.render(
-      import_react5.default.createElement(GlobalTranslationCard, {
+      import_react7.default.createElement(GlobalTranslationCard, {
         word,
         sentence,
         rect,
@@ -63814,7 +64058,7 @@ var GlobalTranslationManager = class {
     const rect = targetEl.getBoundingClientRect();
     import_react_dom.default.unmountComponentAtNode(this.containerEl);
     import_react_dom.default.render(
-      import_react5.default.createElement(GlobalTranslationCard, {
+      import_react7.default.createElement(GlobalTranslationCard, {
         word,
         rect,
         plugin: this.plugin,
@@ -64766,7 +65010,7 @@ async function writeWordAssetSidecar(adapter, path, wordAssets, updated = (/* @_
 // src/main.ts
 var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 var LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
-var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
+var JarvisReaderPlugin = class extends import_obsidian18.Plugin {
   bookshelfView;
   activeReaderView;
   lastIndexCounts;
@@ -64782,7 +65026,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     adapter: this.app.vault.adapter,
     readNote: async (path) => {
       const file = this.app.vault.getAbstractFileByPath(path);
-      if (!(file instanceof import_obsidian16.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
+      if (!(file instanceof import_obsidian18.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
       return this.app.vault.read(file);
     },
     writeNote: async (path, content) => {
@@ -64790,7 +65034,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       await writeExistingRecoveryNote(
         path,
         content,
-        file instanceof import_obsidian16.TFile ? file : null,
+        file instanceof import_obsidian18.TFile ? file : null,
         (note, body) => this.app.vault.modify(note, body),
         this.app.vault.adapter
       );
@@ -64804,18 +65048,18 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
   );
   highlightSidecarUnavailable = false;
   async onload() {
-    (0, import_obsidian16.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
-    (0, import_obsidian16.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
+    (0, import_obsidian18.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
+    (0, import_obsidian18.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
     await this.migrateReviewData();
     const highlightRecovery = await this.highlightTransactionService.recoverPending();
     if (highlightRecovery.finalized || highlightRecovery.rolledBack) {
-      new import_obsidian16.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
+      new import_obsidian18.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
     }
     if (highlightRecovery.errors.length) {
       console.error("Jarvis Reader highlight transaction recovery failed.", highlightRecovery.errors);
-      new import_obsidian16.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
+      new import_obsidian18.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
     }
     await resolveSyncConflicts(this);
     if (needsStartupIndexPersistence) {
@@ -64859,7 +65103,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       }
     });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file instanceof import_obsidian16.TFile && file.extension.toLowerCase() === "pdf") {
+      if (file instanceof import_obsidian18.TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0").setIcon("pencil").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -64928,18 +65172,18 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
   async openReadingSource(parameters) {
     const target = parseReadingSourceTarget(parameters);
     if (!target) {
-      new import_obsidian16.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
+      new import_obsidian18.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
       return;
     }
     const file = this.app.vault.getAbstractFileByPath(target.bookPath);
-    if (!(file instanceof import_obsidian16.TFile)) {
-      new import_obsidian16.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
+    if (!(file instanceof import_obsidian18.TFile)) {
+      new import_obsidian18.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
       return;
     }
     const indexed = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
     const cfiRange = indexed?.cfiRange || target.cfiRange;
     if (!cfiRange) {
-      new import_obsidian16.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
+      new import_obsidian18.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
       return;
     }
     this.sourceJumpPaths.add(target.bookPath);
@@ -64949,7 +65193,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       await leaf.view.jumpToHighlight({ id: indexed?.id || target.highlightId, cfiRange });
     } catch (error) {
       console.error("Jarvis Reader source navigation failed.", error);
-      new import_obsidian16.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+      new import_obsidian18.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
     } finally {
       this.sourceJumpPaths.delete(target.bookPath);
     }
@@ -65130,7 +65374,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
         this.highlightSidecarUnavailable = true;
         this.settings.bookHighlights = {};
         console.error("Jarvis Reader highlight sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian16.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian18.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       const wordAssetSidecar = await readWordAssetSidecar(adapter, paths.wordAssets);
       if (wordAssetSidecar.status === "ready") {
@@ -65144,7 +65388,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
         this.wordAssetSidecarUnavailable = true;
         this.settings.wordAssets = {};
         console.error("Jarvis Reader word asset sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian18.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       if (restoredToMemory) {
         await this.logIndexChange("restore-from-sidecar");
@@ -65153,7 +65397,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
-      new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
+      new import_obsidian18.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
       throw error;
     }
   }
@@ -65165,13 +65409,13 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     await writeWordAssetSidecar(adapter, paths.wordAssets, migration.wordAssets);
     this.settings = migration.settings;
     await this.saveSettingsData();
-    new import_obsidian16.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
+    new import_obsidian18.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
   }
   async persistWordAssetSidecar(reason = "save") {
     if (this.wordAssetSidecarUnavailable) {
       const message = "\u8BCD\u6761\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u8BCD\u6761\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D word-assets.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian16.Notice(message, 0);
+      new import_obsidian18.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -65203,7 +65447,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     if (this.highlightSidecarUnavailable) {
       const message = "\u9AD8\u4EAE\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u9AD8\u4EAE\u7D22\u5F15\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D highlights.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian16.Notice(message, 0);
+      new import_obsidian18.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -65294,13 +65538,13 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       this.coverCacheMigrationComplete = true;
       if (backupRoot) {
         await this.saveSettingsData();
-        new import_obsidian16.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
+        new import_obsidian18.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
       }
     } catch (error) {
       this.coverCacheMigrationComplete = false;
       this.settings.bookCoverCache = legacyCoverCache;
       console.error("Jarvis Reader cover cache migration failed.", error);
-      new import_obsidian16.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
+      new import_obsidian18.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
     }
     if (!["single", "dual"].includes(this.settings.sidebarLayoutMode)) {
       this.settings.sidebarLayoutMode = "single";
@@ -65310,7 +65554,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
     if (migration.migrated) {
       await this.saveSettingsData();
-      new import_obsidian16.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
+      new import_obsidian18.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
     }
   }
   async saveSettings() {

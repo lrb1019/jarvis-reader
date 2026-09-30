@@ -6,6 +6,18 @@
   position: relative;
 }
 
+.jarvis-reader-reading-title {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  left: 112px;
+  right: 112px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .jarvis-reader-epub > div:not(.jarvis-reader-word-card):not(.jarvis-reader-highlight-popover):not(.jarvis-reader-highlight-menu) {
   background: transparent !important;
 }
@@ -13,39 +25,32 @@
 .jarvis-reader-epub button[class*="prev"],
 .jarvis-reader-epub button[class*="next"] {
   position: absolute !important;
-  top: auto !important;
-  bottom: 20px !important;
-  transform: none !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
   margin-top: 0 !important;
-  width: 36px !important;
-  height: 36px !important;
-  background: var(--interactive-normal) !important;
-  border-radius: 50% !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  color: var(--text-normal) !important;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 15%) !important;
+  width: 40px !important;
+  height: calc(100% - 100px) !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.jarvis-reader-epub button[class*="prev"]:hover,
-.jarvis-reader-epub button[class*="next"]:hover {
-  background: var(--interactive-hover) !important;
   opacity: 1;
 }
 
 .jarvis-reader-epub button[class*="prev"] {
-  left: calc(50% - 44px) !important;
+  left: 0 !important;
   right: auto !important;
 }
 
 .jarvis-reader-epub button[class*="next"] {
-  left: calc(50% + 8px) !important;
-  right: auto !important;
+  left: auto !important;
+  right: 0 !important;
 }
 
 /* react-reader uses text glyphs for paging. Replace them with centered Lucide-compatible SVGs. */
@@ -57,8 +62,10 @@
 
 .jarvis-reader-epub .jarvis-reader-page-button svg {
   display: block;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 44px;
+  opacity: 0;
+  transition: opacity 160ms ease;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.5;
@@ -66,76 +73,71 @@
   stroke-linejoin: round;
 }
 
+.jarvis-reader-epub .jarvis-reader-page-button[data-active] svg,
+.jarvis-reader-epub .jarvis-reader-page-button:focus-visible svg {
+  opacity: 1;
+}
+
 .jarvis-reader-side-hover-zone {
-  bottom: 96px;
-  left: 0;
   position: absolute;
-  top: 96px;
-  width: 76px;
+  top: 4px;
+  height: 32px;
+  right: 12px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  pointer-events: auto;
   z-index: 600;
 }
 
 .jarvis-reader-side-controls {
   align-items: center;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-left: none;
-  border-radius: 0 12px 12px 0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  left: 0;
+  flex-direction: row;
+  gap: 4px;
   opacity: 0;
-  padding: 12px 10px;
+  padding: 2px;
   pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: translate(-10px, -50%);
-  transition: opacity 160ms ease, transform 160ms ease;
+  overflow-x: auto;
+  transition: opacity 160ms ease;
 }
 
-.jarvis-reader-side-hover-zone:hover .jarvis-reader-side-controls,
-.jarvis-reader-side-controls:focus-within {
+.jarvis-reader-side-hover-zone.is-active .jarvis-reader-side-controls,
+.jarvis-reader-side-hover-zone.is-open .jarvis-reader-side-controls,
+.jarvis-reader-side-controls:has(button:focus-visible) {
   opacity: 1;
   pointer-events: auto;
-  transform: translate(0, -50%);
+  transform: translateY(0);
 }
 
-.jarvis-reader-side-button {
+.jarvis-reader-epub .jarvis-reader-side-button {
   align-items: center;
   appearance: none;
-  background: color-mix(in srgb, var(--background-secondary) 70%, white 30%);
-  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 55%, transparent);
-  border-radius: 11px;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 8%);
-  color: var(--text-normal);
+  background: transparent !important;
+  border: none !important;
+  border-radius: 4px;
+  box-shadow: none !important;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   font: 600 13px var(--font-interface);
-  height: 31px;
+  height: 28px;
   justify-content: center;
   outline: none;
   padding: 0;
-  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-  width: 31px;
+  transition: color 120ms ease;
+  width: 28px;
+  flex: 0 0 28px;
 }
 
-.jarvis-reader-side-button:hover {
-  background: var(--interactive-hover);
-  box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
-  transform: translateY(-1px);
-}
-
+.jarvis-reader-side-button:hover,
 .jarvis-reader-side-button:active {
-  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
-  transform: scale(0.96);
-}
-
-.jarvis-reader-side-mode-button {
-  border-radius: 999px;
-  color: var(--interactive-accent);
-  font-size: 12px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-normal);
 }
 
 .jarvis-reader-side-button svg {
@@ -1317,13 +1319,55 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   color: var(--interactive-accent);
 }
 
-.jarvis-reader-highlights-more {
-  flex: 0 0 auto;
-  margin-left: auto;
-  min-width: 32px;
-  padding-left: 8px;
-  padding-right: 8px;
-  text-align: center;
+.jarvis-reader-highlights-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jarvis-reader-highlights-search-row .jarvis-reader-highlights-search {
+  flex: 1;
+  min-width: 0;
+}
+
+.jarvis-reader-highlights-filter-toggle {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+}
+
+.jarvis-reader-highlights-filter-toggle.is-active {
+  color: var(--interactive-accent);
+}
+
+.jarvis-reader-highlights-filter-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.jarvis-reader-highlights-filter-options[hidden] {
+  display: none;
+}
+
+.jarvis-reader-highlights-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.jarvis-reader-highlights-option-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.jarvis-reader-highlights-filter-options .jarvis-reader-highlights-filters {
+  flex-wrap: wrap;
+}
+
+.jarvis-reader-highlights-reset {
+  margin-top: 6px;
 }
 
 .jarvis-reader-highlights-card {
@@ -1487,9 +1531,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 
 .jarvis-reader-sidebar-toolbar {
   align-items: center;
-  display: grid;
+  display: flex;
   flex: 0 0 auto;
-  grid-template-columns: 30px minmax(max-content, 1fr);
   gap: 6px;
   min-width: 0;
   overflow: visible;
@@ -1537,8 +1580,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   display: flex;
   flex: 0 0 auto;
   gap: 6px;
-  justify-content: flex-end;
-  margin-left: auto;
+  justify-content: flex-start;
+  margin-left: 0;
   min-width: max-content;
 }
 
@@ -2101,6 +2144,18 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   background-color: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
   border-bottom: 2px solid var(--interactive-accent);
   cursor: pointer;
+}
+
+/* marks-pane appends its SVG above the EPUB iframe. Blend the whole pane
+   with the page: mix-blend-mode is CSS, not an SVG presentation attribute. */
+.jarvis-reader-epub .epub-view > svg {
+  mix-blend-mode: multiply;
+}
+
+.jarvis-reader-epub g.jarvis-reader-highlight rect,
+.jarvis-reader-epub g.jarvis-reader-highlight-with-comment-bg rect {
+  rx: 3px;
+  ry: 3px;
 }
 
 g.jarvis-reader-word-highlight rect,
@@ -5031,3 +5086,64 @@ g.jarvis-reader-highlight-with-comment line {
   min-height: 0;
   resize: vertical;
 }
+
+/* Settings is the last permanent action in the hover toolbar. */
+.jarvis-reader-side-button:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
+.jarvis-reader-settings-panel {
+  position: absolute; right: 0; top: 40px; width: min(340px, calc(100cqw - 24px));
+  max-height: calc(var(--jarvis-reader-height, 100vh) - 52px); overflow-y: auto; pointer-events: auto; box-sizing: border-box;
+  padding: 16px; border: 1px solid var(--background-modifier-border); border-radius: 12px;
+  background: var(--background-secondary); color: var(--text-normal); box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
+  font-family: var(--font-interface); font-size: 13px; line-height: 1.5;
+}
+.jarvis-reader-epub { container-type: inline-size; }
+.jarvis-reader-settings-panel header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.jarvis-reader-settings-panel header strong { font-size: 16px; }
+.jarvis-reader-settings-panel header button { background: transparent; border: none; box-shadow: none; padding: 0; width: 28px; height: 28px; color: var(--text-muted); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-group { margin: 16px 0 0; padding: 0; min-width: 0; border: none; }
+.jarvis-reader-settings-panel .jarvis-reader-settings-group legend { color: var(--text-muted); font-size: 12px; padding: 0 8px 6px; }
+.jarvis-reader-settings-group-body { background: var(--background-primary); border-radius: 9px; padding: 0 12px; }
+.jarvis-reader-settings-group-body > label,
+.jarvis-reader-settings-group-body > .jarvis-reader-settings-choice { margin: 0; border-bottom: 1px solid var(--background-modifier-border); }
+.jarvis-reader-settings-group-body > :last-child { border-bottom: none; }
+.jarvis-reader-settings-panel .jarvis-reader-settings-range { display: block; padding: 9px 0; }
+.jarvis-reader-settings-range-label { display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+.jarvis-reader-settings-range-control { display: grid; grid-template-columns: 18px minmax(0, 1fr) 50px; align-items: center; gap: 10px; min-height: 24px; }
+.jarvis-reader-settings-range-icon { display: flex; color: var(--text-muted); }
+.jarvis-reader-settings-range-icon svg { width: 16px; height: 16px; }
+.jarvis-reader-settings-panel output { text-align: right; color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jarvis-reader-settings-panel input[type="range"] { display: block; width: 100%; min-width: 0; margin: 0; accent-color: var(--text-normal); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-choice { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; min-width: 0; }
+.jarvis-reader-settings-panel select { width: auto; min-width: 0; max-width: 60%; margin: 0; font-size: 12px; color: var(--text-muted); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-reset { display: block; margin-top: 16px; width: 100%; background: transparent; border: none; box-shadow: none; color: var(--text-muted); font-size: 12px; }
+.jarvis-reader-settings-panel [role="alert"] { color: var(--text-error); font-size: 12px; }
+.jarvis-reader-side-controls:empty { display: none; }
+
+
+/* Selection actions use a vertical list within the reading pane. */
+.jarvis-reader-selection-toolbar {
+  flex-direction: column !important;
+  width: 180px !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 16px) !important;
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+  border-radius: 10px !important;
+  padding: 6px !important;
+}
+.jarvis-reader-selection-toolbar .jarvis-reader-context-menu-item {
+  width: 100% !important;
+  height: 34px !important;
+  flex: 0 0 auto;
+}
+.jarvis-reader-selection-toolbar .jarvis-reader-context-menu-item:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.jarvis-reader-settings-icon-options { display: flex; gap: 4px; flex: 0 0 auto; }
+.jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: none; border-radius: 5px; box-shadow: none; background: transparent; color: var(--text-muted); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button[aria-pressed="true"] { color: var(--text-normal); background: var(--background-modifier-hover); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button:hover:not(:disabled) { background: var(--background-modifier-hover); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 1px; }
+.jarvis-reader-settings-icon-options svg { width: 16px; height: 16px; }

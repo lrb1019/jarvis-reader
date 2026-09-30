@@ -3,6 +3,7 @@ import { normalizeVaultPath } from "./utils";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
+import { clampReaderZoom, clampReaderLineHeight, READER_ZOOM_LIMITS, READER_LINE_HEIGHT_LIMITS, READER_WIDTH_LIMITS } from "./reader-settings";
 
 export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
@@ -17,10 +18,15 @@ created: {{created}}
 {{toc}}`;
 
 export const DEFAULT_SETTINGS = {
+  readerLetterSpacing: 0,
+  readerWordSpacing: 0,
+  readerParagraphIndent: "original",
+  readerWidth: READER_WIDTH_LIMITS.defaultValue,
   scrolledView: false,
   singlePageView: false,
-  readerZoom: 1,
-  readerLineHeight: 1.6,
+  readerZoom: READER_ZOOM_LIMITS.defaultValue,
+  readerLineHeight: READER_LINE_HEIGHT_LIMITS.defaultValue,
+  readerQuickActions: ["bookmark", "note"],
   bookNoteFolder: "",
   knowledgeNoteFolder: "知识库/想法",
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
@@ -375,15 +381,19 @@ created: {{created}}
     if (this.activeTab === "appearance") {
 
       new Setting(contentDiv).setName("阅读器默认缩放比例").setDesc("全局控制阅读器中文字的放大缩小级别").addSlider((slider) => {
-        slider.setLimits(0.5, 3.0, 0.1).setValue(this.plugin.settings.readerZoom || 1).setDynamicTooltip().onChange(async (value) => {
-          this.plugin.settings.readerZoom = value;
+        slider.setLimits(READER_ZOOM_LIMITS.min, READER_ZOOM_LIMITS.max, READER_ZOOM_LIMITS.step).setValue(clampReaderZoom(this.plugin.settings.readerZoom)).setDynamicTooltip().onChange(async (value) => {
+          const nextValue = clampReaderZoom(value);
+          slider.setValue(nextValue);
+          this.plugin.settings.readerZoom = nextValue;
           await this.plugin.saveSettings();
         });
       });
 
       new Setting(contentDiv).setName("阅读器默认行高").setDesc("全局控制阅读器中文字的行间距").addSlider((slider) => {
-        slider.setLimits(1.0, 3.0, 0.1).setValue(this.plugin.settings.readerLineHeight || 1.6).setDynamicTooltip().onChange(async (value) => {
-          this.plugin.settings.readerLineHeight = value;
+        slider.setLimits(READER_LINE_HEIGHT_LIMITS.min, READER_LINE_HEIGHT_LIMITS.max, READER_LINE_HEIGHT_LIMITS.step).setValue(clampReaderLineHeight(this.plugin.settings.readerLineHeight)).setDynamicTooltip().onChange(async (value) => {
+          const nextValue = clampReaderLineHeight(value);
+          slider.setValue(nextValue);
+          this.plugin.settings.readerLineHeight = nextValue;
           await this.plugin.saveSettings();
         });
       });

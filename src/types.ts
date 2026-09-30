@@ -164,8 +164,13 @@ export type SidebarLayoutMode = "single" | "dual";
 export interface JarvisReaderSettings {
   scrolledView: boolean;
   singlePageView: boolean;
+  readerLetterSpacing: number;
+  readerWordSpacing: number;
+  readerParagraphIndent: import("./reader-settings").ReaderParagraphIndent;
+  readerWidth: number;
   readerZoom: number;
   readerLineHeight: number;
+  readerQuickActions: string[];
   bookNoteFolder: string;
   knowledgeNoteFolder: string;
   bookNoteTemplate: string;

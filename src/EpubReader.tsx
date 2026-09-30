@@ -1,3 +1,4 @@
+import { bindReaderContainerResize } from "./reader-resize";
 import { removeEpubAnnotation } from "./epub-annotations-adapter";
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
@@ -13,15 +14,19 @@ import { formatLocalDateTime } from "./utils-core";
 import { WikiLinkCodeMirrorEditor } from "./wiki-editor";
 import type { BookHighlight, WordAsset } from "./types";
 import type { HighlightNoteDetails } from "./book-note-document";
+import type { ReaderSettingsAccess } from "./reader/ReaderSettingsPanel";
 import { ReaderSideControls } from "./reader/ReaderSideControls";
+import { clampSelectionMenuPosition, getSelectionTranslationOptions, type SelectionTranslationKind } from "./reader-selection";
+import { READER_ZOOM_LIMITS } from "./reader-settings";
 import { moveFloatingCardRect } from "./floating-card-core";
 
-export interface EpubReaderProps {
+export interface EpubReaderProps extends ReaderSettingsAccess {
   contents: ArrayBuffer;
   title: string;
   bookPath: string;
   scrolled: boolean;
   singlePage: boolean;
+  readerWidth: number;
   readerZoom: number;
   readerLineHeight: number;
   tocOffset: number;
@@ -200,7 +205,7 @@ const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) =
   });
 };
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPath, scrolled, singlePage, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferencesChange, contents, title, bookPath, scrolled, singlePage, readerWidth, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
   const [location, setLocation] = useState<any>(() => shouldSkipInitialLocation?.() ? null : initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -230,6 +235,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   const suppressHighlightPopoverResizeClickRef = useRef(false);
   const wordTranslationRectRef = useRef<any>(null);
   const renditionRef = useRef<any>(null);
+  const resizeCleanupRef = useRef<(() => void) | null>(null);
+  useEffect(() => () => resizeCleanupRef.current?.(), []);
   const currentLocationRef = useRef<string | null>(initLocation);
   const pendingInitLocationRef = useRef<string | null>(initLocation);
   const highlightListRef = useRef<any[]>(highlights || []);
@@ -295,11 +302,12 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
 
   const wordHoverHideTimerRef = useRef<any>(null);
   const pendingHighlightMenuRef = useRef<any>(null);
+  const selectionMenuRef = useRef<HTMLDivElement>(null);
   const pendingWordSelectionRef = useRef<any>(null);
   const readerTitleRef = useRef<any>(title);
   const tocRef = useRef<any[]>([]);
   const effectiveScrolled = scrolled && singlePage;
-  const maxReaderWidth = !effectiveScrolled && singlePage ? 760 : 1120;
+  const maxReaderWidth = readerWidth;
   const getHighlightPopoverBounds = () => {
     const rect = containerRef.current && typeof containerRef.current.getBoundingClientRect === "function" ? containerRef.current.getBoundingClientRect() : null;
     return {
@@ -528,8 +536,9 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
   } : {
     allowPopups: false
   };
-  if (!effectiveScrolled && singlePage) {
-    epubOptions.spread = "none";
+  if (!effectiveScrolled) {
+    epubOptions.spread = singlePage ? "none" : "auto";
+    epubOptions.minSpreadWidth = 600;
   }
   const locationChanged = (epubcifi) => {
     const pendingInitLocation = pendingInitLocationRef.current;
@@ -642,7 +651,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
         const commentColor = currentColors?.comment || "#f97316";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment-bg", {
           fill: commentColor,
-          "fill-opacity": "0.15",
+          "fill-opacity": "0.45",
           "mix-blend-mode": "multiply"
         });
         rendition.annotations.underline(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight-with-comment", {
@@ -655,7 +664,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ contents, title, bookPat
         const normalColor = currentColors?.normal || "#ffeb3b";
         rendition.annotations.highlight(highlight.cfiRange, { id: highlight.id, cfiRange: highlight.cfiRange }, eventHandler, "jarvis-reader-highlight", {
           fill: normalColor,
-          "fill-opacity": "0.24",
+          "fill-opacity": "0.75",
           "mix-blend-mode": "multiply"
         });
       }
@@ -906,124 +915,31 @@ const showWordHoverCard = (asset, element) => {
     setPendingWordSelection(null);
     setWordLookupState({ status: "idle", result: null, error: "", savedLemma: "" });
   };
-  const openWordTranslator = async (item, options: { autoLocalOnly?: boolean } = {}) => {
-    if (!item || typeof translateSelection !== "function")
-      return false;
+  const openWordTranslator = async (item, kind: SelectionTranslationKind) => {
+    if (!item || typeof translateSelection !== "function") return;
+    const normalized = normalizeWordSelection(item.quote || "");
+    if (kind === "offline" && !normalized?.isSingleWord) return;
+    const requestId = ++pendingWordLookupRef.current;
     wordTranslationRectRef.current = null;
     setWordTranslationRect(null);
-    const normalized = normalizeWordSelection(item.quote || "");
-    if (options.autoLocalOnly) {
-      if (!normalized || !normalized.isSingleWord)
-        return false;
-      const requestId = pendingWordLookupRef.current + 1;
-      pendingWordLookupRef.current = requestId;
-      setPendingHighlightMenu(null);
-      setPendingWordSelection({
-        ...item,
-        normalized
-      });
-      setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
-      try {
-        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
-        if (pendingWordLookupRef.current !== requestId)
-          return true;
-        if (!localDictionaryResult)
-          return false;
-        setPendingSelection(null);
-        setPendingHighlightMenu(null);
-        setHighlightComment("");
-        setWikiSuggest(null);
-        setWikiEditRange(null);
-        setPendingWordSelection({
-          ...item,
-          normalized
-        });
-        setWordLookupState({
-          status: "ready",
-          result: localDictionaryResult,
-          error: "",
-          savedLemma: ""
-        });
-        return true;
-      } catch (error) {
-        if (pendingWordLookupRef.current !== requestId)
-          return true;
-        console.warn("Jarvis Reader automatic local dictionary lookup failed.", error);
-        return false;
-      }
-    }
     setPendingSelection(null);
     setPendingHighlightMenu(null);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
-    setPendingWordSelection({
-      ...item,
-      normalized
-    });
+    setPendingWordSelection({ ...item, normalized, translationKind: kind });
     setWordLookupState({ status: "loading", result: null, error: "", savedLemma: "" });
-    if (normalized && normalized.isSingleWord) {
-      try {
-        const localDictionaryResult = await translateSelection(item.quote || normalized.surface, item.sentence || "", { localOnly: true });
-        if (localDictionaryResult) {
-          setWordLookupState({
-            status: "ready",
-            result: localDictionaryResult,
-            error: "",
-            savedLemma: ""
-          });
-          return true;
-        }
-      } catch (error) {
-        console.warn("Jarvis Reader local dictionary lookup failed; trying saved card or AI.", error);
-      }
-    }
-    const existingWordAsset = normalized ? findWordAssetBySurface(wordAssetsRef.current, normalized.surface) : null;
-    if (existingWordAsset) {
-      setWordLookupState({
-        status: "ready",
-        result: getWordLookupResultFromAsset(existingWordAsset, item.quote || normalized.surface),
-        error: "",
-        savedLemma: normalized.lemma
-      });
-      if (!existingWordAsset.display && typeof loadWordDisplay === "function") {
-        Promise.resolve(loadWordDisplay(existingWordAsset)).then((display) => {
-          const nextDisplay = truncateWordDisplay(display);
-          if (!nextDisplay)
-            return;
-          setWordLookupState((current) => current.savedLemma === normalized.lemma && current.result ? {
-            ...current,
-            result: {
-              ...current.result,
-              display: nextDisplay
-            }
-          } : current);
-        }).catch(() => {
-        });
-      }
-      return true;
-    }
-    const requestId = pendingWordLookupRef.current + 1;
-    pendingWordLookupRef.current = requestId;
     try {
-      const result = await translateSelection(item.quote || "", item.sentence || "");
-      if (pendingWordLookupRef.current !== requestId)
+      const result = await translateSelection(item.quote || "", item.sentence || "", getSelectionTranslationOptions(kind));
+      if (pendingWordLookupRef.current !== requestId) return;
+      if (!result) {
+        setWordLookupState({ status: "error", result: null, error: "离线词典未收录这个单词，可主动选择 AI 翻译。", savedLemma: "" });
         return;
-      setWordLookupState({
-        status: "ready",
-        result,
-        error: "",
-        savedLemma: ""
-      });
+      }
+      setWordLookupState({ status: "ready", result, error: "", savedLemma: "" });
     } catch (error) {
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "error",
-        result: null,
-        error: error && error.message ? error.message : String(error || "Translation failed."),
-        savedLemma: ""
-      });
+      if (pendingWordLookupRef.current !== requestId) return;
+      setWordLookupState({ status: "error", result: null, error: error instanceof Error ? error.message : String(error), savedLemma: "" });
     }
   };
   const persistPendingWordAsset = async () => {
@@ -1068,37 +984,7 @@ const showWordHoverCard = (asset, element) => {
     }
   };
   const translatePendingWordWithAi = async () => {
-    if (!pendingWordSelection || typeof translateSelection !== "function")
-      return;
-    const requestId = pendingWordLookupRef.current + 1;
-    pendingWordLookupRef.current = requestId;
-    setWordLookupState((current) => ({
-      ...current,
-      status: "loading",
-      error: ""
-    }));
-    try {
-      const result = await translateSelection(pendingWordSelection.quote || "", pendingWordSelection.sentence || "", { forceAi: true });
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "ready",
-        result,
-        error: "",
-        savedLemma: ""
-      });
-      return true;
-    } catch (error) {
-      if (pendingWordLookupRef.current !== requestId)
-        return;
-      setWordLookupState({
-        status: "error",
-        result: null,
-        error: error && error.message ? error.message : String(error || "Translation failed."),
-        savedLemma: ""
-      });
-      return true;
-    }
+    if (pendingWordSelection) await openWordTranslator(pendingWordSelection, "ai");
   };
   const deleteActiveWordAsset = async () => {
     const asset = activeWordHover == null ? void 0 : activeWordHover.asset;
@@ -1469,7 +1355,7 @@ const showWordHoverCard = (asset, element) => {
       if (!event.ctrlKey)
         return;
       event.preventDefault();
-      setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
+      setReaderZoom(event.deltaY < 0 ? READER_ZOOM_LIMITS.step : -READER_ZOOM_LIMITS.step);
     };
     container.addEventListener("wheel", onWheel, { passive: false });
     return () => {
@@ -1480,6 +1366,7 @@ const showWordHoverCard = (asset, element) => {
     const container = containerRef.current;
     if (!container)
       return;
+    const hoverCleanup = new Map<HTMLButtonElement, () => void>();
     const decoratePageButtons = () => {
       const buttons = Array.from(container.querySelectorAll("button")) as HTMLButtonElement[];
       for (const button of buttons) {
@@ -1489,17 +1376,31 @@ const showWordHoverCard = (asset, element) => {
           continue;
         const direction = isPrevious ? "prev" : "next";
         const iconClass = `jarvis-reader-page-button-${direction}`;
+        if (!hoverCleanup.has(button)) {
+          let idleTimer: number | undefined;
+          const reveal = () => {
+            button.setAttribute("data-active", "true");
+            window.clearTimeout(idleTimer);
+            idleTimer = window.setTimeout(() => button.removeAttribute("data-active"), 2500);
+          };
+          const events = ["pointerenter", "pointermove", "pointerdown"];
+          events.forEach(event => button.addEventListener(event, reveal));
+          hoverCleanup.set(button, () => {
+            window.clearTimeout(idleTimer);
+            events.forEach(event => button.removeEventListener(event, reveal));
+          });
+        }
         if (button.classList.contains(iconClass) && button.querySelector("svg"))
           continue;
         button.classList.add("jarvis-reader-page-button", iconClass);
         button.setAttribute("aria-label", direction === "prev" ? "上一页" : "下一页");
-        button.setAttribute("title", direction === "prev" ? "上一页" : "下一页");
+        button.removeAttribute("title");
         button.replaceChildren();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("viewBox", "0 0 12 36");
         svg.setAttribute("aria-hidden", "true");
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", direction === "prev" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6");
+        path.setAttribute("d", direction === "prev" ? "m9 4-6 14 6 14" : "m3 4 6 14-6 14");
         svg.appendChild(path);
         button.appendChild(svg);
       }
@@ -1507,7 +1408,10 @@ const showWordHoverCard = (asset, element) => {
     decoratePageButtons();
     const observer = new MutationObserver(decoratePageButtons);
     observer.observe(container, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      hoverCleanup.forEach(cleanup => cleanup());
+    };
   }, []);
   useEffect(() => {
     if (!pendingHighlightMenu || pendingHighlightMenu.id)
@@ -1547,6 +1451,25 @@ const showWordHoverCard = (asset, element) => {
         doc.removeEventListener("keyup", closeIfSelectionGone);
       }
     };
+  }, [pendingHighlightMenu]);
+  useLayoutEffect(() => {
+    const menu = selectionMenuRef.current;
+    const container = containerRef.current;
+    if (!menu || !container || !pendingHighlightMenu) return;
+    const place = () => {
+      const rect = menu.getBoundingClientRect();
+      const bounds = container.getBoundingClientRect();
+      const position = clampSelectionMenuPosition(pendingHighlightMenu.rect?.x || 8, pendingHighlightMenu.rect?.y || 8, rect.width, rect.height, bounds.width, bounds.height);
+      menu.style.left = `${position.left}px`;
+      menu.style.top = `${position.top}px`;
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(container);
+    const documents: Document[] = [document, ...(renditionRef.current?.getContents() || []).map((content: { document: Document }) => content.document)];
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setPendingHighlightMenu(null); };
+    documents.forEach(doc => doc.addEventListener("keydown", escape));
+    return () => { observer.disconnect(); documents.forEach(doc => doc.removeEventListener("keydown", escape)); };
   }, [pendingHighlightMenu]);
   const updateReaderTitle = (relocated) => {
     const href = relocated && relocated.start ? relocated.start.href : "";
@@ -1593,6 +1516,7 @@ const showWordHoverCard = (asset, element) => {
     if (!selectedText) {
       setActiveSelectionInfo(null);
       activeSelectionInfoRef.current = null;
+      setPendingHighlightMenu(null);
       return;
     }
     const selectionItem = {
@@ -1603,22 +1527,13 @@ const showWordHoverCard = (asset, element) => {
       rect: getSelectionHighlightMenuRect(contents2),
       contents2
     };
+    const previousSelection = activeSelectionInfoRef.current;
     setActiveSelectionInfo(selectionItem);
     activeSelectionInfoRef.current = selectionItem;
 
-    const existingHighlight = (highlightListRef.current || []).find((highlight) => highlight.cfiRange === cfiRange);
     clearWordLookup();
     setPendingSelection(null);
-    if (existingHighlight) {
-      // Defer existing highlights from auto-popover on selection overlap
-      return;
-    }
-    Promise.resolve(openWordTranslator(selectionItem, { autoLocalOnly: true })).then((opened) => {
-      if (!opened) {
-        clearWordLookup();
-        // Do not auto-show pending highlight menu on text selection
-      }
-    });
+    if (previousSelection?.cfiRange !== cfiRange) setPendingHighlightMenu(null);
     setHighlightComment("");
     setWikiSuggest(null);
     setWikiEditRange(null);
@@ -1855,8 +1770,8 @@ const showWordHoverCard = (asset, element) => {
     }
     const confirmed = await confirmDestructiveAction(
       effectiveApp,
-      "删除划线与笔记",
-      "确定要删除这条划线及其所有笔记吗？这会清除阅读器中的原文标记和书籍笔记中的对应内容，此操作不可恢复。"
+      "删除高亮与笔记",
+      "确定要删除这条高亮及其所有笔记吗？这会清除阅读器中的原文标记和书籍笔记中的对应内容，此操作不可恢复。"
     );
     if (!confirmed)
       return;
@@ -2398,7 +2313,7 @@ const showWordHoverCard = (asset, element) => {
   const pendingTranslationKey = pendingWordSelection && wordLookupState.result ? getTranslationAssetKey(pendingWordSelection, wordLookupState.result) : normalizedPendingWord ? normalizedPendingWord.lemma : "";
   const savedWordAsset = pendingTranslationKey ? currentWordAssets[pendingTranslationKey] || null : null;
   const canPersistPendingWord = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && pendingTranslationKey);
-  const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status === "ready" && wordLookupState.result && wordLookupState.result.sourceType);
+  const canSwitchPendingWordToAi = !!(pendingWordSelection && wordLookupState.status !== "loading" && (wordLookupState.status === "error" || wordLookupState.result?.sourceType));
   const persistPendingLabel = normalizedPendingWord?.isPhrase ? "\u4fdd\u5b58\u77ed\u8bed" : "\u4fdd\u5b58\u5355\u8bcd";
   const pendingWordTags = (() => {
     const result = wordLookupState.result;
@@ -2463,16 +2378,18 @@ const showWordHoverCard = (asset, element) => {
   }, React.createElement(ReaderSideControls, {
     location: currentLocationRef.current,
     chapterTitle: readerTitleRef.current,
-    singlePage,
-    scrolled: effectiveScrolled,
     onAddBookmark: addBookmark,
     onOpenBookNote: createBookNote,
-    onZoom: setReaderZoom,
-    onLineHeight: setReaderLineHeight,
-    onScrolledChange: setScrolled,
-    onSinglePageChange: setSinglePage,
-  }), React.createElement(ReactReader, {
+    getPanelOpen,
+    onPanelOpenChange,
+    getPreferences,
+    onPreferencesChange,
+  }), React.createElement("div", {
+    className: "jarvis-reader-reading-title",
     title: readerTitle,
+    style: { color: theme.muted, fontFamily: theme.fontFamily, fontSize: theme.fontSize }
+  }, readerTitle), React.createElement(ReactReader, {
+    title: "",
     showToc: false,
     location,
     locationChanged,
@@ -2483,6 +2400,15 @@ const showWordHoverCard = (asset, element) => {
       tocMemo(toc);
     },
     getRendition: (rendition) => {
+      resizeCleanupRef.current?.();
+      resizeCleanupRef.current = containerRef.current
+        ? bindReaderContainerResize(containerRef.current, {
+          on: (event, callback) => rendition.on(event, callback),
+          off: (event, callback) => rendition.off(event, callback),
+          // Bundled epub.js accepts omitted dimensions; its declarations require them.
+          resize: () => (rendition.resize as (width?: number, height?: number) => void).call(rendition),
+        })
+        : null;
       renditionRef.current = rendition;
       applyPendingInitLocation(rendition);
       syncRenditionTheme(rendition);
@@ -2508,7 +2434,7 @@ const showWordHoverCard = (asset, element) => {
             doc.addEventListener("wheel", (event: WheelEvent) => {
               if (!event.ctrlKey) return;
               event.preventDefault();
-              setReaderZoom(event.deltaY < 0 ? 0.05 : -0.05);
+              setReaderZoom(event.deltaY < 0 ? READER_ZOOM_LIMITS.step : -READER_ZOOM_LIMITS.step);
             }, { passive: false });
 
             // Right-click contextmenu handler on selected text
@@ -2541,7 +2467,9 @@ const showWordHoverCard = (asset, element) => {
                   }
                 }
 
+                const existingHighlight = (highlightListRef.current || []).find(highlight => highlight.cfiRange === cfiRange);
                 setPendingHighlightMenu({
+                  ...existingHighlight,
                   cfiRange,
                   quote: selectionText,
                   sentence: getSelectionContextSentence(contents, selectionText),
@@ -2557,6 +2485,7 @@ const showWordHoverCard = (asset, element) => {
         });
 
         rendition.on("relocated", (relocated) => {
+          setPendingHighlightMenu(null);
           const relocatedCfi = relocated?.start?.cfi || relocated?.end?.cfi || "";
           if (pendingInitLocationRef.current && relocatedCfi === pendingInitLocationRef.current) {
             pendingInitLocationRef.current = null;
@@ -2625,19 +2554,19 @@ const showWordHoverCard = (asset, element) => {
       },
       prev: {
         ...ReactReaderStyle.prev,
-        left: "calc(50% - 44px)",
+        left: 8,
         right: "auto",
-        top: "auto",
-        bottom: 20,
-        transform: "none",
+        top: "50%",
+        bottom: "auto",
+        transform: "translateY(-50%)",
         marginTop: 0,
         width: 36,
         height: 36,
-        background: "var(--interactive-normal)",
-        borderRadius: "50%",
-        border: "1px solid var(--background-modifier-border)",
+        background: "transparent",
+        borderRadius: 6,
+        border: "none",
         color: "var(--text-normal)",
-        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -2645,19 +2574,19 @@ const showWordHoverCard = (asset, element) => {
       },
       next: {
         ...ReactReaderStyle.next,
-        left: "calc(50% + 8px)",
-        right: "auto",
-        top: "auto",
-        bottom: 20,
-        transform: "none",
+        left: "auto",
+        right: 8,
+        top: "50%",
+        bottom: "auto",
+        transform: "translateY(-50%)",
         marginTop: 0,
         width: 36,
         height: 36,
-        background: "var(--interactive-normal)",
-        borderRadius: "50%",
-        border: "1px solid var(--background-modifier-border)",
+        background: "transparent",
+        borderRadius: 6,
+        border: "none",
         color: "var(--text-normal)",
-        boxShadow: "0 2px 8px rgb(0 0 0 / 15%)",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -2666,8 +2595,8 @@ const showWordHoverCard = (asset, element) => {
       arrow: {
         ...ReactReaderStyle.arrow,
         alignItems: "center",
-        top: "auto",
-        bottom: 20,
+        top: "50%",
+        bottom: "auto",
         boxSizing: "border-box",
         display: "flex",
         width: 36,
@@ -2755,16 +2684,20 @@ const showWordHoverCard = (asset, element) => {
       }
     } as any
   }), pendingHighlightMenu ? (() => {
-    const containsEnglish = /[a-zA-Z]{2,}/.test(pendingHighlightMenu.quote || "");
+    const canLookupOffline = !!normalizeWordSelection(pendingHighlightMenu.quote || "")?.isSingleWord;
     return React.createElement("div", {
-      className: "jarvis-reader-highlight-menu",
+      ref: selectionMenuRef,
+      role: "toolbar",
+      "aria-label": "选文操作",
+      className: "jarvis-reader-highlight-menu jarvis-reader-selection-toolbar",
+      onMouseDown: (event) => event.preventDefault(),
       style: pendingHighlightMenu.rect ? {
         left: pendingHighlightMenu.rect.x,
         top: pendingHighlightMenu.rect.y
       } : void 0,
       onClick: (event) => event.stopPropagation()
     },
-      React.createElement("div", {
+      React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
         role: "button",
         onClick: () => {
@@ -2772,15 +2705,15 @@ const showWordHoverCard = (asset, element) => {
           setPendingHighlightMenu(null);
         }
       }, renderObsidianIcon("copy"), React.createElement("span", null, "复制")),
-      containsEnglish ? React.createElement("div", {
+      canLookupOffline ? React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
-        role: "button",
-        onClick: () => {
-          openWordTranslator(pendingHighlightMenu);
-          setPendingHighlightMenu(null);
-        }
-      }, renderObsidianIcon("languages"), React.createElement("span", null, "翻译")) : null,
-      pendingHighlightMenu.id ? null : React.createElement("div", {
+        onClick: () => { void openWordTranslator(pendingHighlightMenu, "offline"); }
+      }, renderObsidianIcon("book-open"), React.createElement("span", null, "离线查词")) : null,
+      React.createElement("button", {
+        className: "jarvis-reader-context-menu-item",
+        onClick: () => { void openWordTranslator(pendingHighlightMenu, "ai"); }
+      }, renderObsidianIcon("languages"), React.createElement("span", null, "AI 翻译")),
+      pendingHighlightMenu.id ? null : React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
         role: "button",
         onClick: () => {
@@ -2788,7 +2721,7 @@ const showWordHoverCard = (asset, element) => {
           setPendingHighlightMenu(null);
         }
       }, renderObsidianIcon("highlighter"), React.createElement("span", null, "高亮")),
-      React.createElement("div", {
+      React.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-highlight-menu-button-primary",
         role: "button",
         onClick: () => {
@@ -2796,7 +2729,7 @@ const showWordHoverCard = (asset, element) => {
           setPendingHighlightMenu(null);
         }
       }, renderObsidianIcon("pencil"), React.createElement("span", null, "笔记")),
-      pendingHighlightMenu.id ? React.createElement("div", {
+      pendingHighlightMenu.id ? React.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-context-menu-item-danger",
         role: "button",
         onClick: () => {
@@ -2822,7 +2755,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-head-row"
   }, React.createElement("div", {
     className: "jarvis-reader-highlight-title"
-  }, "\u7ffb\u8bd1"), React.createElement("div", {
+  }, pendingWordSelection.translationKind === "offline" ? "离线查词" : "AI 翻译"), React.createElement("div", {
     style: { flex: "1 1 auto", cursor: "grab", minHeight: "24px", minWidth: "20px" }
   }), React.createElement("div", {
     className: "jarvis-reader-word-card-actions",

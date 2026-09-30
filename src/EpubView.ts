@@ -1,6 +1,7 @@
 // Extracted from main.js L51297-51821 — EpubView (Obsidian FileView for epub files)
 
 import React from "react";
+import { clampReaderLetterSpacing, clampReaderWordSpacing, normalizeReaderParagraphIndent, clampReaderWidth, resolveReaderPreferences, type ReaderPreferences } from "./reader-settings";
 import { createRoot, type Root } from "react-dom/client";
 import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
@@ -471,10 +472,13 @@ export class EpubView extends FileView {
       }
       const readerZoom = clampReaderZoom(this.plugin.settings.readerZoom);
       const readerLineHeight = clampReaderLineHeight(this.plugin.settings.readerLineHeight);
+      const letterSpacing = clampReaderLetterSpacing(this.plugin.settings.readerLetterSpacing);
+      const wordSpacing = clampReaderWordSpacing(this.plugin.settings.readerWordSpacing);
+      const paragraphIndent = normalizeReaderParagraphIndent(this.plugin.settings.readerParagraphIndent);
       const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
-      const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}`;
+      const nextThemeKey = `${theme.background}|${theme.text}|${theme.fontFamily}|${theme.fontSize}|${theme.lineHeight}|${readerZoom}|${paragraphIndent}|${letterSpacing}|${wordSpacing}`;
       if (nextThemeKey !== lastThemeKey) {
-        applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight);
+        applyObsidianThemeToRendition(rendition, readerZoom, readerLineHeight, paragraphIndent, letterSpacing, wordSpacing);
         this.refreshCurrentHighlightPanes();
         lastThemeKey = nextThemeKey;
       }
@@ -527,45 +531,52 @@ export class EpubView extends FileView {
     new Notice(`${context}保存失败，将在下次操作时重试。`);
   }
 
-  async setReaderZoom(delta: number): Promise<void> {
-    const nextZoom = clampReaderZoom(clampReaderZoom(this.plugin.settings.readerZoom) + delta);
-    this.plugin.settings.readerZoom = nextZoom;
-    await this.plugin.saveSettings();
-    if (this.currentRendition) {
-      applyObsidianThemeToRendition(this.currentRendition, nextZoom, this.plugin.settings.readerLineHeight);
-      if (typeof this.currentRendition.resize === "function") {
-        this.currentRendition.resize();
-      }
+  private renderedReaderLayout: Pick<ReaderPreferences, "singlePageView" | "scrolledView" | "readerWidth"> | null = null;
+  readerSettingsOpen = false;
+  getReaderSettingsOpen = (): boolean => this.readerSettingsOpen;
+  setReaderSettingsOpen = (open: boolean): void => { this.readerSettingsOpen = open; };
+
+  getReaderPreferences = (): ReaderPreferences => ({
+    readerLetterSpacing: clampReaderLetterSpacing(this.plugin.settings.readerLetterSpacing),
+    readerWordSpacing: clampReaderWordSpacing(this.plugin.settings.readerWordSpacing),
+    readerParagraphIndent: normalizeReaderParagraphIndent(this.plugin.settings.readerParagraphIndent),
+    readerWidth: clampReaderWidth(this.plugin.settings.readerWidth),
+    readerZoom: clampReaderZoom(this.plugin.settings.readerZoom),
+    readerLineHeight: clampReaderLineHeight(this.plugin.settings.readerLineHeight),
+    singlePageView: this.plugin.settings.singlePageView,
+    scrolledView: this.plugin.settings.singlePageView && this.plugin.settings.scrolledView,
+  });
+
+  updateReaderPreferences = async (patch: Partial<ReaderPreferences>): Promise<void> => {
+    const before = this.getReaderPreferences();
+    const next = resolveReaderPreferences(before, patch);
+    Object.assign(this.plugin.settings, next);
+    try { await this.plugin.saveSettings(); }
+    catch (error) { this.reportBackgroundSaveError("阅读设置", error); throw error; }
+    const rendered = this.renderedReaderLayout || before;
+    if (rendered.readerWidth !== next.readerWidth || rendered.singlePageView !== next.singlePageView || rendered.scrolledView !== next.scrolledView) {
+      await this.onLoadFile(this.file!);
+    } else if (this.currentRendition) {
+      applyObsidianThemeToRendition(this.currentRendition, next.readerZoom, next.readerLineHeight, next.readerParagraphIndent, next.readerLetterSpacing, next.readerWordSpacing);
+      this.currentRendition.resize?.();
       this.refreshCurrentHighlightPanes();
     }
+  };
+
+  async setReaderZoom(delta: number): Promise<void> {
+    await this.updateReaderPreferences({ readerZoom: this.getReaderPreferences().readerZoom + delta });
   }
 
   async setReaderLineHeight(delta: number): Promise<void> {
-    const nextLineHeight = clampReaderLineHeight(clampReaderLineHeight(this.plugin.settings.readerLineHeight) + delta);
-    this.plugin.settings.readerLineHeight = nextLineHeight;
-    await this.plugin.saveSettings();
-    if (this.currentRendition) {
-      applyObsidianThemeToRendition(this.currentRendition, this.plugin.settings.readerZoom, nextLineHeight);
-      if (typeof this.currentRendition.resize === "function") {
-        this.currentRendition.resize();
-      }
-      this.refreshCurrentHighlightPanes();
-    }
+    await this.updateReaderPreferences({ readerLineHeight: this.getReaderPreferences().readerLineHeight + delta });
   }
 
   async setScrolledView(value: boolean): Promise<void> {
-    this.plugin.settings.scrolledView = value;
-    await this.plugin.saveSettings();
-    await this.onLoadFile(this.file!);
+    await this.updateReaderPreferences({ scrolledView: value });
   }
 
   async setSinglePageView(value: boolean): Promise<void> {
-    this.plugin.settings.singlePageView = value;
-    if (!value) {
-      this.plugin.settings.scrolledView = false;
-    }
-    await this.plugin.saveSettings();
-    await this.onLoadFile(this.file!);
+    await this.updateReaderPreferences({ singlePageView: value });
   }
 
   async setInitLocation(initLocation: string): Promise<void> {
@@ -620,6 +631,7 @@ export class EpubView extends FileView {
     const contents = await this.app.vault.adapter.readBinary(file.path);
     this.plugin.activeReaderView = this;
     await this.plugin.setActiveReader(this, "toc");
+    this.renderedReaderLayout = { readerWidth: clampReaderWidth(this.settings.readerWidth), singlePageView: this.settings.singlePageView, scrolledView: this.settings.singlePageView && this.settings.scrolledView };
     this.reactRoot = createRoot(this.contentEl);
     this.reactRoot.render(React.createElement(EpubReader, {
       contents,
@@ -627,6 +639,7 @@ export class EpubView extends FileView {
       bookPath: file.path,
       scrolled: this.settings.scrolledView,
       singlePage: this.settings.singlePageView,
+      readerWidth: clampReaderWidth(this.settings.readerWidth),
       readerZoom: clampReaderZoom(this.settings.readerZoom),
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
@@ -643,10 +656,14 @@ export class EpubView extends FileView {
       selectHighlight: (highlight: any) => { this.selectHighlight(highlight); },
       registerHighlightEditor: (editor: any) => { this.registerHighlightEditor(editor); },
       registerHighlightDeleted: (callback: any) => { this.registerHighlightDeleted(callback); },
-      setScrolled: (value: boolean) => { this.setScrolledView(value); },
-      setSinglePage: (value: boolean) => { this.setSinglePageView(value); },
-      setReaderZoom: (delta: number) => { this.setReaderZoom(delta); },
-      setReaderLineHeight: (delta: number) => { this.setReaderLineHeight(delta); },
+      getPreferences: this.getReaderPreferences,
+      getPanelOpen: this.getReaderSettingsOpen,
+      onPanelOpenChange: this.setReaderSettingsOpen,
+      onPreferencesChange: this.updateReaderPreferences,
+      setScrolled: (value: boolean) => { void this.setScrolledView(value).catch(() => {}); },
+      setSinglePage: (value: boolean) => { void this.setSinglePageView(value).catch(() => {}); },
+      setReaderZoom: (delta: number) => { void this.setReaderZoom(delta).catch(() => {}); },
+      setReaderLineHeight: (delta: number) => { void this.setReaderLineHeight(delta).catch(() => {}); },
       syncRenditionTheme: (rendition: any) => { this.startThemeSync(rendition); },
       wordAssets: this.getWordAssets(),
       translateSelection: (text: string, sentence: string = "", options: any = {}) => this.translateSelection(text, sentence, options),

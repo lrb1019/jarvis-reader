@@ -25,6 +25,9 @@ export function confirmDestructiveAction(app: App, title: string, message: strin
       resolve(value);
     };
     const modal = new Modal(app);
+    // EPUB iframe elements lack Obsidian's main-window DOM extensions.
+    // Restoring that selection in Modal.close can throw before confirmation resolves.
+    modal.shouldRestoreSelection = false;
     modal.titleEl.setText(title);
     modal.contentEl.createEl("p", { text: message });
     new Setting(modal.contentEl)

@@ -1,0 +1,49 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { bindReaderContainerResize } from "../src/reader-resize.ts";
+
+function fixture() {
+  const host = { clientWidth: 500, clientHeight: 600 };
+  let attached: (() => void) | undefined;
+  let observed: (() => void) | undefined;
+  let pending: (() => void) | undefined;
+  let disconnected = false;
+  const sizes: number[][] = [];
+  const cleanup = bindReaderContainerResize(host, {
+    on(_event, callback) { attached = callback; },
+    off(_event, callback) { if (attached === callback) attached = undefined; },
+    resize() { sizes.push([host.clientWidth, host.clientHeight]); },
+  }, {
+    observe(_host, callback) { observed = callback; return () => { disconnected = true; }; },
+    delay(callback) { pending = callback; return () => { if (pending === callback) pending = undefined; }; },
+  });
+  return { host, sizes, cleanup, attach: () => attached?.(), change: () => observed?.(),
+    flush: () => { const callback = pending; pending = undefined; callback?.(); },
+    disconnected: () => disconnected, bound: () => !!attached };
+}
+
+test("侧栏尺寸变化无需 window resize，等待挂载且连续变动只使用最终尺寸", () => {
+  const f = fixture();
+  f.change(); f.flush();
+  assert.deepEqual(f.sizes, []);
+  f.attach(); f.flush();
+  f.host.clientWidth = 400; f.change();
+  f.host.clientWidth = 850; f.change();
+  f.host.clientHeight = 700; f.change(); f.flush();
+  assert.deepEqual(f.sizes, [[500, 600], [850, 700]]);
+});
+
+test("隐藏容器不重排，重新显示后测量最新尺寸", () => {
+  const f = fixture(); f.attach(); f.flush();
+  f.host.clientWidth = 0; f.change(); f.flush();
+  assert.equal(f.sizes.length, 1);
+  f.host.clientWidth = 900; f.change(); f.flush();
+  assert.deepEqual(f.sizes[1], [900, 600]);
+});
+
+test("关闭或替换阅读器取消待处理重排并移除监听，旧回调不访问已销毁引擎", () => {
+  const f = fixture(); f.attach(); f.change(); f.cleanup(); f.flush(); f.change(); f.flush();
+  assert.deepEqual(f.sizes, []);
+  assert.equal(f.disconnected(), true);
+  assert.equal(f.bound(), false);
+});

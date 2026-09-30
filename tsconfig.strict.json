@@ -14,6 +14,11 @@
     "src/highlight-transaction-service.ts",
     "src/index-sidecars.ts",
     "src/reading-stats-service.ts",
+    "src/reader-settings.ts",
+    "src/reader-paragraphs.ts",
+    "src/reader-selection.ts",
+    "src/reader-resize.ts",
+    "src/reader-text-spacing.ts",
     "src/reader/ReaderSideControls.tsx",
     "src/library/library-highlight-core.ts",
     "src/settings-save-queue.ts"

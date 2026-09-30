@@ -1,5 +1,11 @@
 // Extracted from main.js L48929-49010 — Obsidian theme sync for epub rendition
 
+import { clampReaderZoom, clampReaderLineHeight, READER_ZOOM_LIMITS, READER_LINE_HEIGHT_LIMITS } from "./reader-settings.ts";
+import { syncReaderTextSpacing } from "./reader-text-spacing.ts";
+import { syncReaderParagraphIndent } from "./reader-paragraphs.ts";
+import type { ReaderParagraphIndent } from "./reader-settings.ts";
+export { clampReaderZoom, clampReaderLineHeight } from "./reader-settings.ts";
+
 export function getObsidianCssVar(name: string, fallback: string = ""): string {
   const el = document.querySelector(".app-container") || document.body;
   const value = getComputedStyle(el).getPropertyValue(name).trim();
@@ -9,18 +15,6 @@ export function getObsidianCssVar(name: string, fallback: string = ""): string {
 export function getCssPixelValue(value: string | null | undefined): string {
   const parsed = parseFloat(value || "");
   return Number.isFinite(parsed) && parsed > 0 ? `${parsed}px` : "";
-}
-
-export function clampReaderZoom(value: any): number {
-  const parsed = parseFloat(value);
-  const zoom = Number.isFinite(parsed) ? parsed : 1;
-  return Math.min(2, Math.max(0.6, Math.round(zoom * 20) / 20));
-}
-
-export function clampReaderLineHeight(value: any): number {
-  const parsed = parseFloat(value);
-  const lineHeight = Number.isFinite(parsed) ? parsed : 1.6;
-  return Math.min(2.4, Math.max(1.1, Math.round(lineHeight * 20) / 20));
 }
 
 export function scaleCssPixelValue(value: string | null | undefined, scale: any): string {
@@ -43,7 +37,7 @@ export function getObsidianTextFontSize(): string {
   return getCssPixelValue(getComputedStyle(document.body).fontSize) || "18px";
 }
 
-export function getJarvisReaderTheme(readerZoom: number = 1, readerLineHeight: number = 1.6): any {
+export function getJarvisReaderTheme(readerZoom: number = READER_ZOOM_LIMITS.defaultValue, readerLineHeight: number = READER_LINE_HEIGHT_LIMITS.defaultValue): any {
   const baseFontSize = getObsidianTextFontSize();
   return {
     background: getObsidianCssVar("--background-primary", "#ffffff"),
@@ -59,7 +53,7 @@ export function getJarvisReaderTheme(readerZoom: number = 1, readerLineHeight: n
   };
 }
 
-export function applyObsidianThemeToRendition(rendition: any, readerZoom: number = 1, readerLineHeight: number = 1.6): void {
+export function applyObsidianThemeToRendition(rendition: any, readerZoom: number = READER_ZOOM_LIMITS.defaultValue, readerLineHeight: number = READER_LINE_HEIGHT_LIMITS.defaultValue, paragraphIndent: ReaderParagraphIndent = "original", letterSpacing: number = 0, wordSpacing: number = 0): void {
   const theme = getJarvisReaderTheme(readerZoom, readerLineHeight);
   try {
     rendition.themes.register("obsidian", {
@@ -105,6 +99,8 @@ export function applyObsidianThemeToRendition(rendition: any, readerZoom: number
     rendition.themes.override("font-family", theme.fontFamily, true);
     rendition.themes.override("font-size", theme.fontSize, true);
     rendition.themes.override("line-height", theme.lineHeight, true);
+    syncReaderParagraphIndent(rendition, paragraphIndent);
+    syncReaderTextSpacing(rendition, letterSpacing, wordSpacing);
   } catch (error) {
     console.warn("Jarvis Reader theme sync failed.", error);
   }
