@@ -39,3 +39,10 @@ test("builds a knowledge note body with the quote and every reflection", () => {
 test("builds a vault-relative Markdown path", () => {
   assert.equal(buildKnowledgeNotePath("知识库/想法", "延迟:回报"), "知识库/想法/延迟-回报.md");
 });
+
+test("a moved source note reopens its existing knowledge note by stable source block identity", () => {
+  const content = buildKnowledgeNoteContent({ title: "Idea", body: "user idea", sourceNotePath: "Old/A.md", sourceBlockId: "ar-stable-123", sourceBookTitle: "Book" }, "2026-10-01");
+  assert.equal(hasKnowledgeNoteSource(content, "Reading Notes/Renamed.md", "ar-stable-123"), true);
+  assert.equal(hasKnowledgeNoteSource(content, "Reading Notes/Renamed.md", "other"), false);
+  assert.equal(hasKnowledgeNoteSource(content, "Reading Notes/Renamed.md", ""), false);
+});

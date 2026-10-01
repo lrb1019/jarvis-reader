@@ -22,6 +22,10 @@ export function hasKnowledgeNoteSource(content: string, sourceNotePath: string, 
   const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
   const sectionStart = "## 来源\n\n";
   const normalized = content.replace(/\r\n/g, "\n");
+  // Generated source block IDs stay stable when their parent note moves.
+  const frontmatter = normalized.match(/^---\n([\s\S]*?)\n---(?:\n|$)/)?.[1];
+  const storedBlock = frontmatter?.match(/^source_block:\s*(.+)$/m)?.[1].trim();
+  if (sourceBlockId && (storedBlock === sourceBlockId || storedBlock === JSON.stringify(sourceBlockId))) return true;
   return normalized.includes(`${sectionStart}[[${target}|返回读书笔记]]`)
     || normalized.includes(`${sectionStart}[[${target}]]`);
 }

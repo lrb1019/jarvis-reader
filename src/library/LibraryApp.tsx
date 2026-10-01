@@ -1,4 +1,6 @@
 import * as React from "react";
+import { projectLibraryBookNotes } from "./book-note-projection";
+import { ensureStorageFolders, isBookInFolder } from "../storage-folders";
 import type JarvisReaderPlugin from "../main";
 import { TFile, Notice, Menu, moment } from "obsidian";
 import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
@@ -141,6 +143,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [gridCols, setGridCols] = React.useState(6);
   const [selectedGridBook, setSelectedGridBook] = React.useState<string | null>(null);
   const [bookNotesMap, setBookNotesMap] = React.useState<Record<string, TFile>>({});
+  const [bookNoteIssues, setBookNoteIssues] = React.useState<Record<string, string>>({});
   const homeRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -168,7 +171,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const loadBooks = React.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof TFile && file.extension.toLowerCase() === "epub" && isBookInFolder(file.path, plugin.settings.bookFolder)
     );
     setBooks(filtered);
     setBooksLoaded(true);
@@ -179,10 +182,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     const onCreate = () => loadBooks();
     const onDelete = () => loadBooks();
     const onRename = () => loadBooks();
+    window.addEventListener("jarvis-reader-folders-updated", loadBooks);
     plugin.app.vault.on("create", onCreate);
     plugin.app.vault.on("delete", onDelete);
     plugin.app.vault.on("rename", onRename);
     return () => {
+      window.removeEventListener("jarvis-reader-folders-updated", loadBooks);
       plugin.app.vault.off("create", onCreate);
       plugin.app.vault.off("delete", onDelete);
       plugin.app.vault.off("rename", onRename);
@@ -197,9 +202,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   React.useEffect(() => {
     const handleAssetOrHighlightChange = () => setRefreshTrigger((value) => value + 1);
+    plugin.app.metadataCache.on("changed", handleAssetOrHighlightChange);
     window.addEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
     window.addEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     return () => {
+      plugin.app.metadataCache.off("changed", handleAssetOrHighlightChange);
       window.removeEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
       window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     };
@@ -212,21 +219,10 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   // Map book paths to their markdown notes
   React.useEffect(() => {
-    if (books.length === 0) return;
-    const notesMap: Record<string, TFile> = {};
-    let changedNotes = false;
-
-    books.forEach(book => {
-      const noteFile = findBookNote(plugin.app, book, plugin.settings);
-      if (noteFile) {
-        notesMap[book.path] = noteFile;
-        changedNotes = true;
-      }
-    });
-    if (changedNotes) {
-      setBookNotesMap(notesMap);
-    }
-  }, [books, coverCache, plugin.app, plugin.settings]);
+    const projection = projectLibraryBookNotes(books, book => findBookNote(plugin.app, book, plugin.settings));
+    setBookNotesMap(projection.notes);
+    setBookNoteIssues(projection.issues);
+  }, [books, coverCache, plugin.app, plugin.settings, refreshTrigger]);
 
   // Handle Ctrl+Scroll zooming on the entire home container
   React.useEffect(() => {
@@ -258,11 +254,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     let cancelled = false;
 
     const runCoverCacheQueue = async () => {
-      const validKeys = books
+      // Directory filtering only changes visibility; retain covers for every EPUB in the vault.
+      const validKeys = plugin.app.vault.getFiles()
         .filter((file) => file.extension.toLowerCase() === "epub")
         .map((file) => `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`);
       await plugin.pruneBookCoverCache(validKeys);
-      if (cancelled) return;
+      if (cancelled || plugin.bookPathUpdateInProgress || plugin.bookPathUpdateBlocked) return;
       setCoverCache({ ...plugin.settings.bookCoverCache });
 
       for (const file of books) {
@@ -805,7 +802,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     if (!activeBook) return;
 
     const loadMetadata = () => {
-      const noteFile = findBookNote(plugin.app, activeBook, plugin.settings);
+      const projection = projectLibraryBookNotes([activeBook], book => findBookNote(plugin.app, book, plugin.settings));
+      const noteFile = projection.notes[activeBook.path];
       
       let status = "unread";
       let rating = 0;
@@ -1788,6 +1786,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
     return (
       <div className="jarvis-library-home" ref={homeRef}>
+        {Object.keys(bookNoteIssues).length > 0 && (
+          <div role="status" style={{ color: "var(--text-muted)", fontSize: "var(--font-ui-small)", marginBottom: "12px" }}>
+            {Object.keys(bookNoteIssues).length} 本书的读书笔记关联路径失效，阅读仍可用；请恢复或修正笔记路径。
+          </div>
+        )}
         {/* Header toolbar */}
         <div className="jarvis-library-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ flex: 1 }}></div>
@@ -2067,13 +2070,19 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         canvas.toBlob(async (blob) => {
           if (!blob) return;
           const buffer = await blob.arrayBuffer();
-          const targetFolder = plugin.settings.customCoverFolder || "00-Attachment";
-          const folderAbstract = plugin.app.vault.getAbstractFileByPath(targetFolder);
-          if (!folderAbstract) {
-             try { await plugin.app.vault.createFolder(targetFolder); } catch (e) {}
+          const targetFolder = plugin.settings.customCoverFolder ?? "Cover";
+          try {
+            await ensureStorageFolders({
+              stat: path => plugin.app.vault.adapter.stat(path),
+              mkdir: path => plugin.app.vault.createFolder(path)
+            }, [targetFolder]);
+          } catch (error) {
+            new Notice("无法创建封面目录");
+            console.error("Failed to create cover folder", error);
+            return;
           }
           const baseName = uploadBook.basename.replace(/[\\/:*?"<>|]/g, "_");
-          const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
+          const targetPath = `${targetFolder ? targetFolder + "/" : ""}cover_${baseName}.jpg`;
           
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
           if (targetFile instanceof TFile) {

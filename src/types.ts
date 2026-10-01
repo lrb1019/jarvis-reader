@@ -171,6 +171,7 @@ export interface JarvisReaderSettings {
   readerZoom: number;
   readerLineHeight: number;
   readerQuickActions: string[];
+  bookFolder?: string;
   bookNoteFolder: string;
   knowledgeNoteFolder: string;
   bookNoteTemplate: string;
@@ -184,6 +185,8 @@ export interface JarvisReaderSettings {
   wordAudioAccent: WordAudioAccent;
   blurWordCardBody: boolean;
   speechLang: string;
+  bookPathAliases?: Record<string, string>;
+  bookNotePaths?: Record<string, string>;
   bookInitLocations: BookLocations;
   bookHighlights: BookHighlightsMap;
   bookProgress: BookProgressMap;

@@ -1,7 +1,8 @@
 // Extracted from main.js L47585-47629 — book note creation and opening
 
-import { TFolder, TFile, WorkspaceLeaf, Notice, App } from "obsidian";
+import { TFile, WorkspaceLeaf, Notice, App } from "obsidian";
 import { normalizeVaultPath, joinVaultPath, formatLocalDateTime } from "./utils";
+import { ensureStorageFolders } from "./storage-folders";
 import type { JarvisReaderSettings } from "./types";
 
 export function getDefaultBookNoteContent(file: TFile, toc: string): string {
@@ -32,6 +33,12 @@ export function getBookNotePath(file: TFile, settings: Partial<JarvisReaderSetti
 }
 
 export function findBookNote(app: App, file: TFile, settings: Partial<JarvisReaderSettings> = {}): TFile | null {
+  const remembered = settings.bookNotePaths?.[file.path];
+  if (remembered) {
+    const note = app.vault.getAbstractFileByPath(remembered);
+    if (note instanceof TFile) return note;
+    throw new Error("关联的读书笔记不存在，请恢复或修正路径，未新建替代笔记");
+  }
   // 1. Check exact expected path first
   const exactPath = getBookNotePath(file, settings);
   const exactFile = app.vault.getAbstractFileByPath(exactPath);
@@ -61,10 +68,14 @@ export async function getOrCreateBookNote(app: App, file: TFile, toc: string, se
 
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
   if (configuredFolder) {
-    const folder = app.vault.getAbstractFileByPath(configuredFolder);
-    if (folder == null || !(folder instanceof TFolder)) {
-      new Notice(`Jarvis Reader note folder does not exist: ${configuredFolder}`);
-      return null;
+    try {
+      await ensureStorageFolders({
+        stat: path => app.vault.adapter.stat(path),
+        mkdir: path => app.vault.createFolder(path)
+      }, [configuredFolder]);
+    } catch (error) {
+      new Notice(`无法创建读书笔记目录：${configuredFolder}`);
+      throw error;
     }
   }
   const noteFilename = getBookNotePath(file, settings);

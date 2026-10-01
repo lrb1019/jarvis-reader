@@ -601,6 +601,16 @@ export class EpubView extends FileView {
     return location ? location : null;
   }
 
+  async prepareBookPathChange(oldPath: string): Promise<void> {
+    this.statsBookFile = null;
+    if (this.reactRoot) { this.reactRoot.unmount(); this.reactRoot = null; }
+    await this.stopThemeSync();
+    const stats = this.plugin.settings.readingStats || (this.plugin.settings.readingStats = {});
+    const date = new Date();
+    const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    await this.readingStatsService.flush(oldPath, today, stats, () => this.plugin.saveSettingsData());
+  }
+
   async onLoadFile(file: TFile): Promise<void> {
     this.sourceJumpPending = !!this.plugin.sourceJumpPaths?.has(file.path);
     this.setHeaderMenuVisibility(true);

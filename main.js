@@ -307,31 +307,31 @@ var require_react_development = __commonJS({
         function isArray(a) {
           return isArrayImpl(a);
         }
-        function typeName(value) {
+        function typeName(value2) {
           {
             var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
-            var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+            var type = hasToStringTag && value2[Symbol.toStringTag] || value2.constructor.name || "Object";
             return type;
           }
         }
-        function willCoercionThrow(value) {
+        function willCoercionThrow(value2) {
           {
             try {
-              testStringCoercion(value);
+              testStringCoercion(value2);
               return false;
             } catch (e) {
               return true;
             }
           }
         }
-        function testStringCoercion(value) {
-          return "" + value;
+        function testStringCoercion(value2) {
+          return "" + value2;
         }
-        function checkKeyStringCoercion(value) {
+        function checkKeyStringCoercion(value2) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
@@ -1128,19 +1128,19 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useImperativeHandle(ref, create, deps);
         }
-        function useDebugValue(value, formatterFn) {
+        function useDebugValue(value2, formatterFn) {
           {
             var dispatcher = resolveDispatcher();
-            return dispatcher.useDebugValue(value, formatterFn);
+            return dispatcher.useDebugValue(value2, formatterFn);
           }
         }
         function useTransition() {
           var dispatcher = resolveDispatcher();
           return dispatcher.useTransition();
         }
-        function useDeferredValue(value) {
+        function useDeferredValue(value2) {
           var dispatcher = resolveDispatcher();
-          return dispatcher.useDeferredValue(value);
+          return dispatcher.useDeferredValue(value2);
         }
         function useId2() {
           var dispatcher = resolveDispatcher();
@@ -2497,71 +2497,71 @@ var require_react_dom_development = __commonJS({
         }
         var canUseDOM = !!(typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined");
         var hasOwnProperty2 = Object.prototype.hasOwnProperty;
-        function typeName(value) {
+        function typeName(value2) {
           {
             var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
-            var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+            var type = hasToStringTag && value2[Symbol.toStringTag] || value2.constructor.name || "Object";
             return type;
           }
         }
-        function willCoercionThrow(value) {
+        function willCoercionThrow(value2) {
           {
             try {
-              testStringCoercion(value);
+              testStringCoercion(value2);
               return false;
             } catch (e) {
               return true;
             }
           }
         }
-        function testStringCoercion(value) {
-          return "" + value;
+        function testStringCoercion(value2) {
+          return "" + value2;
         }
-        function checkAttributeStringCoercion(value, attributeName) {
+        function checkAttributeStringCoercion(value2, attributeName) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided `%s` attribute is an unsupported type %s. This value must be coerced to a string before before using it here.", attributeName, typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided `%s` attribute is an unsupported type %s. This value must be coerced to a string before before using it here.", attributeName, typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
-        function checkKeyStringCoercion(value) {
+        function checkKeyStringCoercion(value2) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
-        function checkPropStringCoercion(value, propName) {
+        function checkPropStringCoercion(value2, propName) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided `%s` prop is an unsupported type %s. This value must be coerced to a string before before using it here.", propName, typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided `%s` prop is an unsupported type %s. This value must be coerced to a string before before using it here.", propName, typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
-        function checkCSSPropertyStringCoercion(value, propName) {
+        function checkCSSPropertyStringCoercion(value2, propName) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided `%s` CSS property is an unsupported type %s. This value must be coerced to a string before before using it here.", propName, typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided `%s` CSS property is an unsupported type %s. This value must be coerced to a string before before using it here.", propName, typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
-        function checkHtmlStringCoercion(value) {
+        function checkHtmlStringCoercion(value2) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided HTML markup uses a value of unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided HTML markup uses a value of unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
-        function checkFormFieldValueStringCoercion(value) {
+        function checkFormFieldValueStringCoercion(value2) {
           {
-            if (willCoercionThrow(value)) {
-              error("Form field values (value, checked, defaultValue, or defaultChecked props) must be strings, not %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("Form field values (value, checked, defaultValue, or defaultChecked props) must be strings, not %s. This value must be coerced to a string before before using it here.", typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
@@ -2606,11 +2606,11 @@ var require_react_dom_development = __commonJS({
           }
           return false;
         }
-        function shouldRemoveAttributeWithWarning(name, value, propertyInfo, isCustomComponentTag) {
+        function shouldRemoveAttributeWithWarning(name, value2, propertyInfo, isCustomComponentTag) {
           if (propertyInfo !== null && propertyInfo.type === RESERVED) {
             return false;
           }
-          switch (typeof value) {
+          switch (typeof value2) {
             case "function":
             // $FlowIssue symbol is perfectly valid here
             case "symbol":
@@ -2630,11 +2630,11 @@ var require_react_dom_development = __commonJS({
               return false;
           }
         }
-        function shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag) {
-          if (value === null || typeof value === "undefined") {
+        function shouldRemoveAttribute(name, value2, propertyInfo, isCustomComponentTag) {
+          if (value2 === null || typeof value2 === "undefined") {
             return true;
           }
-          if (shouldRemoveAttributeWithWarning(name, value, propertyInfo, isCustomComponentTag)) {
+          if (shouldRemoveAttributeWithWarning(name, value2, propertyInfo, isCustomComponentTag)) {
             return true;
           }
           if (isCustomComponentTag) {
@@ -2643,13 +2643,13 @@ var require_react_dom_development = __commonJS({
           if (propertyInfo !== null) {
             switch (propertyInfo.type) {
               case BOOLEAN:
-                return !value;
+                return !value2;
               case OVERLOADED_BOOLEAN:
-                return value === false;
+                return value2 === false;
               case NUMERIC:
-                return isNaN(value);
+                return isNaN(value2);
               case POSITIVE_NUMERIC:
-                return isNaN(value) || value < 1;
+                return isNaN(value2) || value2 < 1;
             }
           }
           return false;
@@ -3077,17 +3077,17 @@ var require_react_dom_development = __commonJS({
               var stringValue = null;
               if (propertyInfo.type === OVERLOADED_BOOLEAN) {
                 if (node.hasAttribute(attributeName)) {
-                  var value = node.getAttribute(attributeName);
-                  if (value === "") {
+                  var value2 = node.getAttribute(attributeName);
+                  if (value2 === "") {
                     return true;
                   }
                   if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
-                    return value;
+                    return value2;
                   }
-                  if (value === "" + expected) {
+                  if (value2 === "" + expected) {
                     return expected;
                   }
-                  return value;
+                  return value2;
                 }
               } else if (node.hasAttribute(attributeName)) {
                 if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
@@ -3116,34 +3116,34 @@ var require_react_dom_development = __commonJS({
             if (!node.hasAttribute(name)) {
               return expected === void 0 ? void 0 : null;
             }
-            var value = node.getAttribute(name);
+            var value2 = node.getAttribute(name);
             {
               checkAttributeStringCoercion(expected, name);
             }
-            if (value === "" + expected) {
+            if (value2 === "" + expected) {
               return expected;
             }
-            return value;
+            return value2;
           }
         }
-        function setValueForProperty(node, name, value, isCustomComponentTag) {
+        function setValueForProperty(node, name, value2, isCustomComponentTag) {
           var propertyInfo = getPropertyInfo(name);
           if (shouldIgnoreAttribute(name, propertyInfo, isCustomComponentTag)) {
             return;
           }
-          if (shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag)) {
-            value = null;
+          if (shouldRemoveAttribute(name, value2, propertyInfo, isCustomComponentTag)) {
+            value2 = null;
           }
           if (isCustomComponentTag || propertyInfo === null) {
             if (isAttributeNameSafe(name)) {
               var _attributeName = name;
-              if (value === null) {
+              if (value2 === null) {
                 node.removeAttribute(_attributeName);
               } else {
                 {
-                  checkAttributeStringCoercion(value, name);
+                  checkAttributeStringCoercion(value2, name);
                 }
-                node.setAttribute(_attributeName, "" + value);
+                node.setAttribute(_attributeName, "" + value2);
               }
             }
             return;
@@ -3151,28 +3151,28 @@ var require_react_dom_development = __commonJS({
           var mustUseProperty = propertyInfo.mustUseProperty;
           if (mustUseProperty) {
             var propertyName = propertyInfo.propertyName;
-            if (value === null) {
+            if (value2 === null) {
               var type = propertyInfo.type;
               node[propertyName] = type === BOOLEAN ? false : "";
             } else {
-              node[propertyName] = value;
+              node[propertyName] = value2;
             }
             return;
           }
           var attributeName = propertyInfo.attributeName, attributeNamespace = propertyInfo.attributeNamespace;
-          if (value === null) {
+          if (value2 === null) {
             node.removeAttribute(attributeName);
           } else {
             var _type = propertyInfo.type;
             var attributeValue;
-            if (_type === BOOLEAN || _type === OVERLOADED_BOOLEAN && value === true) {
+            if (_type === BOOLEAN || _type === OVERLOADED_BOOLEAN && value2 === true) {
               attributeValue = "";
             } else {
               {
                 {
-                  checkAttributeStringCoercion(value, attributeName);
+                  checkAttributeStringCoercion(value2, attributeName);
                 }
-                attributeValue = "" + value;
+                attributeValue = "" + value2;
               }
               if (propertyInfo.sanitizeURL) {
                 sanitizeURL(attributeValue.toString());
@@ -3691,21 +3691,21 @@ var require_react_dom_development = __commonJS({
             isRendering = rendering;
           }
         }
-        function toString(value) {
-          return "" + value;
+        function toString(value2) {
+          return "" + value2;
         }
-        function getToStringValue(value) {
-          switch (typeof value) {
+        function getToStringValue(value2) {
+          switch (typeof value2) {
             case "boolean":
             case "number":
             case "string":
             case "undefined":
-              return value;
+              return value2;
             case "object":
               {
-                checkFormFieldValueStringCoercion(value);
+                checkFormFieldValueStringCoercion(value2);
               }
-              return value;
+              return value2;
             default:
               return "";
           }
@@ -3741,16 +3741,16 @@ var require_react_dom_development = __commonJS({
           node._valueTracker = null;
         }
         function getValueFromNode(node) {
-          var value = "";
+          var value2 = "";
           if (!node) {
-            return value;
+            return value2;
           }
           if (isCheckable(node)) {
-            value = node.checked ? "true" : "false";
+            value2 = node.checked ? "true" : "false";
           } else {
-            value = node.value;
+            value2 = node.value;
           }
-          return value;
+          return value2;
         }
         function trackValueOnNode(node) {
           var valueField = isCheckable(node) ? "checked" : "value";
@@ -3768,12 +3768,12 @@ var require_react_dom_development = __commonJS({
             get: function() {
               return get2.call(this);
             },
-            set: function(value) {
+            set: function(value2) {
               {
-                checkFormFieldValueStringCoercion(value);
+                checkFormFieldValueStringCoercion(value2);
               }
-              currentValue = "" + value;
-              set2.call(this, value);
+              currentValue = "" + value2;
+              set2.call(this, value2);
             }
           });
           Object.defineProperty(node, valueField, {
@@ -3783,11 +3783,11 @@ var require_react_dom_development = __commonJS({
             getValue: function() {
               return currentValue;
             },
-            setValue: function(value) {
+            setValue: function(value2) {
               {
-                checkFormFieldValueStringCoercion(value);
+                checkFormFieldValueStringCoercion(value2);
               }
-              currentValue = "" + value;
+              currentValue = "" + value2;
             },
             stopTracking: function() {
               detachTracker(node);
@@ -3889,17 +3889,17 @@ var require_react_dom_development = __commonJS({
             }
           }
           updateChecked(element, props);
-          var value = getToStringValue(props.value);
+          var value2 = getToStringValue(props.value);
           var type = props.type;
-          if (value != null) {
+          if (value2 != null) {
             if (type === "number") {
-              if (value === 0 && node.value === "" || // We explicitly want to coerce to number here if possible.
+              if (value2 === 0 && node.value === "" || // We explicitly want to coerce to number here if possible.
               // eslint-disable-next-line
-              node.value != value) {
-                node.value = toString(value);
+              node.value != value2) {
+                node.value = toString(value2);
               }
-            } else if (node.value !== toString(value)) {
-              node.value = toString(value);
+            } else if (node.value !== toString(value2)) {
+              node.value = toString(value2);
             }
           } else if (type === "submit" || type === "reset") {
             node.removeAttribute("value");
@@ -3907,7 +3907,7 @@ var require_react_dom_development = __commonJS({
           }
           {
             if (props.hasOwnProperty("value")) {
-              setDefaultValue(node, props.type, value);
+              setDefaultValue(node, props.type, value2);
             } else if (props.hasOwnProperty("defaultValue")) {
               setDefaultValue(node, props.type, getToStringValue(props.defaultValue));
             }
@@ -3980,15 +3980,15 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function setDefaultValue(node, type, value) {
+        function setDefaultValue(node, type, value2) {
           if (
             // Focused number inputs synchronize on blur. See ChangeEventPlugin.js
             type !== "number" || getActiveElement(node.ownerDocument) !== node
           ) {
-            if (value == null) {
+            if (value2 == null) {
               node.defaultValue = toString(node._wrapperState.initialValue);
-            } else if (node.defaultValue !== toString(value)) {
-              node.defaultValue = toString(value);
+            } else if (node.defaultValue !== toString(value2)) {
+              node.defaultValue = toString(value2);
             }
           }
         }
@@ -4122,9 +4122,9 @@ var require_react_dom_development = __commonJS({
         function postMountWrapper$2(element, props) {
           var node = element;
           node.multiple = !!props.multiple;
-          var value = props.value;
-          if (value != null) {
-            updateOptions(node, !!props.multiple, value, false);
+          var value2 = props.value;
+          if (value2 != null) {
+            updateOptions(node, !!props.multiple, value2, false);
           } else if (props.defaultValue != null) {
             updateOptions(node, !!props.multiple, props.defaultValue, true);
           }
@@ -4133,9 +4133,9 @@ var require_react_dom_development = __commonJS({
           var node = element;
           var wasMultiple = node._wrapperState.wasMultiple;
           node._wrapperState.wasMultiple = !!props.multiple;
-          var value = props.value;
-          if (value != null) {
-            updateOptions(node, !!props.multiple, value, false);
+          var value2 = props.value;
+          if (value2 != null) {
+            updateOptions(node, !!props.multiple, value2, false);
           } else if (wasMultiple !== !!props.multiple) {
             if (props.defaultValue != null) {
               updateOptions(node, !!props.multiple, props.defaultValue, true);
@@ -4146,9 +4146,9 @@ var require_react_dom_development = __commonJS({
         }
         function restoreControlledState$1(element, props) {
           var node = element;
-          var value = props.value;
-          if (value != null) {
-            updateOptions(node, !!props.multiple, value, false);
+          var value2 = props.value;
+          if (value2 != null) {
+            updateOptions(node, !!props.multiple, value2, false);
           }
         }
         var didWarnValDefaultVal = false;
@@ -4204,10 +4204,10 @@ var require_react_dom_development = __commonJS({
         }
         function updateWrapper$1(element, props) {
           var node = element;
-          var value = getToStringValue(props.value);
+          var value2 = getToStringValue(props.value);
           var defaultValue = getToStringValue(props.defaultValue);
-          if (value != null) {
-            var newValue = toString(value);
+          if (value2 != null) {
+            var newValue = toString(value2);
             if (newValue !== node.value) {
               node.value = newValue;
             }
@@ -4401,18 +4401,18 @@ var require_react_dom_development = __commonJS({
             isUnitlessNumber[prefixKey(prefix2, prop)] = isUnitlessNumber[prop];
           });
         });
-        function dangerousStyleValue(name, value, isCustomProperty) {
-          var isEmpty = value == null || typeof value === "boolean" || value === "";
+        function dangerousStyleValue(name, value2, isCustomProperty) {
+          var isEmpty = value2 == null || typeof value2 === "boolean" || value2 === "";
           if (isEmpty) {
             return "";
           }
-          if (!isCustomProperty && typeof value === "number" && value !== 0 && !(isUnitlessNumber.hasOwnProperty(name) && isUnitlessNumber[name])) {
-            return value + "px";
+          if (!isCustomProperty && typeof value2 === "number" && value2 !== 0 && !(isUnitlessNumber.hasOwnProperty(name) && isUnitlessNumber[name])) {
+            return value2 + "px";
           }
           {
-            checkCSSPropertyStringCoercion(value, name);
+            checkCSSPropertyStringCoercion(value2, name);
           }
-          return ("" + value).trim();
+          return ("" + value2).trim();
         }
         var uppercasePattern = /([A-Z])/g;
         var msPattern = /^ms-/;
@@ -4456,40 +4456,40 @@ var require_react_dom_development = __commonJS({
             warnedStyleNames[name] = true;
             error("Unsupported vendor-prefixed style property %s. Did you mean %s?", name, name.charAt(0).toUpperCase() + name.slice(1));
           };
-          var warnStyleValueWithSemicolon = function(name, value) {
-            if (warnedStyleValues.hasOwnProperty(value) && warnedStyleValues[value]) {
+          var warnStyleValueWithSemicolon = function(name, value2) {
+            if (warnedStyleValues.hasOwnProperty(value2) && warnedStyleValues[value2]) {
               return;
             }
-            warnedStyleValues[value] = true;
-            error(`Style property values shouldn't contain a semicolon. Try "%s: %s" instead.`, name, value.replace(badStyleValueWithSemicolonPattern, ""));
+            warnedStyleValues[value2] = true;
+            error(`Style property values shouldn't contain a semicolon. Try "%s: %s" instead.`, name, value2.replace(badStyleValueWithSemicolonPattern, ""));
           };
-          var warnStyleValueIsNaN = function(name, value) {
+          var warnStyleValueIsNaN = function(name, value2) {
             if (warnedForNaNValue) {
               return;
             }
             warnedForNaNValue = true;
             error("`NaN` is an invalid value for the `%s` css style property.", name);
           };
-          var warnStyleValueIsInfinity = function(name, value) {
+          var warnStyleValueIsInfinity = function(name, value2) {
             if (warnedForInfinityValue) {
               return;
             }
             warnedForInfinityValue = true;
             error("`Infinity` is an invalid value for the `%s` css style property.", name);
           };
-          warnValidStyle = function(name, value) {
+          warnValidStyle = function(name, value2) {
             if (name.indexOf("-") > -1) {
               warnHyphenatedStyleName(name);
             } else if (badVendoredStyleNamePattern.test(name)) {
               warnBadVendoredStyleName(name);
-            } else if (badStyleValueWithSemicolonPattern.test(value)) {
-              warnStyleValueWithSemicolon(name, value);
+            } else if (badStyleValueWithSemicolonPattern.test(value2)) {
+              warnStyleValueWithSemicolon(name, value2);
             }
-            if (typeof value === "number") {
-              if (isNaN(value)) {
-                warnStyleValueIsNaN(name, value);
-              } else if (!isFinite(value)) {
-                warnStyleValueIsInfinity(name, value);
+            if (typeof value2 === "number") {
+              if (isNaN(value2)) {
+                warnStyleValueIsNaN(name, value2);
+              } else if (!isFinite(value2)) {
+                warnStyleValueIsInfinity(name, value2);
               }
             }
           };
@@ -4537,8 +4537,8 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function isValueEmpty(value) {
-          return value == null || typeof value === "boolean" || value === "";
+        function isValueEmpty(value2) {
+          return value2 == null || typeof value2 === "boolean" || value2 === "";
         }
         function expandShorthandMap(styles) {
           var expanded = {};
@@ -5277,7 +5277,7 @@ var require_react_dom_development = __commonJS({
           var INVALID_EVENT_NAME_REGEX = /^on[^A-Z]/;
           var rARIA$1 = new RegExp("^(aria)-[" + ATTRIBUTE_NAME_CHAR + "]*$");
           var rARIACamel$1 = new RegExp("^(aria)[A-Z][" + ATTRIBUTE_NAME_CHAR + "]*$");
-          validateProperty$1 = function(tagName, name, value, eventRegistry) {
+          validateProperty$1 = function(tagName, name, value2, eventRegistry) {
             if (hasOwnProperty2.call(warnedProperties$1, name) && warnedProperties$1[name]) {
               return true;
             }
@@ -5323,12 +5323,12 @@ var require_react_dom_development = __commonJS({
               warnedProperties$1[name] = true;
               return true;
             }
-            if (lowerCasedName === "is" && value !== null && value !== void 0 && typeof value !== "string") {
-              error("Received a `%s` for a string attribute `is`. If this is expected, cast the value to a string.", typeof value);
+            if (lowerCasedName === "is" && value2 !== null && value2 !== void 0 && typeof value2 !== "string") {
+              error("Received a `%s` for a string attribute `is`. If this is expected, cast the value to a string.", typeof value2);
               warnedProperties$1[name] = true;
               return true;
             }
-            if (typeof value === "number" && isNaN(value)) {
+            if (typeof value2 === "number" && isNaN(value2)) {
               error("Received NaN for the `%s` attribute. If this is expected, cast the value to a string.", name);
               warnedProperties$1[name] = true;
               return true;
@@ -5347,11 +5347,11 @@ var require_react_dom_development = __commonJS({
               warnedProperties$1[name] = true;
               return true;
             }
-            if (typeof value === "boolean" && shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
-              if (value) {
-                error('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.', value, name, name, value, name);
+            if (typeof value2 === "boolean" && shouldRemoveAttributeWithWarning(name, value2, propertyInfo, false)) {
+              if (value2) {
+                error('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.', value2, name, name, value2, name);
               } else {
-                error('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.\n\nIf you used to conditionally omit it with %s={condition && value}, pass %s={condition ? value : undefined} instead.', value, name, name, value, name, name, name);
+                error('Received `%s` for a non-boolean attribute `%s`.\n\nIf you want to write it to the DOM, pass a string instead: %s="%s" or %s={value.toString()}.\n\nIf you used to conditionally omit it with %s={condition && value}, pass %s={condition ? value : undefined} instead.', value2, name, name, value2, name, name, name);
               }
               warnedProperties$1[name] = true;
               return true;
@@ -5359,12 +5359,12 @@ var require_react_dom_development = __commonJS({
             if (isReserved) {
               return true;
             }
-            if (shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
+            if (shouldRemoveAttributeWithWarning(name, value2, propertyInfo, false)) {
               warnedProperties$1[name] = true;
               return false;
             }
-            if ((value === "false" || value === "true") && propertyInfo !== null && propertyInfo.type === BOOLEAN) {
-              error("Received the string `%s` for the boolean attribute `%s`. %s Did you mean %s={%s}?", value, name, value === "false" ? "The browser will interpret it as a truthy value." : 'Although this works, it will not work as expected if you pass the string "false".', name, value);
+            if ((value2 === "false" || value2 === "true") && propertyInfo !== null && propertyInfo.type === BOOLEAN) {
+              error("Received the string `%s` for the boolean attribute `%s`. %s Did you mean %s={%s}?", value2, name, value2 === "false" ? "The browser will interpret it as a truthy value." : 'Although this works, it will not work as expected if you pass the string "false".', name, value2);
               warnedProperties$1[name] = true;
               return true;
             }
@@ -5688,8 +5688,8 @@ var require_react_dom_development = __commonJS({
         function has(key) {
           return key._reactInternals !== void 0;
         }
-        function set(key, value) {
-          key._reactInternals = value;
+        function set(key, value2) {
+          key._reactInternals = value2;
         }
         var NoFlags = (
           /*                      */
@@ -10873,13 +10873,13 @@ var require_react_dom_development = __commonJS({
           }
           index--;
         }
-        function push(cursor, value, fiber) {
+        function push(cursor, value2, fiber) {
           index++;
           valueStack[index] = cursor.current;
           {
             fiberStack[index] = fiber;
           }
-          cursor.current = value;
+          cursor.current = value2;
         }
         var warnedAboutMissingGetChildContext;
         {
@@ -11632,8 +11632,8 @@ var require_react_dom_development = __commonJS({
           };
           var setToSortedString = function(set2) {
             var array = [];
-            set2.forEach(function(value) {
-              array.push(value);
+            set2.forEach(function(value2) {
+              array.push(value2);
             });
             return array.sort().join(", ");
           };
@@ -11984,12 +11984,12 @@ var require_react_dom_development = __commonJS({
               error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().");
             }
           }
-          var value = context._currentValue;
+          var value2 = context._currentValue;
           if (lastFullyObservedContext === context) ;
           else {
             var contextItem = {
               context,
-              memoizedValue: value,
+              memoizedValue: value2,
               next: null
             };
             if (lastContextDependency === null) {
@@ -12005,7 +12005,7 @@ var require_react_dom_development = __commonJS({
               lastContextDependency = lastContextDependency.next = contextItem;
             }
           }
-          return value;
+          return value2;
         }
         var concurrentQueues = null;
         function pushConcurrentUpdateQueue(queue) {
@@ -13134,15 +13134,15 @@ var require_react_dom_development = __commonJS({
               if (current2 !== null && current2.ref !== null && typeof current2.ref === "function" && current2.ref._stringRef === stringRef) {
                 return current2.ref;
               }
-              var ref = function(value) {
+              var ref = function(value2) {
                 var refs = resolvedInst.refs;
                 if (refs === emptyRefsObject) {
                   refs = resolvedInst.refs = {};
                 }
-                if (value === null) {
+                if (value2 === null) {
                   delete refs[stringRef];
                 } else {
-                  refs[stringRef] = value;
+                  refs[stringRef] = value2;
                 }
               };
               ref._stringRef = stringRef;
@@ -14728,7 +14728,7 @@ var require_react_dom_development = __commonJS({
           var effectDeps = deps !== null && deps !== void 0 ? deps.concat([ref]) : null;
           return updateEffectImpl(Update, Layout, imperativeHandleEffect.bind(null, create, ref), effectDeps);
         }
-        function mountDebugValue(value, formatterFn) {
+        function mountDebugValue(value2, formatterFn) {
         }
         var updateDebugValue = mountDebugValue;
         function mountCallback(callback, deps) {
@@ -14775,31 +14775,31 @@ var require_react_dom_development = __commonJS({
           hook.memoizedState = [nextValue, nextDeps];
           return nextValue;
         }
-        function mountDeferredValue(value) {
+        function mountDeferredValue(value2) {
           var hook = mountWorkInProgressHook();
-          hook.memoizedState = value;
-          return value;
+          hook.memoizedState = value2;
+          return value2;
         }
-        function updateDeferredValue(value) {
+        function updateDeferredValue(value2) {
           var hook = updateWorkInProgressHook();
           var resolvedCurrentHook = currentHook;
           var prevValue = resolvedCurrentHook.memoizedState;
-          return updateDeferredValueImpl(hook, prevValue, value);
+          return updateDeferredValueImpl(hook, prevValue, value2);
         }
-        function rerenderDeferredValue(value) {
+        function rerenderDeferredValue(value2) {
           var hook = updateWorkInProgressHook();
           if (currentHook === null) {
-            hook.memoizedState = value;
-            return value;
+            hook.memoizedState = value2;
+            return value2;
           } else {
             var prevValue = currentHook.memoizedState;
-            return updateDeferredValueImpl(hook, prevValue, value);
+            return updateDeferredValueImpl(hook, prevValue, value2);
           }
         }
-        function updateDeferredValueImpl(hook, prevValue, value) {
+        function updateDeferredValueImpl(hook, prevValue, value2) {
           var shouldDeferValue = !includesOnlyNonUrgentLanes(renderLanes);
           if (shouldDeferValue) {
-            if (!objectIs(value, prevValue)) {
+            if (!objectIs(value2, prevValue)) {
               var deferredLane = claimNextTransitionLane();
               currentlyRenderingFiber$1.lanes = mergeLanes(currentlyRenderingFiber$1.lanes, deferredLane);
               markSkippedUpdateLanes(deferredLane);
@@ -14811,8 +14811,8 @@ var require_react_dom_development = __commonJS({
               hook.baseState = false;
               markWorkInProgressReceivedUpdate();
             }
-            hook.memoizedState = value;
-            return value;
+            hook.memoizedState = value2;
+            return value2;
           }
         }
         function startTransition(setPending, callback, options2) {
@@ -15111,15 +15111,15 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               mountHookTypesDev();
               return mountDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               mountHookTypesDev();
-              return mountDeferredValue(value);
+              return mountDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15215,15 +15215,15 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               updateHookTypesDev();
               return mountDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               updateHookTypesDev();
-              return mountDeferredValue(value);
+              return mountDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15319,15 +15319,15 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               updateHookTypesDev();
               return updateDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               updateHookTypesDev();
-              return updateDeferredValue(value);
+              return updateDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15423,15 +15423,15 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               updateHookTypesDev();
               return updateDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               updateHookTypesDev();
-              return rerenderDeferredValue(value);
+              return rerenderDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15538,17 +15538,17 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               warnInvalidHookAccess();
               mountHookTypesDev();
               return mountDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               warnInvalidHookAccess();
               mountHookTypesDev();
-              return mountDeferredValue(value);
+              return mountDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15659,17 +15659,17 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               warnInvalidHookAccess();
               updateHookTypesDev();
               return updateDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               warnInvalidHookAccess();
               updateHookTypesDev();
-              return updateDeferredValue(value);
+              return updateDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15780,17 +15780,17 @@ var require_react_dom_development = __commonJS({
                 ReactCurrentDispatcher$1.current = prevDispatcher;
               }
             },
-            useDebugValue: function(value, formatterFn) {
+            useDebugValue: function(value2, formatterFn) {
               currentHookNameInDev = "useDebugValue";
               warnInvalidHookAccess();
               updateHookTypesDev();
               return updateDebugValue();
             },
-            useDeferredValue: function(value) {
+            useDeferredValue: function(value2) {
               currentHookNameInDev = "useDeferredValue";
               warnInvalidHookAccess();
               updateHookTypesDev();
-              return rerenderDeferredValue(value);
+              return rerenderDeferredValue(value2);
             },
             useTransition: function() {
               currentHookNameInDev = "useTransition";
@@ -15928,17 +15928,17 @@ var require_react_dom_development = __commonJS({
             child = child.sibling;
           }
         }
-        function createCapturedValueAtFiber(value, source) {
+        function createCapturedValueAtFiber(value2, source) {
           return {
-            value,
+            value: value2,
             source,
             stack: getStackByFiberInDevAndProd(source),
             digest: null
           };
         }
-        function createCapturedValue(value, digest, stack) {
+        function createCapturedValue(value2, digest, stack) {
           return {
-            value,
+            value: value2,
             source: null,
             stack: stack != null ? stack : null,
             digest: digest != null ? digest : null
@@ -16125,15 +16125,15 @@ var require_react_dom_development = __commonJS({
           suspenseBoundary.lanes = rootRenderLanes;
           return suspenseBoundary;
         }
-        function throwException(root2, returnFiber, sourceFiber, value, rootRenderLanes) {
+        function throwException(root2, returnFiber, sourceFiber, value2, rootRenderLanes) {
           sourceFiber.flags |= Incomplete;
           {
             if (isDevToolsPresent) {
               restorePendingUpdaters(root2, rootRenderLanes);
             }
           }
-          if (value !== null && typeof value === "object" && typeof value.then === "function") {
-            var wakeable = value;
+          if (value2 !== null && typeof value2 === "object" && typeof value2.then === "function") {
+            var wakeable = value2;
             resetSuspendedComponent(sourceFiber);
             {
               if (getIsHydrating() && sourceFiber.mode & ConcurrentMode) {
@@ -16156,7 +16156,7 @@ var require_react_dom_development = __commonJS({
                 return;
               }
               var uncaughtSuspenseError = new Error("A component suspended while responding to synchronous input. This will cause the UI to be replaced with a loading indicator. To fix, updates that suspend should be wrapped with startTransition.");
-              value = uncaughtSuspenseError;
+              value2 = uncaughtSuspenseError;
             }
           } else {
             if (getIsHydrating() && sourceFiber.mode & ConcurrentMode) {
@@ -16167,18 +16167,18 @@ var require_react_dom_development = __commonJS({
                   _suspenseBoundary.flags |= ForceClientRender;
                 }
                 markSuspenseBoundaryShouldCapture(_suspenseBoundary, returnFiber, sourceFiber, root2, rootRenderLanes);
-                queueHydrationError(createCapturedValueAtFiber(value, sourceFiber));
+                queueHydrationError(createCapturedValueAtFiber(value2, sourceFiber));
                 return;
               }
             }
           }
-          value = createCapturedValueAtFiber(value, sourceFiber);
-          renderDidError(value);
+          value2 = createCapturedValueAtFiber(value2, sourceFiber);
+          renderDidError(value2);
           var workInProgress2 = returnFiber;
           do {
             switch (workInProgress2.tag) {
               case HostRoot: {
-                var _errorInfo = value;
+                var _errorInfo = value2;
                 workInProgress2.flags |= ShouldCapture;
                 var lane = pickArbitraryLane(rootRenderLanes);
                 workInProgress2.lanes = mergeLanes(workInProgress2.lanes, lane);
@@ -16187,7 +16187,7 @@ var require_react_dom_development = __commonJS({
                 return;
               }
               case ClassComponent:
-                var errorInfo = value;
+                var errorInfo = value2;
                 var ctor = workInProgress2.type;
                 var instance = workInProgress2.stateNode;
                 if ((workInProgress2.flags & DidCapture) === NoFlags && (typeof ctor.getDerivedStateFromError === "function" || instance !== null && typeof instance.componentDidCatch === "function" && !isAlreadyFailedLegacyErrorBoundary(instance))) {
@@ -16841,7 +16841,7 @@ var require_react_dom_development = __commonJS({
             context = getMaskedContext(workInProgress2, unmaskedContext);
           }
           prepareToReadContext(workInProgress2, renderLanes2);
-          var value;
+          var value2;
           var hasId;
           {
             markComponentRenderStarted(workInProgress2);
@@ -16859,7 +16859,7 @@ var require_react_dom_development = __commonJS({
             }
             setIsRendering(true);
             ReactCurrentOwner$1.current = workInProgress2;
-            value = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
+            value2 = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
             hasId = checkDidRenderIdHook();
             setIsRendering(false);
           }
@@ -16868,7 +16868,7 @@ var require_react_dom_development = __commonJS({
           }
           workInProgress2.flags |= PerformedWork;
           {
-            if (typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0) {
+            if (typeof value2 === "object" && value2 !== null && typeof value2.render === "function" && value2.$$typeof === void 0) {
               var _componentName = getComponentNameFromType(Component) || "Unknown";
               if (!didWarnAboutModulePatternComponent[_componentName]) {
                 error("The <%s /> component appears to be a function component that returns a class instance. Change %s to a class that extends React.Component instead. If you can't use a class try assigning the prototype on the function as a workaround. `%s.prototype = React.Component.prototype`. Don't use an arrow function since it cannot be called with `new` by React.", _componentName, _componentName, _componentName);
@@ -16879,7 +16879,7 @@ var require_react_dom_development = __commonJS({
           if (
             // Run these checks in production only if the flag is off.
             // Eventually we'll delete this branch altogether.
-            typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0
+            typeof value2 === "object" && value2 !== null && typeof value2.render === "function" && value2.$$typeof === void 0
           ) {
             {
               var _componentName2 = getComponentNameFromType(Component) || "Unknown";
@@ -16898,9 +16898,9 @@ var require_react_dom_development = __commonJS({
             } else {
               hasContext = false;
             }
-            workInProgress2.memoizedState = value.state !== null && value.state !== void 0 ? value.state : null;
+            workInProgress2.memoizedState = value2.state !== null && value2.state !== void 0 ? value2.state : null;
             initializeUpdateQueue(workInProgress2);
-            adoptClassInstance(workInProgress2, value);
+            adoptClassInstance(workInProgress2, value2);
             mountClassInstance(workInProgress2, Component, props, renderLanes2);
             return finishClassComponent(null, workInProgress2, Component, true, hasContext, renderLanes2);
           } else {
@@ -16909,7 +16909,7 @@ var require_react_dom_development = __commonJS({
               if (workInProgress2.mode & StrictLegacyMode) {
                 setIsStrictModeForDevtools(true);
                 try {
-                  value = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
+                  value2 = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
                   hasId = checkDidRenderIdHook();
                 } finally {
                   setIsStrictModeForDevtools(false);
@@ -16919,7 +16919,7 @@ var require_react_dom_development = __commonJS({
             if (getIsHydrating() && hasId) {
               pushMaterializedTreeId(workInProgress2);
             }
-            reconcileChildren(null, workInProgress2, value, renderLanes2);
+            reconcileChildren(null, workInProgress2, value2, renderLanes2);
             {
               validateFunctionComponentInDev(workInProgress2, Component);
             }
@@ -22872,17 +22872,17 @@ var require_react_dom_development = __commonJS({
             }
             return copyWithRenameImpl(obj, oldPath, newPath, 0);
           };
-          var copyWithSetImpl = function(obj, path, index2, value) {
+          var copyWithSetImpl = function(obj, path, index2, value2) {
             if (index2 >= path.length) {
-              return value;
+              return value2;
             }
             var key = path[index2];
             var updated = isArray(obj) ? obj.slice() : assign({}, obj);
-            updated[key] = copyWithSetImpl(obj[key], path, index2 + 1, value);
+            updated[key] = copyWithSetImpl(obj[key], path, index2 + 1, value2);
             return updated;
           };
-          var copyWithSet = function(obj, path, value) {
-            return copyWithSetImpl(obj, path, 0, value);
+          var copyWithSet = function(obj, path, value2) {
+            return copyWithSetImpl(obj, path, 0, value2);
           };
           var findHook = function(fiber, id) {
             var currentHook2 = fiber.memoizedState;
@@ -22892,10 +22892,10 @@ var require_react_dom_development = __commonJS({
             }
             return currentHook2;
           };
-          overrideHookState = function(fiber, id, path, value) {
+          overrideHookState = function(fiber, id, path, value2) {
             var hook = findHook(fiber, id);
             if (hook !== null) {
-              var newState = copyWithSet(hook.memoizedState, path, value);
+              var newState = copyWithSet(hook.memoizedState, path, value2);
               hook.memoizedState = newState;
               hook.baseState = newState;
               fiber.memoizedProps = assign({}, fiber.memoizedProps);
@@ -22931,8 +22931,8 @@ var require_react_dom_development = __commonJS({
               }
             }
           };
-          overrideProps = function(fiber, path, value) {
-            fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
+          overrideProps = function(fiber, path, value2) {
+            fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value2);
             if (fiber.alternate) {
               fiber.alternate.pendingProps = fiber.pendingProps;
             }
@@ -23552,39 +23552,39 @@ function joinVaultPath(folder, filename) {
   const cleanFolder = normalizeVaultPath(folder);
   return cleanFolder ? `${cleanFolder}/${filename}` : filename;
 }
-function formatLocalDate(value) {
-  if (!value)
+function formatLocalDate(value2) {
+  if (!value2)
     return "";
-  const date = value instanceof Date ? value : new Date(value);
+  const date = value2 instanceof Date ? value2 : new Date(value2);
   if (Number.isNaN(date.getTime()))
     return "";
   const pad = (number) => String(number).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
-function formatLocalDateTime(value) {
-  if (!value)
+function formatLocalDateTime(value2) {
+  if (!value2)
     return "";
-  const date = value instanceof Date ? value : new Date(value);
+  const date = value2 instanceof Date ? value2 : new Date(value2);
   if (Number.isNaN(date.getTime()))
-    return value;
+    return value2;
   const pad = (number) => String(number).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
-function sanitizeWordAssetFilename(value) {
-  const cleaned = (value || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim();
+function sanitizeWordAssetFilename(value2) {
+  const cleaned = (value2 || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim();
   return cleaned || "word";
 }
-function escapeRegExp(value) {
-  return (value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function escapeRegExp(value2) {
+  return (value2 || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
-function escapeYamlString(value) {
-  return String(value || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+function escapeYamlString(value2) {
+  return String(value2 || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 function normalizeHighlightQuote(quote) {
   return (quote || "").replace(/\s+/g, " ").trim();
 }
-function normalizeWordDisplayText(value) {
-  return String(value || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
+function normalizeWordDisplayText(value2) {
+  return String(value2 || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
 }
 async function ensureVaultFolder(app, folderPath) {
   const cleanPath = normalizeVaultPath(folderPath);
@@ -23625,12 +23625,12 @@ __export(utils_exports, {
 function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8BA4\u5220\u9664") {
   return new Promise((resolve) => {
     let resolved = false;
-    const finish = (value) => {
+    const finish = (value2) => {
       if (resolved)
         return;
       resolved = true;
       modal.close();
-      resolve(value);
+      resolve(value2);
     };
     const modal = new import_obsidian.Modal(app);
     modal.shouldRestoreSelection = false;
@@ -23662,6 +23662,72 @@ var init_utils = __esm({
   "src/utils.ts"() {
     import_obsidian = require("obsidian");
     init_utils_core();
+  }
+});
+
+// src/storage-folders.ts
+function validateFolderPath(value2) {
+  const raw = value2.trim().replace(/\\/g, "/");
+  if (raw.startsWith("/") || raw.split("/").some((part) => part === ".." || part === ".") || /[:\x00-\x1f]/.test(raw)) {
+    throw new Error("\u8BF7\u4F7F\u7528\u4ED3\u5E93\u5185\u7684\u6587\u4EF6\u5939\u8DEF\u5F84");
+  }
+  return normalizeVaultPath(raw);
+}
+function isBookInFolder(path, root = "") {
+  return !root || path.startsWith(root + "/");
+}
+async function ensureStorageFolders(storage, paths) {
+  const folders = /* @__PURE__ */ new Set();
+  for (const path of paths.map(validateFolderPath)) {
+    const parts = path.split("/").filter(Boolean);
+    for (let i = 1; i <= parts.length; i++) folders.add(parts.slice(0, i).join("/"));
+  }
+  for (const path of folders) {
+    const stat = await storage.stat(path);
+    if (stat && stat.type !== "folder") throw new Error(`\u8DEF\u5F84\u5DF2\u88AB\u6587\u4EF6\u5360\u7528\uFF1A${path}`);
+  }
+  for (const path of folders) {
+    if (await storage.stat(path)) continue;
+    try {
+      await storage.mkdir(path);
+    } catch (error) {
+      if ((await storage.stat(path))?.type !== "folder") throw error;
+    }
+  }
+}
+async function configureStorageFolders(storage, settings, draft, persist) {
+  const folders = {
+    bookFolder: validateFolderPath(draft.bookFolder),
+    bookNoteFolder: validateFolderPath(draft.bookNoteFolder),
+    knowledgeNoteFolder: validateFolderPath(draft.knowledgeNoteFolder),
+    customCoverFolder: validateFolderPath(draft.customCoverFolder)
+  };
+  await ensureStorageFolders(storage, Object.values(folders));
+  const hadRoot = Object.hasOwn(settings, "bookFolder");
+  const previous = {
+    bookFolder: settings.bookFolder,
+    bookNoteFolder: settings.bookNoteFolder,
+    knowledgeNoteFolder: settings.knowledgeNoteFolder,
+    customCoverFolder: settings.customCoverFolder
+  };
+  Object.assign(settings, folders);
+  try {
+    await persist();
+  } catch (error) {
+    Object.assign(settings, previous);
+    if (!hadRoot) delete settings.bookFolder;
+    throw error;
+  }
+}
+var DEFAULT_STORAGE_FOLDERS;
+var init_storage_folders = __esm({
+  "src/storage-folders.ts"() {
+    init_utils_core();
+    DEFAULT_STORAGE_FOLDERS = {
+      bookNoteFolder: "Reading Notes",
+      knowledgeNoteFolder: "Knowledge Notes",
+      customCoverFolder: "Cover"
+    };
   }
 });
 
@@ -23700,6 +23766,12 @@ function getBookNotePath(file, settings = {}) {
   return joinVaultPath(noteFolder, `${file.basename}.md`);
 }
 function findBookNote(app, file, settings = {}) {
+  const remembered = settings.bookNotePaths?.[file.path];
+  if (remembered) {
+    const note = app.vault.getAbstractFileByPath(remembered);
+    if (note instanceof import_obsidian2.TFile) return note;
+    throw new Error("\u5173\u8054\u7684\u8BFB\u4E66\u7B14\u8BB0\u4E0D\u5B58\u5728\uFF0C\u8BF7\u6062\u590D\u6216\u4FEE\u6B63\u8DEF\u5F84\uFF0C\u672A\u65B0\u5EFA\u66FF\u4EE3\u7B14\u8BB0");
+  }
   const exactPath = getBookNotePath(file, settings);
   const exactFile = app.vault.getAbstractFileByPath(exactPath);
   if (exactFile instanceof import_obsidian2.TFile) return exactFile;
@@ -23720,10 +23792,14 @@ async function getOrCreateBookNote(app, file, toc, settings = {}) {
   if (noteFile) return noteFile;
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
   if (configuredFolder) {
-    const folder = app.vault.getAbstractFileByPath(configuredFolder);
-    if (folder == null || !(folder instanceof import_obsidian2.TFolder)) {
-      new import_obsidian2.Notice(`Jarvis Reader note folder does not exist: ${configuredFolder}`);
-      return null;
+    try {
+      await ensureStorageFolders({
+        stat: (path) => app.vault.adapter.stat(path),
+        mkdir: (path) => app.vault.createFolder(path)
+      }, [configuredFolder]);
+    } catch (error) {
+      new import_obsidian2.Notice(`\u65E0\u6CD5\u521B\u5EFA\u8BFB\u4E66\u7B14\u8BB0\u76EE\u5F55\uFF1A${configuredFolder}`);
+      throw error;
     }
   }
   const noteFilename = getBookNotePath(file, settings);
@@ -23753,6 +23829,7 @@ var init_book_notes = __esm({
   "src/book-notes.ts"() {
     import_obsidian2 = require("obsidian");
     init_utils();
+    init_storage_folders();
   }
 });
 
@@ -24279,12 +24356,12 @@ var require_factoryWithTypeCheckers = __commonJS({
               return null;
             }
           }
-          var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
-            var type = getPreciseType(value);
+          var valuesString = JSON.stringify(expectedValues, function replacer(key, value2) {
+            var type = getPreciseType(value2);
             if (type === "symbol") {
-              return String(value);
+              return String(value2);
             }
-            return value;
+            return value2;
           });
           return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
         }
@@ -24490,8 +24567,8 @@ var require_factoryWithTypeCheckers = __commonJS({
         }
         return propType;
       }
-      function getPostfixForTypeWarning(value) {
-        var type = getPreciseType(value);
+      function getPostfixForTypeWarning(value2) {
+        var type = getPreciseType(value2);
         switch (type) {
           case "array":
           case "object":
@@ -24538,8 +24615,8 @@ var require_is = __commonJS({
   "node_modules/type/value/is.js"(exports, module2) {
     "use strict";
     var _undefined = void 0;
-    module2.exports = function(value) {
-      return value !== _undefined && value !== null;
+    module2.exports = function(value2) {
+      return value2 !== _undefined && value2 !== null;
     };
   }
 });
@@ -24555,9 +24632,9 @@ var require_is2 = __commonJS({
       "undefined": true
       /* document.all */
     };
-    module2.exports = function(value) {
-      if (!isValue(value)) return false;
-      return hasOwnProperty.call(possibleTypes, typeof value);
+    module2.exports = function(value2) {
+      if (!isValue(value2)) return false;
+      return hasOwnProperty.call(possibleTypes, typeof value2);
     };
   }
 });
@@ -24567,11 +24644,11 @@ var require_is3 = __commonJS({
   "node_modules/type/prototype/is.js"(exports, module2) {
     "use strict";
     var isObject = require_is2();
-    module2.exports = function(value) {
-      if (!isObject(value)) return false;
+    module2.exports = function(value2) {
+      if (!isObject(value2)) return false;
       try {
-        if (!value.constructor) return false;
-        return value.constructor.prototype === value;
+        if (!value2.constructor) return false;
+        return value2.constructor.prototype === value2;
       } catch (error) {
         return false;
       }
@@ -24584,17 +24661,17 @@ var require_is4 = __commonJS({
   "node_modules/type/function/is.js"(exports, module2) {
     "use strict";
     var isPrototype = require_is3();
-    module2.exports = function(value) {
-      if (typeof value !== "function") return false;
-      if (!hasOwnProperty.call(value, "length")) return false;
+    module2.exports = function(value2) {
+      if (typeof value2 !== "function") return false;
+      if (!hasOwnProperty.call(value2, "length")) return false;
       try {
-        if (typeof value.length !== "number") return false;
-        if (typeof value.call !== "function") return false;
-        if (typeof value.apply !== "function") return false;
+        if (typeof value2.length !== "number") return false;
+        if (typeof value2.call !== "function") return false;
+        if (typeof value2.apply !== "function") return false;
       } catch (error) {
         return false;
       }
-      return !isPrototype(value);
+      return !isPrototype(value2);
     };
   }
 });
@@ -24606,9 +24683,9 @@ var require_is5 = __commonJS({
     var isFunction = require_is4();
     var classRe = /^\s*class[\s{/}]/;
     var functionToString = Function.prototype.toString;
-    module2.exports = function(value) {
-      if (!isFunction(value)) return false;
-      if (classRe.test(functionToString.call(value))) return false;
+    module2.exports = function(value2) {
+      if (!isFunction(value2)) return false;
+      if (classRe.test(functionToString.call(value2))) return false;
       return true;
     };
   }
@@ -24688,9 +24765,9 @@ var require_valid_value = __commonJS({
   "node_modules/es5-ext/object/valid-value.js"(exports, module2) {
     "use strict";
     var isValue = require_is_value();
-    module2.exports = function(value) {
-      if (!isValue(value)) throw new TypeError("Cannot use null or undefined");
-      return value;
+    module2.exports = function(value2) {
+      if (!isValue(value2)) throw new TypeError("Cannot use null or undefined");
+      return value2;
     };
   }
 });
@@ -24700,11 +24777,11 @@ var require_shim2 = __commonJS({
   "node_modules/es5-ext/object/assign/shim.js"(exports, module2) {
     "use strict";
     var keys = require_keys();
-    var value = require_valid_value();
+    var value2 = require_valid_value();
     var max = Math.max;
     module2.exports = function(dest, src) {
       var error, i, length = max(arguments.length, 2), assign;
-      dest = Object(value(dest));
+      dest = Object(value2(dest));
       assign = function(key) {
         try {
           dest[key] = src[key];
@@ -24792,11 +24869,11 @@ var require_d = __commonJS({
     var assign = require_assign();
     var normalizeOpts = require_normalize_options();
     var contains = require_contains();
-    var d = module2.exports = function(dscr, value) {
+    var d = module2.exports = function(dscr, value2) {
       var c, e, w, options, desc;
       if (arguments.length < 2 || typeof dscr !== "string") {
-        options = value;
-        value = dscr;
+        options = value2;
+        value2 = dscr;
         dscr = null;
       } else {
         options = arguments[2];
@@ -24809,7 +24886,7 @@ var require_d = __commonJS({
         c = w = true;
         e = false;
       }
-      desc = { value, configurable: c, enumerable: e, writable: w };
+      desc = { value: value2, configurable: c, enumerable: e, writable: w };
       return !options ? desc : assign(normalizeOpts(options), desc);
     };
     d.gs = function(dscr, get, set) {
@@ -24863,7 +24940,7 @@ var require_event_emitter = __commonJS({
     "use strict";
     var d = require_d();
     var callable = require_valid_callable();
-    var apply = Function.prototype.apply;
+    var apply2 = Function.prototype.apply;
     var call = Function.prototype.call;
     var create = Object.create;
     var defineProperty = Object.defineProperty;
@@ -24898,7 +24975,7 @@ var require_event_emitter = __commonJS({
       self2 = this;
       on.call(this, type, once2 = function() {
         off.call(self2, type, once2);
-        apply.call(listener, this, arguments);
+        apply2.call(listener, this, arguments);
       });
       once2.__eeOnceListener__ = listener;
       return this;
@@ -24935,7 +25012,7 @@ var require_event_emitter = __commonJS({
         for (i = 1; i < l; ++i) args[i - 1] = arguments[i];
         listeners = listeners.slice();
         for (i = 0; listener = listeners[i]; ++i) {
-          apply.call(listener, this, args);
+          apply2.call(listener, this, args);
         }
       } else {
         switch (arguments.length) {
@@ -24954,7 +25031,7 @@ var require_event_emitter = __commonJS({
             for (i = 1; i < l; ++i) {
               args[i - 1] = arguments[i];
             }
-            apply.call(listeners, this, args);
+            apply2.call(listeners, this, args);
         }
       }
     };
@@ -25036,8 +25113,8 @@ var require_conventions = __commonJS({
        * @see https://en.wikipedia.org/wiki/HTML Wikipedia
        * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString MDN
        * @see https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#dom-domparser-parsefromstring 	 */
-      isHTML: function(value) {
-        return value === MIME_TYPE.HTML;
+      isHTML: function(value2) {
+        return value2 === MIME_TYPE.HTML;
       },
       /**
        * `application/xml`, the standard mime type for XML documents.
@@ -26212,9 +26289,9 @@ var require_dom = __commonJS({
       getAttributeNode: function(name) {
         return this.attributes.getNamedItem(name);
       },
-      setAttribute: function(name, value) {
+      setAttribute: function(name, value2) {
         var attr = this.ownerDocument.createAttribute(name);
-        attr.value = attr.nodeValue = "" + value;
+        attr.value = attr.nodeValue = "" + value2;
         this.setAttributeNode(attr);
       },
       removeAttribute: function(name) {
@@ -26250,9 +26327,9 @@ var require_dom = __commonJS({
         var attr = this.getAttributeNodeNS(namespaceURI, localName);
         return attr && attr.value || "";
       },
-      setAttributeNS: function(namespaceURI, qualifiedName, value) {
+      setAttributeNS: function(namespaceURI, qualifiedName, value2) {
         var attr = this.ownerDocument.createAttributeNS(namespaceURI, qualifiedName);
-        attr.value = attr.nodeValue = "" + value;
+        attr.value = attr.nodeValue = "" + value2;
         this.setAttributeNode(attr);
       },
       getAttributeNodeNS: function(namespaceURI, localName) {
@@ -26418,11 +26495,11 @@ var require_dom = __commonJS({
       }
       return true;
     }
-    function addSerializedAttribute(buf, qualifiedName, value, requireWellFormed) {
+    function addSerializedAttribute(buf, qualifiedName, value2, requireWellFormed) {
       if (requireWellFormed && !tagNamePattern.test(qualifiedName)) {
         throw new DOMException(INVALID_STATE_ERR, 'The attribute name "' + qualifiedName + '" is not a valid XML QName');
       }
-      buf.push(" ", qualifiedName, '="', value.replace(/[<>&"\t\n\r]/g, _xmlEncoder), '"');
+      buf.push(" ", qualifiedName, '="', value2.replace(/[<>&"\t\n\r]/g, _xmlEncoder), '"');
     }
     function serializeToString(node, buf, isHTML, nodeFilter, visibleNamespaces, requireWellFormed) {
       if (!visibleNamespaces) {
@@ -26688,8 +26765,8 @@ var require_dom = __commonJS({
       });
       return destRoot;
     }
-    function __set__(object, key, value) {
-      object[key] = value;
+    function __set__(object, key, value2) {
+      object[key] = value2;
     }
     try {
       if (Object.defineProperty) {
@@ -26736,8 +26813,8 @@ var require_dom = __commonJS({
             }
           }
         });
-        __set__ = function(object, key, value) {
-          object["$$" + key] = value;
+        __set__ = function(object, key, value2) {
+          object["$$" + key] = value2;
         };
       }
     } catch (e) {
@@ -29092,7 +29169,7 @@ var require_sax = __commonJS({
       return t;
     }
     function parseElementStartPart(source, start, el, currentNSMap, entityReplacer, errorHandler) {
-      function addAttribute(qname, value2, startIndex) {
+      function addAttribute(qname, value3, startIndex) {
         if (el.attributeNames.hasOwnProperty(qname)) {
           errorHandler.fatalError("Attribute " + qname + " redefined");
         }
@@ -29102,12 +29179,12 @@ var require_sax = __commonJS({
           // since the xmldom sax parser does not "interpret" DTD the following is not implemented:
           // - recursive replacement of (DTD) entity references
           // - trimming and collapsing multiple spaces into a single one for attributes that are not of type CDATA
-          value2.replace(/[\t\n\r]/g, " ").replace(/&#?\w+;/g, entityReplacer),
+          value3.replace(/[\t\n\r]/g, " ").replace(/&#?\w+;/g, entityReplacer),
           startIndex
         );
       }
       var attrName;
-      var value;
+      var value2;
       var p = ++start;
       var s = S_TAG;
       while (true) {
@@ -29136,15 +29213,15 @@ var require_sax = __commonJS({
               start = p + 1;
               p = source.indexOf(c, start);
               if (p > 0) {
-                value = source.slice(start, p);
-                addAttribute(attrName, value, start - 1);
+                value2 = source.slice(start, p);
+                addAttribute(attrName, value2, start - 1);
                 s = S_ATTR_END;
               } else {
                 throw new Error("attribute value no end '" + c + "' match");
               }
             } else if (s == S_ATTR_NOQUOT_VALUE) {
-              value = source.slice(start, p);
-              addAttribute(attrName, value, start);
+              value2 = source.slice(start, p);
+              addAttribute(attrName, value2, start);
               errorHandler.warning('attribute "' + attrName + '" missed start quot(' + c + ")!!");
               start = p + 1;
               s = S_ATTR_END;
@@ -29190,23 +29267,23 @@ var require_sax = __commonJS({
               case S_ATTR_NOQUOT_VALUE:
               //Compatible state
               case S_ATTR:
-                value = source.slice(start, p);
-                if (value.slice(-1) === "/") {
+                value2 = source.slice(start, p);
+                if (value2.slice(-1) === "/") {
                   el.closed = true;
-                  value = value.slice(0, -1);
+                  value2 = value2.slice(0, -1);
                 }
               case S_ATTR_SPACE:
                 if (s === S_ATTR_SPACE) {
-                  value = attrName;
+                  value2 = attrName;
                 }
                 if (s == S_ATTR_NOQUOT_VALUE) {
-                  errorHandler.warning('attribute "' + value + '" missed quot(")!');
-                  addAttribute(attrName, value, start);
+                  errorHandler.warning('attribute "' + value2 + '" missed quot(")!');
+                  addAttribute(attrName, value2, start);
                 } else {
-                  if (!NAMESPACE.isHTML(currentNSMap[""]) || !value.match(/^(?:disabled|checked|selected)$/i)) {
-                    errorHandler.warning('attribute "' + value + '" missed value!! "' + value + '" instead!!');
+                  if (!NAMESPACE.isHTML(currentNSMap[""]) || !value2.match(/^(?:disabled|checked|selected)$/i)) {
+                    errorHandler.warning('attribute "' + value2 + '" missed value!! "' + value2 + '" instead!!');
                   }
-                  addAttribute(value, value, start);
+                  addAttribute(value2, value2, start);
                 }
                 break;
               case S_EQ:
@@ -29228,9 +29305,9 @@ var require_sax = __commonJS({
                   s = S_ATTR_SPACE;
                   break;
                 case S_ATTR_NOQUOT_VALUE:
-                  var value = source.slice(start, p);
-                  errorHandler.warning('attribute "' + value + '" missed quot(")!!');
-                  addAttribute(attrName, value, start);
+                  var value2 = source.slice(start, p);
+                  errorHandler.warning('attribute "' + value2 + '" missed quot(")!!');
+                  addAttribute(attrName, value2, start);
                 case S_ATTR_END:
                   s = S_TAG_SPACE;
                   break;
@@ -29274,7 +29351,7 @@ var require_sax = __commonJS({
       while (i--) {
         var a = el[i];
         var qName = a.qName;
-        var value = a.value;
+        var value2 = a.value;
         var nsp = qName.indexOf(":");
         if (nsp > 0) {
           var prefix = a.prefix = qName.slice(0, nsp);
@@ -29291,9 +29368,9 @@ var require_sax = __commonJS({
             localNSMap = {};
             currentNSMap = Object.create(currentNSMap);
           }
-          currentNSMap[nsPrefix] = localNSMap[nsPrefix] = value;
+          currentNSMap[nsPrefix] = localNSMap[nsPrefix] = value2;
           a.uri = NAMESPACE.XMLNS;
-          domBuilder.startPrefixMapping(nsPrefix, value);
+          domBuilder.startPrefixMapping(nsPrefix, value2);
         }
       }
       var i = el.length;
@@ -29438,12 +29515,12 @@ var require_sax = __commonJS({
         }
         this.tagName = tagName;
       },
-      addValue: function(qName, value, offset) {
+      addValue: function(qName, value2, offset) {
         if (!tagNamePattern.test(qName)) {
           throw new Error("invalid attribute:" + qName);
         }
         this.attributeNames[qName] = this.length;
-        this[this.length++] = { qName, value, offset };
+        this[this.length++] = { qName, value: value2, offset };
       },
       length: 0,
       getLocalName: function(i) {
@@ -29585,11 +29662,11 @@ var require_dom_parser = __commonJS({
         this.locator && position(this.locator, el);
         for (var i = 0; i < len; i++) {
           var namespaceURI = attrs.getURI(i);
-          var value = attrs.getValue(i);
+          var value2 = attrs.getValue(i);
           var qName = attrs.getQName(i);
           var attr = doc.createAttributeNS(namespaceURI, qName);
           this.locator && position(attrs.getLocator(i), attr);
-          attr.value = attr.nodeValue = value;
+          attr.value = attr.nodeValue = value2;
           el.setAttributeNode(attr);
         }
       },
@@ -32198,11 +32275,11 @@ var require_section = __commonJS({
         this.properties.forEach(function(prop) {
           var rendition = prop.replace("rendition:", "");
           var split = rendition.indexOf("-");
-          var property, value;
+          var property, value2;
           if (split != -1) {
             property = rendition.slice(0, split);
-            value = rendition.slice(split + 1);
-            settings[property] = value;
+            value2 = rendition.slice(split + 1);
+            settings[property] = value2;
           }
         });
         return settings;
@@ -32292,7 +32369,7 @@ var require_spine = __commonJS({
        * @param  {method} resolver URL resolver
        * @param  {method} canonical Resolve canonical url
        */
-      unpack(_package, resolver, canonical) {
+      unpack(_package, resolver, canonical2) {
         this.items = _package.spine;
         this.manifest = _package.manifest;
         this.spineNodeIndex = _package.spineNodeIndex;
@@ -32305,12 +32382,12 @@ var require_spine = __commonJS({
           item.cfiBase = this.epubcfi.generateChapterComponent(this.spineNodeIndex, item.index, item.id);
           if (item.href) {
             item.url = resolver(item.href, true);
-            item.canonical = canonical(item.href);
+            item.canonical = canonical2(item.href);
           }
           if (manifestItem) {
             item.href = manifestItem.href;
             item.url = resolver(item.href, true);
-            item.canonical = canonical(item.href);
+            item.canonical = canonical2(item.href);
             if (manifestItem.properties.length) {
               item.properties.push.apply(item.properties, manifestItem.properties);
             }
@@ -32643,11 +32720,11 @@ var require_queue = __commonJS({
         return function() {
           var toApply = arguments || [];
           return new Promise((resolve, reject) => {
-            var callback = function(value, err) {
-              if (!value && err) {
+            var callback = function(value2, err) {
+              if (!value2 && err) {
                 reject(err);
               } else {
-                resolve(value);
+                resolve(value2);
               }
             };
             toApply.push(callback);
@@ -34838,10 +34915,10 @@ var require_themes = __commonJS({
        * @param {string} value
        * @param {boolean} priority
        */
-      override(name, value, priority) {
+      override(name, value2, priority) {
         var contents = this.rendition.getContents();
         this._overrides[name] = {
-          value,
+          value: value2,
           priority: priority === true
         };
         contents.forEach((content) => {
@@ -35480,10 +35557,10 @@ var require_contents = __commonJS({
       	* @param {string} value
       	* @param {boolean} [priority] set as "important"
       	*/
-      css(property, value, priority) {
+      css(property, value2, priority) {
         var content = this.content || this.document.body;
-        if (value) {
-          content.style.setProperty(property, value, priority ? "important" : "");
+        if (value2) {
+          content.style.setProperty(property, value2, priority ? "important" : "");
         } else {
           content.style.removeProperty(property);
         }
@@ -37683,9 +37760,9 @@ var require_scrolltype = __commonJS({
 // node_modules/lodash/isObject.js
 var require_isObject = __commonJS({
   "node_modules/lodash/isObject.js"(exports, module2) {
-    function isObject(value) {
-      var type = typeof value;
-      return value != null && (type == "object" || type == "function");
+    function isObject(value2) {
+      var type = typeof value2;
+      return value2 != null && (type == "object" || type == "function");
     }
     module2.exports = isObject;
   }
@@ -37763,19 +37840,19 @@ var require_getRawTag = __commonJS({
     var hasOwnProperty2 = objectProto.hasOwnProperty;
     var nativeObjectToString = objectProto.toString;
     var symToStringTag = Symbol2 ? Symbol2.toStringTag : void 0;
-    function getRawTag(value) {
-      var isOwn = hasOwnProperty2.call(value, symToStringTag), tag = value[symToStringTag];
+    function getRawTag(value2) {
+      var isOwn = hasOwnProperty2.call(value2, symToStringTag), tag = value2[symToStringTag];
       try {
-        value[symToStringTag] = void 0;
+        value2[symToStringTag] = void 0;
         var unmasked = true;
       } catch (e) {
       }
-      var result = nativeObjectToString.call(value);
+      var result = nativeObjectToString.call(value2);
       if (unmasked) {
         if (isOwn) {
-          value[symToStringTag] = tag;
+          value2[symToStringTag] = tag;
         } else {
-          delete value[symToStringTag];
+          delete value2[symToStringTag];
         }
       }
       return result;
@@ -37789,8 +37866,8 @@ var require_objectToString = __commonJS({
   "node_modules/lodash/_objectToString.js"(exports, module2) {
     var objectProto = Object.prototype;
     var nativeObjectToString = objectProto.toString;
-    function objectToString(value) {
-      return nativeObjectToString.call(value);
+    function objectToString(value2) {
+      return nativeObjectToString.call(value2);
     }
     module2.exports = objectToString;
   }
@@ -37805,11 +37882,11 @@ var require_baseGetTag = __commonJS({
     var nullTag = "[object Null]";
     var undefinedTag = "[object Undefined]";
     var symToStringTag = Symbol2 ? Symbol2.toStringTag : void 0;
-    function baseGetTag(value) {
-      if (value == null) {
-        return value === void 0 ? undefinedTag : nullTag;
+    function baseGetTag(value2) {
+      if (value2 == null) {
+        return value2 === void 0 ? undefinedTag : nullTag;
       }
-      return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+      return symToStringTag && symToStringTag in Object(value2) ? getRawTag(value2) : objectToString(value2);
     }
     module2.exports = baseGetTag;
   }
@@ -37818,8 +37895,8 @@ var require_baseGetTag = __commonJS({
 // node_modules/lodash/isObjectLike.js
 var require_isObjectLike = __commonJS({
   "node_modules/lodash/isObjectLike.js"(exports, module2) {
-    function isObjectLike(value) {
-      return value != null && typeof value == "object";
+    function isObjectLike(value2) {
+      return value2 != null && typeof value2 == "object";
     }
     module2.exports = isObjectLike;
   }
@@ -37831,8 +37908,8 @@ var require_isSymbol = __commonJS({
     var baseGetTag = require_baseGetTag();
     var isObjectLike = require_isObjectLike();
     var symbolTag = "[object Symbol]";
-    function isSymbol(value) {
-      return typeof value == "symbol" || isObjectLike(value) && baseGetTag(value) == symbolTag;
+    function isSymbol(value2) {
+      return typeof value2 == "symbol" || isObjectLike(value2) && baseGetTag(value2) == symbolTag;
     }
     module2.exports = isSymbol;
   }
@@ -37849,23 +37926,23 @@ var require_toNumber = __commonJS({
     var reIsBinary = /^0b[01]+$/i;
     var reIsOctal = /^0o[0-7]+$/i;
     var freeParseInt = parseInt;
-    function toNumber(value) {
-      if (typeof value == "number") {
-        return value;
+    function toNumber(value2) {
+      if (typeof value2 == "number") {
+        return value2;
       }
-      if (isSymbol(value)) {
+      if (isSymbol(value2)) {
         return NAN;
       }
-      if (isObject(value)) {
-        var other = typeof value.valueOf == "function" ? value.valueOf() : value;
-        value = isObject(other) ? other + "" : other;
+      if (isObject(value2)) {
+        var other = typeof value2.valueOf == "function" ? value2.valueOf() : value2;
+        value2 = isObject(other) ? other + "" : other;
       }
-      if (typeof value != "string") {
-        return value === 0 ? value : +value;
+      if (typeof value2 != "string") {
+        return value2 === 0 ? value2 : +value2;
       }
-      value = baseTrim(value);
-      var isBinary = reIsBinary.test(value);
-      return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+      value2 = baseTrim(value2);
+      var isBinary = reIsBinary.test(value2);
+      return isBinary || reIsOctal.test(value2) ? freeParseInt(value2.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value2) ? NAN : +value2;
     }
     module2.exports = toNumber;
   }
@@ -41111,9 +41188,9 @@ var require_jszip = __commonJS({
           this.currentFile = streamInfo["file"].name;
           var streamedContent = this.streamFiles && !streamInfo["file"].dir;
           if (streamedContent) {
-            var record = generateZipParts(streamInfo, streamedContent, false, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
+            var record2 = generateZipParts(streamInfo, streamedContent, false, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
             this.push({
-              data: record.fileRecord,
+              data: record2.fileRecord,
               meta: { percent: 0 }
             });
           } else {
@@ -41123,8 +41200,8 @@ var require_jszip = __commonJS({
         ZipFileWorker.prototype.closedSource = function(streamInfo) {
           this.accumulate = false;
           var streamedContent = this.streamFiles && !streamInfo["file"].dir;
-          var record = generateZipParts(streamInfo, streamedContent, true, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
-          this.dirRecords.push(record.dirRecord);
+          var record2 = generateZipParts(streamInfo, streamedContent, true, this.currentSourceOffset, this.zipPlatform, this.encodeFileName);
+          this.dirRecords.push(record2.dirRecord);
           if (streamedContent) {
             this.push({
               data: generateDataDescriptors(streamInfo),
@@ -41132,7 +41209,7 @@ var require_jszip = __commonJS({
             });
           } else {
             this.push({
-              data: record.fileRecord,
+              data: record2.fileRecord,
               meta: { percent: 0 }
             });
             while (this.contentBuffer.length) {
@@ -42315,8 +42392,8 @@ var require_jszip = __commonJS({
            * @param {Object} value the associated value
            * @return {Worker} the current worker for chainability
            */
-          withStreamInfo: function(key, value) {
-            this.extraStreamInfo[key] = value;
+          withStreamInfo: function(key, value2) {
+            this.extraStreamInfo[key] = value2;
             this.mergeStreamInfo();
             return this;
           },
@@ -43656,9 +43733,9 @@ var require_jszip = __commonJS({
           }
           var p = this.constructor;
           return this.then(resolve2, reject2);
-          function resolve2(value) {
+          function resolve2(value2) {
             function yes() {
-              return value;
+              return value2;
             }
             return p.resolve(callback()).then(yes);
           }
@@ -43696,23 +43773,23 @@ var require_jszip = __commonJS({
             this.callRejected = this.otherCallRejected;
           }
         }
-        QueueItem.prototype.callFulfilled = function(value) {
-          handlers.resolve(this.promise, value);
+        QueueItem.prototype.callFulfilled = function(value2) {
+          handlers.resolve(this.promise, value2);
         };
-        QueueItem.prototype.otherCallFulfilled = function(value) {
-          unwrap(this.promise, this.onFulfilled, value);
+        QueueItem.prototype.otherCallFulfilled = function(value2) {
+          unwrap(this.promise, this.onFulfilled, value2);
         };
-        QueueItem.prototype.callRejected = function(value) {
-          handlers.reject(this.promise, value);
+        QueueItem.prototype.callRejected = function(value2) {
+          handlers.reject(this.promise, value2);
         };
-        QueueItem.prototype.otherCallRejected = function(value) {
-          unwrap(this.promise, this.onRejected, value);
+        QueueItem.prototype.otherCallRejected = function(value2) {
+          unwrap(this.promise, this.onRejected, value2);
         };
-        function unwrap(promise, func, value) {
+        function unwrap(promise, func, value2) {
           immediate(function() {
             var returnValue;
             try {
-              returnValue = func(value);
+              returnValue = func(value2);
             } catch (e) {
               return handlers.reject(promise, e);
             }
@@ -43723,8 +43800,8 @@ var require_jszip = __commonJS({
             }
           });
         }
-        handlers.resolve = function(self2, value) {
-          var result = tryCatch(getThen, value);
+        handlers.resolve = function(self2, value2) {
+          var result = tryCatch(getThen, value2);
           if (result.status === "error") {
             return handlers.reject(self2, result.value);
           }
@@ -43733,11 +43810,11 @@ var require_jszip = __commonJS({
             safelyResolveThenable(self2, thenable);
           } else {
             self2.state = FULFILLED;
-            self2.outcome = value;
+            self2.outcome = value2;
             var i = -1;
             var len = self2.queue.length;
             while (++i < len) {
-              self2.queue[i].callFulfilled(value);
+              self2.queue[i].callFulfilled(value2);
             }
           }
           return self2;
@@ -43762,19 +43839,19 @@ var require_jszip = __commonJS({
         }
         function safelyResolveThenable(self2, thenable) {
           var called = false;
-          function onError(value) {
+          function onError(value2) {
             if (called) {
               return;
             }
             called = true;
-            handlers.reject(self2, value);
+            handlers.reject(self2, value2);
           }
-          function onSuccess(value) {
+          function onSuccess(value2) {
             if (called) {
               return;
             }
             called = true;
-            handlers.resolve(self2, value);
+            handlers.resolve(self2, value2);
           }
           function tryToUnwrap() {
             thenable(onSuccess, onError);
@@ -43784,10 +43861,10 @@ var require_jszip = __commonJS({
             onError(result.value);
           }
         }
-        function tryCatch(func, value) {
+        function tryCatch(func, value2) {
           var out = {};
           try {
-            out.value = func(value);
+            out.value = func(value2);
             out.status = "success";
           } catch (e) {
             out.status = "error";
@@ -43796,11 +43873,11 @@ var require_jszip = __commonJS({
           return out;
         }
         Promise2.resolve = resolve;
-        function resolve(value) {
-          if (value instanceof this) {
-            return value;
+        function resolve(value2) {
+          if (value2 instanceof this) {
+            return value2;
           }
-          return handlers.resolve(new this(INTERNAL), value);
+          return handlers.resolve(new this(INTERNAL), value2);
         }
         Promise2.reject = reject;
         function reject(reason) {
@@ -43826,8 +43903,8 @@ var require_jszip = __commonJS({
             allResolver(iterable[i], i);
           }
           return promise;
-          function allResolver(value, i2) {
-            self2.resolve(value).then(resolveFromAll, function(error) {
+          function allResolver(value2, i2) {
+            self2.resolve(value2).then(resolveFromAll, function(error) {
               if (!called) {
                 called = true;
                 handlers.reject(promise, error);
@@ -43859,8 +43936,8 @@ var require_jszip = __commonJS({
             resolver(iterable[i]);
           }
           return promise;
-          function resolver(value) {
-            self2.resolve(value).then(function(response) {
+          function resolver(value2) {
+            self2.resolve(value2).then(function(response) {
               if (!called) {
                 called = true;
                 handlers.resolve(promise, response);
@@ -47432,14 +47509,14 @@ var require_jszip = __commonJS({
           s.pending_buf[s.pending++] = w & 255;
           s.pending_buf[s.pending++] = w >>> 8 & 255;
         }
-        function send_bits(s, value, length) {
+        function send_bits(s, value2, length) {
           if (s.bi_valid > Buf_size - length) {
-            s.bi_buf |= value << s.bi_valid & 65535;
+            s.bi_buf |= value2 << s.bi_valid & 65535;
             put_short(s, s.bi_buf);
-            s.bi_buf = value >> Buf_size - s.bi_valid;
+            s.bi_buf = value2 >> Buf_size - s.bi_valid;
             s.bi_valid += length - Buf_size;
           } else {
-            s.bi_buf |= value << s.bi_valid & 65535;
+            s.bi_buf |= value2 << s.bi_valid & 65535;
             s.bi_valid += length;
           }
         }
@@ -48536,23 +48613,23 @@ var require_localforage = __commonJS({
             this.callRejected = this.otherCallRejected;
           }
         }
-        QueueItem.prototype.callFulfilled = function(value) {
-          handlers.resolve(this.promise, value);
+        QueueItem.prototype.callFulfilled = function(value2) {
+          handlers.resolve(this.promise, value2);
         };
-        QueueItem.prototype.otherCallFulfilled = function(value) {
-          unwrap(this.promise, this.onFulfilled, value);
+        QueueItem.prototype.otherCallFulfilled = function(value2) {
+          unwrap(this.promise, this.onFulfilled, value2);
         };
-        QueueItem.prototype.callRejected = function(value) {
-          handlers.reject(this.promise, value);
+        QueueItem.prototype.callRejected = function(value2) {
+          handlers.reject(this.promise, value2);
         };
-        QueueItem.prototype.otherCallRejected = function(value) {
-          unwrap(this.promise, this.onRejected, value);
+        QueueItem.prototype.otherCallRejected = function(value2) {
+          unwrap(this.promise, this.onRejected, value2);
         };
-        function unwrap(promise, func, value) {
+        function unwrap(promise, func, value2) {
           immediate(function() {
             var returnValue;
             try {
-              returnValue = func(value);
+              returnValue = func(value2);
             } catch (e) {
               return handlers.reject(promise, e);
             }
@@ -48563,8 +48640,8 @@ var require_localforage = __commonJS({
             }
           });
         }
-        handlers.resolve = function(self2, value) {
-          var result = tryCatch(getThen, value);
+        handlers.resolve = function(self2, value2) {
+          var result = tryCatch(getThen, value2);
           if (result.status === "error") {
             return handlers.reject(self2, result.value);
           }
@@ -48573,11 +48650,11 @@ var require_localforage = __commonJS({
             safelyResolveThenable(self2, thenable);
           } else {
             self2.state = FULFILLED;
-            self2.outcome = value;
+            self2.outcome = value2;
             var i = -1;
             var len = self2.queue.length;
             while (++i < len) {
-              self2.queue[i].callFulfilled(value);
+              self2.queue[i].callFulfilled(value2);
             }
           }
           return self2;
@@ -48602,19 +48679,19 @@ var require_localforage = __commonJS({
         }
         function safelyResolveThenable(self2, thenable) {
           var called = false;
-          function onError(value) {
+          function onError(value2) {
             if (called) {
               return;
             }
             called = true;
-            handlers.reject(self2, value);
+            handlers.reject(self2, value2);
           }
-          function onSuccess(value) {
+          function onSuccess(value2) {
             if (called) {
               return;
             }
             called = true;
-            handlers.resolve(self2, value);
+            handlers.resolve(self2, value2);
           }
           function tryToUnwrap() {
             thenable(onSuccess, onError);
@@ -48624,10 +48701,10 @@ var require_localforage = __commonJS({
             onError(result.value);
           }
         }
-        function tryCatch(func, value) {
+        function tryCatch(func, value2) {
           var out = {};
           try {
-            out.value = func(value);
+            out.value = func(value2);
             out.status = "success";
           } catch (e) {
             out.status = "error";
@@ -48636,11 +48713,11 @@ var require_localforage = __commonJS({
           return out;
         }
         Promise2.resolve = resolve;
-        function resolve(value) {
-          if (value instanceof this) {
-            return value;
+        function resolve(value2) {
+          if (value2 instanceof this) {
+            return value2;
           }
-          return handlers.resolve(new this(INTERNAL), value);
+          return handlers.resolve(new this(INTERNAL), value2);
         }
         Promise2.reject = reject;
         function reject(reason) {
@@ -48666,8 +48743,8 @@ var require_localforage = __commonJS({
             allResolver(iterable[i], i);
           }
           return promise;
-          function allResolver(value, i2) {
-            self2.resolve(value).then(resolveFromAll, function(error) {
+          function allResolver(value2, i2) {
+            self2.resolve(value2).then(resolveFromAll, function(error) {
               if (!called) {
                 called = true;
                 handlers.reject(promise, error);
@@ -48699,8 +48776,8 @@ var require_localforage = __commonJS({
             resolver(iterable[i]);
           }
           return promise;
-          function resolver(value) {
-            self2.resolve(value).then(function(response) {
+          function resolver(value2) {
+            self2.resolve(value2).then(function(response) {
               if (!called) {
                 called = true;
                 handlers.resolve(promise, response);
@@ -48858,8 +48935,8 @@ var require_localforage = __commonJS({
           if (typeof supportsBlobs === "boolean") {
             return Promise$1.resolve(supportsBlobs);
           }
-          return _checkBlobSupportWithoutCaching(idb2).then(function(value) {
-            supportsBlobs = value;
+          return _checkBlobSupportWithoutCaching(idb2).then(function(value2) {
+            supportsBlobs = value2;
             return supportsBlobs;
           });
         }
@@ -48991,8 +49068,8 @@ var require_localforage = __commonJS({
           var arrayBuff = _binStringToArrayBuffer(atob(encodedBlob.data));
           return createBlob([arrayBuff], { type: encodedBlob.type });
         }
-        function _isEncodedBlob(value) {
-          return value && value.__local_forage_encoded_blob;
+        function _isEncodedBlob(value2) {
+          return value2 && value2.__local_forage_encoded_blob;
         }
         function _fullyReady(callback) {
           var self2 = this;
@@ -49135,14 +49212,14 @@ var require_localforage = __commonJS({
                   var store = transaction.objectStore(self2._dbInfo.storeName);
                   var req = store.get(key2);
                   req.onsuccess = function() {
-                    var value = req.result;
-                    if (value === void 0) {
-                      value = null;
+                    var value2 = req.result;
+                    if (value2 === void 0) {
+                      value2 = null;
                     }
-                    if (_isEncodedBlob(value)) {
-                      value = _decodeBlob(value);
+                    if (_isEncodedBlob(value2)) {
+                      value2 = _decodeBlob(value2);
                     }
-                    resolve(value);
+                    resolve(value2);
                   };
                   req.onerror = function() {
                     reject(req.error);
@@ -49171,11 +49248,11 @@ var require_localforage = __commonJS({
                   req.onsuccess = function() {
                     var cursor = req.result;
                     if (cursor) {
-                      var value = cursor.value;
-                      if (_isEncodedBlob(value)) {
-                        value = _decodeBlob(value);
+                      var value2 = cursor.value;
+                      if (_isEncodedBlob(value2)) {
+                        value2 = _decodeBlob(value2);
                       }
-                      var result = iterator(value, cursor.key, iterationNumber++);
+                      var result = iterator(value2, cursor.key, iterationNumber++);
                       if (result !== void 0) {
                         resolve(result);
                       } else {
@@ -49197,38 +49274,38 @@ var require_localforage = __commonJS({
           executeCallback(promise, callback);
           return promise;
         }
-        function setItem(key2, value, callback) {
+        function setItem(key2, value2, callback) {
           var self2 = this;
           key2 = normalizeKey(key2);
           var promise = new Promise$1(function(resolve, reject) {
             var dbInfo;
             self2.ready().then(function() {
               dbInfo = self2._dbInfo;
-              if (toString.call(value) === "[object Blob]") {
+              if (toString.call(value2) === "[object Blob]") {
                 return _checkBlobSupport(dbInfo.db).then(function(blobSupport) {
                   if (blobSupport) {
-                    return value;
+                    return value2;
                   }
-                  return _encodeBlob(value);
+                  return _encodeBlob(value2);
                 });
               }
-              return value;
-            }).then(function(value2) {
+              return value2;
+            }).then(function(value3) {
               createTransaction(self2._dbInfo, READ_WRITE, function(err, transaction) {
                 if (err) {
                   return reject(err);
                 }
                 try {
                   var store = transaction.objectStore(self2._dbInfo.storeName);
-                  if (value2 === null) {
-                    value2 = void 0;
+                  if (value3 === null) {
+                    value3 = void 0;
                   }
-                  var req = store.put(value2, key2);
+                  var req = store.put(value3, key2);
                   transaction.oncomplete = function() {
-                    if (value2 === void 0) {
-                      value2 = null;
+                    if (value3 === void 0) {
+                      value3 = null;
                     }
-                    resolve(value2);
+                    resolve(value3);
                   };
                   transaction.onabort = transaction.onerror = function() {
                     var err2 = req.error ? req.error : req.transaction.error;
@@ -49597,19 +49674,19 @@ var require_localforage = __commonJS({
           }
           return base64String;
         }
-        function serialize(value, callback) {
+        function serialize(value2, callback) {
           var valueType = "";
-          if (value) {
-            valueType = toString$1.call(value);
+          if (value2) {
+            valueType = toString$1.call(value2);
           }
-          if (value && (valueType === "[object ArrayBuffer]" || value.buffer && toString$1.call(value.buffer) === "[object ArrayBuffer]")) {
+          if (value2 && (valueType === "[object ArrayBuffer]" || value2.buffer && toString$1.call(value2.buffer) === "[object ArrayBuffer]")) {
             var buffer;
             var marker = SERIALIZED_MARKER;
-            if (value instanceof ArrayBuffer) {
-              buffer = value;
+            if (value2 instanceof ArrayBuffer) {
+              buffer = value2;
               marker += TYPE_ARRAYBUFFER;
             } else {
-              buffer = value.buffer;
+              buffer = value2.buffer;
               if (valueType === "[object Int8Array]") {
                 marker += TYPE_INT8ARRAY;
               } else if (valueType === "[object Uint8Array]") {
@@ -49636,25 +49713,25 @@ var require_localforage = __commonJS({
           } else if (valueType === "[object Blob]") {
             var fileReader = new FileReader();
             fileReader.onload = function() {
-              var str = BLOB_TYPE_PREFIX + value.type + "~" + bufferToString(this.result);
+              var str = BLOB_TYPE_PREFIX + value2.type + "~" + bufferToString(this.result);
               callback(SERIALIZED_MARKER + TYPE_BLOB + str);
             };
-            fileReader.readAsArrayBuffer(value);
+            fileReader.readAsArrayBuffer(value2);
           } else {
             try {
-              callback(JSON.stringify(value));
+              callback(JSON.stringify(value2));
             } catch (e) {
-              console.error("Couldn't convert value into a JSON string: ", value);
+              console.error("Couldn't convert value into a JSON string: ", value2);
               callback(null, e);
             }
           }
         }
-        function deserialize(value) {
-          if (value.substring(0, SERIALIZED_MARKER_LENGTH) !== SERIALIZED_MARKER) {
-            return JSON.parse(value);
+        function deserialize(value2) {
+          if (value2.substring(0, SERIALIZED_MARKER_LENGTH) !== SERIALIZED_MARKER) {
+            return JSON.parse(value2);
           }
-          var serializedString = value.substring(TYPE_SERIALIZED_MARKER_LENGTH);
-          var type = value.substring(SERIALIZED_MARKER_LENGTH, TYPE_SERIALIZED_MARKER_LENGTH);
+          var serializedString = value2.substring(TYPE_SERIALIZED_MARKER_LENGTH);
+          var type = value2.substring(SERIALIZED_MARKER_LENGTH, TYPE_SERIALIZED_MARKER_LENGTH);
           var blobType;
           if (type === TYPE_BLOB && BLOB_TYPE_PREFIX_REGEX.test(serializedString)) {
             var matcher = serializedString.match(BLOB_TYPE_PREFIX_REGEX);
@@ -49796,22 +49873,22 @@ var require_localforage = __commonJS({
           executeCallback(promise, callback);
           return promise;
         }
-        function _setItem(key2, value, callback, retriesLeft) {
+        function _setItem(key2, value2, callback, retriesLeft) {
           var self2 = this;
           key2 = normalizeKey(key2);
           var promise = new Promise$1(function(resolve, reject) {
             self2.ready().then(function() {
-              if (value === void 0) {
-                value = null;
+              if (value2 === void 0) {
+                value2 = null;
               }
-              var originalValue = value;
+              var originalValue = value2;
               var dbInfo = self2._dbInfo;
-              dbInfo.serializer.serialize(value, function(value2, error) {
+              dbInfo.serializer.serialize(value2, function(value3, error) {
                 if (error) {
                   reject(error);
                 } else {
                   dbInfo.db.transaction(function(t) {
-                    tryExecuteSql(t, dbInfo, "INSERT OR REPLACE INTO " + dbInfo.storeName + " (key, value) VALUES (?, ?)", [key2, value2], function() {
+                    tryExecuteSql(t, dbInfo, "INSERT OR REPLACE INTO " + dbInfo.storeName + " (key, value) VALUES (?, ?)", [key2, value3], function() {
                       resolve(originalValue);
                     }, function(t2, error2) {
                       reject(error2);
@@ -49832,8 +49909,8 @@ var require_localforage = __commonJS({
           executeCallback(promise, callback);
           return promise;
         }
-        function setItem$1(key2, value, callback) {
-          return _setItem.apply(this, [key2, value, callback, 1]);
+        function setItem$1(key2, value2, callback) {
+          return _setItem.apply(this, [key2, value2, callback, 1]);
         }
         function removeItem$1(key2, callback) {
           var self2 = this;
@@ -50104,13 +50181,13 @@ var require_localforage = __commonJS({
               if (key2.indexOf(keyPrefix) !== 0) {
                 continue;
               }
-              var value = localStorage.getItem(key2);
-              if (value) {
-                value = dbInfo.serializer.deserialize(value);
+              var value2 = localStorage.getItem(key2);
+              if (value2) {
+                value2 = dbInfo.serializer.deserialize(value2);
               }
-              value = iterator(value, key2.substring(keyPrefixLength), iterationNumber++);
-              if (value !== void 0) {
-                return value;
+              value2 = iterator(value2, key2.substring(keyPrefixLength), iterationNumber++);
+              if (value2 !== void 0) {
+                return value2;
               }
             }
           });
@@ -50170,22 +50247,22 @@ var require_localforage = __commonJS({
           executeCallback(promise, callback);
           return promise;
         }
-        function setItem$2(key2, value, callback) {
+        function setItem$2(key2, value2, callback) {
           var self2 = this;
           key2 = normalizeKey(key2);
           var promise = self2.ready().then(function() {
-            if (value === void 0) {
-              value = null;
+            if (value2 === void 0) {
+              value2 = null;
             }
-            var originalValue = value;
+            var originalValue = value2;
             return new Promise$1(function(resolve, reject) {
               var dbInfo = self2._dbInfo;
-              dbInfo.serializer.serialize(value, function(value2, error) {
+              dbInfo.serializer.serialize(value2, function(value3, error) {
                 if (error) {
                   reject(error);
                 } else {
                   try {
-                    localStorage.setItem(dbInfo.keyPrefix + key2, value2);
+                    localStorage.setItem(dbInfo.keyPrefix + key2, value3);
                     resolve(originalValue);
                   } catch (e) {
                     if (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED") {
@@ -50883,22 +50960,22 @@ var require_displayoptions = __commonJS({
         }
         const options = (0, _core.qsa)(displayOptionsNode, "option");
         options.forEach((el) => {
-          let value = "";
+          let value2 = "";
           if (el.childNodes.length) {
-            value = el.childNodes[0].nodeValue;
+            value2 = el.childNodes[0].nodeValue;
           }
           switch (el.attributes.name.value) {
             case "interactive":
-              this.interactive = value;
+              this.interactive = value2;
               break;
             case "fixed-layout":
-              this.fixedLayout = value;
+              this.fixedLayout = value2;
               break;
             case "open-to-spread":
-              this.openToSpread = value;
+              this.openToSpread = value2;
               break;
             case "orientation-lock":
-              this.orientationLock = value;
+              this.orientationLock = value2;
               break;
           }
         });
@@ -51776,11 +51853,11 @@ var require_EpubView = __commonJS({
       };
       return _getPrototypeOf(o);
     }
-    function _defineProperty(obj, key, value) {
+    function _defineProperty(obj, key, value2) {
       if (key in obj) {
-        Object.defineProperty(obj, key, { value, enumerable: true, configurable: true, writable: true });
+        Object.defineProperty(obj, key, { value: value2, enumerable: true, configurable: true, writable: true });
       } else {
-        obj[key] = value;
+        obj[key] = value2;
       }
       return obj;
     }
@@ -52512,11 +52589,11 @@ var require_ReactReader = __commonJS({
       };
       return _getPrototypeOf(o);
     }
-    function _defineProperty(obj, key, value) {
+    function _defineProperty(obj, key, value2) {
       if (key in obj) {
-        Object.defineProperty(obj, key, { value, enumerable: true, configurable: true, writable: true });
+        Object.defineProperty(obj, key, { value: value2, enumerable: true, configurable: true, writable: true });
       } else {
-        obj[key] = value;
+        obj[key] = value2;
       }
       return obj;
     }
@@ -53219,31 +53296,31 @@ var require_react_jsx_runtime_development = __commonJS({
         function isArray(a) {
           return isArrayImpl(a);
         }
-        function typeName(value) {
+        function typeName(value2) {
           {
             var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
-            var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+            var type = hasToStringTag && value2[Symbol.toStringTag] || value2.constructor.name || "Object";
             return type;
           }
         }
-        function willCoercionThrow(value) {
+        function willCoercionThrow(value2) {
           {
             try {
-              testStringCoercion(value);
+              testStringCoercion(value2);
               return false;
             } catch (e) {
               return true;
             }
           }
         }
-        function testStringCoercion(value) {
-          return "" + value;
+        function testStringCoercion(value2) {
+          return "" + value2;
         }
-        function checkKeyStringCoercion(value) {
+        function checkKeyStringCoercion(value2) {
           {
-            if (willCoercionThrow(value)) {
-              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
+            if (willCoercionThrow(value2)) {
+              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value2));
+              return testStringCoercion(value2);
             }
           }
         }
@@ -53691,23 +53768,23 @@ var READER_WORD_SPACING_LIMITS = Object.freeze({
   step: 1,
   defaultValue: 0
 });
-function clampReaderLetterSpacing(value) {
-  return clampReaderNumber(value, READER_LETTER_SPACING_LIMITS);
+function clampReaderLetterSpacing(value2) {
+  return clampReaderNumber(value2, READER_LETTER_SPACING_LIMITS);
 }
-function clampReaderWordSpacing(value) {
-  return clampReaderNumber(value, READER_WORD_SPACING_LIMITS);
+function clampReaderWordSpacing(value2) {
+  return clampReaderNumber(value2, READER_WORD_SPACING_LIMITS);
 }
-function clampReaderNumber(value, limits) {
-  const parsed = typeof value === "number" ? value : typeof value === "string" ? parseFloat(value) : NaN;
+function clampReaderNumber(value2, limits) {
+  const parsed = typeof value2 === "number" ? value2 : typeof value2 === "string" ? parseFloat(value2) : NaN;
   const number = Number.isFinite(parsed) ? parsed : limits.defaultValue;
   const scale = 1 / limits.step;
   return Math.min(limits.max, Math.max(limits.min, Math.round(number * scale) / scale));
 }
-function clampReaderZoom(value) {
-  return clampReaderNumber(value, READER_ZOOM_LIMITS);
+function clampReaderZoom(value2) {
+  return clampReaderNumber(value2, READER_ZOOM_LIMITS);
 }
-function clampReaderLineHeight(value) {
-  return clampReaderNumber(value, READER_LINE_HEIGHT_LIMITS);
+function clampReaderLineHeight(value2) {
+  return clampReaderNumber(value2, READER_LINE_HEIGHT_LIMITS);
 }
 var READER_WIDTH_LIMITS = Object.freeze({
   min: 480,
@@ -53715,11 +53792,11 @@ var READER_WIDTH_LIMITS = Object.freeze({
   step: 40,
   defaultValue: 760
 });
-function clampReaderWidth(value) {
-  return clampReaderNumber(value, READER_WIDTH_LIMITS);
+function clampReaderWidth(value2) {
+  return clampReaderNumber(value2, READER_WIDTH_LIMITS);
 }
-function normalizeReaderParagraphIndent(value) {
-  return value === "two-chars" || value === "none" ? value : "original";
+function normalizeReaderParagraphIndent(value2) {
+  return value2 === "two-chars" || value2 === "none" ? value2 : "original";
 }
 var DEFAULT_READER_PREFERENCES = Object.freeze({
   readerLetterSpacing: 0,
@@ -53778,7 +53855,7 @@ function parseReadingSourceTarget(parameters) {
   const highlightId = String(parameters.highlight || "").trim();
   const cfiRange = String(parameters.cfi || "").trim();
   if (!bookPath || !highlightId || !cfiRange) return null;
-  if ([bookPath, highlightId, cfiRange].some((value) => value.length > MAX_PARAMETER_LENGTH)) return null;
+  if ([bookPath, highlightId, cfiRange].some((value2) => value2.length > MAX_PARAMETER_LENGTH)) return null;
   if (bookPath.startsWith("/") || bookPath.split("/").some((part) => part === "..") || !bookPath.toLowerCase().endsWith(".epub")) return null;
   return { bookPath, highlightId, cfiRange };
 }
@@ -54188,12 +54265,12 @@ JSON \u7ED3\u6784\u8981\u6C42\uFF1A
 var TRANSLATION_PROMPT_HELP_TEXT = "\u5FC5\u9700\u5B57\u6BB5\uFF1Alemma\u3001translation\u3001display\u3001isWord\u3002word/phrase \u8F93\u51FA\u8BCD\u5361\uFF1Bsentence \u53EA\u8F93\u51FA\u8BD1\u6587\u4E14 isWord=false\u3002display \u6362\u884C\u8BF7\u5199\u6210 \\n\u3002\u6D4B\u8BD5\u4F1A\u5148\u6821\u9A8C JSON \u793A\u4F8B\u3002";
 var DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?audio={{word}}&type={{type}}";
 var LOCAL_DICTIONARY_CACHE = /* @__PURE__ */ new Map();
-function normalizeWordSelection(value) {
-  if (!value)
+function normalizeWordSelection(value2) {
+  if (!value2)
     return null;
-  if (/[\u4e00-\u9fa5]/.test(value))
+  if (/[\u4e00-\u9fa5]/.test(value2))
     return null;
-  const cleaned = value.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
+  const cleaned = value2.replace(/[\u201c\u201d]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
   if (!cleaned)
     return null;
   const stripped = cleaned.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, "").replace(/\s+/g, " ").trim();
@@ -54224,8 +54301,8 @@ function buildWordAudioUrl(template, word, accent) {
   const type = getWordAudioType(accent);
   return cleanTemplate.replace(/\{\{\s*word\s*\}\}/g, encodeURIComponent(cleanWord)).replace(/\{\{\s*type\s*\}\}/g, type).replace(/\{\{\s*accent\s*\}\}/g, accent || "us");
 }
-function getTranslationSelectionType(value) {
-  const text = normalizeHighlightQuote(value || "");
+function getTranslationSelectionType(value2) {
+  const text = normalizeHighlightQuote(value2 || "");
   if (/[.!?。！？]\s*$/.test(text) || /[.!?。！？]\s+/.test(text))
     return "sentence";
   const normalized = normalizeWordSelection(text);
@@ -54424,8 +54501,8 @@ function isWordInflectionOf(surface, lemma) {
   }
   return variants.has(word);
 }
-function findWordAssetBySurface(assetsMap, value) {
-  const normalized = normalizeWordSelection(value || "");
+function findWordAssetBySurface(assetsMap, value2) {
+  const normalized = normalizeWordSelection(value2 || "");
   if (!normalized || !assetsMap)
     return null;
   const direct = assetsMap[normalized.lemma];
@@ -54490,16 +54567,16 @@ function buildWordAssetMetadata(asset) {
     updated: asset.updated || ""
   };
 }
-function isRecord(value) {
-  return !!value && typeof value === "object" && !Array.isArray(value);
+function isRecord(value2) {
+  return !!value2 && typeof value2 === "object" && !Array.isArray(value2);
 }
-function isWordAssetSource(value) {
-  return isRecord(value) && typeof value.bookPath === "string" && typeof value.bookTitle === "string" && typeof value.chapterTitle === "string" && typeof value.cfiRange === "string" && typeof value.quote === "string" && typeof value.created === "string";
+function isWordAssetSource(value2) {
+  return isRecord(value2) && typeof value2.bookPath === "string" && typeof value2.bookTitle === "string" && typeof value2.chapterTitle === "string" && typeof value2.cfiRange === "string" && typeof value2.quote === "string" && typeof value2.created === "string";
 }
-function isWordAssetRecord(value) {
-  if (!isRecord(value))
+function isWordAssetRecord(value2) {
+  if (!isRecord(value2))
     return false;
-  return typeof value.lemma === "string" && typeof value.title === "string" && ["word", "phrase", "sentence"].includes(String(value.kind || "")) && (typeof value.isWord === "boolean" || value.isWord === void 0) && Array.isArray(value.surfaceForms) && value.surfaceForms.every((form) => typeof form === "string") && typeof value.translation === "string" && typeof value.display === "string" && typeof value.phonetic === "string" && typeof value.partOfSpeech === "string" && typeof value.example === "string" && Array.isArray(value.sources) && value.sources.every(isWordAssetSource) && typeof value.created === "string" && typeof value.updated === "string";
+  return typeof value2.lemma === "string" && typeof value2.title === "string" && ["word", "phrase", "sentence"].includes(String(value2.kind || "")) && (typeof value2.isWord === "boolean" || value2.isWord === void 0) && Array.isArray(value2.surfaceForms) && value2.surfaceForms.every((form) => typeof form === "string") && typeof value2.translation === "string" && typeof value2.display === "string" && typeof value2.phonetic === "string" && typeof value2.partOfSpeech === "string" && typeof value2.example === "string" && Array.isArray(value2.sources) && value2.sources.every(isWordAssetSource) && typeof value2.created === "string" && typeof value2.updated === "string";
 }
 function parseWordAssetSidecar(payload) {
   if (!isRecord(payload) || payload.version !== 2 || !isRecord(payload.wordAssets))
@@ -54669,28 +54746,28 @@ function parsePlainTranslationResponse(selectedText, text, selectionType = "") {
     isWord: !!normalized
   };
 }
-function normalizeJsonString(value) {
-  return typeof value === "string" ? value.trim() : "";
+function normalizeJsonString(value2) {
+  return typeof value2 === "string" ? value2.trim() : "";
 }
-function normalizeJsonArray(value) {
-  return Array.isArray(value) ? value : [];
+function normalizeJsonArray(value2) {
+  return Array.isArray(value2) ? value2 : [];
 }
 function getPrimaryPosMeaning(payload) {
   const meanings = normalizeJsonArray(payload == null ? void 0 : payload.pos_meanings);
   const first = meanings.find((item) => item && (normalizeJsonString(item.pos) || normalizeJsonString(item.meaning)));
   return first || null;
 }
-function normalizeJsonExample(value) {
-  if (typeof value === "string") {
+function normalizeJsonExample(value2) {
+  if (typeof value2 === "string") {
     return {
-      en: value.trim(),
+      en: value2.trim(),
       zh: ""
     };
   }
-  if (value && typeof value === "object") {
+  if (value2 && typeof value2 === "object") {
     return {
-      en: normalizeJsonString(value.en),
-      zh: normalizeJsonString(value.zh)
+      en: normalizeJsonString(value2.en),
+      zh: normalizeJsonString(value2.zh)
     };
   }
   return {
@@ -54795,7 +54872,7 @@ function normalizeTranslationResult(selectedText, payload, selectionType = "") {
     isWord: payload && typeof payload.isWord === "boolean" ? payload.isWord : !!normalized
   };
 }
-function normalizeTranslationProvider(value, baseUrl = "") {
+function normalizeTranslationProvider(value2, baseUrl = "") {
   const lowered = String(baseUrl || "").toLowerCase();
   if (lowered.includes("anthropic"))
     return "anthropic";
@@ -54806,7 +54883,7 @@ function normalizeTranslationProvider(value, baseUrl = "") {
   if (lowered.includes("dashscope") || lowered.includes("qwen")) return "qwen";
   if (lowered.includes("moonshot") || lowered.includes("kimi")) return "moonshot";
   if (lowered.includes("minimax")) return "minimax";
-  const provider = String(value || "").trim().toLowerCase();
+  const provider = String(value2 || "").trim().toLowerCase();
   if (TRANSLATION_PROVIDER_OPTIONS.includes(provider)) {
     return provider;
   }
@@ -55085,8 +55162,8 @@ var preferences = /* @__PURE__ */ new WeakMap();
 function syncReaderTextSpacing(rendition, letter, word) {
   if (!preferences.has(rendition)) {
     rendition.hooks.content.register((contents) => {
-      const value = preferences.get(rendition);
-      if (value) applyReaderTextSpacing(contents.document, value.letter, value.word);
+      const value2 = preferences.get(rendition);
+      if (value2) applyReaderTextSpacing(contents.document, value2.letter, value2.word);
     });
   }
   preferences.set(rendition, { letter: clampReaderLetterSpacing(letter), word: clampReaderWordSpacing(word) });
@@ -55131,8 +55208,8 @@ function applyReaderParagraphIndent(doc, mode) {
   });
 }
 var indentModes = /* @__PURE__ */ new WeakMap();
-function syncReaderParagraphIndent(rendition, value) {
-  const mode = normalizeReaderParagraphIndent(value);
+function syncReaderParagraphIndent(rendition, value2) {
+  const mode = normalizeReaderParagraphIndent(value2);
   if (!indentModes.has(rendition)) {
     rendition.hooks.content.register((contents) => applyReaderParagraphIndent(contents.document, indentModes.get(rendition) || "original"));
   }
@@ -55143,16 +55220,16 @@ function syncReaderParagraphIndent(rendition, value) {
 // src/theme.ts
 function getObsidianCssVar(name, fallback = "") {
   const el = document.querySelector(".app-container") || document.body;
-  const value = getComputedStyle(el).getPropertyValue(name).trim();
-  return value || fallback;
+  const value2 = getComputedStyle(el).getPropertyValue(name).trim();
+  return value2 || fallback;
 }
-function getCssPixelValue(value) {
-  const parsed = parseFloat(value || "");
+function getCssPixelValue(value2) {
+  const parsed = parseFloat(value2 || "");
   return Number.isFinite(parsed) && parsed > 0 ? `${parsed}px` : "";
 }
-function scaleCssPixelValue(value, scale) {
-  const parsed = parseFloat(value || "");
-  return Number.isFinite(parsed) && parsed > 0 ? `${parsed * clampReaderZoom(scale)}px` : value || "";
+function scaleCssPixelValue(value2, scale) {
+  const parsed = parseFloat(value2 || "");
+  return Number.isFinite(parsed) && parsed > 0 ? `${parsed * clampReaderZoom(scale)}px` : value2 || "";
 }
 function getObsidianTextFontSize() {
   const cssVarSize = getCssPixelValue(getObsidianCssVar("--font-text-size", "")) || getCssPixelValue(getObsidianCssVar("--editor-font-size", ""));
@@ -55257,11 +55334,11 @@ function findChapterTitle(toc, href) {
   visit(toc);
   return best;
 }
-function clampProgressValue(value) {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
+function clampProgressValue(value2) {
+  if (typeof value2 !== "number" || !Number.isFinite(value2)) {
     return null;
   }
-  return Math.min(1, Math.max(0, value));
+  return Math.min(1, Math.max(0, value2));
 }
 function getReaderDisplayedPage(relocated) {
   if (!relocated || !relocated.start) {
@@ -55515,10 +55592,10 @@ function getJarvisReaderCodeMirrorModules() {
   }
   return jarvisReaderCodeMirrorModules;
 }
-function getWikiLinkRangeInText(value, cursor) {
+function getWikiLinkRangeInText(value2, cursor) {
   const pattern = /\[\[([^\]]+)\]\]/g;
   let match;
-  while ((match = pattern.exec(value || "")) !== null) {
+  while ((match = pattern.exec(value2 || "")) !== null) {
     const start = match.index;
     const end = start + match[0].length;
     if (cursor >= start && cursor <= end) {
@@ -55605,10 +55682,10 @@ function createWikiLinkDecorationsExtension(cm) {
     }
   });
 }
-var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, placeholder }) => {
+var WikiLinkCodeMirrorEditor = ({ value: value2, onChange, candidates, onOpenLink, placeholder }) => {
   const hostRef = (0, import_react.useRef)(null);
   const viewRef = (0, import_react.useRef)(null);
-  const valueRef = (0, import_react.useRef)(value || "");
+  const valueRef = (0, import_react.useRef)(value2 || "");
   const candidatesRef = (0, import_react.useRef)(candidates || []);
   const openRef = (0, import_react.useRef)(onOpenLink);
   candidatesRef.current = candidates || [];
@@ -55769,18 +55846,18 @@ var WikiLinkCodeMirrorEditor = ({ value, onChange, candidates, onOpenLink, place
   }, []);
   (0, import_react.useEffect)(() => {
     const view = viewRef.current;
-    const next = value || "";
+    const next = value2 || "";
     if (!view || next === valueRef.current)
       return;
     valueRef.current = next;
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: next }
     });
-  }, [value]);
+  }, [value2]);
   if (!getJarvisReaderCodeMirrorModules()) {
     return import_react.default.createElement("textarea", {
       className: "jarvis-reader-highlight-input",
-      value: value || "",
+      value: value2 || "",
       placeholder,
       onChange: (event) => onChange(event.currentTarget.value),
       onKeyDown: (event) => {
@@ -55874,9 +55951,9 @@ var import_react3 = __toESM(require_react(), 1);
 var import_obsidian5 = require("obsidian");
 var import_react2 = __toESM(require_react(), 1);
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-function RangeSetting({ label, value, limits, busy, change, format, icon }) {
-  const [draft, setDraft] = (0, import_react2.useState)(value);
-  (0, import_react2.useEffect)(() => setDraft(value), [value]);
+function RangeSetting({ label, value: value2, limits, busy, change, format, icon }) {
+  const [draft, setDraft] = (0, import_react2.useState)(value2);
+  (0, import_react2.useEffect)(() => setDraft(value2), [value2]);
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { className: "jarvis-reader-settings-range", children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "jarvis-reader-settings-range-label", children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "jarvis-reader-settings-range-control", children: [
@@ -55902,7 +55979,7 @@ function RangeSetting({ label, value, limits, busy, change, format, icon }) {
     ] })
   ] });
 }
-function IconChoice({ label, value, options, disabled, change }) {
+function IconChoice({ label, value: value2, options, disabled, change }) {
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-choice", role: "group", "aria-label": label, children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "jarvis-reader-settings-icon-options", children: options.map((option) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
@@ -55911,7 +55988,7 @@ function IconChoice({ label, value, options, disabled, change }) {
         type: "button",
         "aria-label": option.label,
         title: option.label,
-        "aria-pressed": value === option.value,
+        "aria-pressed": value2 === option.value,
         disabled,
         onClick: () => change(option.value),
         dangerouslySetInnerHTML: { __html: (0, import_obsidian5.getIcon)(option.icon)?.outerHTML || "" }
@@ -56009,29 +56086,29 @@ function ReaderSettingsPanel({ getPreferences, onPreferencesChange, onClose, id 
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { className: "jarvis-reader-settings-group", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("legend", { children: "\u6587\u5B57\u6392\u7248" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-group-body", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "type", label: "\u5B57\u53F7", value: values.readerZoom, limits: READER_ZOOM_LIMITS, busy, format: (value) => `${Math.round(value * 100)}%`, change: (value) => void change({ readerZoom: value }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "list", label: "\u884C\u8DDD", value: values.readerLineHeight, limits: READER_LINE_HEIGHT_LIMITS, busy, format: (value) => value.toFixed(2), change: (value) => void change({ readerLineHeight: value }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "move-horizontal", label: "\u5B57\u7B26\u95F4\u8DDD", value: values.readerLetterSpacing, limits: READER_LETTER_SPACING_LIMITS, busy, format: (value) => `${value > 0 ? "+" : ""}${value}%`, change: (value) => void change({ readerLetterSpacing: value }) }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "space", label: "\u8BCD\u95F4\u8DDD", value: values.readerWordSpacing, limits: READER_WORD_SPACING_LIMITS, busy, format: (value) => `${value > 0 ? "+" : ""}${value}%`, change: (value) => void change({ readerWordSpacing: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "type", label: "\u5B57\u53F7", value: values.readerZoom, limits: READER_ZOOM_LIMITS, busy, format: (value2) => `${Math.round(value2 * 100)}%`, change: (value2) => void change({ readerZoom: value2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "list", label: "\u884C\u8DDD", value: values.readerLineHeight, limits: READER_LINE_HEIGHT_LIMITS, busy, format: (value2) => value2.toFixed(2), change: (value2) => void change({ readerLineHeight: value2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "move-horizontal", label: "\u5B57\u7B26\u95F4\u8DDD", value: values.readerLetterSpacing, limits: READER_LETTER_SPACING_LIMITS, busy, format: (value2) => `${value2 > 0 ? "+" : ""}${value2}%`, change: (value2) => void change({ readerLetterSpacing: value2 }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "space", label: "\u8BCD\u95F4\u8DDD", value: values.readerWordSpacing, limits: READER_WORD_SPACING_LIMITS, busy, format: (value2) => `${value2 > 0 ? "+" : ""}${value2}%`, change: (value2) => void change({ readerWordSpacing: value2 }) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u9996\u884C\u7F29\u8FDB", value: values.readerParagraphIndent, disabled: busy, options: [
               { value: "original", label: "\u9075\u5FAA\u539F\u4E66\u7F29\u8FDB", icon: "book-open" },
               { value: "two-chars", label: "\u9996\u884C\u7F29\u8FDB\u4E24\u5B57", icon: "indent-increase" },
               { value: "none", label: "\u4E0D\u7F29\u8FDB", icon: "align-left" }
-            ], change: (value) => void change({ readerParagraphIndent: value }) })
+            ], change: (value2) => void change({ readerParagraphIndent: value2 }) })
           ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("fieldset", { className: "jarvis-reader-settings-group", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("legend", { children: "\u9605\u8BFB\u5E03\u5C40" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "jarvis-reader-settings-group-body", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "panel-top", label: "\u6B63\u6587\u5BBD\u5EA6", value: values.readerWidth, limits: READER_WIDTH_LIMITS, busy, format: (value) => `${value}px`, change: (value) => void change({ readerWidth: value }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RangeSetting, { icon: "panel-top", label: "\u6B63\u6587\u5BBD\u5EA6", value: values.readerWidth, limits: READER_WIDTH_LIMITS, busy, format: (value2) => `${value2}px`, change: (value2) => void change({ readerWidth: value2 }) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u680F\u6570", value: values.singlePageView ? "single" : "dual", disabled: busy, options: [
               { value: "single", label: "1 \u680F", icon: "square" },
               { value: "dual", label: "2 \u680F", icon: "columns-2" }
-            ], change: (value) => void change({ singlePageView: value === "single" }) }),
+            ], change: (value2) => void change({ singlePageView: value2 === "single" }) }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChoice, { label: "\u9605\u8BFB\u65B9\u5F0F", value: values.scrolledView ? "scroll" : "paged", disabled: busy || !values.singlePageView, options: [
               { value: "paged", label: "\u5206\u9875\u9605\u8BFB", icon: "book-open" },
               { value: "scroll", label: "\u6EDA\u52A8\u9605\u8BFB", icon: "scroll-text" }
-            ], change: (value) => void change({ scrolledView: value === "scroll" }) })
+            ], change: (value2) => void change({ scrolledView: value2 === "scroll" }) })
           ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "jarvis-reader-settings-reset", disabled: busy, title: "\u53EA\u6062\u590D\u9605\u8BFB\u6392\u7248\u4E0E\u6A21\u5F0F\uFF0C\u4FDD\u7559\u9605\u8BFB\u8FDB\u5EA6\u3001\u4E66\u7B7E\u548C\u7B14\u8BB0\u3002", onClick: () => void change({ ...DEFAULT_READER_PREFERENCES }), children: "\u6062\u590D\u9605\u8BFB\u9ED8\u8BA4\u503C" }),
@@ -56130,8 +56207,8 @@ function getLightWordAsset(asset) {
 }
 var WORD_DISPLAY_MAX_CHARS = 8e3;
 var WORD_DISPLAY_CACHE_LIMIT = 50;
-function truncateWordDisplay(value) {
-  const text = normalizeWordDisplayText(value);
+function truncateWordDisplay(value2) {
+  const text = normalizeWordDisplayText(value2);
   if (text.length <= WORD_DISPLAY_MAX_CHARS)
     return text;
   return `${text.slice(0, WORD_DISPLAY_MAX_CHARS).trimEnd()}
@@ -56139,22 +56216,22 @@ function truncateWordDisplay(value) {
 ...`;
 }
 function renderWordCardDisplayText(text) {
-  const value = String(text || "");
+  const value2 = String(text || "");
   const parts = [];
   const pattern = /(\*\*|__)([\s\S]+?)\1/g;
   let lastIndex = 0;
   let match = null;
-  while (match = pattern.exec(value)) {
+  while (match = pattern.exec(value2)) {
     if (match.index > lastIndex) {
-      parts.push(value.slice(lastIndex, match.index));
+      parts.push(value2.slice(lastIndex, match.index));
     }
     parts.push(import_react4.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
     lastIndex = pattern.lastIndex;
   }
-  if (lastIndex < value.length) {
-    parts.push(value.slice(lastIndex));
+  if (lastIndex < value2.length) {
+    parts.push(value2.slice(lastIndex));
   }
-  return parts.length ? parts : value;
+  return parts.length ? parts : value2;
 }
 function getWordCardDisplayLineMeta(line) {
   const raw = String(line || "");
@@ -57525,7 +57602,7 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
           const left = text.slice(0, index);
           const right = text.slice(index + selectedText.length);
           const leftBoundary = Math.max(left.lastIndexOf("."), left.lastIndexOf("?"), left.lastIndexOf("!"), left.lastIndexOf(";"), left.lastIndexOf("\n"), left.lastIndexOf("\u3002"), left.lastIndexOf("\uFF1F"), left.lastIndexOf("\uFF01"));
-          const rightMatches = [right.indexOf("."), right.indexOf("?"), right.indexOf("!"), right.indexOf(";"), right.indexOf("\n"), right.indexOf("\u3002"), right.indexOf("\uFF1F"), right.indexOf("\uFF01")].filter((value) => value >= 0);
+          const rightMatches = [right.indexOf("."), right.indexOf("?"), right.indexOf("!"), right.indexOf(";"), right.indexOf("\n"), right.indexOf("\u3002"), right.indexOf("\uFF1F"), right.indexOf("\uFF01")].filter((value2) => value2 >= 0);
           const rightBoundary = rightMatches.length ? Math.min(...rightMatches) : -1;
           const start = leftBoundary >= 0 ? leftBoundary + 1 : 0;
           const end = rightBoundary >= 0 ? index + selectedText.length + rightBoundary + 1 : text.length;
@@ -57565,8 +57642,8 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     setWikiSuggest(null);
     setWikiEditRange(null);
   };
-  const getWikiTrigger = (value, cursor) => {
-    const before = value.slice(0, cursor);
+  const getWikiTrigger = (value2, cursor) => {
+    const before = value2.slice(0, cursor);
     const start = before.lastIndexOf("[[");
     if (start < 0)
       return null;
@@ -57575,10 +57652,10 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       return null;
     return { start, end: cursor, query };
   };
-  const getWikiLinkAtCursor = (value, cursor) => {
+  const getWikiLinkAtCursor = (value2, cursor) => {
     const pattern = /\[\[([^\]]+)\]\]/g;
     let match;
-    while ((match = pattern.exec(value || "")) !== null) {
+    while ((match = pattern.exec(value2 || "")) !== null) {
       const start = match.index;
       const end = start + match[0].length;
       if (cursor >= start && cursor <= end) {
@@ -57588,10 +57665,10 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     }
     return null;
   };
-  const getWikiLinkRangeAtCursor = (value, cursor) => {
+  const getWikiLinkRangeAtCursor = (value2, cursor) => {
     const pattern = /\[\[([^\]]+)\]\]/g;
     let match;
-    while ((match = pattern.exec(value || "")) !== null) {
+    while ((match = pattern.exec(value2 || "")) !== null) {
       const start = match.index;
       const end = start + match[0].length;
       if (cursor >= start && cursor <= end) {
@@ -57636,8 +57713,8 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       return (a.title || "").localeCompare(b.title || "", "zh-Hans-CN");
     }).slice(0, 12);
   };
-  const updateWikiSuggest = (value, cursor) => {
-    const trigger = getWikiTrigger(value, cursor);
+  const updateWikiSuggest = (value2, cursor) => {
+    const trigger = getWikiTrigger(value2, cursor);
     if (!trigger) {
       setWikiSuggest(null);
       return;
@@ -57647,8 +57724,8 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     const items = getWikiSuggestItems(trigger.query, nextCandidates);
     setWikiSuggest(items.length ? { ...trigger, items, activeIndex: 0 } : null);
   };
-  const updateWikiEditRange = (value, cursor) => {
-    setWikiEditRange(getWikiLinkRangeAtCursor(value, cursor));
+  const updateWikiEditRange = (value2, cursor) => {
+    setWikiEditRange(getWikiLinkRangeAtCursor(value2, cursor));
   };
   const setHighlightCommentWithSelection = (nextValue, start, end = start) => {
     setHighlightComment(nextValue);
@@ -57695,8 +57772,8 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     setWikiSuggest(null);
     openWikiLink(target);
   };
-  const renderWikiInputPreview = (value) => {
-    const text = value || "";
+  const renderWikiInputPreview = (value2) => {
+    const text = value2 || "";
     const nodes = [];
     const pattern = /\[\[([^\]]+)\]\]/g;
     let lastIndex = 0;
@@ -57904,8 +57981,8 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
   const isReadingHighlightComment = !!(isExistingHighlightComment && highlightCommentMode !== "append" && editingNoteIndex === null);
   const isAppendingHighlightComment = !isExistingHighlightComment || highlightCommentMode === "append" || editingNoteIndex !== null;
   const highlightCommentPlaceholder = isExistingHighlightComment ? "\u5199\u4E0B\u65B0\u7684\u7B14\u8BB0\uFF0C\u4FDD\u5B58\u540E\u4F1A\u8FFD\u52A0\u5230\u539F\u5757" : "\u5199\u4E0B\u4F60\u7684\u7B14\u8BB0";
-  const formatHighlightNoteTime = (value) => {
-    const raw = String(value || "").trim();
+  const formatHighlightNoteTime = (value2) => {
+    const raw = String(value2 || "").trim();
     if (!raw)
       return "\u672A\u8BB0\u5F55\u65F6\u95F4";
     const normalized = raw.includes("T") ? raw : raw.replace(" ", "T");
@@ -57958,32 +58035,35 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       key: `${entry.label || "note"}-${index}`,
       style: { display: "flex", flexDirection: "column", gap: "4px" }
     },
+    import_react4.default.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "\u7B14\u8BB0"),
+    import_react4.default.createElement("div", {
+      className: "jarvis-reader-highlight-note-card-text",
+      style: { marginTop: "2px" }
+    }, import_react4.default.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
     import_react4.default.createElement(
       "div",
       {
-        style: { display: "flex", alignItems: "center", justifyContent: "space-between" }
+        className: "jarvis-reader-highlight-note-footer"
       },
-      import_react4.default.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "\u7B14\u8BB0"),
-      import_react4.default.createElement(
-        "div",
-        {
-          style: { display: "flex", gap: "6px" }
-        },
-        import_react4.default.createElement("button", {
-          className: "jarvis-reader-highlight-icon-button",
-          type: "button",
-          title: "\u7F16\u8F91\u7B14\u8BB0",
-          onClick: () => {
+      import_react4.default.createElement("span", {
+        className: "jarvis-reader-highlight-note-card-time"
+      }, formatHighlightNoteTime(entry.created)),
+      import_react4.default.createElement("button", {
+        className: "jarvis-reader-highlight-icon-button jarvis-reader-highlight-note-more",
+        type: "button",
+        title: "\u7B14\u8BB0\u64CD\u4F5C",
+        "aria-label": `${entry.label || "\u7B14\u8BB0"}\u64CD\u4F5C`,
+        "aria-haspopup": "menu",
+        onClick: (event) => {
+          event.stopPropagation();
+          const rect = event.currentTarget.getBoundingClientRect();
+          const menu = new import_obsidian7.Menu();
+          menu.addItem((item) => item.setTitle("\u7F16\u8F91").setIcon("pencil").onClick(() => {
             setEditingNoteIndex(index);
             setHighlightComment(entry.text);
             setHighlightCommentMode("edit");
-          }
-        }, renderObsidianIcon("pencil")),
-        import_react4.default.createElement("button", {
-          className: "jarvis-reader-highlight-icon-button",
-          type: "button",
-          title: "\u5220\u9664\u7B14\u8BB0",
-          onClick: async () => {
+          }));
+          menu.addItem((item) => item.setTitle("\u5220\u9664").setIcon("trash-2").onClick(async () => {
             const effectiveApp = app || window.app;
             if (!effectiveApp) {
               new import_obsidian7.Notice("\u65E0\u6CD5\u83B7\u53D6 Obsidian App \u5B9E\u4F8B\u3002");
@@ -57994,21 +58074,12 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
               "\u5220\u9664\u7B14\u8BB0",
               "\u786E\u5B9A\u8981\u5220\u9664\u8FD9\u6761\u7B14\u8BB0\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002"
             );
-            if (confirmed) {
-              await deleteNoteEntry(index);
-            }
-          }
-        }, renderObsidianIcon("trash-2"))
-      )
-    ),
-    import_react4.default.createElement("div", {
-      className: "jarvis-reader-highlight-note-card-text",
-      style: { marginTop: "2px" }
-    }, import_react4.default.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
-    import_react4.default.createElement("div", {
-      className: "jarvis-reader-highlight-note-card-time",
-      style: { marginTop: "2px" }
-    }, formatHighlightNoteTime(entry.created))
+            if (confirmed) await deleteNoteEntry(index);
+          }));
+          menu.showAtPosition({ x: rect.left, y: rect.bottom });
+        }
+      }, renderObsidianIcon("ellipsis"))
+    )
   ))) : import_react4.default.createElement("div", {
     className: "jarvis-reader-highlight-empty"
   }, "\u6682\u65E0\u7B14\u8BB0");
@@ -58868,7 +58939,7 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     className: "jarvis-reader-highlight-note-card-time"
   }, formatHighlightNoteTime(entry.created))))) : null, import_react4.default.createElement(WikiLinkCodeMirrorEditor, {
     value: highlightComment,
-    onChange: (value) => setHighlightComment(value),
+    onChange: (value2) => setHighlightComment(value2),
     candidates: currentWikiLinkCandidates,
     onOpenLink: openWikiLink,
     placeholder: highlightCommentPlaceholder
@@ -58889,10 +58960,10 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     placeholder: highlightCommentPlaceholder,
     autoFocus: true,
     onChange: (event) => {
-      const value = event.currentTarget.value;
-      setHighlightComment(value);
-      updateWikiSuggest(value, event.currentTarget.selectionStart || value.length);
-      updateWikiEditRange(value, event.currentTarget.selectionStart || value.length);
+      const value2 = event.currentTarget.value;
+      setHighlightComment(value2);
+      updateWikiSuggest(value2, event.currentTarget.selectionStart || value2.length);
+      updateWikiEditRange(value2, event.currentTarget.selectionStart || value2.length);
     },
     onClick: (event) => {
       const input = event.currentTarget;
@@ -59045,13 +59116,15 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
       title: "\u5173\u95ED\u5361\u7247",
       onClick: hideWordHoverCard
-    }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react4.default.createElement("div", {}, activeWordHover.asset.phonetic) : null),
+    }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ? import_react4.default.createElement("div", {
+      className: "jarvis-reader-word-phonetic"
+    }, activeWordHover.asset.phonetic) : null),
     activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford ? import_react4.default.createElement(
       "div",
-      { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
-      activeWordHover.asset.oxford === 1 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
-      activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? import_react4.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(activeWordHover.asset.collins)) : null,
-      activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag) => import_react4.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+      { className: "jarvis-reader-word-tags" },
+      activeWordHover.asset.oxford === 1 ? import_react4.default.createElement("span", { className: "jarvis-reader-word-tag" }, "\u725B\u6D25\u6838\u5FC3") : null,
+      activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? import_react4.default.createElement("span", { className: "jarvis-reader-word-tag" }, "\u2605".repeat(activeWordHover.asset.collins)) : null,
+      activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag) => import_react4.default.createElement("span", { key: tag, className: "jarvis-reader-word-tag" }, tag.toUpperCase())) : null
     ) : null,
     import_react4.default.createElement("div", {
       className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
@@ -59059,7 +59132,7 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       className: "jarvis-reader-word-card-original-sentence",
       style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
     }, activeWordHover.asset.title || activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote || "") : null, import_react4.default.createElement("div", {
-      style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
+      style: { display: "flex", flexDirection: "column", gap: "6px" }
     }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ? import_react4.default.createElement("div", {
       className: "jarvis-reader-word-translation"
     }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ? import_react4.default.createElement("div", {
@@ -59124,8 +59197,8 @@ var ReadingStatsService = class {
       if (existing !== void 0 && (!existing || typeof existing !== "object" || Array.isArray(existing))) {
         throw new Error("\u9605\u8BFB\u7EDF\u8BA1\u6570\u636E\u5F02\u5E38\uFF0C\u672A\u5199\u5165\u8865\u5F55\u8BB0\u5F55");
       }
-      const value = existing?.[bookPath];
-      if (value !== void 0 && (!Number.isFinite(value) || value < 0)) {
+      const value2 = existing?.[bookPath];
+      if (value2 !== void 0 && (!Number.isFinite(value2) || value2 < 0)) {
         throw new Error("\u9605\u8BFB\u7EDF\u8BA1\u6570\u636E\u5F02\u5E38\uFF0C\u672A\u5199\u5165\u8865\u5F55\u8BB0\u5F55");
       }
       const daily = stats[date] || (stats[date] = {});
@@ -59168,6 +59241,9 @@ function hasKnowledgeNoteSource(content, sourceNotePath, sourceBlockId) {
   const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
   const sectionStart = "## \u6765\u6E90\n\n";
   const normalized = content.replace(/\r\n/g, "\n");
+  const frontmatter = normalized.match(/^---\n([\s\S]*?)\n---(?:\n|$)/)?.[1];
+  const storedBlock = frontmatter?.match(/^source_block:\s*(.+)$/m)?.[1].trim();
+  if (sourceBlockId && (storedBlock === sourceBlockId || storedBlock === JSON.stringify(sourceBlockId))) return true;
   return normalized.includes(`${sectionStart}[[${target}|\u8FD4\u56DE\u8BFB\u4E66\u7B14\u8BB0]]`) || normalized.includes(`${sectionStart}[[${target}]]`);
 }
 function buildKnowledgeNoteBody(quote, entries) {
@@ -59201,7 +59277,7 @@ function buildKnowledgeNoteContent(draft, createdAt) {
   const location = draft.sourceLocationLink ? `
 
 [\u8FD4\u56DE\u539F\u6587](${draft.sourceLocationLink})` : "";
-  const escapeYaml = (value) => value.replace(/"/g, '\\"');
+  const escapeYaml = (value2) => value2.replace(/"/g, '\\"');
   return `---
 created: ${createdAt}
 author: "[[Jarvis]]"
@@ -59482,7 +59558,7 @@ var EpubView = class extends import_obsidian8.FileView {
     let updated = buildHighlightNoteUpdate(
       list[index],
       highlight,
-      shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
+      shouldAppendComment ? [list[index].comment, nextComment].map((value2) => (value2 || "").trim()).filter(Boolean).join("\n\n") : nextComment,
       updatedAt
     );
     if (highlight.aiSections !== void 0) {
@@ -59769,11 +59845,11 @@ var EpubView = class extends import_obsidian8.FileView {
   async setReaderLineHeight(delta) {
     await this.updateReaderPreferences({ readerLineHeight: this.getReaderPreferences().readerLineHeight + delta });
   }
-  async setScrolledView(value) {
-    await this.updateReaderPreferences({ scrolledView: value });
+  async setScrolledView(value2) {
+    await this.updateReaderPreferences({ scrolledView: value2 });
   }
-  async setSinglePageView(value) {
-    await this.updateReaderPreferences({ singlePageView: value });
+  async setSinglePageView(value2) {
+    await this.updateReaderPreferences({ singlePageView: value2 });
   }
   async setInitLocation(initLocation) {
     this.plugin.settings.bookInitLocations[this.file.path] = initLocation;
@@ -59793,6 +59869,18 @@ var EpubView = class extends import_obsidian8.FileView {
   async getInitLocation() {
     const location = this.plugin.settings.bookInitLocations[this.file.path];
     return location ? location : null;
+  }
+  async prepareBookPathChange(oldPath) {
+    this.statsBookFile = null;
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
+    await this.stopThemeSync();
+    const stats = this.plugin.settings.readingStats || (this.plugin.settings.readingStats = {});
+    const date = /* @__PURE__ */ new Date();
+    const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    await this.readingStatsService.flush(oldPath, today, stats, () => this.plugin.saveSettingsData());
   }
   async onLoadFile(file) {
     this.sourceJumpPending = !!this.plugin.sourceJumpPaths?.has(file.path);
@@ -59867,12 +59955,12 @@ var EpubView = class extends import_obsidian8.FileView {
       getPanelOpen: this.getReaderSettingsOpen,
       onPanelOpenChange: this.setReaderSettingsOpen,
       onPreferencesChange: this.updateReaderPreferences,
-      setScrolled: (value) => {
-        void this.setScrolledView(value).catch(() => {
+      setScrolled: (value2) => {
+        void this.setScrolledView(value2).catch(() => {
         });
       },
-      setSinglePage: (value) => {
-        void this.setSinglePageView(value).catch(() => {
+      setSinglePage: (value2) => {
+        void this.setSinglePageView(value2).catch(() => {
         });
       },
       setReaderZoom: (delta) => {
@@ -59970,8 +60058,8 @@ var EpubView = class extends import_obsidian8.FileView {
 var import_obsidian9 = require("obsidian");
 
 // src/conflict-resolution-core.ts
-function isRecord2(value) {
-  return !!value && typeof value === "object" && !Array.isArray(value);
+function isRecord2(value2) {
+  return !!value2 && typeof value2 === "object" && !Array.isArray(value2);
 }
 function classifyConflictFiles(indexFiles, rootFiles) {
   return {
@@ -60023,11 +60111,11 @@ var HIGHLIGHT_INDEX_FIELDS = [
   "created",
   "updated"
 ];
-function toHighlightIndexEntry(value) {
-  if (!isRecord2(value)) return null;
+function toHighlightIndexEntry(value2) {
+  if (!isRecord2(value2)) return null;
   const entry = {};
   for (const field of HIGHLIGHT_INDEX_FIELDS) {
-    if (value[field] !== void 0) entry[field] = value[field];
+    if (value2[field] !== void 0) entry[field] = value2[field];
   }
   return typeof entry.id === "string" && typeof entry.cfiRange === "string" ? entry : null;
 }
@@ -60109,12 +60197,12 @@ async function ensureFolder(adapter, folder) {
 async function createConflictBackup(adapter, files) {
   const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
   const root = `${PLUGIN_ROOT}/backups/conflicts/${timestamp}`;
-  const canonical = [
+  const canonical2 = [
     `${INDEX_FOLDER}/word-assets.json`,
     `${INDEX_FOLDER}/highlights.json`,
     `${PLUGIN_ROOT}/data.json`
   ];
-  for (const path of [...canonical, ...allConflictPaths(files)]) {
+  for (const path of [...canonical2, ...allConflictPaths(files)]) {
     if (!await adapter.exists(path)) continue;
     const target = `${root}/${path.replace(/^\/+/, "")}`;
     await ensureFolder(adapter, target.split("/").slice(0, -1).join("/"));
@@ -60216,11 +60304,11 @@ function confirmConflictResolution(app, files) {
   return new Promise((resolve) => {
     const modal = new import_obsidian9.Modal(app);
     let settled = false;
-    const finish = (value) => {
+    const finish = (value2) => {
       if (settled) return;
       settled = true;
       modal.close();
-      resolve(value);
+      resolve(value2);
     };
     modal.titleEl.setText("\u53D1\u73B0\u540C\u6B65\u51B2\u7A81\u526F\u672C");
     modal.contentEl.createEl("p", {
@@ -60294,17 +60382,17 @@ var HighlightsPanelController = class {
     this.pendingRevealHighlightId = highlightId || null;
     this.render();
   }
-  formatTime(value) {
-    if (!value)
+  formatTime(value2) {
+    if (!value2)
       return "";
     try {
-      return new Date(value).toLocaleString();
+      return new Date(value2).toLocaleString();
     } catch (error) {
-      return value;
+      return value2;
     }
   }
-  previewText(value, maxLength = 72) {
-    const text = (value || "").replace(/\s+/g, " ").trim();
+  previewText(value2, maxLength = 72) {
+    const text = (value2 || "").replace(/\s+/g, " ").trim();
     if (text.length <= maxLength)
       return text;
     return `${text.slice(0, maxLength).trim()}...`;
@@ -60319,8 +60407,8 @@ var HighlightsPanelController = class {
       return;
     this.app.workspace.openLinkText(target, this.reader && this.reader.file ? this.reader.file.path : "", true);
   }
-  renderLinkedPreview(container, value, maxLength = 96) {
-    const text = this.previewText(value, maxLength);
+  renderLinkedPreview(container, value2, maxLength = 96) {
+    const text = this.previewText(value2, maxLength);
     const pattern = /\[\[([^\]]+)\]\]/g;
     let lastIndex = 0;
     let match;
@@ -60347,8 +60435,8 @@ var HighlightsPanelController = class {
       container.createSpan({ text: text.slice(lastIndex) });
     }
   }
-  getWikiLinks(value) {
-    const text = value || "";
+  getWikiLinks(value2) {
+    const text = value2 || "";
     const pattern = /\[\[([^\]]+)\]\]/g;
     const links = [];
     const seen = /* @__PURE__ */ new Set();
@@ -60993,6 +61081,24 @@ var ReactDOM = __toESM(require_client(), 1);
 
 // src/library/LibraryApp.tsx
 var React6 = __toESM(require_react(), 1);
+
+// src/library/book-note-projection.ts
+function projectLibraryBookNotes(books, find) {
+  const notes = {};
+  const issues = {};
+  for (const book of books) {
+    try {
+      const note = find(book);
+      if (note) notes[book.path] = note;
+    } catch (error) {
+      issues[book.path] = error instanceof Error ? error.message : "\u8BFB\u4E66\u7B14\u8BB0\u8BFB\u53D6\u5931\u8D25";
+    }
+  }
+  return { notes, issues };
+}
+
+// src/library/LibraryApp.tsx
+init_storage_folders();
 var import_obsidian12 = require("obsidian");
 init_book_notes();
 init_utils();
@@ -61064,6 +61170,7 @@ function LibraryApp({ plugin }) {
   const [gridCols, setGridCols] = React6.useState(6);
   const [selectedGridBook, setSelectedGridBook] = React6.useState(null);
   const [bookNotesMap, setBookNotesMap] = React6.useState({});
+  const [bookNoteIssues, setBookNoteIssues] = React6.useState({});
   const homeRef = React6.useRef(null);
   React6.useEffect(() => {
     if (currentView !== "home" || viewLayout !== "grid" || !selectedGridBook) return;
@@ -61087,7 +61194,7 @@ function LibraryApp({ plugin }) {
   const loadBooks = React6.useCallback(() => {
     const allFiles = plugin.app.vault.getFiles();
     const filtered = allFiles.filter(
-      (file) => file instanceof import_obsidian12.TFile && file.extension.toLowerCase() === "epub"
+      (file) => file instanceof import_obsidian12.TFile && file.extension.toLowerCase() === "epub" && isBookInFolder(file.path, plugin.settings.bookFolder)
     );
     setBooks(filtered);
     setBooksLoaded(true);
@@ -61097,10 +61204,12 @@ function LibraryApp({ plugin }) {
     const onCreate = () => loadBooks();
     const onDelete = () => loadBooks();
     const onRename = () => loadBooks();
+    window.addEventListener("jarvis-reader-folders-updated", loadBooks);
     plugin.app.vault.on("create", onCreate);
     plugin.app.vault.on("delete", onDelete);
     plugin.app.vault.on("rename", onRename);
     return () => {
+      window.removeEventListener("jarvis-reader-folders-updated", loadBooks);
       plugin.app.vault.off("create", onCreate);
       plugin.app.vault.off("delete", onDelete);
       plugin.app.vault.off("rename", onRename);
@@ -61112,10 +61221,12 @@ function LibraryApp({ plugin }) {
     return () => window.removeEventListener("jarvis-reader-bookmarks-updated", handleUpdate);
   }, [books]);
   React6.useEffect(() => {
-    const handleAssetOrHighlightChange = () => setRefreshTrigger((value) => value + 1);
+    const handleAssetOrHighlightChange = () => setRefreshTrigger((value2) => value2 + 1);
+    plugin.app.metadataCache.on("changed", handleAssetOrHighlightChange);
     window.addEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
     window.addEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     return () => {
+      plugin.app.metadataCache.off("changed", handleAssetOrHighlightChange);
       window.removeEventListener("jarvis-reader-word-assets-changed", handleAssetOrHighlightChange);
       window.removeEventListener("jarvis-reader-highlights-changed", handleAssetOrHighlightChange);
     };
@@ -61124,20 +61235,10 @@ function LibraryApp({ plugin }) {
     setCoverCache(plugin.settings.bookCoverCache || {});
   }, [plugin.settings.bookCoverCache]);
   React6.useEffect(() => {
-    if (books.length === 0) return;
-    const notesMap = {};
-    let changedNotes = false;
-    books.forEach((book) => {
-      const noteFile = findBookNote(plugin.app, book, plugin.settings);
-      if (noteFile) {
-        notesMap[book.path] = noteFile;
-        changedNotes = true;
-      }
-    });
-    if (changedNotes) {
-      setBookNotesMap(notesMap);
-    }
-  }, [books, coverCache, plugin.app, plugin.settings]);
+    const projection = projectLibraryBookNotes(books, (book) => findBookNote(plugin.app, book, plugin.settings));
+    setBookNotesMap(projection.notes);
+    setBookNoteIssues(projection.issues);
+  }, [books, coverCache, plugin.app, plugin.settings, refreshTrigger]);
   React6.useEffect(() => {
     const home = homeRef.current;
     if (!home) return;
@@ -61161,9 +61262,9 @@ function LibraryApp({ plugin }) {
     if (!booksLoaded) return;
     let cancelled = false;
     const runCoverCacheQueue = async () => {
-      const validKeys = books.filter((file) => file.extension.toLowerCase() === "epub").map((file) => `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`);
+      const validKeys = plugin.app.vault.getFiles().filter((file) => file.extension.toLowerCase() === "epub").map((file) => `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`);
       await plugin.pruneBookCoverCache(validKeys);
-      if (cancelled) return;
+      if (cancelled || plugin.bookPathUpdateInProgress || plugin.bookPathUpdateBlocked) return;
       setCoverCache({ ...plugin.settings.bookCoverCache });
       for (const file of books) {
         if (cancelled) break;
@@ -61619,7 +61720,8 @@ function LibraryApp({ plugin }) {
   React6.useEffect(() => {
     if (!activeBook) return;
     const loadMetadata = () => {
-      const noteFile = findBookNote(plugin.app, activeBook, plugin.settings);
+      const projection = projectLibraryBookNotes([activeBook], (book) => findBookNote(plugin.app, book, plugin.settings));
+      const noteFile = projection.notes[activeBook.path];
       let status = "unread";
       let rating = 0;
       let tags = [];
@@ -61661,16 +61763,16 @@ function LibraryApp({ plugin }) {
     };
     loadMetadata();
   }, [activeBook, currentView, plugin]);
-  const handleUpdateMetadata = async (key, value) => {
+  const handleUpdateMetadata = async (key, value2) => {
     if (!activeBook) return;
-    setBookMetadata((prev) => ({ ...prev, [key]: value }));
+    setBookMetadata((prev) => ({ ...prev, [key]: value2 }));
     try {
       const noteFile = await getOrCreateBookNote(plugin.app, activeBook, "", plugin.settings);
       if (noteFile) {
         await plugin.app.fileManager.processFrontMatter(noteFile, (fm) => {
-          if (key === "startDate") fm.start_date = value;
-          else if (key === "finishDate") fm.finish_date = value;
-          else fm[key] = value;
+          if (key === "startDate") fm.start_date = value2;
+          else if (key === "finishDate") fm.finish_date = value2;
+          else fm[key] = value2;
         });
       }
     } catch (e) {
@@ -62409,6 +62511,10 @@ function LibraryApp({ plugin }) {
       }
     }
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-home", ref: homeRef, children: [
+      Object.keys(bookNoteIssues).length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { role: "status", style: { color: "var(--text-muted)", fontSize: "var(--font-ui-small)", marginBottom: "12px" }, children: [
+        Object.keys(bookNoteIssues).length,
+        " \u672C\u4E66\u7684\u8BFB\u4E66\u7B14\u8BB0\u5173\u8054\u8DEF\u5F84\u5931\u6548\uFF0C\u9605\u8BFB\u4ECD\u53EF\u7528\uFF1B\u8BF7\u6062\u590D\u6216\u4FEE\u6B63\u7B14\u8BB0\u8DEF\u5F84\u3002"
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { style: { flex: 1 } }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
@@ -62698,16 +62804,19 @@ function LibraryApp({ plugin }) {
         canvas.toBlob(async (blob) => {
           if (!blob) return;
           const buffer = await blob.arrayBuffer();
-          const targetFolder = plugin.settings.customCoverFolder || "00-Attachment";
-          const folderAbstract = plugin.app.vault.getAbstractFileByPath(targetFolder);
-          if (!folderAbstract) {
-            try {
-              await plugin.app.vault.createFolder(targetFolder);
-            } catch (e2) {
-            }
+          const targetFolder = plugin.settings.customCoverFolder ?? "Cover";
+          try {
+            await ensureStorageFolders({
+              stat: (path) => plugin.app.vault.adapter.stat(path),
+              mkdir: (path) => plugin.app.vault.createFolder(path)
+            }, [targetFolder]);
+          } catch (error) {
+            new import_obsidian12.Notice("\u65E0\u6CD5\u521B\u5EFA\u5C01\u9762\u76EE\u5F55");
+            console.error("Failed to create cover folder", error);
+            return;
           }
           const baseName = uploadBook.basename.replace(/[\\/:*?"<>|]/g, "_");
-          const targetPath = `${targetFolder}/cover_${baseName}.jpg`;
+          const targetPath = `${targetFolder ? targetFolder + "/" : ""}cover_${baseName}.jpg`;
           let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
           if (targetFile instanceof import_obsidian12.TFile) {
             await plugin.app.vault.modifyBinary(targetFile, buffer);
@@ -62877,7 +62986,7 @@ function LibraryApp({ plugin }) {
           try {
             const stats2 = plugin.settings.readingStats || (plugin.settings.readingStats = {});
             await manualStats.current.recordManual(timeBook.path, timeDate, Number(timeMinutes), stats2, () => plugin.saveSettings());
-            setRefreshTrigger((value) => value + 1);
+            setRefreshTrigger((value2) => value2 + 1);
             setTimeBook(null);
             new import_obsidian12.Notice("\u9605\u8BFB\u65F6\u957F\u5DF2\u8865\u5F55");
           } catch (error) {
@@ -62943,7 +63052,7 @@ var LibraryView = class extends import_obsidian13.ItemView {
 
 // src/settings.ts
 var import_obsidian14 = require("obsidian");
-init_utils();
+init_storage_folders();
 var DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
 status: unread
@@ -62965,10 +63074,11 @@ var DEFAULT_SETTINGS = {
   readerZoom: READER_ZOOM_LIMITS.defaultValue,
   readerLineHeight: READER_LINE_HEIGHT_LIMITS.defaultValue,
   readerQuickActions: ["bookmark", "note"],
-  bookNoteFolder: "",
-  knowledgeNoteFolder: "\u77E5\u8BC6\u5E93/\u60F3\u6CD5",
+  bookFolder: "",
+  bookNoteFolder: DEFAULT_STORAGE_FOLDERS.bookNoteFolder,
+  knowledgeNoteFolder: DEFAULT_STORAGE_FOLDERS.knowledgeNoteFolder,
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
-  customCoverFolder: "00-Attachment",
+  customCoverFolder: DEFAULT_STORAGE_FOLDERS.customCoverFolder,
   wordAssets: {},
   translationApi: {
     provider: "openai-compatible",
@@ -63074,65 +63184,44 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
     });
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
     if (this.activeTab === "storage") {
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0").setHeading();
-      let bookFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u52A8\u751F\u6210\u8BFB\u4E66\u7B14\u8BB0\u7684\u6587\u4EF6\u5939").addText((text) => {
-        bookFolderText = text;
-        text.setPlaceholder("\u9009\u62E9\u6216\u8F93\u5165\u6587\u4EF6\u5939").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.bookNoteFolder = path;
-          await this.plugin.saveSettings();
-          if (bookFolderText) {
-            bookFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
-        this.plugin.settings.bookNoteFolder = "";
-        await this.plugin.saveSettings();
-        if (bookFolderText) {
-          bookFolderText.setValue("");
-        }
-      }));
-      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0").setHeading();
-      let knowledgeFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u77E5\u8BC6\u7B14\u8BB0\u9ED8\u8BA4\u76EE\u5F55").setDesc("\u5C06\u9605\u8BFB\u7B14\u8BB0\u63D0\u5347\u4E3A\u72EC\u7ACB\u77E5\u8BC6\u7B14\u8BB0\u65F6\uFF0C\u81EA\u52A8\u521B\u5EFA\u5230\u6B64\u76EE\u5F55\u3002\u7559\u7A7A\u5219\u521B\u5EFA\u5230\u4ED3\u5E93\u6839\u76EE\u5F55\u3002").addText((text) => {
-        knowledgeFolderText = text;
-        text.setPlaceholder("\u5982: \u77E5\u8BC6\u5E93/\u60F3\u6CD5").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.knowledgeNoteFolder = path;
-          await this.plugin.saveSettings();
-          knowledgeFolderText?.setValue(path);
-        }).open();
-      }));
-      new import_obsidian14.Setting(contentDiv).setName("\u5176\u4ED6\u6587\u4EF6").setHeading();
-      let customCoverFolderText = null;
-      new import_obsidian14.Setting(contentDiv).setName("\u81EA\u5B9A\u4E49\u5C01\u9762\u6587\u4EF6\u5939").setDesc("\u4FDD\u5B58\u81EA\u5B9A\u4E49\u56FE\u4E66\u5C01\u9762\u7684\u6587\u4EF6\u5939\u8DEF\u5F84").addText((text) => {
-        customCoverFolderText = text;
-        text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
-          this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("\u9009\u62E9").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.customCoverFolder = path;
-          await this.plugin.saveSettings();
-          if (customCoverFolderText) {
-            customCoverFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("\u6E05\u9664").onClick(async () => {
-        this.plugin.settings.customCoverFolder = "";
-        await this.plugin.saveSettings();
-        if (customCoverFolderText) {
-          customCoverFolderText.setValue("");
+      new import_obsidian14.Setting(contentDiv).setName("\u4E66\u7C4D\u4E0E\u6587\u4EF6\u5939").setHeading();
+      const draft = {
+        bookFolder: this.plugin.settings.bookFolder || "",
+        bookNoteFolder: this.plugin.settings.bookNoteFolder,
+        knowledgeNoteFolder: this.plugin.settings.knowledgeNoteFolder,
+        customCoverFolder: this.plugin.settings.customCoverFolder
+      };
+      const inputs = /* @__PURE__ */ new Map();
+      const rows = [
+        { key: "bookFolder", name: "\u4E66\u7C4D\u6587\u4EF6\u5939", placeholder: "\u7559\u7A7A\u4E3A\u6574\u4E2A\u4ED3\u5E93" },
+        { key: "bookNoteFolder", name: "\u8BFB\u4E66\u7B14\u8BB0", placeholder: "Reading Notes" },
+        { key: "knowledgeNoteFolder", name: "\u77E5\u8BC6\u7B14\u8BB0", placeholder: "Knowledge Notes" },
+        { key: "customCoverFolder", name: "\u5C01\u9762", placeholder: "Cover" }
+      ];
+      for (const row of rows) {
+        const setting = new import_obsidian14.Setting(contentDiv).setName(row.name);
+        if (row.key === "bookFolder") setting.setDesc("\u4EC5\u7528\u4E8E\u7B5B\u9009\u4E66\u67B6\uFF0C\u5176\u4ED6\u76EE\u5F55\u72EC\u7ACB\u8BBE\u7F6E\u3002");
+        setting.addText((text) => {
+          inputs.set(row.key, text);
+          text.setPlaceholder(row.placeholder).setValue(draft[row.key]).onChange((value2) => {
+            draft[row.key] = value2;
+          });
+        }).addExtraButton((button) => button.setIcon("folder-open").setTooltip("\u9009\u62E9\u6587\u4EF6\u5939").onClick(() => {
+          new JarvisReaderFolderSuggestModal(this.app, (path) => {
+            draft[row.key] = path;
+            inputs.get(row.key)?.setValue(path);
+          }).open();
+        }));
+      }
+      new import_obsidian14.Setting(contentDiv).addButton((button) => button.setButtonText("\u4FDD\u5B58\u5E76\u521B\u5EFA\u6587\u4EF6\u5939").setCta().onClick(async () => {
+        button.setDisabled(true);
+        try {
+          await this.plugin.configureStorageFolders(draft);
+          new import_obsidian14.Notice("\u6587\u4EF6\u5939\u8BBE\u7F6E\u5DF2\u4FDD\u5B58");
+        } catch (error) {
+          new import_obsidian14.Notice(error instanceof Error ? error.message : "\u6587\u4EF6\u5939\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25");
+        } finally {
+          button.setDisabled(false);
         }
       }));
       new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
@@ -63146,8 +63235,8 @@ finish_date: ""
 created: {{created}}
 ---
 
-{{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value) => {
-          this.plugin.settings.bookNoteTemplate = value;
+{{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value2) => {
+          this.plugin.settings.bookNoteTemplate = value2;
           await this.plugin.saveSettings();
         });
         text.inputEl.rows = 7;
@@ -63158,8 +63247,8 @@ created: {{created}}
       let translationModelText = null;
       let translationPromptText = null;
       new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u670D\u52A1").setDesc("\u9009\u62E9 API \u683C\u5F0F\uFF0C\u81EA\u5B9A\u4E49 URL \u4F1A\u81EA\u52A8\u8BC6\u522B\u7C7B\u578B").addDropdown((dropdown) => {
-        dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value) => {
-          const provider = value;
+        dropdown.addOption("openai-compatible", "OpenAI \u517C\u5BB9").addOption("anthropic", "Anthropic Claude").addOption("gemini", "Google Gemini").addOption("deepseek", "\u6DF1\u5EA6\u6C42\u7D22 (DeepSeek)").addOption("zhipu", "\u667A\u8C31\u6E05\u8A00 (GLM)").addOption("qwen", "\u901A\u4E49\u5343\u95EE (Qwen)").addOption("moonshot", "Kimi (Moonshot)").addOption("minimax", "MiniMax").addOption("custom", "\u81EA\u5B9A\u4E49").setValue((this.plugin.settings.translationApi || {}).provider || "openai-compatible").onChange(async (value2) => {
+          const provider = value2;
           const defaults = getTranslationProviderDefaults(provider);
           this.plugin.settings.translationApi.provider = provider;
           if (!String(this.plugin.settings.translationApi.baseUrl || "").trim() && defaults.baseUrl) {
@@ -63182,15 +63271,15 @@ created: {{created}}
       new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u57FA\u7840\u5730\u5740").setDesc("\u670D\u52A1\u5546\u57FA\u7840\u5730\u5740\uFF1B\u63D2\u4EF6\u4F1A\u6309\u6240\u9009\u670D\u52A1\u81EA\u52A8\u8FFD\u52A0\u8BF7\u6C42\u8DEF\u5F84").addText((text) => {
         translationBaseUrlText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
-        text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value) => {
-          this.plugin.settings.translationApi.baseUrl = value.trim();
+        text.setPlaceholder(defaults.baseUrl || "https://...").setValue((this.plugin.settings.translationApi || {}).baseUrl || "").onChange(async (value2) => {
+          this.plugin.settings.translationApi.baseUrl = value2.trim();
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
       new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1 API \u5BC6\u94A5").setDesc("\u7528\u4E8E\u8BF7\u6C42\u7FFB\u8BD1\u670D\u52A1\u7684\u8BBF\u95EE\u5BC6\u94A5").addText((text) => {
-        text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value) => {
-          this.plugin.settings.translationApi.apiKey = value.trim();
+        text.setPlaceholder("sk-...").setValue((this.plugin.settings.translationApi || {}).apiKey || "").onChange(async (value2) => {
+          this.plugin.settings.translationApi.apiKey = value2.trim();
           await this.plugin.saveSettings();
         });
         text.inputEl.type = "password";
@@ -63199,8 +63288,8 @@ created: {{created}}
       new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u6A21\u578B").setDesc("\u5F53\u524D\u670D\u52A1\u4F7F\u7528\u7684\u6A21\u578B ID").addText((text) => {
         translationModelText = text;
         const defaults = getTranslationProviderDefaults((this.plugin.settings.translationApi || {}).provider);
-        text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value) => {
-          this.plugin.settings.translationApi.model = value.trim();
+        text.setPlaceholder(defaults.model || "\u6A21\u578B ID").setValue((this.plugin.settings.translationApi || {}).model || "").onChange(async (value2) => {
+          this.plugin.settings.translationApi.model = value2.trim();
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
@@ -63223,8 +63312,8 @@ created: {{created}}
       });
       new import_obsidian14.Setting(contentDiv).setName("\u7FFB\u8BD1\u63D0\u793A\u8BCD").setDesc("\u7528\u4E8E\u751F\u6210\u5355\u8BCD\u91CA\u4E49\u7684\u63D0\u793A\u8BCD").addTextArea((text) => {
         translationPromptText = text;
-        text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value) => {
-          this.plugin.settings.translationPrompt = value || DEFAULT_TRANSLATION_PROMPT;
+        text.setValue(this.plugin.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT).onChange(async (value2) => {
+          this.plugin.settings.translationPrompt = value2 || DEFAULT_TRANSLATION_PROMPT;
           await this.plugin.saveSettings();
         });
         text.inputEl.rows = 6;
@@ -63241,55 +63330,55 @@ created: {{created}}
     }
     if (this.activeTab === "words") {
       new import_obsidian14.Setting(contentDiv).setName("\u5DF2\u4FDD\u5B58\u8BCD\u5361\u7684\u6807\u8BB0").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u5361").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u548C\u77ED\u8BED\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u5361\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
-        this.plugin.settings.enableAutoHighlight = value;
+      new import_obsidian14.Setting(contentDiv).setName("\u5728\u4E66\u4E2D\u6807\u8BB0\u5DF2\u4FDD\u5B58\u7684\u8BCD\u5361").setDesc("\u5F00\u542F\u540E\uFF0C\u9605\u8BFB\u5668\u4F1A\u6807\u8BB0\u5DF2\u4FDD\u5B58\u4E14\u80FD\u5728\u5F53\u524D\u4E66\u4E2D\u5B9A\u4F4D\u7684\u5355\u8BCD\u548C\u77ED\u8BED\uFF1B\u5173\u95ED\u540E\u4ECD\u4FDD\u7559\u8BCD\u5361\u8BB0\u5F55\u3002").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value2) => {
+        this.plugin.settings.enableAutoHighlight = value2;
         await this.plugin.saveSettings();
       }));
       this.createColorPicker(contentDiv, "\u5355\u8BCD\u989C\u8272", "\u5DF2\u4FDD\u5B58\u5355\u8BCD\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "word");
       this.createColorPicker(contentDiv, "\u77ED\u8BED\u989C\u8272", "\u5DF2\u4FDD\u5B58\u77ED\u8BED\u5728\u9605\u8BFB\u5668\u4E2D\u7684\u6807\u8BB0\u989C\u8272", "phrase");
       new import_obsidian14.Setting(contentDiv).setName("\u8BCD\u5361").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value) => {
-        this.plugin.settings.blurWordCardBody = value;
+      new import_obsidian14.Setting(contentDiv).setName("\u6A21\u7CCA\u8BCD\u5361\u6B63\u6587").setDesc("\u53EA\u6A21\u7CCA\u53EF\u6EDA\u52A8\u7684\u8BCD\u5361\u6B63\u6587\uFF1B\u9F20\u6807\u60AC\u505C\u540E\u663E\u793A\uFF0C\u6807\u9898\u548C\u6765\u6E90\u59CB\u7EC8\u53EF\u89C1").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.blurWordCardBody).onChange(async (value2) => {
+        this.plugin.settings.blurWordCardBody = value2;
         await this.plugin.saveSettings();
       }));
       new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3").setHeading();
-      new import_obsidian14.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value) => {
-        this.plugin.settings.enableWordAudio = value;
+      new import_obsidian14.Setting(contentDiv).setName("\u542F\u7528\u5355\u8BCD\u53D1\u97F3").setDesc("\u4F18\u5148\u4F7F\u7528\u53D1\u97F3\u94FE\u63A5\uFF1B\u5931\u8D25\u65F6\u56DE\u9000\u5230\u6D4F\u89C8\u5668\u8BED\u97F3\u5408\u6210").addToggle((toggle) => toggle.setValue(!!this.plugin.settings.enableWordAudio).onChange(async (value2) => {
+        this.plugin.settings.enableWordAudio = value2;
         await this.plugin.saveSettings();
       }));
       new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u94FE\u63A5\u6A21\u677F").setDesc("\u53EF\u7528 {{word}}\u3001{{type}}\u3001{{accent}}\u3002\u6709\u9053 type\uFF1A1 \u82F1\u5F0F\uFF0C2 \u7F8E\u5F0F\u3002").addText((text) => {
-        text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value) => {
-          this.plugin.settings.wordAudioTemplate = value.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
+        text.setPlaceholder(DEFAULT_WORD_AUDIO_TEMPLATE).setValue(this.plugin.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE).onChange(async (value2) => {
+          this.plugin.settings.wordAudioTemplate = value2.trim() || DEFAULT_WORD_AUDIO_TEMPLATE;
           await this.plugin.saveSettings();
         });
         text.inputEl.style.width = "100%";
       });
       new import_obsidian14.Setting(contentDiv).setName("\u53D1\u97F3\u53E3\u97F3").setDesc("\u9009\u62E9\u7F8E\u5F0F\u6216\u82F1\u5F0F\u53D1\u97F3").addDropdown((dropdown) => {
-        dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value) => {
-          this.plugin.settings.wordAudioAccent = value === "uk" ? "uk" : "us";
-          this.plugin.settings.speechLang = value === "uk" ? "en-GB" : "en-US";
+        dropdown.addOption("us", "\u7F8E\u5F0F").addOption("uk", "\u82F1\u5F0F").setValue(this.plugin.settings.wordAudioAccent || "us").onChange(async (value2) => {
+          this.plugin.settings.wordAudioAccent = value2 === "uk" ? "uk" : "us";
+          this.plugin.settings.speechLang = value2 === "uk" ? "en-GB" : "en-US";
           await this.plugin.saveSettings();
         });
       });
       new import_obsidian14.Setting(contentDiv).setName("\u8BED\u97F3\u56DE\u9000\u8BED\u8A00").setDesc("\u4EC5\u5728\u53D1\u97F3\u94FE\u63A5\u65E0\u6CD5\u64AD\u653E\u65F6\u4F7F\u7528").addText((text) => {
-        text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value) => {
-          this.plugin.settings.speechLang = value.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
+        text.setPlaceholder("en-US").setValue(this.plugin.settings.speechLang || "en-US").onChange(async (value2) => {
+          this.plugin.settings.speechLang = value2.trim() || (this.plugin.settings.wordAudioAccent === "uk" ? "en-GB" : "en-US");
           await this.plugin.saveSettings();
         });
       });
     }
     if (this.activeTab === "appearance") {
       new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u7F29\u653E\u6BD4\u4F8B").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u653E\u5927\u7F29\u5C0F\u7EA7\u522B").addSlider((slider) => {
-        slider.setLimits(READER_ZOOM_LIMITS.min, READER_ZOOM_LIMITS.max, READER_ZOOM_LIMITS.step).setValue(clampReaderZoom(this.plugin.settings.readerZoom)).setDynamicTooltip().onChange(async (value) => {
-          const nextValue = clampReaderZoom(value);
+        slider.setLimits(READER_ZOOM_LIMITS.min, READER_ZOOM_LIMITS.max, READER_ZOOM_LIMITS.step).setValue(clampReaderZoom(this.plugin.settings.readerZoom)).setDynamicTooltip().onChange(async (value2) => {
+          const nextValue = clampReaderZoom(value2);
           slider.setValue(nextValue);
           this.plugin.settings.readerZoom = nextValue;
           await this.plugin.saveSettings();
         });
       });
       new import_obsidian14.Setting(contentDiv).setName("\u9605\u8BFB\u5668\u9ED8\u8BA4\u884C\u9AD8").setDesc("\u5168\u5C40\u63A7\u5236\u9605\u8BFB\u5668\u4E2D\u6587\u5B57\u7684\u884C\u95F4\u8DDD").addSlider((slider) => {
-        slider.setLimits(READER_LINE_HEIGHT_LIMITS.min, READER_LINE_HEIGHT_LIMITS.max, READER_LINE_HEIGHT_LIMITS.step).setValue(clampReaderLineHeight(this.plugin.settings.readerLineHeight)).setDynamicTooltip().onChange(async (value) => {
-          const nextValue = clampReaderLineHeight(value);
+        slider.setLimits(READER_LINE_HEIGHT_LIMITS.min, READER_LINE_HEIGHT_LIMITS.max, READER_LINE_HEIGHT_LIMITS.step).setValue(clampReaderLineHeight(this.plugin.settings.readerLineHeight)).setDynamicTooltip().onChange(async (value2) => {
+          const nextValue = clampReaderLineHeight(value2);
           slider.setValue(nextValue);
           this.plugin.settings.readerLineHeight = nextValue;
           await this.plugin.saveSettings();
@@ -63301,10 +63390,10 @@ created: {{created}}
     }
   }
   createColorPicker(containerEl, name, desc, key) {
-    new import_obsidian14.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value) => {
+    new import_obsidian14.Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker.setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key]).onChange(async (value2) => {
       this.plugin.settings.highlightColors = {
         ...this.plugin.settings.highlightColors || DEFAULT_SETTINGS.highlightColors,
-        [key]: value
+        [key]: value2
       };
       await this.plugin.saveSettings();
       window.dispatchEvent(new CustomEvent("jarvis-reader-colors-changed", { detail: this.plugin.settings.highlightColors }));
@@ -63321,28 +63410,28 @@ var import_react6 = __toESM(require_react(), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
 var import_obsidian15 = require("obsidian");
 init_utils();
-function truncateWordDisplay2(value) {
-  const raw = String(value || "");
+function truncateWordDisplay2(value2) {
+  const raw = String(value2 || "");
   if (raw.length <= 8e3) return raw;
   return raw.slice(0, 8e3) + "\n... (truncated)";
 }
 function renderWordCardDisplayText2(text) {
-  const value = String(text || "");
+  const value2 = String(text || "");
   const parts = [];
   const pattern = /(\*\*|__)([\s\S]+?)\1/g;
   let lastIndex = 0;
   let match = null;
-  while (match = pattern.exec(value)) {
+  while (match = pattern.exec(value2)) {
     if (match.index > lastIndex) {
-      parts.push(value.slice(lastIndex, match.index));
+      parts.push(value2.slice(lastIndex, match.index));
     }
     parts.push(import_react6.default.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
     lastIndex = pattern.lastIndex;
   }
-  if (lastIndex < value.length) {
-    parts.push(value.slice(lastIndex));
+  if (lastIndex < value2.length) {
+    parts.push(value2.slice(lastIndex));
   }
-  return parts.length ? parts : value;
+  return parts.length ? parts : value2;
 }
 function getWordCardDisplayLineMeta2(line) {
   const raw = String(line || "");
@@ -63721,9 +63810,9 @@ var GlobalTranslationCard = ({
         result.isWord !== false && (result.tags || result.collins || result.oxford) ? import_react6.default.createElement(
           "div",
           { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px" } },
-          result.oxford === 1 ? import_react6.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u725B\u6D25\u6838\u5FC3") : null,
-          result.collins && result.collins > 0 ? import_react6.default.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "\u2605".repeat(result.collins)) : null,
-          result.tags ? result.tags.map((tag) => import_react6.default.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+          result.oxford === 1 ? import_react6.default.createElement("span", { className: "jarvis-reader-word-tag" }, "\u725B\u6D25\u6838\u5FC3") : null,
+          result.collins && result.collins > 0 ? import_react6.default.createElement("span", { className: "jarvis-reader-word-tag" }, "\u2605".repeat(result.collins)) : null,
+          result.tags ? result.tags.map((tag) => import_react6.default.createElement("span", { key: tag, className: "jarvis-reader-word-tag" }, tag.toUpperCase())) : null
         ) : null,
         result.display ? renderWordDisplayContent(result.display) : import_react6.default.createElement("div", { className: "jarvis-reader-word-translation" }, result.translation)
       )
@@ -64221,8 +64310,8 @@ function createKnowledgeNoteStorage(vault) {
 // src/cover-cache-service.ts
 var CACHE_FOLDER = ".obsidian/plugins/jarvis-reader/cache/covers";
 var DATA_PATH = ".obsidian/plugins/jarvis-reader/data.json";
-function isRecord3(value) {
-  return !!value && typeof value === "object" && !Array.isArray(value);
+function isRecord3(value2) {
+  return !!value2 && typeof value2 === "object" && !Array.isArray(value2);
 }
 function parseEntry(payload) {
   if (!isRecord3(payload) || payload.version !== 1 || typeof payload.key !== "string" || !isRecord3(payload.entry)) return null;
@@ -64230,10 +64319,10 @@ function parseEntry(payload) {
   if (typeof entry.updated !== "string" || entry.dataUrl !== void 0 && typeof entry.dataUrl !== "string") return null;
   return payload;
 }
-function hashPart(value, seed) {
+function hashPart(value2, seed) {
   let hash = seed >>> 0;
-  for (let index = 0; index < value.length; index++) {
-    hash ^= value.charCodeAt(index);
+  for (let index = 0; index < value2.length; index++) {
+    hash ^= value2.charCodeAt(index);
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(16).padStart(8, "0");
@@ -64331,8 +64420,8 @@ async function writeExistingRecoveryNote(path, content, indexedFile, modify, ada
   await adapter.write(path, content);
 }
 var PENDING_FOLDER = ".obsidian/plugins/jarvis-reader/pending/highlights";
-function isRecord4(value) {
-  return !!value && typeof value === "object" && !Array.isArray(value);
+function isRecord4(value2) {
+  return !!value2 && typeof value2 === "object" && !Array.isArray(value2);
 }
 function normalizeHighlights(highlights) {
   return highlights.map((highlight) => buildHighlightMetadata(highlight));
@@ -64529,10 +64618,10 @@ var REVIEW_SETTING_FIELDS = ["autoPlayAudioOnReview", "wordReviewStats", "sm2Sta
 function hasOwn(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
 }
-function removeReviewFields(value, fields) {
-  const next = { ...value };
+function removeReviewFields(value2, fields2) {
+  const next = { ...value2 };
   const removed = {};
-  for (const field of fields) {
+  for (const field of fields2) {
     if (hasOwn(next, field)) {
       removed[field] = next[field];
       delete next[field];
@@ -64544,15 +64633,15 @@ function removeReviewData(wordAssets, settings) {
   let changed = false;
   const nextAssets = {};
   for (const [key, asset] of Object.entries(wordAssets)) {
-    const record = asset;
-    if (isLegacySentenceAsset(key, record)) {
+    const record2 = asset;
+    if (isLegacySentenceAsset(key, record2)) {
       changed = true;
       continue;
     }
-    const result = removeReviewFields(record, REVIEW_ASSET_FIELDS);
+    const result = removeReviewFields(record2, REVIEW_ASSET_FIELDS);
     delete result.value.isWord;
     nextAssets[key] = result.value;
-    changed ||= Object.keys(result.removed).length > 0 || hasOwn(record, "isWord");
+    changed ||= Object.keys(result.removed).length > 0 || hasOwn(record2, "isWord");
   }
   const settingsResult = removeReviewFields(settings, REVIEW_SETTING_FIELDS);
   const highlightColors = settingsResult.value.highlightColors;
@@ -64620,6 +64709,199 @@ var BookStateService = class {
   }
 };
 
+// src/main.ts
+init_storage_folders();
+
+// src/book-path-service.ts
+var fields = ["bookInitLocations", "bookProgress", "bookBookmarks", "bookHighlights", "readingStats", "wordAssets", "bookCoverCache", "bookPathAliases", "bookNotePaths"];
+function record(value2) {
+  if (!value2 || typeof value2 !== "object" || Array.isArray(value2)) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u8BB0\u5F55\u7ED3\u6784\u5F02\u5E38\uFF0C\u5DF2\u505C\u6B62\u540C\u6B65");
+  return value2;
+}
+function canonical(value2) {
+  if (Array.isArray(value2)) return value2.map(canonical);
+  if (value2 && typeof value2 === "object") return Object.fromEntries(Object.entries(value2).sort(([a], [b]) => a.localeCompare(b)).filter(([, v]) => v !== void 0).map(([k, v]) => [k, canonical(v)]));
+  return value2;
+}
+function equal(a, b) {
+  return JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+}
+function indexed(field, input) {
+  if (field === "bookHighlights" && input.present && Array.isArray(input.value)) return { present: true, value: input.value.map(buildHighlightMetadata) };
+  return input;
+}
+function value(map, key) {
+  return Object.hasOwn(map, key) ? { present: true, value: map[key] } : { present: false };
+}
+function validPath(path, extension = ".epub") {
+  return !!path && !path.startsWith("/") && !path.split("/").some((part) => part === ".." || !part) && path.toLowerCase().endsWith(extension);
+}
+function resolveBookPath(path, aliases = {}) {
+  const seen = /* @__PURE__ */ new Set();
+  while (aliases[path]) {
+    if (seen.has(path)) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u5173\u8054\u5B58\u5728\u5FAA\u73AF");
+    seen.add(path);
+    path = aliases[path];
+  }
+  return path;
+}
+function planBookRename(state, oldPath, newPath, notePath) {
+  if (!validPath(oldPath) || !validPath(newPath) || oldPath === newPath) throw new Error("\u4E66\u7C4D\u6539\u540D\u8DEF\u5F84\u65E0\u6548");
+  const patches = [];
+  const set = (field, key, after) => {
+    const before = indexed(field, value(record(state[field] || {}), key));
+    after = indexed(field, after);
+    if (!equal(before, after)) patches.push({ field, key, before, after });
+  };
+  for (const field of ["bookInitLocations", "bookProgress", "bookBookmarks", "bookHighlights", "bookNotePaths"]) {
+    const map = record(state[field] || {});
+    if (Object.hasOwn(map, newPath)) throw new Error("\u76EE\u6807\u4E66\u7C4D\u8DEF\u5F84\u5DF2\u6709\u8BB0\u5F55\uFF0C\u672A\u8986\u76D6\uFF1B\u8BF7\u68C0\u67E5\u8DEF\u5F84\u51B2\u7A81");
+    if (!Object.hasOwn(map, oldPath)) continue;
+    let next = map[oldPath];
+    if (field === "bookHighlights") {
+      if (!Array.isArray(next)) throw new Error("\u9AD8\u4EAE\u8BB0\u5F55\u7ED3\u6784\u5F02\u5E38");
+      next = next.map((item) => ({ ...record(item), bookPath: newPath }));
+    }
+    set(field, oldPath, { present: false });
+    set(field, newPath, { present: true, value: next });
+  }
+  if (notePath && !state.bookNotePaths?.[oldPath]) set("bookNotePaths", newPath, { present: true, value: notePath });
+  for (const [day, dailyValue] of Object.entries(state.readingStats || {})) {
+    const daily = record(dailyValue);
+    if (!Object.hasOwn(daily, oldPath)) continue;
+    if (Object.hasOwn(daily, newPath)) throw new Error("\u76EE\u6807\u8DEF\u5F84\u5DF2\u6709\u9605\u8BFB\u65F6\u957F\uFF0C\u672A\u5408\u5E76");
+    const next = { ...daily, [newPath]: daily[oldPath] };
+    delete next[oldPath];
+    set("readingStats", day, { present: true, value: next });
+  }
+  for (const [key, asset] of Object.entries(state.wordAssets || {})) {
+    if (!Array.isArray(asset.sources)) throw new Error("\u8BCD\u6761\u6765\u6E90\u7ED3\u6784\u5F02\u5E38");
+    if (asset.sources.some((source) => source.bookPath === oldPath)) set("wordAssets", key, { present: true, value: { ...asset, sources: asset.sources.map((source) => source.bookPath === oldPath ? { ...source, bookPath: newPath } : source) } });
+  }
+  for (const [key, entry] of Object.entries(state.bookCoverCache || {})) {
+    if (!key.startsWith(`${oldPath}|`)) continue;
+    const nextKey = `${newPath}${key.slice(oldPath.length)}`;
+    if (Object.hasOwn(state.bookCoverCache, nextKey)) throw new Error("\u76EE\u6807\u8DEF\u5F84\u5DF2\u6709\u5C01\u9762\u8BB0\u5F55");
+    set("bookCoverCache", key, { present: false });
+    set("bookCoverCache", nextKey, { present: true, value: entry });
+  }
+  const aliases = state.bookPathAliases || {};
+  for (const key of Object.keys(aliases)) {
+    if (key === newPath) set("bookPathAliases", key, { present: false });
+    else if (resolveBookPath(key, aliases) === oldPath) set("bookPathAliases", key, { present: true, value: newPath });
+  }
+  set("bookPathAliases", oldPath, { present: true, value: newPath });
+  return { version: 1, oldPath, newPath, patches };
+}
+function planBookNoteRename(state, oldPath, newPath) {
+  if (!validPath(oldPath, ".md") || !validPath(newPath, ".md") || oldPath === newPath) throw new Error("\u7B14\u8BB0\u6539\u540D\u8DEF\u5F84\u65E0\u6548");
+  const patches = [];
+  for (const [bookPath, path] of Object.entries(state.bookNotePaths || {})) {
+    if (path === oldPath) patches.push({ field: "bookNotePaths", key: bookPath, before: { present: true, value: oldPath }, after: { present: true, value: newPath } });
+  }
+  for (const [bookPath, highlights] of Object.entries(state.bookHighlights || {})) {
+    if (!Array.isArray(highlights)) throw new Error("\u9AD8\u4EAE\u8BB0\u5F55\u7ED3\u6784\u5F02\u5E38");
+    if (!highlights.some((item) => item.notePath === oldPath)) continue;
+    patches.push({
+      field: "bookHighlights",
+      key: bookPath,
+      before: indexed("bookHighlights", { present: true, value: highlights }),
+      after: indexed("bookHighlights", { present: true, value: highlights.map((item) => item.notePath === oldPath ? { ...item, notePath: newPath } : item) })
+    });
+  }
+  return { kind: "note", version: 1, oldPath, newPath, patches };
+}
+function apply(state, pending, forward) {
+  for (const patch of pending.patches) {
+    const current = indexed(patch.field, value(record(state[patch.field] || {}), patch.key));
+    if (!equal(current, patch.before) && !equal(current, patch.after)) throw new Error("\u8DEF\u5F84\u6062\u590D\u8BB0\u5F55\u4E0E\u5F53\u524D\u6570\u636E\u51B2\u7A81\uFF0C\u672A\u8986\u76D6\u73B0\u6709\u5185\u5BB9");
+  }
+  for (const patch of pending.patches) {
+    if (!state[patch.field]) Object.assign(state, { [patch.field]: {} });
+    const map = record(state[patch.field]);
+    const target = forward ? patch.after : patch.before;
+    if (target.present) {
+      if (pending.kind === "note" && patch.field === "bookHighlights" && Array.isArray(target.value)) {
+        const current = Array.isArray(map[patch.key]) ? map[patch.key] : [];
+        map[patch.key] = target.value.map((item) => {
+          const metadata = record(item);
+          const cached = current.find((entry) => record(entry).id === metadata.id);
+          return { ...cached ? record(cached) : {}, ...metadata };
+        });
+      } else map[patch.key] = target.value;
+    } else delete map[patch.key];
+  }
+}
+function parsePending2(content) {
+  const parsed = record(JSON.parse(content));
+  const extension = parsed.kind === "note" ? ".md" : ".epub";
+  if (parsed.kind !== void 0 && parsed.kind !== "note" || parsed.version !== 1 || typeof parsed.oldPath !== "string" || typeof parsed.newPath !== "string" || !validPath(parsed.oldPath, extension) || !validPath(parsed.newPath, extension) || !Array.isArray(parsed.patches)) throw new Error("\u8DEF\u5F84\u6062\u590D\u8BB0\u5F55\u65E0\u6548\uFF0C\u539F\u8BB0\u5F55\u4FDD\u7559");
+  const unique = /* @__PURE__ */ new Set();
+  for (const item of parsed.patches) {
+    const patch = record(item);
+    if (!fields.includes(patch.field) || typeof patch.key !== "string" || ["__proto__", "constructor", "prototype"].includes(patch.key)) throw new Error("\u8DEF\u5F84\u6062\u590D\u5B57\u6BB5\u65E0\u6548");
+    if (parsed.kind === "note" && !["bookNotePaths", "bookHighlights"].includes(patch.field)) throw new Error("\u7B14\u8BB0\u8DEF\u5F84\u6062\u590D\u5B57\u6BB5\u65E0\u6548");
+    for (const side of [patch.before, patch.after]) {
+      const val = record(side);
+      if (typeof val.present !== "boolean" || val.present && !Object.hasOwn(val, "value")) throw new Error("\u8DEF\u5F84\u6062\u590D\u503C\u65E0\u6548");
+    }
+    const id = `${patch.field}:${patch.key}`;
+    if (unique.has(id)) throw new Error("\u91CD\u590D\u8DEF\u5F84\u6062\u590D\u5B57\u6BB5");
+    unique.add(id);
+  }
+  return parsed;
+}
+var BookPathService = class {
+  running = false;
+  host;
+  constructor(host) {
+    this.host = host;
+  }
+  async rename(oldPath, newPath, notePath) {
+    await this.run(() => planBookRename(this.host.state(), oldPath, newPath, notePath));
+  }
+  async renameNote(oldPath, newPath) {
+    await this.run(() => planBookNoteRename(this.host.state(), oldPath, newPath));
+  }
+  async run(plan) {
+    if (this.running) throw new Error("\u5B58\u5728\u672A\u5B8C\u6210\u7684\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\uFF0C\u8BF7\u5148\u6062\u590D");
+    this.running = true;
+    try {
+      if (await this.host.readPending()) throw new Error("\u5B58\u5728\u672A\u5B8C\u6210\u7684\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\uFF0C\u8BF7\u5148\u6062\u590D");
+      const pending = plan();
+      if (!pending.patches.length) return;
+      const content = JSON.stringify(pending);
+      await this.host.writePending(content);
+      if (await this.host.readPending() !== content) throw new Error("\u8DEF\u5F84\u6062\u590D\u8BB0\u5F55\u5199\u5165\u6821\u9A8C\u5931\u8D25");
+      await this.commit(pending);
+    } finally {
+      this.running = false;
+    }
+  }
+  async recover() {
+    const content = await this.host.readPending();
+    if (!content) return false;
+    const pending = parsePending2(content);
+    await this.commit(pending);
+    return true;
+  }
+  async commit(pending) {
+    apply(this.host.state(), pending, true);
+    try {
+      await this.host.persist();
+    } catch (error) {
+      apply(this.host.state(), pending, false);
+      try {
+        await this.host.persist();
+      } catch (rollbackError) {
+        throw new AggregateError([error, rollbackError], "\u8DEF\u5F84\u540C\u6B65\u4E0E\u56DE\u6EDA\u4FDD\u5B58\u5931\u8D25\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559");
+      }
+      throw error;
+    }
+    await this.host.clearPending();
+  }
+};
+
 // src/index-sidecars.ts
 async function writeValidatedSidecar(adapter, path, content, parse) {
   const tempPath = `${path}.tmp`;
@@ -64648,11 +64930,11 @@ async function writeValidatedSidecar(adapter, path, content, parse) {
   }
   if (await adapter.exists(backupPath)) await adapter.remove(backupPath);
 }
-function isRecord5(value) {
-  return !!value && typeof value === "object" && !Array.isArray(value);
+function isRecord5(value2) {
+  return !!value2 && typeof value2 === "object" && !Array.isArray(value2);
 }
-function isHighlightRecord(value) {
-  if (!isRecord5(value)) return false;
+function isHighlightRecord(value2) {
+  if (!isRecord5(value2)) return false;
   const requiredFields = [
     "id",
     "bookPath",
@@ -64664,7 +64946,7 @@ function isHighlightRecord(value) {
     "created",
     "updated"
   ];
-  return requiredFields.every((field) => typeof value[field] === "string");
+  return requiredFields.every((field) => typeof value2[field] === "string");
 }
 function parseHighlightSidecar(payload) {
   if (!isRecord5(payload) || payload.version !== 1 || !isRecord5(payload.bookHighlights)) {
@@ -64701,8 +64983,8 @@ async function readValidatedSidecar(adapter, path, parse) {
     }
   }
   try {
-    const value = parse(JSON.parse(await adapter.read(path)));
-    return value ? { status: "ready", value } : { status: "invalid" };
+    const value2 = parse(JSON.parse(await adapter.read(path)));
+    return value2 ? { status: "ready", value: value2 } : { status: "invalid" };
   } catch {
     return { status: "invalid" };
   }
@@ -64772,6 +65054,35 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     (settingsData) => this.saveData(settingsData)
   );
   highlightSidecarUnavailable = false;
+  bookPathUpdateInProgress = false;
+  bookPathUpdateBlocked = false;
+  bookPathQueue = Promise.resolve();
+  pendingNotePaths = /* @__PURE__ */ new Set();
+  bookPathPending = ".obsidian/plugins/jarvis-reader/pending/book-path-rename.json";
+  bookPathService = new BookPathService({
+    state: () => this.settings,
+    readPending: async () => await this.app.vault.adapter.exists(this.bookPathPending) ? this.app.vault.adapter.read(this.bookPathPending) : null,
+    writePending: async (content) => {
+      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/pending");
+      await this.app.vault.adapter.write(this.bookPathPending, content);
+    },
+    clearPending: () => this.app.vault.adapter.remove(this.bookPathPending),
+    persist: async () => {
+      if (this.highlightSidecarUnavailable || this.wordAssetSidecarUnavailable || !this.coverCacheMigrationComplete) throw new Error("\u7D22\u5F15\u6216\u5C01\u9762\u5B58\u50A8\u4E0D\u53EF\u7528\uFF0C\u8DEF\u5F84\u540C\u6B65\u5DF2\u505C\u6B62");
+      const snapshot = this.getIndexSnapshot();
+      const paths = this.getIndexSidecarPaths();
+      await writeHighlightSidecar(this.app.vault.adapter, paths.highlights, snapshot.bookHighlights);
+      await writeWordAssetSidecar(this.app.vault.adapter, paths.wordAssets, snapshot.wordAssets);
+      const covers = this.settings.bookCoverCache || {};
+      const current = this.coverCacheService.snapshot();
+      for (const [key, entry] of Object.entries(covers)) {
+        if (JSON.stringify(current[key]) !== JSON.stringify(entry)) await this.coverCacheService.save(key, entry);
+      }
+      await this.coverCacheService.prune(Object.keys(covers));
+      this.settings.bookCoverCache = this.coverCacheService.snapshot();
+      await this.saveSettingsData();
+    }
+  });
   async onload() {
     (0, import_obsidian16.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
     (0, import_obsidian16.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
@@ -64790,7 +65101,73 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     if (needsStartupIndexPersistence) {
       await this.persistIndexSidecars("startup");
     }
-    await this.saveSettingsData();
+    try {
+      if (await this.bookPathService.recover()) new import_obsidian16.Notice("\u5DF2\u6062\u590D\u672A\u5B8C\u6210\u7684\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65");
+    } catch (error) {
+      this.bookPathUpdateBlocked = true;
+      console.error("Jarvis Reader book path recovery failed", error);
+      new import_obsidian16.Notice("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u9700\u8981\u6062\u590D\uFF0C\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u6062\u590D\u8BB0\u5F55\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u65E5\u5FD7\u3002", 0);
+    }
+    if (!this.bookPathUpdateBlocked) await this.saveSettingsData();
+    this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+      if (file instanceof import_obsidian16.TFile && file.extension.toLowerCase() === "md" && oldPath.toLowerCase().endsWith(".md")) {
+        const tracked = this.pendingNotePaths.has(oldPath) || Object.values(this.settings.bookNotePaths || {}).includes(oldPath) || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items) && items.some((item) => item.notePath === oldPath));
+        if (!tracked) return;
+        this.bookPathUpdateInProgress = true;
+        const newPath2 = file.path;
+        this.pendingNotePaths.add(newPath2);
+        this.bookPathQueue = this.bookPathQueue.then(async () => {
+          if (this.bookPathUpdateBlocked) throw new Error("\u4E0A\u4E00\u6B21\u8DEF\u5F84\u540C\u6B65\u5C1A\u672A\u6062\u590D");
+          await this.flushSettingsData();
+          await this.bookPathService.renameNote(oldPath, newPath2);
+          this.pendingNotePaths.delete(newPath2);
+          this.bookPathUpdateInProgress = this.pendingNotePaths.size > 0;
+          this.onHighlightsChanged();
+          window.dispatchEvent(new CustomEvent("jarvis-reader-folders-updated"));
+        }).catch((error) => {
+          this.bookPathUpdateInProgress = false;
+          this.bookPathUpdateBlocked = true;
+          console.error("Jarvis Reader note path synchronization failed", error);
+          new import_obsidian16.Notice("\u8BFB\u4E66\u7B14\u8BB0\u5DF2\u79FB\u52A8\uFF0C\u4F46\u5173\u8054\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u539F\u8BB0\u5F55\u548C\u6062\u590D\u4FE1\u606F\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
+        });
+        return;
+      }
+      if (!(file instanceof import_obsidian16.TFile) || file.extension.toLowerCase() !== "epub" || !oldPath.toLowerCase().endsWith(".epub")) return;
+      this.bookPathUpdateInProgress = true;
+      const newPath = file.path;
+      const readers = this.app.workspace.getLeavesOfType("epub").map((leaf) => leaf.view).filter((view) => view instanceof EpubView && !!view.file);
+      const preparing = Promise.all(readers.map((view) => view.prepareBookPathChange(view.file === file ? oldPath : view.file.path)));
+      this.bookPathQueue = this.bookPathQueue.then(async () => {
+        await preparing;
+        await this.flushSettingsData();
+        this.bookPathUpdateInProgress = true;
+        try {
+          if (this.bookPathUpdateBlocked) throw new Error("\u4E0A\u4E00\u6B21\u8DEF\u5F84\u540C\u6B65\u5C1A\u672A\u6062\u590D");
+          const basename = oldPath.slice(oldPath.lastIndexOf("/") + 1, -5);
+          const previousFile = { path: oldPath, basename, extension: "epub", parent: { path: oldPath.slice(0, Math.max(0, oldPath.lastIndexOf("/"))) } };
+          const note = findBookNote(this.app, previousFile, this.settings) || findBookNote(this.app, file, this.settings);
+          await this.bookPathService.rename(oldPath, newPath, note?.path);
+          this.onHighlightsChanged();
+          this.onWordAssetsChanged();
+          window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
+        } finally {
+          this.bookPathUpdateInProgress = false;
+        }
+        for (const view of readers) {
+          try {
+            if (view.file) await view.onLoadFile(view.file);
+          } catch (error) {
+            console.error("Jarvis Reader renamed book could not reopen", error);
+            new import_obsidian16.Notice("\u9605\u8BFB\u8BB0\u5F55\u5DF2\u540C\u6B65\uFF0C\u4F46\u4E66\u7C4D\u91CD\u65B0\u6253\u5F00\u5931\u8D25\uFF0C\u8BF7\u91CD\u65B0\u6253\u5F00\u4E66\u7C4D");
+          }
+        }
+      }).catch((error) => {
+        this.bookPathUpdateInProgress = false;
+        this.bookPathUpdateBlocked = true;
+        console.error("Jarvis Reader book path synchronization failed", error);
+        new import_obsidian16.Notice("\u4E66\u7C4D\u5DF2\u6539\u540D\uFF0C\u4F46\u9605\u8BFB\u8BB0\u5F55\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u8BF7\u52FF\u7EE7\u7EED\u6539\u540D\uFF0C\u539F\u8BB0\u5F55\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u68C0\u67E5\u65E5\u5FD7\u5E76\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
+      });
+    }));
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
     });
@@ -64900,13 +65277,16 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       new import_obsidian16.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
       return;
     }
+    const aliases = this.settings.bookPathAliases || {};
+    const originalIndexed = (this.settings.bookHighlights?.[target.bookPath] || []).some((item) => item.id === target.highlightId || item.blockId === target.highlightId);
+    if (!originalIndexed) target.bookPath = resolveBookPath(target.bookPath, aliases);
     const file = this.app.vault.getAbstractFileByPath(target.bookPath);
     if (!(file instanceof import_obsidian16.TFile)) {
       new import_obsidian16.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
       return;
     }
-    const indexed = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
-    const cfiRange = indexed?.cfiRange || target.cfiRange;
+    const indexed2 = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
+    const cfiRange = indexed2?.cfiRange || target.cfiRange;
     if (!cfiRange) {
       new import_obsidian16.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
       return;
@@ -64915,7 +65295,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     try {
       const leaf = await openFileOnceInActiveTab(this.app.workspace, file, "epub");
       if (!(leaf.view instanceof EpubView)) throw new Error("\u9605\u8BFB\u5668\u672A\u80FD\u6253\u5F00\u3002");
-      await leaf.view.jumpToHighlight({ id: indexed?.id || target.highlightId, cfiRange });
+      await leaf.view.jumpToHighlight({ id: indexed2?.id || target.highlightId, cfiRange });
     } catch (error) {
       console.error("Jarvis Reader source navigation failed.", error);
       new import_obsidian16.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
@@ -65137,6 +65517,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     new import_obsidian16.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
   }
   async persistWordAssetSidecar(reason = "save") {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u671F\u95F4\u4FDD\u5B58\u5DF2\u6682\u505C");
     if (this.wordAssetSidecarUnavailable) {
       const message = "\u8BCD\u6761\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u8BCD\u6761\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D word-assets.json\u3002";
       console.error(`Jarvis Reader ${message}`);
@@ -65169,6 +65550,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     }
   }
   async persistHighlightSidecar(reason = "save") {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u671F\u95F4\u4FDD\u5B58\u5DF2\u6682\u505C");
     if (this.highlightSidecarUnavailable) {
       const message = "\u9AD8\u4EAE\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u9AD8\u4EAE\u7D22\u5F15\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D highlights.json\u3002";
       console.error(`Jarvis Reader ${message}`);
@@ -65248,8 +65630,9 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
     delete this.settings.localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+    this.settings.bookFolder = normalizeVaultPath(this.settings.bookFolder || "");
     this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
-    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder || "00-Attachment");
+    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder ?? DEFAULT_SETTINGS.customCoverFolder);
     this.settings.enableAutoHighlight = this.settings.enableAutoHighlight !== false;
     this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
     this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);
@@ -65282,7 +65665,16 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       new import_obsidian16.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
     }
   }
+  async configureStorageFolders(draft) {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u66F4\u65B0\u671F\u95F4\u4E0D\u80FD\u66F4\u6539\u76EE\u5F55");
+    await configureStorageFolders({
+      stat: (path) => this.app.vault.adapter.stat(path),
+      mkdir: (path) => this.app.vault.createFolder(path)
+    }, this.settings, draft, () => this.saveSettingsData());
+    window.dispatchEvent(new CustomEvent("jarvis-reader-folders-updated"));
+  }
   async saveSettings() {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u671F\u95F4\u4FDD\u5B58\u5DF2\u6682\u505C");
     await this.saveSettingsData();
   }
   async saveSettingsData() {
@@ -65303,6 +65695,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
     await this.settingsSaveQueue.flushNow();
   }
   async saveBookCoverCacheEntry(key, entry) {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u671F\u95F4\u5C01\u9762\u4FDD\u5B58\u5DF2\u6682\u505C");
     if (!this.coverCacheMigrationComplete) {
       throw new Error("\u5C01\u9762\u7F13\u5B58\u670D\u52A1\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u5199\u5165\u4EE5\u4FDD\u62A4\u65E7\u914D\u7F6E\u3002");
     }
@@ -65311,6 +65704,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
   }
   async pruneBookCoverCache(validKeys) {
     if (!this.coverCacheMigrationComplete) return 0;
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) return 0;
     const removed = await this.coverCacheService.prune(validKeys);
     if (removed) this.settings.bookCoverCache = this.coverCacheService.snapshot();
     return removed;

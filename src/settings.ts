@@ -1,5 +1,5 @@
 import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
-import { normalizeVaultPath } from "./utils";
+import { DEFAULT_STORAGE_FOLDERS, type StorageFolders } from "./storage-folders";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
@@ -27,10 +27,11 @@ export const DEFAULT_SETTINGS = {
   readerZoom: READER_ZOOM_LIMITS.defaultValue,
   readerLineHeight: READER_LINE_HEIGHT_LIMITS.defaultValue,
   readerQuickActions: ["bookmark", "note"],
-  bookNoteFolder: "",
-  knowledgeNoteFolder: "知识库/想法",
+  bookFolder: "",
+  bookNoteFolder: DEFAULT_STORAGE_FOLDERS.bookNoteFolder,
+  knowledgeNoteFolder: DEFAULT_STORAGE_FOLDERS.knowledgeNoteFolder,
   bookNoteTemplate: DEFAULT_BOOK_NOTE_TEMPLATE,
-  customCoverFolder: "00-Attachment",
+  customCoverFolder: DEFAULT_STORAGE_FOLDERS.customCoverFolder,
   wordAssets: {},
   translationApi: {
     provider: "openai-compatible",
@@ -145,68 +146,43 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     const contentDiv = containerEl.createDiv("jarvis-settings-content");
 
     if (this.activeTab === "storage") {
-      new Setting(contentDiv).setName("读书笔记").setHeading();
-      let bookFolderText: any = null;
-      new Setting(contentDiv).setName("读书笔记文件夹").setDesc("保存自动生成读书笔记的文件夹").addText((text) => {
-        bookFolderText = text;
-        text.setPlaceholder("选择或输入文件夹").setValue(this.plugin.settings.bookNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.bookNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("选择").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.bookNoteFolder = path;
-          await this.plugin.saveSettings();
-          if (bookFolderText) {
-            bookFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
-        this.plugin.settings.bookNoteFolder = "";
-        await this.plugin.saveSettings();
-        if (bookFolderText) {
-          bookFolderText.setValue("");
-        }
-      }));
-
-      new Setting(contentDiv).setName("知识笔记").setHeading();
-      let knowledgeFolderText: any = null;
-      new Setting(contentDiv).setName("知识笔记默认目录").setDesc("将阅读笔记提升为独立知识笔记时，自动创建到此目录。留空则创建到仓库根目录。").addText((text) => {
-        knowledgeFolderText = text;
-        text.setPlaceholder("如: 知识库/想法").setValue(this.plugin.settings.knowledgeNoteFolder || "").onChange(async (value) => {
-          this.plugin.settings.knowledgeNoteFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("选择").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.knowledgeNoteFolder = path;
-          await this.plugin.saveSettings();
-          knowledgeFolderText?.setValue(path);
-        }).open();
-      }));
-
-      new Setting(contentDiv).setName("其他文件").setHeading();
-      let customCoverFolderText: any = null;
-      new Setting(contentDiv).setName("自定义封面文件夹").setDesc("保存自定义图书封面的文件夹路径").addText((text) => {
-        customCoverFolderText = text;
-        text.setPlaceholder("00-Attachment").setValue(this.plugin.settings.customCoverFolder || "").onChange(async (value) => {
-          this.plugin.settings.customCoverFolder = normalizeVaultPath(value);
-          await this.plugin.saveSettings();
-        });
-      }).addButton((button) => button.setButtonText("选择").onClick(() => {
-        new JarvisReaderFolderSuggestModal(this.app, async (path) => {
-          this.plugin.settings.customCoverFolder = path;
-          await this.plugin.saveSettings();
-          if (customCoverFolderText) {
-            customCoverFolderText.setValue(path);
-          }
-        }).open();
-      })).addButton((button) => button.setButtonText("清除").onClick(async () => {
-        this.plugin.settings.customCoverFolder = "";
-        await this.plugin.saveSettings();
-        if (customCoverFolderText) {
-          customCoverFolderText.setValue("");
-        }
+      new Setting(contentDiv).setName("书籍与文件夹").setHeading();
+      const draft: StorageFolders = {
+        bookFolder: this.plugin.settings.bookFolder || "",
+        bookNoteFolder: this.plugin.settings.bookNoteFolder,
+        knowledgeNoteFolder: this.plugin.settings.knowledgeNoteFolder,
+        customCoverFolder: this.plugin.settings.customCoverFolder
+      };
+      const inputs = new Map<keyof StorageFolders, import("obsidian").TextComponent>();
+      const rows: { key: keyof StorageFolders; name: string; placeholder: string }[] = [
+        { key: "bookFolder", name: "书籍文件夹", placeholder: "留空为整个仓库" },
+        { key: "bookNoteFolder", name: "读书笔记", placeholder: "Reading Notes" },
+        { key: "knowledgeNoteFolder", name: "知识笔记", placeholder: "Knowledge Notes" },
+        { key: "customCoverFolder", name: "封面", placeholder: "Cover" }
+      ];
+      for (const row of rows) {
+        const setting = new Setting(contentDiv).setName(row.name);
+        if (row.key === "bookFolder") setting.setDesc("仅用于筛选书架，其他目录独立设置。");
+        setting.addText(text => {
+          inputs.set(row.key, text);
+          text.setPlaceholder(row.placeholder).setValue(draft[row.key]).onChange(value => {
+            draft[row.key] = value;
+          });
+        }).addExtraButton(button => button.setIcon("folder-open").setTooltip("选择文件夹").onClick(() => {
+          new JarvisReaderFolderSuggestModal(this.app, path => {
+            draft[row.key] = path;
+            inputs.get(row.key)?.setValue(path);
+          }).open();
+        }));
+      }
+      new Setting(contentDiv).addButton(button => button.setButtonText("保存并创建文件夹").setCta().onClick(async () => {
+        button.setDisabled(true);
+        try {
+          await this.plugin.configureStorageFolders(draft);
+          new Notice("文件夹设置已保存");
+        } catch (error) {
+          new Notice(error instanceof Error ? error.message : "文件夹设置保存失败");
+        } finally { button.setDisabled(false); }
       }));
 
       new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}")

@@ -2,7 +2,7 @@ import { bindReaderContainerResize } from "./reader-resize";
 import { removeEpubAnnotation } from "./epub-annotations-adapter";
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
-import { Notice, setIcon, MarkdownRenderer } from "obsidian";
+import { Notice, setIcon, MarkdownRenderer, Menu } from "obsidian";
 import { ReactReader } from "react-reader";
 import * as ReactReaderModule from "react-reader";
 import { normalizeHighlightQuote, normalizeWordDisplayText, escapeRegExp, formatLocalDate, confirmDestructiveAction } from "./utils";
@@ -1935,28 +1935,33 @@ const showWordHoverCard = (asset, element) => {
     key: `${entry.label || "note"}-${index}`,
     style: { display: "flex", flexDirection: "column", gap: "4px" }
   },
+    React.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "笔记"),
     React.createElement("div", {
-      style: { display: "flex", alignItems: "center", justifyContent: "space-between" }
+      className: "jarvis-reader-highlight-note-card-text",
+      style: { marginTop: "2px" }
+    }, React.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
+    React.createElement("div", {
+      className: "jarvis-reader-highlight-note-footer"
     },
-      React.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "笔记"),
-      React.createElement("div", {
-        style: { display: "flex", gap: "6px" }
-      },
-        React.createElement("button", {
-          className: "jarvis-reader-highlight-icon-button",
-          type: "button",
-          title: "编辑笔记",
-          onClick: () => {
+      React.createElement("span", {
+        className: "jarvis-reader-highlight-note-card-time"
+      }, formatHighlightNoteTime(entry.created)),
+      React.createElement("button", {
+        className: "jarvis-reader-highlight-icon-button jarvis-reader-highlight-note-more",
+        type: "button",
+        title: "笔记操作",
+        "aria-label": `${entry.label || "笔记"}操作`,
+        "aria-haspopup": "menu",
+        onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+          event.stopPropagation();
+          const rect = event.currentTarget.getBoundingClientRect();
+          const menu = new Menu();
+          menu.addItem((item) => item.setTitle("编辑").setIcon("pencil").onClick(() => {
             setEditingNoteIndex(index);
             setHighlightComment(entry.text);
             setHighlightCommentMode("edit");
-          }
-        }, renderObsidianIcon("pencil")),
-        React.createElement("button", {
-          className: "jarvis-reader-highlight-icon-button",
-          type: "button",
-          title: "删除笔记",
-          onClick: async () => {
+          }));
+          menu.addItem((item) => item.setTitle("删除").setIcon("trash-2").onClick(async () => {
             const effectiveApp = app || (window as any).app;
             if (!effectiveApp) {
               new Notice("无法获取 Obsidian App 实例。");
@@ -1967,21 +1972,12 @@ const showWordHoverCard = (asset, element) => {
               "删除笔记",
               "确定要删除这条笔记吗？此操作不可恢复。"
             );
-            if (confirmed) {
-              await deleteNoteEntry(index);
-            }
-          }
-        }, renderObsidianIcon("trash-2"))
-      )
-    ),
-    React.createElement("div", {
-      className: "jarvis-reader-highlight-note-card-text",
-      style: { marginTop: "2px" }
-    }, React.createElement(ObsidianMarkdown, { text: entry.text, onOpenLink: openWikiLink })),
-    React.createElement("div", {
-      className: "jarvis-reader-highlight-note-card-time",
-      style: { marginTop: "2px" }
-    }, formatHighlightNoteTime(entry.created))
+            if (confirmed) await deleteNoteEntry(index);
+          }));
+          menu.showAtPosition({ x: rect.left, y: rect.bottom });
+        }
+      }, renderObsidianIcon("ellipsis"))
+    )
   ))) : React.createElement("div", {
     className: "jarvis-reader-highlight-empty"
   }, "\u6682\u65e0\u7b14\u8bb0");
@@ -3043,11 +3039,12 @@ const showWordHoverCard = (asset, element) => {
     title: "\u5173\u95ed\u5361\u7247",
     onClick: hideWordHoverCard
   }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
+  className: "jarvis-reader-word-phonetic"
   }, activeWordHover.asset.phonetic) : null), 
-  (activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford) ? React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px", marginBottom: "8px", paddingLeft: "16px", paddingRight: "16px" } },
-    activeWordHover.asset.oxford === 1 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-blue) 20%, transparent)", color: "var(--color-blue)", border: "1px solid color-mix(in srgb, var(--color-blue) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, "牛津核心") : null,
-    activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? React.createElement("span", { className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-yellow) 20%, transparent)", color: "var(--color-yellow)", border: "1px solid color-mix(in srgb, var(--color-yellow) 40%, transparent)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px" } }, '★'.repeat(activeWordHover.asset.collins)) : null,
-    activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-tag", style: { background: "color-mix(in srgb, var(--color-green) 15%, transparent)", color: "var(--color-green)", fontSize: "0.75em", padding: "1px 6px", borderRadius: "12px", border: "1px solid color-mix(in srgb, var(--color-green) 40%, transparent)" } }, tag.toUpperCase())) : null
+  (activeWordHover.asset.tags || activeWordHover.asset.collins || activeWordHover.asset.oxford) ? React.createElement("div", { className: "jarvis-reader-word-tags" },
+    activeWordHover.asset.oxford === 1 ? React.createElement("span", { className: "jarvis-reader-word-tag" }, "牛津核心") : null,
+    activeWordHover.asset.collins && activeWordHover.asset.collins > 0 ? React.createElement("span", { className: "jarvis-reader-word-tag" }, '★'.repeat(activeWordHover.asset.collins)) : null,
+    activeWordHover.asset.tags ? activeWordHover.asset.tags.map((tag: string) => React.createElement("span", { key: tag, className: "jarvis-reader-word-tag" }, tag.toUpperCase())) : null
   ) : null,
   React.createElement("div", {
     className: blurWordCardBody ? "jarvis-reader-word-card-body is-blurred" : "jarvis-reader-word-card-body"
@@ -3055,7 +3052,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-original-sentence",
     style: { background: "color-mix(in srgb, var(--background-secondary) 78%, transparent)", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px", fontSize: "0.95em", lineHeight: "1.5", color: "var(--text-normal)" }
   }, activeWordHover.asset.title || (activeWordHover.asset.sources && activeWordHover.asset.sources[0] && activeWordHover.asset.sources[0].quote) || "") : null,  React.createElement("div", {
-    style: { background: "var(--background-primary)", border: "1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent)", borderRadius: "10px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }
+    style: { display: "flex", flexDirection: "column", gap: "6px" }
   }, activeWordHover.asset.display ? renderWordDisplayContent(activeWordHover.asset.display) : null, !activeWordHover.asset.display ?  React.createElement("div", {
     className: "jarvis-reader-word-translation"
   }, activeWordHover.asset.translation || "") : null, !activeWordHover.asset.display && activeWordHover.asset.partOfSpeech ?  React.createElement("div", {

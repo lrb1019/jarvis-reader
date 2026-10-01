@@ -4,7 +4,7 @@ import { resolveSyncConflicts } from "./conflict-resolver";
 import { JarvisReaderBookshelfView, BOOKSHELF_VIEW_TYPE } from "./sidebar/BookshelfView";
 import { LibraryView, LIBRARY_VIEW_TYPE } from "./library/LibraryView";
 import { JarvisReaderSettingTab, DEFAULT_SETTINGS } from "./settings";
-import { openOrCreateNote } from "./book-notes";
+import { findBookNote, openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
 import { openFileOnceInActiveTab } from "./workspace-navigation";
 import { parseReadingSourceTarget } from "./reading-source-link";
@@ -21,12 +21,14 @@ import { createBookNoteOperations } from "./book-note-operations";
 import { KnowledgeNoteService } from "./knowledge-note-service";
 import { createKnowledgeNoteStorage } from "./knowledge-note-store";
 import { CoverCacheService } from "./cover-cache-service";
-import type { BookCoverCache, BookCoverCacheEntry } from "./types";
+import type { BookCoverCache, BookCoverCacheEntry, BookHighlight } from "./types";
 import { HighlightTransactionService, writeExistingRecoveryNote } from "./highlight-transaction-service";
 import { SettingsSaveQueue } from "./settings-save-queue";
 import { removeSmartCommandsWithBackup } from "./smart-command-migration";
 import { removeReviewData } from "./review-migration";
 import { BookStateService } from "./book-state-service";
+import { configureStorageFolders, type StorageFolders } from "./storage-folders";
+import { BookPathService, resolveBookPath } from "./book-path-service";
 import {
   readHighlightSidecar,
   readWordAssetSidecar,
@@ -76,6 +78,35 @@ export default class JarvisReaderPlugin extends Plugin {
     (settingsData) => this.saveData(settingsData),
   );
   highlightSidecarUnavailable = false;
+  bookPathUpdateInProgress = false;
+  bookPathUpdateBlocked = false;
+  private bookPathQueue: Promise<void> = Promise.resolve();
+  private readonly pendingNotePaths = new Set<string>();
+  private readonly bookPathPending = ".obsidian/plugins/jarvis-reader/pending/book-path-rename.json";
+  bookPathService = new BookPathService({
+    state: () => this.settings,
+    readPending: async () => await this.app.vault.adapter.exists(this.bookPathPending) ? this.app.vault.adapter.read(this.bookPathPending) : null,
+    writePending: async content => {
+      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/pending");
+      await this.app.vault.adapter.write(this.bookPathPending, content);
+    },
+    clearPending: () => this.app.vault.adapter.remove(this.bookPathPending),
+    persist: async () => {
+      if (this.highlightSidecarUnavailable || this.wordAssetSidecarUnavailable || !this.coverCacheMigrationComplete) throw new Error("索引或封面存储不可用，路径同步已停止");
+      const snapshot = this.getIndexSnapshot(); const paths = this.getIndexSidecarPaths();
+      await writeHighlightSidecar(this.app.vault.adapter, paths.highlights, snapshot.bookHighlights);
+      await writeWordAssetSidecar(this.app.vault.adapter, paths.wordAssets, snapshot.wordAssets);
+      const covers: BookCoverCache = this.settings.bookCoverCache || {};
+      const current = this.coverCacheService.snapshot();
+      for (const [key, entry] of Object.entries(covers)) {
+        if (JSON.stringify(current[key]) !== JSON.stringify(entry)) await this.coverCacheService.save(key, entry);
+      }
+      await this.coverCacheService.prune(Object.keys(covers));
+      this.settings.bookCoverCache = this.coverCacheService.snapshot();
+      await this.saveSettingsData();
+    },
+  });
+
 
   async onload() {
     addIcon("jarvis-logo", JARVIS_LOGO_SVG);
@@ -95,7 +126,69 @@ export default class JarvisReaderPlugin extends Plugin {
     if (needsStartupIndexPersistence) {
       await this.persistIndexSidecars("startup");
     }
-    await this.saveSettingsData();
+    try {
+      if (await this.bookPathService.recover()) new Notice("已恢复未完成的书籍路径同步");
+    } catch (error) {
+      this.bookPathUpdateBlocked = true;
+      console.error("Jarvis Reader book path recovery failed", error);
+      new Notice("书籍路径同步需要恢复，保存已暂停，恢复记录保留。请检查日志。", 0);
+    }
+    if (!this.bookPathUpdateBlocked) await this.saveSettingsData();
+    this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+      if (file instanceof TFile && file.extension.toLowerCase() === "md" && oldPath.toLowerCase().endsWith(".md")) {
+        const tracked = this.pendingNotePaths.has(oldPath) || Object.values(this.settings.bookNotePaths || {}).includes(oldPath)
+          || Object.values(this.settings.bookHighlights || {}).some(items => Array.isArray(items) && items.some((item: BookHighlight) => item.notePath === oldPath));
+        if (!tracked) return;
+        this.bookPathUpdateInProgress = true;
+        const newPath = file.path;
+        this.pendingNotePaths.add(newPath);
+        this.bookPathQueue = this.bookPathQueue.then(async () => {
+          if (this.bookPathUpdateBlocked) throw new Error("上一次路径同步尚未恢复");
+          await this.flushSettingsData();
+          await this.bookPathService.renameNote(oldPath, newPath);
+          this.pendingNotePaths.delete(newPath);
+          this.bookPathUpdateInProgress = this.pendingNotePaths.size > 0;
+          this.onHighlightsChanged();
+          window.dispatchEvent(new CustomEvent("jarvis-reader-folders-updated"));
+        }).catch(error => {
+          this.bookPathUpdateInProgress = false;
+          this.bookPathUpdateBlocked = true;
+          console.error("Jarvis Reader note path synchronization failed", error);
+          new Notice("读书笔记已移动，但关联同步未完成；原记录和恢复信息已保留，请恢复后重载插件。", 0);
+        });
+        return;
+      }
+      if (!(file instanceof TFile) || file.extension.toLowerCase() !== "epub" || !oldPath.toLowerCase().endsWith(".epub")) return;
+      this.bookPathUpdateInProgress = true;
+      const newPath = file.path;
+      const readers = this.app.workspace.getLeavesOfType("epub").map(leaf => leaf.view).filter((view): view is EpubView => view instanceof EpubView && !!view.file);
+      const preparing = Promise.all(readers.map(view => view.prepareBookPathChange(view.file === file ? oldPath : view.file!.path)));
+      this.bookPathQueue = this.bookPathQueue.then(async () => {
+        await preparing;
+        await this.flushSettingsData();
+        this.bookPathUpdateInProgress = true;
+        try {
+          if (this.bookPathUpdateBlocked) throw new Error("上一次路径同步尚未恢复");
+          const basename = oldPath.slice(oldPath.lastIndexOf("/") + 1, -5);
+          const previousFile = { path: oldPath, basename, extension: "epub", parent: { path: oldPath.slice(0, Math.max(0, oldPath.lastIndexOf("/"))) } } as TFile;
+          const note = findBookNote(this.app, previousFile, this.settings) || findBookNote(this.app, file, this.settings);
+          await this.bookPathService.rename(oldPath, newPath, note?.path);
+          this.onHighlightsChanged(); this.onWordAssetsChanged();
+          window.dispatchEvent(new CustomEvent("jarvis-reader-bookmarks-updated"));
+        } finally { this.bookPathUpdateInProgress = false; }
+        for (const view of readers) {
+          try { if (view.file) await view.onLoadFile(view.file); } catch (error) {
+            console.error("Jarvis Reader renamed book could not reopen", error);
+            new Notice("阅读记录已同步，但书籍重新打开失败，请重新打开书籍");
+          }
+        }
+      }).catch(error => {
+        this.bookPathUpdateInProgress = false;
+        this.bookPathUpdateBlocked = true;
+        console.error("Jarvis Reader book path synchronization failed", error);
+        new Notice("书籍已改名，但阅读记录同步未完成；保存已暂停，请勿继续改名，原记录已保留，请检查日志并恢复后重载插件。", 0);
+      });
+    }));
     this.registerView("epub", (leaf) => {
       return new EpubView(leaf, this.settings, this);
     });
@@ -209,6 +302,9 @@ export default class JarvisReaderPlugin extends Plugin {
       new Notice("原文链接无效或版本不受支持。");
       return;
     }
+    const aliases = this.settings.bookPathAliases || {};
+    const originalIndexed = (this.settings.bookHighlights?.[target.bookPath] || []).some((item: BookHighlight) => item.id === target.highlightId || item.blockId === target.highlightId);
+    if (!originalIndexed) target.bookPath = resolveBookPath(target.bookPath, aliases);
     const file = this.app.vault.getAbstractFileByPath(target.bookPath);
     if (!(file instanceof TFile)) {
       new Notice("找不到原书，可能已移动或删除。");
@@ -448,6 +544,7 @@ export default class JarvisReaderPlugin extends Plugin {
     new Notice("已移除旧复习和长句词条数据。", 10000);
   }
   async persistWordAssetSidecar(reason = "save") {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径同步期间保存已暂停");
     if (this.wordAssetSidecarUnavailable) {
       const message = "词条主数据不可用，已停止词条保存以保护损坏文件。请先恢复 word-assets.json。";
       console.error(`Jarvis Reader ${message}`);
@@ -480,6 +577,7 @@ export default class JarvisReaderPlugin extends Plugin {
     }
   }
   async persistHighlightSidecar(reason = "save") {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径同步期间保存已暂停");
     if (this.highlightSidecarUnavailable) {
       const message = "高亮主数据不可用，已停止高亮索引保存以保护损坏文件。请先恢复 highlights.json。";
       console.error(`Jarvis Reader ${message}`);
@@ -562,8 +660,9 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
     delete (this.settings as any).localDictionary;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
+    this.settings.bookFolder = normalizeVaultPath(this.settings.bookFolder || "");
     this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
-    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder || "00-Attachment");
+    this.settings.customCoverFolder = normalizeVaultPath(this.settings.customCoverFolder ?? DEFAULT_SETTINGS.customCoverFolder);
     this.settings.enableAutoHighlight = this.settings.enableAutoHighlight !== false;
     this.settings.enableWordAudio = this.settings.enableWordAudio !== false;
     this.settings.wordAudioTemplate = String(this.settings.wordAudioTemplate || DEFAULT_WORD_AUDIO_TEMPLATE);
@@ -596,7 +695,17 @@ export default class JarvisReaderPlugin extends Plugin {
       new Notice(`智能指令已移除，旧配置备份位于：${smartCommandsBackupPath}`, 10000);
     }
   }
+  async configureStorageFolders(draft: StorageFolders): Promise<void> {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径更新期间不能更改目录");
+    await configureStorageFolders({
+      stat: path => this.app.vault.adapter.stat(path),
+      mkdir: path => this.app.vault.createFolder(path)
+    }, this.settings, draft, () => this.saveSettingsData());
+    window.dispatchEvent(new CustomEvent("jarvis-reader-folders-updated"));
+  }
+
   async saveSettings() {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径同步期间保存已暂停");
     // Index sidecars have dedicated services; ordinary settings must not rewrite them.
     await this.saveSettingsData();
   }
@@ -621,6 +730,7 @@ export default class JarvisReaderPlugin extends Plugin {
   }
 
   async saveBookCoverCacheEntry(key: string, entry: BookCoverCacheEntry): Promise<void> {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径同步期间封面保存已暂停");
     if (!this.coverCacheMigrationComplete) {
       throw new Error("封面缓存服务不可用，已停止写入以保护旧配置。");
     }
@@ -630,6 +740,7 @@ export default class JarvisReaderPlugin extends Plugin {
 
   async pruneBookCoverCache(validKeys: Iterable<string>): Promise<number> {
     if (!this.coverCacheMigrationComplete) return 0;
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) return 0;
     const removed = await this.coverCacheService.prune(validKeys);
     if (removed) this.settings.bookCoverCache = this.coverCacheService.snapshot();
     return removed;
