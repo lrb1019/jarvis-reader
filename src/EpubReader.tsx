@@ -1,3 +1,4 @@
+import { fitReaderOverlay } from "./reader-overlay-bounds";
 import { bindReaderContainerResize } from "./reader-resize";
 import { removeEpubAnnotation } from "./epub-annotations-adapter";
 // Extracted from main.js L49177-51296 — EpubReader React component
@@ -155,14 +156,12 @@ export function buildWordMatchRegex(lemma) {
 }
 export function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
   const containerRect = container && typeof container.getBoundingClientRect === "function" ? container.getBoundingClientRect() : null;
-  const boundsWidth = Math.max(360, (containerRect == null ? void 0 : containerRect.width) || window.innerWidth || 960);
-  const boundsHeight = Math.max(240, (containerRect == null ? void 0 : containerRect.height) || window.innerHeight || 720);
+  const boundsWidth = Math.max(0, (containerRect == null ? void 0 : containerRect.width) || window.innerWidth || 960);
+  const boundsHeight = Math.max(0, (containerRect == null ? void 0 : containerRect.height) || window.innerHeight || 720);
   const left = rect ? rect.left - (containerRect == null ? void 0 : containerRect.left) : 24;
   const top = rect ? rect.bottom - (containerRect == null ? void 0 : containerRect.top) + 8 : 24;
-  return {
-    left: Math.min(boundsWidth - width - 16, Math.max(16, left)),
-    top: Math.min(boundsHeight - height - 16, Math.max(16, top))
-  };
+  const fitted = fitReaderOverlay({ x: left, y: top, width, height }, { width: boundsWidth, height: boundsHeight });
+  return { left: fitted.x, top: fitted.y };
 }
 
 const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) => void }> = ({ text, onOpenLink }) => {
@@ -311,15 +310,15 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ getPanelOpen, onPanelOpe
   const getHighlightPopoverBounds = () => {
     const rect = containerRef.current && typeof containerRef.current.getBoundingClientRect === "function" ? containerRef.current.getBoundingClientRect() : null;
     return {
-      width: Math.max(320, (rect == null ? void 0 : rect.width) || window.innerWidth || 960),
-      height: Math.max(240, (rect == null ? void 0 : rect.height) || window.innerHeight || 720)
+      width: Math.max(0, (rect == null ? void 0 : rect.width) || window.innerWidth || 960),
+      height: Math.max(0, (rect == null ? void 0 : rect.height) || window.innerHeight || 720)
     };
   };
   const clampHighlightPopoverRect = (rect) => {
     const bounds = getHighlightPopoverBounds();
     const margin = 16;
-    const minWidth = Math.min(360, Math.max(280, bounds.width - margin * 2));
-    const minHeight = Math.min(260, Math.max(220, bounds.height - margin * 2));
+    const minWidth = Math.min(360, Math.max(0, bounds.width - margin * 2));
+    const minHeight = Math.min(260, Math.max(0, bounds.height - margin * 2));
     const maxWidth = Math.max(minWidth, bounds.width - margin * 2);
     const maxHeight = Math.max(minHeight, bounds.height - margin * 2);
     const width = Math.min(maxWidth, Math.max(minWidth, rect.width || 560));
@@ -1347,6 +1346,31 @@ const showWordHoverCard = (asset, element) => {
       registerHighlightDeleted(null);
     };
   }, [registerHighlightDeleted]);
+  useLayoutEffect(() => {
+    const container = containerRef.current as HTMLElement | null;
+    if (!container || (!activeWordHover && !pendingSelection)) return;
+    const wordCard = container.querySelector<HTMLElement>(".jarvis-reader-word-card");
+    const place = () => {
+      const bounds = { width: container.clientWidth, height: container.clientHeight };
+      if (wordCard) {
+        wordCard.style.maxHeight = `${Math.max(0, bounds.height - 32)}px`;
+        const fitted = fitReaderOverlay({ x: wordCard.offsetLeft, y: wordCard.offsetTop,
+          width: wordCard.offsetWidth, height: wordCard.offsetHeight }, bounds);
+        setActiveWordHover(current => current && (current.left !== fitted.x || current.top !== fitted.y)
+          ? { ...current, left: fitted.x, top: fitted.y } : current);
+      }
+      setHighlightPopoverRect(current => {
+        if (!pendingSelection) return current;
+        const fitted = clampHighlightPopoverRect(current || getDefaultHighlightPopoverRect());
+        return current && fitted.x === current.x && fitted.y === current.y && fitted.width === current.width && fitted.height === current.height ? current : fitted;
+      });
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(container);
+    if (wordCard) observer.observe(wordCard);
+    return () => observer.disconnect();
+  }, [Boolean(activeWordHover), Boolean(pendingSelection)]);
   useEffect(() => {
     const container = containerRef.current;
     if (!container)
@@ -1464,12 +1488,18 @@ const showWordHoverCard = (asset, element) => {
       menu.style.top = `${position.top}px`;
     };
     place();
+    const previousFocus = menu.ownerDocument.activeElement as HTMLElement | null;
+    menu.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
     const observer = new ResizeObserver(place);
     observer.observe(container);
     const documents: Document[] = [document, ...(renditionRef.current?.getContents() || []).map((content: { document: Document }) => content.document)];
     const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setPendingHighlightMenu(null); };
     documents.forEach(doc => doc.addEventListener("keydown", escape));
-    return () => { observer.disconnect(); documents.forEach(doc => doc.removeEventListener("keydown", escape)); };
+    return () => {
+      observer.disconnect();
+      documents.forEach(doc => doc.removeEventListener("keydown", escape));
+      if (menu.contains(menu.ownerDocument.activeElement) && previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
   }, [pendingHighlightMenu]);
   const updateReaderTitle = (relocated) => {
     const href = relocated && relocated.start ? relocated.start.href : "";
@@ -1874,7 +1904,7 @@ const showWordHoverCard = (asset, element) => {
     clearHighlightUi();
   };
   const isWikiSuggestOpen = !!(wikiSuggest && wikiSuggest.items && wikiSuggest.items.length);
-  const activeHighlightPopoverRect = pendingSelection ? highlightPopoverRect || getDefaultHighlightPopoverRect() : null;
+  const activeHighlightPopoverRect = pendingSelection ? clampHighlightPopoverRect(highlightPopoverRect || getDefaultHighlightPopoverRect()) : null;
   const visibleHighlightPopoverRect = activeHighlightPopoverRect && isWikiSuggestOpen ? clampHighlightPopoverRect({
     ...activeHighlightPopoverRect,
     height: Math.max(activeHighlightPopoverRect.height || 0, 480)
@@ -1935,7 +1965,7 @@ const showWordHoverCard = (asset, element) => {
     key: `${entry.label || "note"}-${index}`,
     style: { display: "flex", flexDirection: "column", gap: "4px" }
   },
-    React.createElement("span", { style: { fontWeight: "600", fontSize: "12px", color: "var(--text-normal)" } }, entry.label || "笔记"),
+    React.createElement("span", { style: { fontWeight: "600", fontSize: "var(--font-ui-small)", color: "var(--text-normal)" } }, entry.label || "笔记"),
     React.createElement("div", {
       className: "jarvis-reader-highlight-note-card-text",
       style: { marginTop: "2px" }
@@ -2204,7 +2234,7 @@ const showWordHoverCard = (asset, element) => {
             border: "1px solid var(--background-modifier-border)",
             borderRadius: "6px",
             color: "var(--text-normal)",
-            fontSize: "13px"
+            fontSize: "var(--font-ui-small)"
           }
         }),
         showAssocDropdown ? React.createElement("div", {
@@ -2227,11 +2257,11 @@ const showWordHoverCard = (asset, element) => {
               },
                 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", width: "100%" } },
                   renderObsidianIcon(item.icon),
-                  React.createElement("span", { style: { fontWeight: "500", fontSize: "13px", color: "var(--text-normal)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, item.displayName)
+                  React.createElement("span", { style: { fontWeight: "500", fontSize: "var(--font-ui-small)", color: "var(--text-normal)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, item.displayName)
                 ),
-                item.subtext ? React.createElement("span", { style: { fontSize: "11px", color: "var(--text-muted)", paddingLeft: "20px" } }, item.subtext) : null
+                item.subtext ? React.createElement("span", { style: { fontSize: "var(--font-ui-smaller)", color: "var(--text-muted)", paddingLeft: "20px" } }, item.subtext) : null
               )
-            ) : React.createElement("div", { className: "jarvis-reader-context-menu-item-disabled", style: { padding: "6px 12px", color: "var(--text-muted)", fontSize: "12px" } }, "未找到匹配内容")
+            ) : React.createElement("div", { className: "jarvis-reader-context-menu-item-disabled", style: { padding: "6px 12px", color: "var(--text-muted)", fontSize: "var(--font-ui-small)" } }, "未找到匹配内容")
           ),
           React.createElement("div", {
             className: "jarvis-reader-assoc-dropdown-footer",
@@ -2239,7 +2269,7 @@ const showWordHoverCard = (asset, element) => {
               padding: "6px 12px",
               borderTop: "1px solid var(--background-modifier-border)",
               color: "var(--text-muted)",
-              fontSize: "11px",
+              fontSize: "var(--font-ui-smaller)",
               textAlign: "center",
               background: "var(--background-secondary)",
               borderBottomLeftRadius: "6px",
@@ -2274,12 +2304,12 @@ const showWordHoverCard = (asset, element) => {
             React.createElement("span", { style: { color: "var(--text-muted)", fontSize: "14px", display: "inline-flex", alignItems: "center", userSelect: "none" } }, "•"),
             React.createElement("a", {
               className: "internal-link",
-              style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+              style: { cursor: "pointer", textDecoration: "underline", color: "var(--link-color)", fontSize: "var(--font-ui-small)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
               onClick: () => openWikiLink(linkPath)
             }, displayText),
             linkTime ? React.createElement("span", {
               className: "jarvis-reader-highlight-note-card-time",
-              style: { margin: "0 12px 0 auto", fontSize: "11px", color: "var(--text-muted)", opacity: 0.8, flexShrink: 0 }
+              style: { margin: "0 12px 0 auto", fontSize: "var(--font-ui-smaller)", color: "var(--text-muted)", opacity: 0.8, flexShrink: 0 }
             }, formatHighlightNoteTime(linkTime)) : null,
             React.createElement("button", {
               className: "jarvis-reader-highlight-icon-button",
@@ -2291,7 +2321,7 @@ const showWordHoverCard = (asset, element) => {
           );
         })) : React.createElement("div", {
           className: "jarvis-reader-highlight-empty",
-          style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "13px" }
+          style: { textAlign: "center", padding: "20px", color: "var(--text-muted)", fontSize: "var(--font-ui-small)" }
         }, "暂无关联文章")
       )
     );
@@ -2683,10 +2713,23 @@ const showWordHoverCard = (asset, element) => {
     const canLookupOffline = !!normalizeWordSelection(pendingHighlightMenu.quote || "")?.isSingleWord;
     return React.createElement("div", {
       ref: selectionMenuRef,
-      role: "toolbar",
+      role: "menu",
       "aria-label": "选文操作",
       className: "jarvis-reader-highlight-menu jarvis-reader-selection-toolbar",
       onMouseDown: (event) => event.preventDefault(),
+      onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
+        const current = buttons.indexOf(event.currentTarget.ownerDocument.activeElement as HTMLButtonElement);
+        if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) && buttons.length) {
+          event.preventDefault();
+          const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1
+            : (current + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
+          buttons[next].focus();
+        } else if (event.key === "Tab") {
+          event.preventDefault();
+          setPendingHighlightMenu(null);
+        }
+      },
       style: pendingHighlightMenu.rect ? {
         left: pendingHighlightMenu.rect.x,
         top: pendingHighlightMenu.rect.y
@@ -2695,7 +2738,7 @@ const showWordHoverCard = (asset, element) => {
     },
       React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
-        role: "button",
+        role: "menuitem",
         onClick: () => {
           copyHighlightQuote(pendingHighlightMenu);
           setPendingHighlightMenu(null);
@@ -2703,15 +2746,17 @@ const showWordHoverCard = (asset, element) => {
       }, renderObsidianIcon("copy"), React.createElement("span", null, "复制")),
       canLookupOffline ? React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
+        role: "menuitem",
         onClick: () => { void openWordTranslator(pendingHighlightMenu, "offline"); }
       }, renderObsidianIcon("book-open"), React.createElement("span", null, "离线查词")) : null,
       React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
+        role: "menuitem",
         onClick: () => { void openWordTranslator(pendingHighlightMenu, "ai"); }
       }, renderObsidianIcon("languages"), React.createElement("span", null, "AI 翻译")),
       pendingHighlightMenu.id ? null : React.createElement("button", {
         className: "jarvis-reader-context-menu-item",
-        role: "button",
+        role: "menuitem",
         onClick: () => {
           savePlainHighlight(pendingHighlightMenu);
           setPendingHighlightMenu(null);
@@ -2719,7 +2764,7 @@ const showWordHoverCard = (asset, element) => {
       }, renderObsidianIcon("highlighter"), React.createElement("span", null, "高亮")),
       React.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-highlight-menu-button-primary",
-        role: "button",
+        role: "menuitem",
         onClick: () => {
           openHighlightCommentEditor(pendingHighlightMenu);
           setPendingHighlightMenu(null);
@@ -2727,12 +2772,12 @@ const showWordHoverCard = (asset, element) => {
       }, renderObsidianIcon("pencil"), React.createElement("span", null, "笔记")),
       pendingHighlightMenu.id ? React.createElement("button", {
         className: "jarvis-reader-context-menu-item jarvis-reader-context-menu-item-danger",
-        role: "button",
+        role: "menuitem",
         onClick: () => {
           deleteExistingHighlight(pendingHighlightMenu);
           setPendingHighlightMenu(null);
         }
-      }, renderObsidianIcon("trash"), React.createElement("span", null, "删除高亮")) : null,
+      }, renderObsidianIcon("trash"), React.createElement("span", null, "删除")) : null,
     );
   })() : null, pendingWordSelection ?  React.createElement("div", {
     className: "jarvis-reader-highlight-popover is-floating jarvis-reader-word-translate",

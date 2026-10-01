@@ -1,4 +1,5 @@
 import * as React from "react";
+import { bindDialogFocus } from "../dialog-focus";
 import { projectLibraryBookNotes } from "./book-note-projection";
 import { ensureStorageFolders, isBookInFolder } from "../storage-folders";
 import type JarvisReaderPlugin from "../main";
@@ -123,6 +124,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [savingTime, setSavingTime] = React.useState(false);
   const manualStats = React.useRef(new ReadingStatsService());
   const [activeBook, setActiveBook] = React.useState<TFile | null>(null);
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  const timeEditorRef = React.useRef<HTMLFormElement>(null);
+  React.useEffect(() => {
+    const dialog = activeBook ? editorRef.current : timeBook ? timeEditorRef.current : null;
+    return dialog ? bindDialogFocus(dialog) : undefined;
+  }, [activeBook, timeBook]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<"all" | "unread" | "reading" | "finished">("all");
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
@@ -960,7 +967,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             {debugImages.map(img => (
               <div key={img.href} style={{ border: '1px solid var(--background-modifier-border)', padding: '12px', borderRadius: '8px', background: 'var(--background-secondary)' }}>
                 <img src={img.dataUrl} style={{ maxWidth: '240px', maxHeight: '340px', display: 'block', objectFit: 'contain' }} />
-                <div style={{ marginTop: '12px', fontSize: '12px', wordBreak: 'break-all', maxWidth: '240px', color: 'var(--text-normal)' }}>
+                <div style={{ marginTop: '12px', fontSize: 'var(--font-ui-smaller)', wordBreak: 'break-all', maxWidth: '240px', color: 'var(--text-normal)' }}>
                   <b>大小:</b> {Math.round(img.size / 1024)} KB<br/>
                   <b>路径:</b> {img.href}
                 </div>
@@ -1147,18 +1154,16 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
     }
 
     const maxRankSecs = isTimeRank && sortedRankBooks.length > 0 ? sortedRankBooks[0][1] : 0;
-    const isReadable = (plugin.app.vault as any).getConfig ? (plugin.app.vault as any).getConfig("readableLineLength") : true;
 
     return (
       <div className="jarvis-library-stats-view">
-        <div className={`jarvis-library-stats-view-container ${isReadable ? "is-readable-width" : "is-full-width"}`}>
+        <div className="jarvis-library-stats-view-container">
           <div className="jarvis-library-stats-view-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button className="jarvis-library-back-btn" onClick={() => setCurrentView("home")}>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                返回书架
+              <button className="jarvis-library-back-btn is-icon" aria-label="返回书架" title="返回书架" onClick={() => setCurrentView("home")}>
+                <ObsidianIcon name="arrow-left" />
               </button>
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>阅读统计</h2>
+              <h2 style={{ margin: 0, fontSize: 'var(--font-ui-medium)', fontWeight: 600 }}>阅读统计</h2>
             </div>
           </div>
 
@@ -1210,7 +1215,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 <span className="jarvis-stats-mini-val" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                   {formatDuration(avgSecs)}
-                  <span className={trendClass} style={{ fontSize: '9px', padding: '1px 3px', borderRadius: '4px', background: trendPercent > 0 ? '#E5F5F1' : trendPercent < 0 ? '#FCE8E6' : 'var(--background-modifier-border)' }}>
+                  <span className={trendClass} style={{ fontSize: 'var(--font-ui-smaller)', padding: '1px 3px', borderRadius: '4px', background: 'var(--background-secondary)' }}>
                     {trendText}
                   </span>
                 </span>
@@ -1335,9 +1340,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               if (yAxisTicks[yAxisTicks.length - 1] !== 0) yAxisTicks.push(0);
 
               return (
-                <div style={{ position: 'relative' }}>
+                <div className="jarvis-stats-bar-plot">
                   {/* Grid Lines */}
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '20px', bottom: '38px', pointerEvents: 'none', zIndex: 1 }}>
+                  <div style={{ position: 'absolute', left: 'var(--jarvis-stats-axis-width)', right: 0, top: '20px', height: `${chartHeightPx}px`, pointerEvents: 'none', zIndex: 1 }}>
                     {yAxisTicks.map((tick) => {
                       const ratio = maxVal > 0 ? tick / maxVal : 0;
                       return (
@@ -1354,7 +1359,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                             justifyContent: 'flex-start'
                           }}
                         >
-                          <span style={{ fontSize: '9px', color: 'var(--text-muted)', transform: 'translateY(-100%)' }}>
+                          <span className="jarvis-stats-axis-label">
                             {tick === 0 ? '0' : formatDuration(tick)}
                           </span>
                         </div>
@@ -1362,7 +1367,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                     })}
                   </div>
 
-                  <div className="jarvis-stats-bar-chart-container" style={{ position: 'relative', zIndex: 2 }}>
+                  <div className="jarvis-stats-bar-chart-container" style={{ position: 'relative', zIndex: 2, height: `${chartHeightPx + 46}px` }}>
                     {data.map((item, idx) => {
                       const heightPx = item.secs > 0
                         ? Math.max((item.secs / maxVal) * chartHeightPx, 6)
@@ -1408,7 +1413,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               }
 
               return (
-                <div>
+                <div className="jarvis-stats-calendar">
                   <div className="jarvis-stats-calendar-grid" style={{ marginBottom: '8px' }}>
                     {weekdays.map(wd => (
                       <div key={wd} className="jarvis-stats-calendar-weekday">{wd}</div>
@@ -1437,8 +1442,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   const colCells: any[] = [];
                   const colMonday = gridStart.clone().add(w * 7, "days");
                   
-                  // Record month label if it changes
-                  const m = colMonday.month();
+                  // The first week may begin in December of the preceding year.
+                  const labelDate = colMonday.isBefore(startOfYear) ? startOfYear : colMonday;
+                  const m = labelDate.month();
                   if (m !== lastMonth) {
                     monthLabels.push({ label: `${m + 1}月`, colIndex: w });
                     lastMonth = m;
@@ -1486,21 +1492,21 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   .reduce((acc, entry) => acc + entry[1], 0);
 
                 return (
-                  <div key={yearStr} style={{ marginBottom: '24px' }}>
+                  <div key={yearStr} style={{ marginBottom: '8px' }}>
                     {statsTab === "all" && (
-                      <h4 style={{ fontSize: '13px', margin: '0 0 10px 0', fontWeight: '700' }}>{yearStr}</h4>
+                      <h4 style={{ fontSize: 'var(--font-ui-small)', margin: '0 0 10px 0', fontWeight: 600 }}>{yearStr}</h4>
                     )}
                     <div className="jarvis-stats-heatmap-wrapper">
                       {/* Months Row Header */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(53, 1fr)', gap: '3px', fontSize: '9px', color: 'var(--text-muted)', marginBottom: '4px', paddingLeft: '15px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(53, 10px)', gap: '3px', fontSize: 'var(--font-ui-smaller)', color: 'var(--text-muted)', marginBottom: '4px', paddingLeft: 'calc(var(--font-ui-smaller) + 8px)', width: 'max-content' }}>
                         {monthLabels.map(ml => (
-                          <span key={ml.label} style={{ gridColumnStart: ml.colIndex + 1, whiteSpace: 'nowrap' }}>{ml.label}</span>
+                          <span key={`${ml.label}-${ml.colIndex}`} style={{ gridColumnStart: ml.colIndex + 1, whiteSpace: 'nowrap' }}>{ml.label}</span>
                         ))}
                       </div>
                       
                       <div style={{ display: 'flex', gap: '8px' }}>
                         {/* Weekday labels */}
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '9px', color: 'var(--text-muted)', height: '88px', padding: '2px 0' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: 'var(--font-ui-smaller)', color: 'var(--text-muted)', height: '88px', padding: '2px 0', width: 'var(--font-ui-smaller)', flexShrink: 0 }}>
                           <span>一</span>
                           <span>三</span>
                           <span>五</span>
@@ -1548,8 +1554,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             })()}
           </div>
 
-          {/* Book Rankings TOP 10 (Not shown for Week view) */}
-          {statsTab !== "week" && (
+          {/* Book Rankings TOP 10 for the selected date range */}
             <div className="jarvis-stats-top-section">
               <div className="jarvis-stats-top-title">
                 {isTimeRank ? "阅读时长" : "阅读进度"} TOP {sortedRankBooks.length}
@@ -1580,7 +1585,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                         {cover?.dataUrl ? (
                           <div className="jarvis-stats-top-cover" style={{ backgroundImage: `url("${cover.dataUrl}")` }} />
                         ) : (
-                          <div className="jarvis-stats-top-cover" style={{ background: '#E6E6E6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', textAlign: 'center', padding: '2px', color: 'var(--text-muted)' }}>
+                          <div className="jarvis-stats-top-cover" style={{ background: 'var(--background-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--font-ui-smaller)', textAlign: 'center', padding: '2px', color: 'var(--text-muted)' }}>
                             {title.slice(0, 4)}
                           </div>
                         )}
@@ -1609,15 +1614,14 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                   })}
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '12px' }}>暂无书籍阅读记录</div>
+                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: 'var(--font-ui-smaller)' }}>暂无书籍阅读记录</div>
               )}
             </div>
-          )}
 
           {/* Preference Analysis (Shown for Year and All views) */}
           {(statsTab === "year" || statsTab === "all") && (
             <div>
-              <div className="jarvis-stats-top-title" style={{ marginTop: '24px', marginBottom: '12px' }}>偏好分析</div>
+              <div className="jarvis-stats-top-title" style={{ marginTop: 0, marginBottom: '8px' }}>偏好分析</div>
               <div className="jarvis-stats-pref-section">
                 {/* Category preference radar */}
                 <div className="jarvis-stats-pref-card">
@@ -1693,8 +1697,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                           {dataPoints.length > 0 && (
                             <polygon
                               points={polygonPointsStr}
-                              fill="rgba(140, 26, 26, 0.08)"
-                              stroke="#8C1A1A"
+                              fill="color-mix(in srgb, var(--interactive-accent) 12%, transparent)"
+                              stroke="var(--interactive-accent)"
                               strokeWidth="1.5"
                             />
                           )}
@@ -1704,8 +1708,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                               cx={p.x}
                               cy={p.y}
                               r="2.5"
-                              fill="#ffffff"
-                              stroke="#8C1A1A"
+                              fill="var(--background-primary)"
+                              stroke="var(--interactive-accent)"
                               strokeWidth="1.5"
                             />
                           ))}
@@ -1731,7 +1735,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                                 y={ty}
                                 textAnchor={textAnchor}
                                 dy={dy}
-                                fontSize="8px"
+                                fontSize="var(--font-ui-smaller)"
                                 fill="var(--text-muted)"
                               >
                                 {d.dimension}
@@ -1741,7 +1745,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                         </svg>
                       );
                     })() : (
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>暂无分析数据</div>
+                      <div style={{ fontSize: 'var(--font-ui-smaller)', color: 'var(--text-muted)' }}>暂无分析数据</div>
                     )}
                   </div>
                 </div>
@@ -1761,7 +1765,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                         </div>
                       ))
                     ) : (
-                      <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '11px' }}>暂无出版方信息</div>
+                      <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: 'var(--font-ui-smaller)' }}>暂无出版方信息</div>
                     )}
                   </div>
                 </div>
@@ -1793,11 +1797,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         )}
         {/* Header toolbar */}
         <div className="jarvis-library-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ flex: 1 }}></div>
+          <div className="jarvis-library-header-spacer" style={{ flex: 1 }}></div>
 
           {/* Center Search Input */}
           <div className="jarvis-library-search-wrap" style={{ flex: 1.5, display: 'flex', justifyContent: 'center' }}>
-            <svg className="jarvis-search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <ObsidianIcon name="search" className="jarvis-search-icon" />
             <input
               type="text"
               placeholder="搜索书名、作者..."
@@ -1806,8 +1810,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               className="jarvis-library-search-input"
             />
             {searchQuery && (
-              <button className="jarvis-library-search-clear" onClick={() => setSearchQuery("")}>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <button aria-label="清除搜索" title="清除搜索" className="jarvis-library-search-clear" onClick={() => setSearchQuery("")}>
+                <ObsidianIcon name="x" />
               </button>
             )}
           </div>
@@ -1815,8 +1819,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           {/* Right side controls */}
           <div className="jarvis-library-header-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
             <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
-              <button className={`jarvis-library-filter-btn ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} title="筛选与排序">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              <button className={`jarvis-library-filter-btn ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} aria-label="筛选与排序" aria-expanded={showFilters} title="筛选与排序">
+                <ObsidianIcon name="sliders-horizontal" />
               </button>
 
             {showFilters && (
@@ -1839,21 +1843,21 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             </div>
 
             <div className="jarvis-library-layout-toggle">
-              <button className={`jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} title="网格布局">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <button className={`jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"} title="网格布局">
+                <ObsidianIcon name="layout-grid" />
               </button>
-              <button className={`jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} title="列表布局">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              <button className={`jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} aria-label="列表布局" aria-pressed={viewLayout === "list"} title="列表布局">
+                <ObsidianIcon name="list" />
               </button>
             </div>
 
             <div className="jarvis-library-header-actions">
-              <button className="jarvis-library-action-icon-btn" title="插件设置" onClick={() => {
+              <button className="jarvis-library-action-icon-btn" aria-label="插件设置" title="插件设置" onClick={() => {
                 const setting = (plugin as any).app.setting;
                 setting.open();
                 setting.openTabById(plugin.manifest.id);
               }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <ObsidianIcon name="settings" />
               </button>
             </div>
           </div>
@@ -1885,10 +1889,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           <button 
             className="jarvis-library-back-btn" 
             onClick={() => setCurrentView("stats")}
-            title="查看数据统计"
-            style={{ padding: "4px 12px !important" }}
           >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <ObsidianIcon name="chart-no-axes-column" />
             详细统计
           </button>
         </div>
@@ -1933,7 +1935,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         ) : (
           /* List layout - HTML Table */
           <div className="jarvis-library-list" style={{ padding: '0 20px 20px 20px', overflowX: 'auto', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-            <table className="jarvis-library-table" style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+            <table className="jarvis-library-table" style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', textAlign: 'left', fontSize: 'var(--font-ui-small)' }}>
               <colgroup>
                 <col style={{ width: '28%' }} />
                 <col style={{ width: '16%' }} />
@@ -2014,7 +2016,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                            <div style={{ width: '40px', height: '4px', background: 'var(--background-modifier-border)', borderRadius: '2px', overflow: 'hidden' }}>
                              <div style={{ width: `${percentage}%`, height: '100%', background: 'var(--interactive-accent)' }}></div>
                            </div>
-                           <span style={{ fontSize: '11px' }}>{percentage}%</span>
+                           <span style={{ fontSize: 'var(--font-ui-smaller)' }}>{percentage}%</span>
                         </div>
                       </td>
                       <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{rating}</td>
@@ -2139,7 +2141,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
   const renderBookEditor = () => activeBook ? (
     <div className="jarvis-book-editor-backdrop" onClick={() => setActiveBook(null)}>
-      <div className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="编辑阅读资料"
+      <div ref={editorRef} tabIndex={-1} className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="编辑阅读资料"
         onClick={event => event.stopPropagation()} onKeyDown={event => { if (event.key === "Escape") setActiveBook(null); }}>
         <div className="jarvis-book-editor-header"><h3>编辑阅读资料</h3><button aria-label="关闭" onClick={() => setActiveBook(null)}>×</button></div>
             <div className="detail-metadata-editor">
@@ -2159,13 +2161,16 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 <span className="metadata-label">评分</span>
                 <div className="metadata-stars">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <span 
+                    <button
+                      type="button"
+                      aria-label={`${star}星`}
+                      aria-pressed={bookMetadata.rating === star}
                       key={star}
                       className={`metadata-star ${bookMetadata.rating >= star ? 'is-filled' : ''}`}
                       onClick={() => handleUpdateMetadata("rating", star)}
                     >
                       ★
-                    </span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -2189,7 +2194,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               </div>
               <div className="metadata-row">
                 <span className="metadata-label">时长</span>
-                <span className="metadata-value" style={{ fontSize: '13px', display: 'inline-flex', alignItems: 'center', height: '30px', color: 'var(--text-muted)' }}>
+                <span className="metadata-value" style={{ fontSize: 'var(--font-ui-small)', display: 'inline-flex', alignItems: 'center', height: '30px', color: 'var(--text-muted)' }}>
                   {formatDuration(getBookTotalSeconds(plugin.settings.readingStats, activeBook.path))}
                 </span>
               </div>
@@ -2224,7 +2229,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       <input type="file" accept="image/*" ref={hiddenFileInput} onChange={handleCustomCoverUpload} style={{ display: "none" }} />
       {renderBookEditor()}
       {timeBook && <div className="jarvis-book-editor-backdrop" onClick={() => { if (!savingTime) setTimeBook(null); }}>
-        <form className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="补录阅读时长"
+        <form ref={timeEditorRef} tabIndex={-1} className="jarvis-book-editor" role="dialog" aria-modal="true" aria-label="补录阅读时长"
+          onKeyDown={event => { if (event.key === "Escape" && !savingTime) setTimeBook(null); }}
           onClick={event => event.stopPropagation()} onSubmit={async event => {
             event.preventDefault();
             if (savingTime) return;

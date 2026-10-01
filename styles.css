@@ -123,7 +123,7 @@
   color: var(--text-muted);
   cursor: pointer;
   display: flex;
-  font: 600 13px var(--font-interface);
+  font: 600 var(--font-ui-small) var(--font-interface);
   height: 28px;
   justify-content: center;
   outline: none;
@@ -190,8 +190,8 @@
   left: 50%;
   max-height: calc(100% - 32px);
   max-width: calc(100% - 32px);
-  min-height: 220px;
-  min-width: 360px;
+  min-height: min(220px, calc(100% - 32px));
+  min-width: min(360px, calc(100% - 32px));
   padding-bottom: 18px;
   transform: none;
 }
@@ -900,10 +900,11 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: min(620px, calc(100vh - 72px));
+  max-height: min(620px, calc(100% - 32px));
+  box-sizing: border-box;
   max-width: min(480px, calc(100% - 32px));
   min-height: 0;
-  min-width: 360px;
+  min-width: min(360px, calc(100% - 32px));
   overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior: contain;
@@ -2508,15 +2509,15 @@ g.jarvis-reader-highlight-with-comment line {
   max-height: 85%;
   overflow-y: auto;
   padding: 12px;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-m);
+  font-size: var(--font-ui-smaller);
   background: var(--background-primary);
 }
 
 .jarvis-book-editor-header { display: flex; align-items: center; justify-content: space-between; }
-.jarvis-book-editor h3 { margin: 0 0 8px; font-size: 14px; }
+.jarvis-book-editor h3 { margin: 0 0 8px; font-size: var(--font-ui-medium); }
 .jarvis-book-editor-header h3 { margin: 0; }
-.jarvis-book-editor button { height: 26px; padding: 3px 8px; font-size: 12px; box-shadow: none; }
+.jarvis-book-editor button { height: 26px; padding: 3px 8px; font-size: var(--font-ui-smaller); box-shadow: none; }
 .jarvis-book-editor-header button[aria-label="关闭"] { width: 24px; height: 24px; padding: 0; }
 
 .jarvis-book-editor .detail-metadata-editor {
@@ -2530,7 +2531,7 @@ g.jarvis-reader-highlight-with-comment line {
 
 .jarvis-book-editor .metadata-row { min-width: 0; gap: 8px; }
 .jarvis-book-editor .metadata-label,
-.jarvis-book-editor .metadata-row > label { width: 28px; flex-shrink: 0; font-size: 12px; text-align: left; }
+.jarvis-book-editor .metadata-row > label { width: 28px; flex-shrink: 0; font-size: var(--font-ui-smaller); text-align: left; }
 form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 
 .jarvis-book-editor .metadata-row input,
@@ -2542,12 +2543,13 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   flex: 1 1 0;
   height: 26px;
   padding: 3px 6px;
-  font-size: 12px;
+  font-size: var(--font-ui-smaller);
 }
 
 .jarvis-book-editor .metadata-stars { flex-wrap: wrap; gap: 4px; }
-.jarvis-book-editor .metadata-star { font-size: 16px; line-height: 24px; }
-.jarvis-book-editor .metadata-value { height: 24px !important; font-size: 12px !important; }
+.jarvis-book-editor .metadata-star { background: transparent; border: 0; padding: 0; width: 22px; height: 24px; font-size: var(--font-ui-medium); line-height: 24px; color: var(--text-faint); }
+.jarvis-book-editor .metadata-star.is-filled { color: var(--text-accent); }
+.jarvis-book-editor .metadata-value { height: 24px !important; font-size: var(--font-ui-smaller) !important; }
 
 .book-card-cover-wrap {
   position: relative;
@@ -2903,25 +2905,26 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-library-back-btn {
-  background: var(--background-secondary) !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  border-radius: 20px !important;
-  padding: 5px 14px !important;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  padding: 4px 8px;
+  min-height: 28px;
   font-size: var(--font-ui-small);
-  font-weight: 500;
-  color: var(--text-normal);
-  display: flex;
+  font-weight: 400;
+  color: var(--text-muted);
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  box-shadow: none !important;
-  transition: background 120ms ease, border-color 120ms ease;
+  box-shadow: none;
+  transition: background 120ms ease, color 120ms ease;
 }
-
-.jarvis-library-back-btn:hover {
-  background: var(--background-modifier-hover) !important;
-  border-color: var(--background-modifier-border-hover) !important;
-}
+.jarvis-library-back-btn.is-icon { width: 28px; padding: 0; justify-content: center; }
+.jarvis-library-back-btn svg { width: 16px; height: 16px; }
+.jarvis-library-back-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.jarvis-library-back-btn:focus-visible,
+.jarvis-book-editor .metadata-star:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
 
 .jarvis-library-detail-header {
   display: flex;
@@ -3764,7 +3767,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   border-bottom: 1px solid var(--background-modifier-border);
   padding-bottom: 12px;
 }
@@ -3777,9 +3780,9 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-stats-tab-btn {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 13px;
+  border-radius: var(--radius-s);
+  padding: 4px 10px;
+  font-size: var(--font-ui-small);
   font-weight: 500;
   cursor: pointer;
   color: var(--text-muted);
@@ -3797,11 +3800,6 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   border-color: var(--interactive-accent);
 }
 
-.theme-light .jarvis-stats-tab-btn.is-active {
-  background: #8C1A1A !important;
-  border-color: #8C1A1A !important;
-  color: #ffffff !important;
-}
 
 .jarvis-stats-date-picker {
   display: flex;
@@ -3809,7 +3807,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   gap: 12px;
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 20px;
+  border-radius: var(--radius-s);
   padding: 4px 12px;
 }
 
@@ -3835,7 +3833,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-date-text {
-  font-size: 13px;
+  font-size: var(--font-ui-small);
   font-weight: 600;
   min-width: 120px;
   text-align: center;
@@ -3845,30 +3843,24 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-stats-main-card {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 16px;
+  border-radius: var(--radius-m);
+  padding: 12px;
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.theme-light .jarvis-stats-main-card {
-  background: transparent;
-}
 
 .jarvis-stats-main-time {
-  font-size: 32px;
-  font-weight: 800;
+  font-size: calc(var(--font-ui-medium) * 1.5);
+  font-weight: 600;
   font-family: var(--font-interface);
 }
 
-.theme-light .jarvis-stats-main-time {
-  color: #8C1A1A;
-}
 
 .jarvis-stats-main-time span {
-  font-size: 16px;
+  font-size: var(--font-ui-small);
   font-weight: 500;
   margin-left: 2px;
   margin-right: 8px;
@@ -3876,17 +3868,17 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-main-sub {
-  font-size: 13px;
+  font-size: var(--font-ui-small);
   color: var(--text-muted);
 }
 
 .jarvis-stats-trend-up {
-  color: #2D8C7B;
+  color: var(--text-success);
   font-weight: 600;
 }
 
 .jarvis-stats-trend-down {
-  color: #8C1A1A;
+  color: var(--text-error);
   font-weight: 600;
 }
 
@@ -3895,13 +3887,13 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .jarvis-stats-mini-card {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
+  border-radius: var(--radius-s);
   padding: 12px 8px;
   display: flex;
   flex-direction: column;
@@ -3909,43 +3901,37 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   gap: 4px;
 }
 
-.theme-light .jarvis-stats-mini-card {
-  background: transparent;
-}
 
 .jarvis-stats-mini-val {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--font-ui-medium);
+  font-weight: 600;
 }
 
 .jarvis-stats-mini-label {
-  font-size: 11px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
 }
 
 /* 图表区结构 */
 .jarvis-stats-chart-section {
   border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: var(--radius-m);
+  padding: 12px;
   background: var(--background-secondary);
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
-.theme-light .jarvis-stats-chart-section {
-  background: transparent;
-}
 
 .jarvis-stats-chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .jarvis-stats-chart-title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-ui-medium);
+  font-weight: 600;
 }
 
 .jarvis-stats-chart-toggles {
@@ -3972,9 +3958,16 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   color: var(--interactive-accent);
 }
 
-.theme-light .jarvis-stats-chart-toggle-btn.is-active {
-  background: #F5F2E9;
-  color: #8C1A1A;
+
+/* 时间刻度独占左侧空间，不与柱形重叠。 */
+.jarvis-stats-bar-plot { position: relative; --jarvis-stats-axis-width: 5.5em; }
+.jarvis-stats-axis-label {
+  position: absolute;
+  right: calc(100% + 8px);
+  white-space: nowrap;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  transform: translateY(-50%);
 }
 
 /* 每日柱状图样式 */
@@ -3982,9 +3975,10 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  height: 160px;
+  box-sizing: border-box;
+  margin-left: var(--jarvis-stats-axis-width);
   padding-top: 20px;
-  padding-bottom: 8px;
+  padding-bottom: 0;
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
@@ -3999,6 +3993,8 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-bar {
+  position: absolute;
+  bottom: 26px;
   width: 60%;
   max-width: 24px;
   background: var(--interactive-accent);
@@ -4007,9 +4003,6 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   min-height: 2px;
 }
 
-.theme-light .jarvis-stats-bar {
-  background: #A62B2B;
-}
 
 .jarvis-stats-bar-column:hover .jarvis-stats-bar {
   opacity: 0.8;
@@ -4022,7 +4015,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
   padding: 2px 6px;
-  font-size: 10px;
+  font-size: var(--font-ui-smaller);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -4036,7 +4029,11 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-bar-label {
-  font-size: 10px;
+  position: absolute;
+  bottom: 0;
+  height: 26px;
+  line-height: 26px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   margin-top: 8px;
   text-align: center;
@@ -4046,30 +4043,32 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 /* 日历签到图样式 */
+.jarvis-stats-calendar { width: 100%; }
 .jarvis-stats-calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 4px 8px;
 }
 
 .jarvis-stats-calendar-weekday {
   text-align: center;
-  font-size: 11px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   font-weight: 600;
   padding-bottom: 6px;
 }
 
 .jarvis-stats-calendar-cell {
-  aspect-ratio: 1.2;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
+  height: 44px;
+  min-width: 0;
+  border-radius: var(--radius-s);
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  background: var(--background-primary);
+  font-size: var(--font-ui-small);
+  background: transparent;
   position: relative;
 }
 
@@ -4079,25 +4078,16 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-calendar-cell.has-read {
-  background-color: rgba(45, 140, 240, 0.1);
-  border-color: rgba(45, 140, 240, 0.3);
+  background-color: color-mix(in srgb, var(--interactive-accent) 12%, var(--background-primary));
 }
 
-.theme-light .jarvis-stats-calendar-cell.has-read {
-  background-color: #E5F5F1;
-  border-color: #B4E3D7;
-}
 
 .jarvis-stats-calendar-cell-time {
-  font-size: 9px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   margin-top: 2px;
 }
 
-.theme-light .jarvis-stats-calendar-cell.has-read .jarvis-stats-calendar-cell-time {
-  color: #2D8C7B;
-  font-weight: 600;
-}
 
 /* 年度热力图 (GitHub贡献墙风格) */
 .jarvis-stats-heatmap-wrapper {
@@ -4128,12 +4118,12 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   position: relative;
 }
 
-/* 青色系热力图色阶 */
+/* 跟随主题强调色的热力图色阶 */
 .jarvis-stats-heatmap-cell.level-0 { background-color: var(--background-modifier-border); }
-.jarvis-stats-heatmap-cell.level-1 { background-color: #E5F5F1; }
-.jarvis-stats-heatmap-cell.level-2 { background-color: #92DACB; }
-.jarvis-stats-heatmap-cell.level-3 { background-color: #4CBCA6; }
-.jarvis-stats-heatmap-cell.level-4 { background-color: #2D8C7B; }
+.jarvis-stats-heatmap-cell.level-1 { background-color: color-mix(in srgb, var(--interactive-accent) 20%, var(--background-primary)); }
+.jarvis-stats-heatmap-cell.level-2 { background-color: color-mix(in srgb, var(--interactive-accent) 40%, var(--background-primary)); }
+.jarvis-stats-heatmap-cell.level-3 { background-color: color-mix(in srgb, var(--interactive-accent) 65%, var(--background-primary)); }
+.jarvis-stats-heatmap-cell.level-4 { background-color: color-mix(in srgb, var(--interactive-accent) 90%, var(--background-primary)); }
 
 .jarvis-stats-heatmap-cell-tooltip {
   position: absolute;
@@ -4144,7 +4134,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
   padding: 2px 6px;
-  font-size: 9px;
+  font-size: var(--font-ui-smaller);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -4159,10 +4149,12 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 
 .jarvis-stats-heatmap-footer {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   align-items: center;
   margin-top: 12px;
-  font-size: 11px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
 }
 
@@ -4179,19 +4171,19 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-heatmap-legend-box.level-0 { background-color: var(--background-modifier-border); }
-.jarvis-stats-heatmap-legend-box.level-1 { background-color: #E5F5F1; }
-.jarvis-stats-heatmap-legend-box.level-2 { background-color: #92DACB; }
-.jarvis-stats-heatmap-legend-box.level-3 { background-color: #4CBCA6; }
-.jarvis-stats-heatmap-legend-box.level-4 { background-color: #2D8C7B; }
+.jarvis-stats-heatmap-legend-box.level-1 { background-color: color-mix(in srgb, var(--interactive-accent) 20%, var(--background-primary)); }
+.jarvis-stats-heatmap-legend-box.level-2 { background-color: color-mix(in srgb, var(--interactive-accent) 40%, var(--background-primary)); }
+.jarvis-stats-heatmap-legend-box.level-3 { background-color: color-mix(in srgb, var(--interactive-accent) 65%, var(--background-primary)); }
+.jarvis-stats-heatmap-legend-box.level-4 { background-color: color-mix(in srgb, var(--interactive-accent) 90%, var(--background-primary)); }
 
 /* 阅读时长排行榜 */
 .jarvis-stats-top-section {
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .jarvis-stats-top-title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-ui-medium);
+  font-weight: 600;
   margin-bottom: 12px;
 }
 
@@ -4206,15 +4198,12 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   align-items: center;
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  gap: 14px;
+  border-radius: var(--radius-s);
+  padding: 8px 10px;
+  gap: 10px;
   position: relative;
 }
 
-.theme-light .jarvis-stats-top-item {
-  background: transparent;
-}
 
 .jarvis-stats-top-rank {
   width: 24px;
@@ -4224,8 +4213,8 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
   color: var(--text-muted);
 }
 
@@ -4234,10 +4223,6 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   color: var(--text-on-accent);
 }
 
-.theme-light .jarvis-stats-top-item:nth-child(1) .jarvis-stats-top-rank {
-  background: #8C1A1A;
-  color: #ffffff;
-}
 
 .jarvis-stats-top-cover {
   width: 38px;
@@ -4254,14 +4239,15 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 
 .jarvis-stats-top-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .jarvis-stats-top-bookname {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -4272,15 +4258,15 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-top-author {
-  font-size: 11px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
 }
 
 .jarvis-stats-top-badge {
-  font-size: 9px;
-  background: rgba(140, 26, 26, 0.08);
-  color: #8C1A1A;
-  border: 1px solid rgba(140, 26, 26, 0.2);
+  font-size: var(--font-ui-smaller);
+  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent);
+  color: var(--text-accent);
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 25%, transparent);
   border-radius: 4px;
   padding: 1px 4px;
   font-weight: 600;
@@ -4296,13 +4282,10 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-top-time {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
 }
 
-.theme-light .jarvis-stats-top-time {
-  color: #8C1A1A;
-}
 
 /* 进度条指示线 */
 .jarvis-stats-top-progress-bg {
@@ -4318,39 +4301,33 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   background: var(--interactive-accent);
 }
 
-.theme-light .jarvis-stats-top-progress-bar {
-  background: #A62B2B;
-}
 
 /* 偏好分析块 */
 .jarvis-stats-pref-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 0;
 }
 
 .jarvis-stats-pref-card {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 18px;
+  border-radius: var(--radius-m);
+  padding: 12px;
   display: flex;
   flex-direction: column;
 }
 
-.theme-light .jarvis-stats-pref-card {
-  background: transparent;
-}
 
 .jarvis-stats-pref-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
 .jarvis-stats-pref-sub {
-  font-size: 11px;
+  font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   margin-bottom: 12px;
 }
@@ -4371,14 +4348,11 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 }
 
 .jarvis-stats-publisher-item {
-  font-size: 18px;
-  font-weight: 700;
-  color: #8C1A1A;
-}
-
-.theme-dark .jarvis-stats-publisher-item {
+  font-size: var(--font-ui-medium);
+  font-weight: 600;
   color: var(--text-accent);
 }
+
 
 /* Full-sized Reading Statistics View */
 .jarvis-library-stats-view {
@@ -4386,7 +4360,13 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   height: 100%;
   overflow-y: auto;
   background-color: var(--background-primary);
-  padding: 32px 12px;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  font-size: var(--font-ui-small);
+  line-height: 1.45;
+  container-type: inline-size;
 }
 
 .jarvis-library-stats-view-container {
@@ -4394,17 +4374,9 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.jarvis-library-stats-view-container.is-readable-width {
-  max-width: var(--file-line-width, 700px);
-}
-
-.jarvis-library-stats-view-container.is-full-width {
-  max-width: 100%;
-  padding-left: 24px;
-  padding-right: 24px;
+  gap: 16px;
+  max-width: none;
+  min-width: 0;
 }
 
 .jarvis-library-stats-view-header {
@@ -4412,8 +4384,15 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--background-modifier-border);
-  padding-bottom: 16px;
-  margin-bottom: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 0;
+}
+
+@container (max-width: 520px) {
+  .jarvis-stats-header-wrap { flex-wrap: wrap; gap: 8px; }
+  .jarvis-stats-pref-section { grid-template-columns: minmax(0, 1fr); }
+  .jarvis-stats-calendar-grid { gap: 4px; }
+  .jarvis-stats-calendar-cell { min-height: 44px; aspect-ratio: auto; }
 }
 
 /* Card Flip styles for Memory Mode */
@@ -5084,7 +5063,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   gap: 8px !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  font-size: 13px !important;
+  font-size: var(--font-ui-small) !important;
   font-family: var(--font-interface) !important;
   padding: 5px 10px !important;
   text-align: left !important;
@@ -5255,31 +5234,31 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-reader-settings-panel {
   position: absolute; right: 0; top: 40px; width: min(340px, calc(100cqw - 24px));
   max-height: calc(var(--jarvis-reader-height, 100vh) - 52px); overflow-y: auto; pointer-events: auto; box-sizing: border-box;
-  padding: 16px; border: 1px solid var(--background-modifier-border); border-radius: 12px;
-  background: var(--background-secondary); color: var(--text-normal); box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
-  font-family: var(--font-interface); font-size: 13px; line-height: 1.5;
+  padding: 16px; border: 1px solid var(--background-modifier-border); border-radius: var(--radius-m);
+  background: var(--background-secondary); color: var(--text-normal); box-shadow: var(--shadow-s);
+  font-family: var(--font-interface); font-size: var(--font-ui-small); line-height: 1.5;
 }
 .jarvis-reader-epub { container-type: inline-size; }
 .jarvis-reader-settings-panel header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.jarvis-reader-settings-panel header strong { font-size: 16px; }
+.jarvis-reader-settings-panel header strong { font-size: var(--font-ui-medium); }
 .jarvis-reader-settings-panel header button { background: transparent; border: none; box-shadow: none; padding: 0; width: 28px; height: 28px; color: var(--text-muted); }
 .jarvis-reader-settings-panel .jarvis-reader-settings-group { margin: 16px 0 0; padding: 0; min-width: 0; border: none; }
-.jarvis-reader-settings-panel .jarvis-reader-settings-group legend { color: var(--text-muted); font-size: 12px; padding: 0 8px 6px; }
-.jarvis-reader-settings-group-body { background: var(--background-primary); border-radius: 9px; padding: 0 12px; }
+.jarvis-reader-settings-panel .jarvis-reader-settings-group legend { color: var(--text-muted); font-size: var(--font-ui-smaller); padding: 0 8px 6px; }
+.jarvis-reader-settings-group-body { background: var(--background-primary); border-radius: var(--radius-s); padding: 0 12px; }
 .jarvis-reader-settings-group-body > label,
 .jarvis-reader-settings-group-body > .jarvis-reader-settings-choice { margin: 0; border-bottom: 1px solid var(--background-modifier-border); }
 .jarvis-reader-settings-group-body > :last-child { border-bottom: none; }
 .jarvis-reader-settings-panel .jarvis-reader-settings-range { display: block; padding: 9px 0; }
-.jarvis-reader-settings-range-label { display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+.jarvis-reader-settings-range-label { display: block; color: var(--text-muted); font-size: var(--font-ui-smaller); margin-bottom: 6px; }
 .jarvis-reader-settings-range-control { display: grid; grid-template-columns: 18px minmax(0, 1fr) 50px; align-items: center; gap: 10px; min-height: 24px; }
 .jarvis-reader-settings-range-icon { display: flex; color: var(--text-muted); }
 .jarvis-reader-settings-range-icon svg { width: 16px; height: 16px; }
-.jarvis-reader-settings-panel output { text-align: right; color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jarvis-reader-settings-panel output { text-align: right; color: var(--text-muted); font-size: var(--font-ui-smaller); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .jarvis-reader-settings-panel input[type="range"] { display: block; width: 100%; min-width: 0; margin: 0; accent-color: var(--text-normal); }
 .jarvis-reader-settings-panel .jarvis-reader-settings-choice { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; min-width: 0; }
-.jarvis-reader-settings-panel select { width: auto; min-width: 0; max-width: 60%; margin: 0; font-size: 12px; color: var(--text-muted); }
-.jarvis-reader-settings-panel .jarvis-reader-settings-reset { display: block; margin-top: 16px; width: 100%; background: transparent; border: none; box-shadow: none; color: var(--text-muted); font-size: 12px; }
-.jarvis-reader-settings-panel [role="alert"] { color: var(--text-error); font-size: 12px; }
+.jarvis-reader-settings-panel select { width: auto; min-width: 0; max-width: 60%; margin: 0; font-size: var(--font-ui-smaller); color: var(--text-muted); }
+.jarvis-reader-settings-panel .jarvis-reader-settings-reset { display: block; margin-top: 16px; width: 100%; background: transparent; border: none; box-shadow: none; color: var(--text-muted); font-size: var(--font-ui-smaller); }
+.jarvis-reader-settings-panel [role="alert"] { color: var(--text-error); font-size: var(--font-ui-smaller); }
 .jarvis-reader-side-controls:empty { display: none; }
 
 
@@ -5324,3 +5303,45 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button:hover:not(:disabled) { background: var(--background-modifier-hover); }
 .jarvis-reader-settings-panel .jarvis-reader-settings-icon-options button:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 1px; }
 .jarvis-reader-settings-icon-options svg { width: 16px; height: 16px; }
+
+/* Host-style toolbar icons and keyboard focus; preserve distinct primary actions. */
+.jarvis-library-header button svg { width: 16px; height: 16px; }
+.jarvis-library-header button:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jarvis-reader-highlight-popover.is-floating,
+  .jarvis-reader-word-card,
+  .jarvis-reader-highlight-menu,
+  .jarvis-reader-selection-toolbar { animation: none !important; }
+  .jarvis-reader-side-controls,
+  .jarvis-reader-side-button,
+  .jarvis-library-filter-btn,
+  .jarvis-library-layout-btn,
+  .jarvis-library-action-icon-btn,
+  .jarvis-library-book-card,
+  .book-card-cover-wrap,
+  .jarvis-reader-page-button,
+  .jarvis-book-editor .metadata-star { transition: none !important; }
+}
+
+/* Keep library tools compact, including when a pane becomes narrow. */
+.jarvis-library-app { container-type: inline-size; }
+.jarvis-library-search-wrap,
+.jarvis-library-search-input { min-width: 0; }
+.jarvis-library-search-input { height: 32px; border-radius: var(--radius-s) !important; }
+.jarvis-library-header .jarvis-library-filter-btn,
+.jarvis-library-header .jarvis-library-layout-btn,
+.jarvis-library-header .jarvis-library-action-icon-btn {
+  width: 28px; height: 28px; padding: 0;
+  border: 0; border-radius: var(--radius-s); box-shadow: none;
+  transition: background 120ms ease, color 120ms ease;
+}
+.jarvis-library-action-icon-btn:hover { transform: none; }
+.jarvis-library-layout-toggle { border: 0; border-radius: var(--radius-s); padding: 2px; background: var(--background-secondary); }
+.jarvis-library-search-clear { padding: 0; width: 20px; height: 20px; border: 0; background: transparent; box-shadow: none; }
+@container (max-width: 520px) {
+  .jarvis-library-header { flex-wrap: wrap; gap: 8px; }
+  .jarvis-library-header-spacer { display: none; }
+  .jarvis-library-search-wrap { flex: 1 1 100% !important; max-width: none; }
+  .jarvis-library-header-right { flex: 1 1 100% !important; }
+}
