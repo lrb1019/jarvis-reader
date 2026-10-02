@@ -1,27 +1,16 @@
 # Jarvis Reader
 
-Current version: 1.4.2 · [中文说明](./README.md)
+EPUB reading and knowledge capture for Obsidian · [中文说明](./README.md)
 
 Read EPUBs inside Obsidian, keep quotes and reflections in Markdown, connect existing notes, and promote useful fragments into independent knowledge notes.
 
 **Read → Highlight → Reflect → Link → Create knowledge notes.** Offline lookup, AI translation, and vocabulary collection support this workflow.
 
-## What's new in 1.4.2
+## Purpose
 
-This release combines native styling improvements, file association updates, scoped code cleanup, and three confirmed state fixes.
+Jarvis Reader focuses on making reading an input to your Obsidian knowledge base, rather than replacing a dedicated ebook reader. Quotes, reflections, and links stay together in one Markdown reading note per book. You decide which useful fragments to promote into independent knowledge notes.
 
-- **Obsidian styling:** Consistent compact typography and spacing for note and word cards, subtle dark-card surface contrast and neutral borders, and theme-native reading colors. Removed colored book selection outlines. Reduced statistics typography and margins, compacted the monthly calendar, separated chart bars from axis labels, and added a weekly reading ranking.
-- **File associations:** Follow book and note renames or moves within the vault and recover associations using stable source identities rather than filenames alone.
-- **Restore original covers:** Restore the EPUB cover from the book menu after applying a custom image; uploaded image files are retained.
-- **Bookmark persistence:** Serialize operations so rollback from a failed save cannot overwrite a later successful change.
-- **Reader loading:** Discard obsolete asynchronous results after closing a reader or switching books.
-- **Progress:** Do not persist temporary estimates while the EPUB location table is being generated; refresh progress when it becomes available.
-- **Focused lookup:** Removed word popups, collected-word marks, and the old setting outside the EPUB reader. EPUB lookup, translation, collection, and existing assets remain available.
-- **Code maintenance:** Archived superseded audits, removed unused modules and styles, shared card display and annotation refresh logic, declared the EPUB dependency, and added regression coverage.
-
-**Upgrade impact:** Upgrading from 1.4.1 introduces no new book-note or vocabulary format migration. Existing books, Markdown content, bookmarks, statistics, and collected words remain. The outside-reader lookup setting is retired. Earlier upgrades still run existing migrations: 1.4.0 removed legacy review state, sentence assets, and smart-command settings. Back up notes and plugin data before upgrading.
-
-Related checks and user acceptance were completed in the test vault. The full third-party theme matrix, live sync transport, actual process crashes, and this release's BRAT clean installation/upgrade require separate verification. See the [changelog](./项目管理/03%20改动日志.md) for evidence and limits.
+English support and statistics serve reading; this is not a standalone vocabulary or spaced-repetition product. The plugin does not create a file for every highlight or automatically promote quotes into knowledge notes.
 
 ## Features
 
@@ -60,7 +49,7 @@ dictionaries/ecdict/
 THIRD_PARTY_NOTICES.md
 ```
 
-The three runtime files alone do not include the offline dictionary. Replace release files when updating and retain existing data, indexes, caches, and backups. Cloning `main` provides development source, which may contain unreleased changes.
+The three runtime files alone do not include the offline dictionary. Replace release files when updating and retain existing data, indexes, caches, and backups. Back up notes and plugin data before upgrading and read the target version's [Release notes](https://github.com/lrb1019/jarvis-reader/releases), especially migration and retired-feature notices when upgrading from older versions. Cloning `main` provides development source, which may contain unreleased changes.
 
 ## Reading to knowledge
 
@@ -111,6 +100,12 @@ Data stays in the current vault by default:
 Knowledge notes are user-owned Markdown. Caches and summaries do not replace content; Markdown alone cannot reconstruct lost EPUB CFI positions. Back up notes and plugin data and do not upload them publicly.
 
 Offline lookup makes no external request. AI translation sends selected text and necessary context to the configured service only after explicit action, never a whole book or chapter.
+
+## Compatibility and verification limits
+
+The reader and tools follow the Obsidian theme. The full third-party theme matrix, live sync transport, process crashes, and every version's BRAT clean installation/upgrade have not all been verified in the app. See the [changelog](./项目管理/03%20改动日志.md) for evidence and remaining checks.
+
+The plugin includes a layout adaptation for Claudian's bottom zen composer: while an EPUB is open, the composer floats without reserving more reading space when its selected-content chip appears. Closing all EPUBs restores Claudian's original layout. The overlay can cover text at the bottom and affects other splits in the same workspace. It depends on Claudian's internal CSS classes and still awaits in-app acceptance. Claudian is not required for core reading features.
 
 ## Development and history
 
