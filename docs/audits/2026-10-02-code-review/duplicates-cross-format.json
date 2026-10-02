@@ -1,0 +1,147 @@
+{
+  "duplicates": [
+    {
+      "firstFile": {
+        "end": 124,
+        "endLoc": {
+          "column": 47,
+          "line": 124,
+          "position": 5256
+        },
+        "name": "src/EpubReader.tsx",
+        "start": 108,
+        "startLoc": {
+          "column": 14,
+          "line": 108,
+          "position": 4732
+        }
+      },
+      "format": "tsx",
+      "fragment": "  const parts = [];\n  const pattern = /(\\*\\*|__)([\\s\\S]+?)\\1/g;\n  let lastIndex = 0;\n  let match = null;\n  while ((match = pattern.exec(value))) {\n    if (match.index > lastIndex) {\n      parts.push(value.slice(lastIndex, match.index));\n    }\n    parts.push(React.createElement(\"strong\", { key: `bold-${parts.length}` }, match[2]));\n    lastIndex = pattern.lastIndex;\n  }\n  if (lastIndex < value.length) {\n    parts.push(value.slice(lastIndex));\n  }\n  return parts.length ? parts : value;\n}\nexport function getWordCardDisplayLineMeta(line) {",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 17,
+      "secondFile": {
+        "end": 34,
+        "endLoc": {
+          "column": 47,
+          "line": 34,
+          "position": 1278
+        },
+        "name": "src/global-markdown.ts",
+        "start": 17,
+        "startLoc": {
+          "column": 33,
+          "line": 17,
+          "position": 753
+        }
+      },
+      "tokens": 130
+    },
+    {
+      "firstFile": {
+        "end": 150,
+        "endLoc": {
+          "column": 6,
+          "line": 150,
+          "position": 5920
+        },
+        "name": "src/EpubReader.tsx",
+        "start": 124,
+        "startLoc": {
+          "column": 47,
+          "line": 124,
+          "position": 5256
+        }
+      },
+      "format": "tsx",
+      "fragment": "export function getWordCardDisplayLineMeta(line) {\n  const raw = String(line || \"\");\n  const trimmed = raw.trim();\n  if (/^#{1,6}\\s+/.test(trimmed)) {\n    return {\n      className: \"jarvis-reader-word-card-display-heading\",\n      text: trimmed.replace(/^#{1,6}\\s+/, \"\")\n    };\n  }\n  if (/^>\\s*/.test(trimmed)) {\n    return {\n      className: \"jarvis-reader-word-card-display-quote\",\n      text: trimmed.replace(/^>\\s*/, \"\")\n    };\n  }\n  if (/^(?:[-*]|\\d+[.)])\\s+/.test(trimmed)) {\n    return {\n      className: \"jarvis-reader-word-card-display-list\",\n      text: trimmed.replace(/^(?:[-*]|\\d+[.)])\\s+/, \"\")\n    };\n  }\n  return {\n    className: \"jarvis-reader-word-card-display-line\",\n    text: raw\n  };\n}\nexport function buildWordMatchRegex(lemma) {",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 27,
+      "secondFile": {
+        "end": 61,
+        "endLoc": {
+          "column": 6,
+          "line": 61,
+          "position": 1951
+        },
+        "name": "src/global-markdown.ts",
+        "start": 34,
+        "startLoc": {
+          "column": 55,
+          "line": 34,
+          "position": 1286
+        }
+      },
+      "tokens": 121
+    },
+    {
+      "firstFile": {
+        "end": 593,
+        "endLoc": {
+          "column": 3,
+          "line": 593,
+          "position": 25857
+        },
+        "name": "src/EpubReader.tsx",
+        "start": 579,
+        "startLoc": {
+          "column": 8,
+          "line": 579,
+          "position": 25325
+        }
+      },
+      "format": "tsx",
+      "fragment": "        try {\n          if (!rendition || !rendition.manager || !rendition.manager.stage)\n            return;\n          const views = (typeof rendition.manager.visible === \"function\" ? rendition.manager.visible() : null) || [];\n          for (const view of views) {\n            if (view && view.pane && typeof view.pane.render === \"function\") {\n              view.pane.render();\n            }\n          }\n        } catch (error) {\n          console.warn(\"Jarvis Reader highlight refresh failed.\", error);\n        }\n      });\n    }, 80);\n  };",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 15,
+      "secondFile": {
+        "end": 430,
+        "endLoc": {
+          "column": 3,
+          "line": 430,
+          "position": 16679
+        },
+        "name": "src/EpubView.ts",
+        "start": 416,
+        "startLoc": {
+          "column": 8,
+          "line": 416,
+          "position": 16147
+        }
+      },
+      "tokens": 109
+    }
+  ],
+  "statistics": {
+    "detectionDate": "2026-10-02T00:53:03.507Z",
+    "formats": {
+      "tsx": {
+        "clones": 3,
+        "duplicatedLines": 59,
+        "duplicatedTokens": 360,
+        "lines": 13929,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 0.4235767104601909,
+        "percentageTokens": 0.31866867309905283,
+        "sources": 57,
+        "tokens": 112970
+      }
+    },
+    "total": {
+      "clones": 3,
+      "duplicatedLines": 59,
+      "duplicatedTokens": 360,
+      "lines": 13929,
+      "newClones": 0,
+      "newDuplicatedLines": 0,
+      "percentage": 0.4235767104601909,
+      "percentageTokens": 0.31866867309905283,
+      "sources": 57,
+      "tokens": 112970
+    }
+  }
+}

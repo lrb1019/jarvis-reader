@@ -89,7 +89,7 @@ export function planBookRename(state: BookPathState, oldPath: string, newPath: s
   return { version: 1, oldPath, newPath, patches };
 }
 
-export function planBookNoteRename(state: BookPathState, oldPath: string, newPath: string): PendingRename {
+function planBookNoteRename(state: BookPathState, oldPath: string, newPath: string): PendingRename {
   if (!validPath(oldPath, ".md") || !validPath(newPath, ".md") || oldPath === newPath) throw new Error("笔记改名路径无效");
   const patches: Patch[] = [];
   for (const [bookPath, path] of Object.entries(state.bookNotePaths || {})) {

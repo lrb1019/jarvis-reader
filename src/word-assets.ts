@@ -22,12 +22,17 @@ import type {
 // Re-export from utils for modules that import from word-assets
 export { escapeRegExp } from "./utils-core.ts";
 
+export function getLightWordAsset<T extends object | null | undefined>(asset: T): T {
+  if (!asset) return asset;
+  return { ...asset };
+}
+
 // --- Constants ---
 
 export const JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 export const JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
-export const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
+const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
 export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词卡生成器。
 
@@ -100,7 +105,7 @@ export function normalizeWordSelection(value: string | null | undefined): {
   };
 }
 
-export function getWordAudioType(accent: string | null | undefined): string {
+function getWordAudioType(accent: string | null | undefined): string {
   return String(accent || "us").toLowerCase() === "uk" ? "1" : "2";
 }
 
@@ -131,7 +136,7 @@ export function getTranslationSelectionType(value: string | null | undefined): "
   return "sentence";
 }
 
-export function getExperimentalTranslationSettings(settings: any = {}): {
+function getExperimentalTranslationSettings(settings: any = {}): {
   enabled: boolean;
   localDictionaryEnabled: boolean;
 } {
@@ -142,13 +147,13 @@ export function getExperimentalTranslationSettings(settings: any = {}): {
   };
 }
 
-export function getBuiltinDictionaryShardPath(word: string): string {
+function getBuiltinDictionaryShardPath(word: string): string {
   const first = String(word || "").trim().charAt(0).toLowerCase();
   const shard = /^[a-z]$/.test(first) ? first : "_";
   return `${BUILTIN_DICTIONARY_FOLDER}/${shard}.json`;
 }
 
-export async function readJsonFromVault(app: App, path: string): Promise<any> {
+async function readJsonFromVault(app: App, path: string): Promise<any> {
   const adapter = app && app.vault ? app.vault.adapter : null;
   if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
     return null;
@@ -307,7 +312,7 @@ export function getTranslationAssetStorageKey(asset: any): string {
 
 
 
-export function mergeWordSources(existingSources: WordAssetSource[] | undefined, nextSource: WordAssetSource | null): WordAssetSource[] {
+function mergeWordSources(existingSources: WordAssetSource[] | undefined, nextSource: WordAssetSource | null): WordAssetSource[] {
   const list = Array.isArray(existingSources) ? [...existingSources] : [];
   if (list.length) {
     return list.slice(0, 1);
@@ -318,7 +323,7 @@ export function mergeWordSources(existingSources: WordAssetSource[] | undefined,
   return [source];
 }
 
-export function mergeStringList(existingList: string[] | undefined, nextValue: string | undefined): string[] {
+function mergeStringList(existingList: string[] | undefined, nextValue: string | undefined): string[] {
   const values = Array.isArray(existingList) ? [...existingList] : [];
   const candidate = (nextValue || "").trim();
   if (candidate && !values.includes(candidate)) {
@@ -346,7 +351,7 @@ export function getWordAssetSurfaceForms(asset: any): string[] {
   return forms;
 }
 
-export function isWordInflectionOf(surface: string, lemma: string): boolean {
+function isWordInflectionOf(surface: string, lemma: string): boolean {
   const word = String(surface || "").toLowerCase();
   const base = String(lemma || "").toLowerCase();
   if (!word || !base || word === base)

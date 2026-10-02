@@ -1,126 +1,56 @@
 # Jarvis Reader
 
-Current version: 1.4.1
+Current version: 1.4.2 · [中文说明](./README.md)
 
-[中文说明](./README.md) | English
+Read EPUBs inside Obsidian, keep quotes and reflections in Markdown, connect existing notes, and promote useful fragments into independent knowledge notes.
 
-Jarvis Reader connects EPUB reading with Obsidian knowledge: keep highlights and reflections in Markdown, link them to other notes, and return from notes to the source text. Offline definitions, AI translation, and word or phrase collection support this reading workflow.
+**Read → Highlight → Reflect → Link → Create knowledge notes.** Offline lookup, AI translation, and vocabulary collection support this workflow.
 
-Jarvis Reader bundles the ECDICT offline dictionary. English word lookup works without importing a dictionary or configuring a local path. Dictionary data is loaded from 26 alphabetical shards. Attribution and license details are available in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+## What's new in 1.4.2
 
-## v1.4.1
+This release combines native styling improvements, file association updates, scoped code cleanup, and three confirmed state fixes.
 
-- Single-click selects a book; double-click opens it. Removed expanded cards and the separate detail page; progress and a management menu sit below each cover.
-- The menu offers reading metadata, cover replacement, manual reading time, and deletion, with compact editing dialogs.
-- Manual minutes are added to the selected date, rolled back on save failure, and serialized with automatic recording.
-- Improved dark-theme annotation visibility while keeping reading text and background consistent with the theme; removed redundant bookmark hover tips.
+- **Obsidian styling:** Consistent compact typography and spacing for note and word cards, subtle dark-card surface contrast and neutral borders, and theme-native reading colors. Removed colored book selection outlines. Reduced statistics typography and margins, compacted the monthly calendar, separated chart bars from axis labels, and added a weekly reading ranking.
+- **File associations:** Follow book and note renames or moves within the vault and recover associations using stable source identities rather than filenames alone.
+- **Restore original covers:** Restore the EPUB cover from the book menu after applying a custom image; uploaded image files are retained.
+- **Bookmark persistence:** Serialize operations so rollback from a failed save cannot overwrite a later successful change.
+- **Reader loading:** Discard obsolete asynchronous results after closing a reader or switching books.
+- **Progress:** Do not persist temporary estimates while the EPUB location table is being generated; refresh progress when it becomes available.
+- **Focused lookup:** Removed word popups, collected-word marks, and the old setting outside the EPUB reader. EPUB lookup, translation, collection, and existing assets remain available.
+- **Code maintenance:** Archived superseded audits, removed unused modules and styles, shared card display and annotation refresh logic, declared the EPUB dependency, and added regression coverage.
 
-**Upgrade impact:** No new migration or cleanup of existing notes, bookmarks, progress, or statistics. Manual time changes statistics only after saving. The full theme matrix and BRAT clean installation/upgrade have not been tested in Obsidian.
+**Upgrade impact:** Upgrading from 1.4.1 introduces no new book-note or vocabulary format migration. Existing books, Markdown content, bookmarks, statistics, and collected words remain. The outside-reader lookup setting is retired. Earlier upgrades still run existing migrations: 1.4.0 removed legacy review state, sentence assets, and smart-command settings. Back up notes and plugin data before upgrading.
 
-## v1.4.0
+Related checks and user acceptance were completed in the test vault. The full third-party theme matrix, live sync transport, actual process crashes, and this release's BRAT clean installation/upgrade require separate verification. See the [changelog](./项目管理/03%20改动日志.md) for evidence and limits.
 
-- Central reading settings cover font size, line height, character and word spacing, paragraph indentation, content width, one or two columns, and pagination or scrolling. Narrow views fall back to one column; sidebar changes trigger pagination resizing.
-- Three reader shortcuts for bookmarks, book notes, and settings appear on hover and hide when idle. Page-turn controls appear at the left and right edges on hover.
-- A single reading sidebar switches between contents, saved bookmarks, and highlights with notes. The search filter button expands content, scope, and sorting options with a reset action.
-- Selected text opens its action menu on right-click. Offline lookup and AI translation are explicit actions. Sidebar bookmark and highlight deletion runs directly from the right-click menu; other confirmation behavior is unchanged.
-- Book notes and newly created knowledge notes include EPUB source links; knowledge notes use concise source labels.
-- Smart commands, review and mastery state, the standalone word book, and the vocabulary sidebar have been removed. Only explicitly collected words and phrases are saved; sentences can be translated but are not vocabulary assets.
+## Features
 
-**Upgrade impact:** 1.4.0 removes legacy review fields, mastery state, and sentence assets. Legacy smart-command settings are backed up before removal. Back up plugin data and vocabulary indexes before upgrading. Book Markdown, knowledge notes, and retained words and phrases are outside this cleanup.
+| Feature | Behavior |
+| --- | --- |
+| Library | Grid/list browsing; single-click selects, double-click opens and restores reading position |
+| Book management | Progress and an overflow menu below covers; metadata, custom/original covers, manual reading time, and deletion |
+| Reading layout | Font size, line height, character/word spacing, indentation, width, one/two paginated columns, and single-column scrolling; adapts to sidebar resizing |
+| Reading sidebar | Contents, bookmarks, notes/highlights, search and expandable filters |
+| Highlights and notes | Right-click selected text; multiple reflections and links on a single quote |
+| Knowledge notes | Explicit promotion includes the quote, all reflections, and source links; repeat promotion opens the existing note |
+| English support | Bundled ECDICT lookup, explicit AI translation, manual word/phrase collection; no standalone vocabulary book or review system |
+| Statistics | Automatic and manual time, weekly/monthly/yearly charts and reading rankings |
 
-See the [acceptance record](./docs/plans/2026-09-30%20阅读体验收尾验收.md) for coverage and limitations. This version is published for everyday reading at the user’s request. Clean installation, full BRAT upgrade acceptance, and real API calls have not been fully verified.
+There is no separate book detail page. Selecting text alone does not open a menu or translation result. Ordinary Markdown files do not receive global lookup or saved-word marks.
 
-## v1.3.4
+## Installation and updates
 
-- Book cards now collapse when you click outside them, and blank space below a cover no longer opens a card.
-- The reading-note link list fills the available popover height, shows the number of links, and has a resize handle at the lower right.
-- Reader and settings labels consistently use “notes.” Settings are regrouped, with the book-note template at the bottom.
-- Updated the optional Claudian integration for its current input element and removed premature “sent” notices. Claudian's private interface may change again.
-- No reading data migration is required. Vault-local `books/skill/` files and smart-command settings are not included in the plugin package.
+### BRAT
 
-## v1.3.3
+Add `lrb1019/jarvis-reader` in Obsidian's BRAT plugin to install a published Release. Use BRAT to check updates. Everyday vaults receive official releases rather than direct development deployments.
 
-- Fixed the library note count so it updates immediately after a highlight is created.
-- Improved startup recovery from a highlight index backup and an unfinished write transaction. Saving stops and preserves the files when both the index and its backup are corrupt.
-- A stale editor can no longer overwrite a newer note on the same highlight; it prompts the reader to reopen the note.
-- Updated the EPUB XML parser dependency to `@xmldom/xmldom@0.8.15` to address the dependency audit findings.
-- Verified Markdown and index write failures, corrupt files, and conflict copies in the test vault. Live sync transport and an actual process crash were not simulated.
+### Manual installation
 
-## v1.3.2
+1. Download the complete `jarvis-reader-VERSION.zip` from [GitHub Releases](https://github.com/lrb1019/jarvis-reader/releases).
+2. Extract directly into `.obsidian/plugins/jarvis-reader/` in your vault without an extra nested directory.
+3. Enable Jarvis Reader under Settings → Community plugins.
 
-- Knowledge-note promotion now opens the target file in the foreground, and reopening the same book focuses its existing reader tab.
-- Restored editing for the tag field on the book detail page by removing the overlapping fixed-height layout.
-- Smart commands can reference a vault-relative `SKILL.md` for Claudian to read; command lists show only descriptions and generated prompts stay compact.
-- Temporary translation cards can be dragged freely without inheriting note-window bounds.
-- Left and right arrow keys move the cursor inside the note editor without also turning EPUB pages.
-
-## v1.3.1
-
-- Fixed a bug where highlight quotes containing multiple paragraphs (with empty lines) were prematurely truncated during Markdown parsing.
-- Fixed an issue where multiline chapter titles containing newlines corrupted the Callout layout format.
-
-## v1.3.0
-
-- Strengthened persistence boundaries for highlights, vocabulary assets, settings, and reading statistics with atomic sidecar replacement, highlight transaction recovery, conflict backups, and rollback on failure.
-- Moved cover cache data out of `data.json` into independent cache files, fixed first-load cache pruning, and restored immediate library cover rendering.
-- Added `Contents / Bookmarks` navigation to the reading sidebar with current-book jumps and confirmed deletion.
-- Knowledge-note promotion now includes the source quote, every personal note, and the source block link; repeated promotion opens the existing note for that source block.
-- Unified note projections across book details, the sidebar, and the reader while simplifying translation cards, vocabulary cards, and book-detail layout.
-
-## v1.1.4
-
-- **Note Secondary Editing & Deletion**: Added edit and delete buttons to each note card item in the popover window. Supports editing individual thoughts (preserving their creation timestamps) and deleting entries, and writes changes back to the raw Markdown note file.
-- **Resize Handle Visibility**: Moved the resize handle outside of the conditional actions block to make it visible and draggable across all popover states (view, append, edit).
-- **Asynchronous Detail Page Loading**: Implemented an async parse workflow when entering the book details view to read the Markdown note file directly, extracting and merging `commentEntries` and `aiSections` to ensure the details view is perfectly in sync with the reader.
-- **Style Decoupling & Rename**: Notes cards (with thoughts/links) now display clean quotes without highlight backgrounds, while plain highlight lines show a soft highlight background matching the user's color palette. Renamed detail tab and stat counts back to "笔记" per user request.
-
-## v1.2.0
-
-- The library now keeps Grid and List views only; the low-value 3D Coverflow view was removed.
-- A highlight with a reflection can be promoted directly into an independent knowledge note. Its target folder is configurable, and the new note links to the original book block rather than copying the source text.
-
-## v1.1.2
-
-- **Obsidian-Native Markdown Preview & Wikilink Navigation**: Used Obsidian's native `MarkdownRenderer` in the note display area to support rich formatting (bold, lists, tables) and allow clicking `[[wikilinks]]` directly to open target files.
-- **CodeMirror 6 Editor Activation**: Resolved a CSS display bug that kept the CodeMirror 6 editor hidden under fallback textareas, restoring the native autocomplete, syntax highlighting, and double-bracket suggestion experience.
-- **Sidebar Focus & CFI Snapback Fixes**: Prevented focus changes from resetting the active sidebar tab back to TOC. Resolved a critical race condition where stale `pendingInitLocationRef` values triggered snap-back loops when paginating to later chapters.
-- **Form Layout & Corrupted JSON Tolerance**: Increased default note window height by 30% with scroll helper. Added robust try-catch handling and fallback mechanisms to `word-assets.json` load workflow to protect the plugin against startup crashes on corrupted index files.
-
-## v1.1.1
-
-- Removed the floating note bubble in EPUB body text to avoid random drift or disappearance across pagination and multi-paragraph highlights.
-- Highlights with notes now open the read-only note window by clicking the underline itself; top-right actions still open the Markdown block or append a new note.
-
-## v1.1.0
-
-- Reworked the EPUB highlight note window: highlights with notes open from the underline itself, display as read-only by default, and require the top-right action to append a new note.
-- Added an action to open the corresponding Markdown note block through Obsidian block links: `notePath#^blockId`.
-- Added `Notes / AI` sections in the note window: notes show all entries from the same highlight block; AI shows agent output and wiki links.
-- New note entries are written with the `笔记` label while still reading older `想法` blocks.
-- Simplified the note window toward native Obsidian styling and aligned top-right action buttons with the vocabulary card buttons.
-
-## Highlights
-
-- **Library App**: Browse books with Grid and List views.
-- **Frontmatter status sync**: Reading status, rating, and tags align with the corresponding Markdown book note.
-- **Immersive EPUB reading**: Central controls for font size, line height, character and word spacing, indentation, and width; one or two paginated columns, single-column scrolling, contents, and location recovery.
-- **Highlights and notes**: Create plain highlights, write notes, append notes, open the corresponding Markdown block, filter in the sidebar, and jump back to the source text.
-- **Reading bookmarks**: Add bookmarks in the reader and jump back to precise EPUB CFI locations from the reading sidebar.
-- **Offline lookup and AI translation**: Single words are looked up through bundled ECDICT first; phrases, sentences, and misses require explicit AI translation.
-- **Lightweight vocabulary collection**: Explicitly save words and phrases with definitions and sources; no review system or standalone word book.
-- **Markdown word recognition**: Saved words can be recognized in the current CodeMirror viewport of normal Markdown notes.
-- **TypeScript source project**: Source code lives in `src/`; root `main.js` is generated by esbuild.
-
-## Installation
-
-1. Download a published package from [GitHub Releases](https://github.com/lrb1019/jarvis-reader/releases). Cloning `main` gives you the unreleased development version.
-2. Copy the folder into your Obsidian vault:
-
-```text
-.obsidian/plugins/jarvis-reader
-```
-
-3. Make sure the folder contains at least:
+Required contents:
 
 ```text
 main.js
@@ -130,105 +60,68 @@ dictionaries/ecdict/
 THIRD_PARTY_NOTICES.md
 ```
 
-4. Open Obsidian.
-5. Go to `Settings -> Community plugins`.
-6. Reload the plugin list if needed.
-7. Enable `Jarvis Reader`.
+The three runtime files alone do not include the offline dictionary. Replace release files when updating and retain existing data, indexes, caches, and backups. Cloning `main` provides development source, which may contain unreleased changes.
 
-## Usage
+## Reading to knowledge
 
-- Click the Jarvis Reader ribbon icon to open the Library App.
-- Open an EPUB from the library.
-- Select text, then right-click to choose Highlight, Note, Copy, Offline lookup, or AI translation.
-- Plain highlights save only the selected text; notes save both the selected text and your content into the corresponding Markdown book note.
-- Click a highlight with notes to open the read-only note window.
-- In the note window, `pencil` opens the corresponding Markdown block, `file-pen-line` appends a note, and `x` closes the window.
-- A highlight with a reflection can create an independent Markdown knowledge note containing the source quote, every personal note, the source block link, and an EPUB source link; configure its destination folder in plugin settings.
-- Select an English word and explicitly choose offline lookup from the right-click menu. Selection alone does not open a result.
-- Select a phrase or sentence and choose AI translation to call the configured API explicitly.
-- Lookup does not collect automatically. Explicit collection saves only words or phrases; sentences are not saved as assets.
-- Type `[[note name]]` inside notes to connect reading notes with the rest of your vault.
-- Configure book-note paths, templates, AI translation settings, and pronunciation settings in the plugin settings.
+1. Configure a book folder and add EPUBs; an empty book-folder setting scans the vault.
+2. Single-click selects; double-click opens. Adjust layout in the reader and navigate with contents or bookmarks.
+3. Select text and right-click to highlight or add a note. Each book uses one Markdown reading note rather than one file per quote.
+4. Click an annotation with notes to view its full quote and reflections. Append/edit notes and use `[[wikilinks]]`; each reflection's overflow menu provides editing and deletion.
+5. Explicitly create a knowledge note from a useful fragment. Source links return to the reading note or EPUB. Stable source identities support renames/moves; deleting files or moving them outside the vault is different.
 
-## Data And Privacy
+Sidebar bookmarks and fragments are deleted from their context menus. Book deletion preserves Markdown reading notes and knowledge notes by default.
 
-Jarvis Reader stores data locally in your Obsidian vault by default.
+### Independent folders
 
-Main data locations:
+All paths are vault-relative and independently configurable:
 
-- `data.json`: plugin settings, reading locations, reading progress, bookmarks, and lightweight runtime data.
-- `cache/covers/`: independent local cover-cache entries for each book.
-- `index/word-assets.json`: primary data for collected words and phrases.
-- `index/highlights.json`: authoritative highlight identity, color, and EPUB CFI metadata.
-- `logs/index-changes.jsonl`: index change log.
-- Markdown book notes: authoritative quotes, complete reflections, and links.
+| Setting | Default | Purpose |
+| --- | --- | --- |
+| Book folder | Empty | Filter EPUBs in the library |
+| Reading notes | `Reading Notes` | One Markdown note per book |
+| Knowledge notes | `Knowledge Notes` | Explicitly promoted notes |
+| Covers | `Cover` | Uploaded custom images |
 
-These local data files should not be committed to a public GitHub repository. The repository `.gitignore` excludes common local data files.
+Saving folder settings creates missing directories. The last three are not forced into the book folder; paths such as `books/Reading Notes` are optional. Changing these settings does not automatically move existing files.
 
-External AI translation is called only when explicitly triggered by the user. Bundled ECDICT lookup does not require network access.
+### Lookup and translation
 
-## Development
+Select an English word inside the EPUB reader and choose offline lookup. Bundled ECDICT loads from 26 alphabetical shards without network access or manual import; see [third-party notices](./THIRD_PARTY_NOTICES.md). Phrases, sentences, and offline misses can use the configured AI service after explicit action.
 
-This repository is a TypeScript source project.
+Lookup does not collect automatically. Only explicit saving creates a word/phrase asset; sentences can be translated but are not saved as assets. AI failure must not block notes, highlights, or offline lookup.
 
-Common commands:
+### Manual reading time
 
-```powershell
-npm install
+Add minutes for reading that was not automatically tracked, such as reading on another device. Saved minutes are added to the selected date and included in statistics; they do not replace the book's automatic time.
+
+## Data and privacy
+
+Data stays in the current vault by default:
+
+| Location | Content |
+| --- | --- |
+| `data.json` | Settings, position, progress, bookmarks, and reading time |
+| Book Markdown notes | Authoritative quotes, complete reflections, and links |
+| `index/highlights.json` | Annotation identity, color, chapter, and EPUB CFI location |
+| `index/word-assets.json` | Collected words, definitions, and sources |
+| `cache/covers/` | Regenerable cover cache |
+| `logs/index-changes.jsonl` | Index audit records |
+
+Knowledge notes are user-owned Markdown. Caches and summaries do not replace content; Markdown alone cannot reconstruct lost EPUB CFI positions. Back up notes and plugin data and do not upload them publicly.
+
+Offline lookup makes no external request. AI translation sends selected text and necessary context to the configured service only after explicit action, never a whole book or chapter.
+
+## Development and history
+
+Edit `src/`; `main.js` is generated. Use Node.js 24:
+
+```sh
+npm ci
 npm run verify
+npm run package:release
 ```
 
-`npm run verify` runs:
+Verification runs standard/strict core type checks, tests, a production build, and bundle syntax checks. Release ZIPs include the dictionary and notices, not user data.
 
-1. Standard TypeScript checks plus strict checks for core modules.
-2. Node tests.
-3. Production build with esbuild.
-4. `node --check main.js`.
-
-Development rules:
-
-- Edit `src/` for feature changes.
-- Do not edit `main.js` by hand; it is generated by the build process.
-- Run `npm run verify` before publishing or committing.
-
-## Repository Layout
-
-```text
-src/                    TypeScript source
-styles.css              Plugin styles
-main.js                 Build output
-manifest.json           Obsidian plugin manifest
-dictionaries/ecdict/    Bundled ECDICT dictionary shards
-tests/                  Automated tests
-README.md               Chinese README
-README.en.md            English README
-THIRD_PARTY_NOTICES.md  Third-party notices
-```
-
-## Recent Releases
-
-### v1.1.1
-
-- Removed the floating EPUB note bubble and changed note highlights to open the read-only note window by clicking the underline itself.
-- Kept the note-window actions for opening the Markdown block, appending notes, and closing the window.
-
-### v1.1.0
-
-- Changed EPUB highlight notes to read-only display plus explicit append.
-- Added opening the corresponding Markdown block from the note window.
-- Added `Notes / AI` sections in the note window.
-- Standardized new note labels to `笔记` while keeping compatibility with old `想法` blocks.
-
-### v1.0.9
-
-- Extended the existing word popup flow from CodeMirror Markdown notes to ordinary article/body DOM selections when the page is controllable.
-- Reused the same offline lookup, `AI Translate`, and `Save Word` card flow instead of creating a second vocabulary pipeline.
-- Intentionally stopped short of automatic saved-word highlighting inside third-party article renderers; valuable content should still be saved to local Markdown for long-term reuse.
-
-### v1.0.8
-
-- Audited four icon entry paths: ribbon icons, view tab icons, button icons, and inline SVG icons.
-- Switched the left Open Library ribbon entry back to the native Obsidian library-big icon name.
-- Added a reference note explaining how to use native Lucide icons in Obsidian plugins with real source examples.
-
-For full history, see the project note `03 改动日志.md`.
+[Changelog](./项目管理/03%20改动日志.md) · [Release procedure](./项目管理/06%20发布与同步流程.md) · [Past releases](https://github.com/lrb1019/jarvis-reader/releases)

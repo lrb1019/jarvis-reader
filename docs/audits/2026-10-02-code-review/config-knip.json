@@ -1,0 +1,1 @@
+{"entry": ["src/main.ts", "tests/*.test.ts", "*.mjs"], "project": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "*.mjs"], "esbuild": false, "ignore": ["src/_codex_ref/**"], "ignoreDependencies": ["obsidian", "electron", "@codemirror/*"]}

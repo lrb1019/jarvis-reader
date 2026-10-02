@@ -148,7 +148,7 @@ export function getJarvisReaderCodeMirrorModules(): CodeMirrorModules | null {
   return jarvisReaderCodeMirrorModules!;
 }
 
-export function getWikiLinkRangeInText(value: string, cursor: number): WikiLinkRange | null {
+function getWikiLinkRangeInText(value: string, cursor: number): WikiLinkRange | null {
   const pattern = /\[\[([^\]]+)\]\]/g;
   let match;
   while ((match = pattern.exec(value || "")) !== null) {
@@ -167,7 +167,7 @@ export function getWikiLinkRangeInText(value: string, cursor: number): WikiLinkR
   return null;
 }
 
-export function createWikiLinkDecorationsExtension(cm: CodeMirrorModules): any {
+function createWikiLinkDecorationsExtension(cm: CodeMirrorModules): any {
   const { EditorView: EditorView2, ViewPlugin, Decoration } = cm.view;
   const { RangeSetBuilder } = cm.state;
   const build = (view: any) => {

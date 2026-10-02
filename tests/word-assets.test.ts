@@ -5,6 +5,7 @@ import {
   buildWordAssetFromSelection,
   findWordAssetBySurface,
   getDictionaryLookupKeys,
+  getLightWordAsset,
   getTranslationAssetKey,
   getTranslationSelectionType,
   normalizeDictionaryEntry,
@@ -13,6 +14,18 @@ import {
 } from "../src/word-assets.ts";
 
 const file = { path: "Books/Atomic.epub", basename: "Atomic" } as any;
+
+test("word asset projection retains complete legacy fields and shallow references", () => {
+  const asset = { lemma: "battle", display: "**meaning**", legacyFlag: false, sources: [{ bookPath: "Books/A.epub" }] };
+  const projected = getLightWordAsset(asset);
+  assert.notEqual(projected, asset);
+  assert.deepEqual(projected, asset);
+  assert.equal(projected.sources, asset.sources);
+  projected.display = "changed copy";
+  assert.equal(asset.display, "**meaning**");
+  assert.equal(getLightWordAsset(null), null);
+  assert.equal(getLightWordAsset(undefined), undefined);
+});
 
 test("normalizes word and phrase selections", () => {
   assert.deepEqual(normalizeWordSelection("  “Atomic habits”  "), {

@@ -5,7 +5,7 @@ const originalIndents = new WeakMap<HTMLElement, { value: string; priority: stri
 const EXCLUDED_CONTEXT = "blockquote, li, figure, figcaption, table, pre, nav, aside, h1, h2, h3, h4, h5, h6, [role='heading'], [role='doc-footnote'], [role='doc-endnote'], .caption, .image-caption, .poem, .poetry, .verse, .title, .subtitle";
 const EXCLUDED_TYPES = new Set(["footnote", "endnote", "titlepage", "dedication", "poem", "verse", "caption"]);
 
-export function isReaderBodyParagraph(paragraph: Element): boolean {
+function isReaderBodyParagraph(paragraph: Element): boolean {
   if (paragraph.localName !== "p" || !paragraph.textContent?.trim() || paragraph.closest(EXCLUDED_CONTEXT)) return false;
   if (paragraph.querySelector("img, svg, video, audio, canvas, math, table")) return false;
   for (let ancestor: Element | null = paragraph; ancestor; ancestor = ancestor.parentElement) {

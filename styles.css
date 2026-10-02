@@ -2123,12 +2123,6 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   display: none !important;
 }
 
-.jarvis-reader-md-word-highlight {
-  background-color: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
-  border-bottom: 2px solid var(--interactive-accent);
-  cursor: pointer;
-}
-
 /* marks-pane appends its SVG above the EPUB iframe. Blend the whole pane
    with the page: mix-blend-mode is CSS, not an SVG presentation attribute. */
 .jarvis-reader-epub .epub-view > svg {
@@ -2885,24 +2879,7 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   color: var(--text-normal);
 }
 
-/* Detail View Screen */
-.jarvis-library-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 8px;
-}
 
-.jarvis-library-detail-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--background-modifier-border);
-  padding-bottom: 12px;
-}
 
 .jarvis-library-back-btn {
   background: transparent;
@@ -2926,166 +2903,26 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-library-back-btn:focus-visible,
 .jarvis-book-editor .metadata-star:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
 
-.jarvis-library-detail-header {
-  display: flex;
-  gap: 28px;
-  flex-wrap: wrap;
-}
 
-.detail-header-cover-side {
-  align-self: flex-start;
-  aspect-ratio: 2 / 3;
-  background: var(--background-secondary-alt);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex: 0 0 280px;
-  overflow: hidden;
-}
 
-.detail-cover {
-  display: block;
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
-}
 
-.detail-cover-placeholder {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px 14px;
-  box-sizing: border-box;
-  color: white;
-}
 
-.detail-header-info-side {
-  flex: 1 1 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 420px;
-}
 
-.detail-header-intro-side {
-  flex: 1 1 300px;
-  display: flex;
-  flex-direction: column;
-  height: 395px;
-  background: var(--background-secondary-alt);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 20px;
-  box-sizing: border-box;
-}
 
-.detail-header-intro-side h4 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-normal);
-}
 
-.detail-intro-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 8px;
-}
 
-.detail-intro-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-.detail-intro-scroll::-webkit-scrollbar-thumb {
-  background-color: var(--background-modifier-border-hover);
-  border-radius: 4px;
-}
 
-.detail-intro-scroll p {
-  margin: 0;
-  font-size: var(--font-ui-small);
-  line-height: 1.6;
-  color: var(--text-muted);
-  white-space: pre-wrap;
-}
 
-.metadata-textarea {
-  width: 100%;
-  min-height: 100%;
-  resize: none;
-  background-color: var(--background-modifier-form-field);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: var(--font-ui-small);
-  color: var(--text-normal);
-  line-height: 1.6;
-  font-family: inherit;
-}
 
-.detail-book-title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1.2;
-}
 
-.detail-book-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
 
-.detail-meta-text {
-  font-size: var(--font-ui-small);
-  color: var(--text-muted);
-}
 
-/* Detail statistics board */
-.detail-progress-board {
-  display: flex;
-  background: color-mix(in srgb, var(--background-secondary) 60%, transparent);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-}
 
-.detail-progress-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
 
-.progress-stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-normal);
-  line-height: 1;
-}
 
-.progress-stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-}
 
-.detail-progress-divider {
-  width: 1px;
-  height: 28px;
-  background-color: var(--background-modifier-border);
-}
 
-/* Action button bar */
-.detail-action-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
+
 
 /* Metadata Editor */
 .detail-metadata-editor {
@@ -3205,101 +3042,17 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   color: white;
 }
 
-/* Intro block */
-.detail-book-intro {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
-}
 
-.detail-book-intro h4 {
-  margin: 0;
-  max-height: 395px;
-  overflow-y: auto;
-}
 
-.detail-header-intro-side h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-normal);
-}
 
-.detail-header-intro-side p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
 
-.intro-collapsed {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
-.intro-expand-toggle {
-  background: transparent;
-  border: none;
-  color: var(--interactive-accent);
-  font-size: 12px;
-  cursor: pointer;
-  align-self: flex-start;
-  padding: 2px 0;
-  font-weight: 600;
-}
 
-.intro-expand-toggle:hover {
-  text-decoration: underline;
-}
 
-/* Tabs list */
-.jarvis-library-detail-tabs {
-  display: flex;
-  margin-top: 10px;
-}
 
-/* Tab group container (Segmented Control style) */
-.detail-tab-group {
-  display: inline-flex;
-  align-items: center;
-  background-color: var(--background-secondary-alt);
-  border: 1px solid var(--border-color);
-  border-radius: 8px; /* 圆滑外框 */
-  padding: 4px;
-  gap: 8px; /* 间距拉开 */
-}
 
-/* Individual tab button */
-.detail-tab-group button.detail-tab-btn {
-  background: transparent !important;
-  border: none !important;
-  border-radius: 6px !important; /* 按钮圆角 */
-  box-shadow: none !important;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px; /* 图标与文字间距 */
-}
 
-.detail-tab-group button.detail-tab-btn:hover:not(.is-active) {
-  color: var(--text-normal);
-  background-color: var(--background-modifier-hover) !important;
-}
 
-.detail-tab-group button.detail-tab-btn.is-active {
-  color: var(--text-normal) !important;
-  background-color: var(--background-primary) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
 
 /* Tab empty state */
 .jarvis-library-tab-empty {
@@ -4008,9 +3761,9 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   opacity: 0.8;
 }
 
-.jarvis-stats-bar-tooltip {
+.jarvis-stats-bar-tooltip,
+.jarvis-stats-heatmap-cell-tooltip {
   position: absolute;
-  top: -24px;
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
@@ -4022,6 +3775,10 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   transition: opacity 0.2s ease;
   z-index: 10;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.jarvis-stats-bar-tooltip {
+  top: -24px;
 }
 
 .jarvis-stats-bar-column:hover .jarvis-stats-bar-tooltip {
@@ -4126,21 +3883,9 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-stats-heatmap-cell.level-4 { background-color: color-mix(in srgb, var(--interactive-accent) 90%, var(--background-primary)); }
 
 .jarvis-stats-heatmap-cell-tooltip {
-  position: absolute;
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: var(--font-ui-smaller);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .jarvis-stats-heatmap-cell:hover .jarvis-stats-heatmap-cell-tooltip {
@@ -5016,6 +4761,13 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 
 .jarvis-reader-word-card {
   font: 400 var(--font-ui-small) / 1.5 var(--font-interface);
+}
+
+.theme-dark .jarvis-reader-highlight-popover.is-floating,
+.theme-dark .jarvis-reader-word-card {
+  background: color-mix(in srgb, var(--background-primary) 92%, var(--text-normal)) !important;
+  border: 1px solid var(--background-modifier-border-hover, var(--background-modifier-border));
+  box-shadow: var(--shadow-l, 0 12px 32px rgb(0 0 0 / 32%));
 }
 
 .jarvis-reader-word-card .jarvis-reader-word-phonetic {

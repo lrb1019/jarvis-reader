@@ -5,7 +5,7 @@ import { normalizeTranslationProvider, getTranslationProviderDefaults, validateT
 import type JarvisReaderPlugin from "./main";
 import { clampReaderZoom, clampReaderLineHeight, READER_ZOOM_LIMITS, READER_LINE_HEIGHT_LIMITS, READER_WIDTH_LIMITS } from "./reader-settings";
 
-export const DEFAULT_BOOK_NOTE_TEMPLATE = `---
+const DEFAULT_BOOK_NOTE_TEMPLATE = `---
 bookname: "[[{{bookname}}]]"
 status: unread
 rating: 0
@@ -62,7 +62,7 @@ export const DEFAULT_SETTINGS = {
   },
   readingStats: {}
 };
-export class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
+class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
   onChoose: (path: string) => void;
   folders: string[];
   constructor(app: App, onChoose: (path: string) => void) {

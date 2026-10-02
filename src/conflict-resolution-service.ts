@@ -32,7 +32,7 @@ export interface ConflictResolutionHost {
   saveSettingsData(): Promise<void>;
 }
 
-export const PLUGIN_ROOT = ".obsidian/plugins/jarvis-reader";
+const PLUGIN_ROOT = ".obsidian/plugins/jarvis-reader";
 const INDEX_FOLDER = `${PLUGIN_ROOT}/index`;
 
 export function allConflictPaths(files: ConflictFileSet): string[] {

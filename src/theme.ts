@@ -6,23 +6,23 @@ import { syncReaderParagraphIndent } from "./reader-paragraphs.ts";
 import type { ReaderParagraphIndent } from "./reader-settings.ts";
 export { clampReaderZoom, clampReaderLineHeight } from "./reader-settings.ts";
 
-export function getObsidianCssVar(name: string, fallback: string = ""): string {
+function getObsidianCssVar(name: string, fallback: string = ""): string {
   const el = document.querySelector(".app-container") || document.body;
   const value = getComputedStyle(el).getPropertyValue(name).trim();
   return value || fallback;
 }
 
-export function getCssPixelValue(value: string | null | undefined): string {
+function getCssPixelValue(value: string | null | undefined): string {
   const parsed = parseFloat(value || "");
   return Number.isFinite(parsed) && parsed > 0 ? `${parsed}px` : "";
 }
 
-export function scaleCssPixelValue(value: string | null | undefined, scale: any): string {
+function scaleCssPixelValue(value: string | null | undefined, scale: any): string {
   const parsed = parseFloat(value || "");
   return Number.isFinite(parsed) && parsed > 0 ? `${parsed * clampReaderZoom(scale)}px` : value || "";
 }
 
-export function getObsidianTextFontSize(): string {
+function getObsidianTextFontSize(): string {
   const cssVarSize = getCssPixelValue(getObsidianCssVar("--font-text-size", "")) || getCssPixelValue(getObsidianCssVar("--editor-font-size", ""));
   if (cssVarSize) {
     return cssVarSize;

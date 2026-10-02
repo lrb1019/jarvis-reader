@@ -13,7 +13,7 @@ export interface KnowledgeNoteBodyEntry {
   text: string;
 }
 
-export function buildKnowledgeNoteSourceLink(sourceNotePath: string, sourceBlockId: string): string {
+function buildKnowledgeNoteSourceLink(sourceNotePath: string, sourceBlockId: string): string {
   const target = sourceBlockId ? `${sourceNotePath}#^${sourceBlockId}` : sourceNotePath;
   return `[[${target}|返回读书笔记]]`;
 }

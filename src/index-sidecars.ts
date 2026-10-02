@@ -61,7 +61,7 @@ function isHighlightRecord(value: unknown): value is PersistedBookHighlight {
   return requiredFields.every((field) => typeof value[field] === "string");
 }
 
-export function parseHighlightSidecar(payload: unknown): PersistedBookHighlightsMap | null {
+function parseHighlightSidecar(payload: unknown): PersistedBookHighlightsMap | null {
   if (!isRecord(payload) || payload.version !== 1 || !isRecord(payload.bookHighlights)) {
     return null;
   }
@@ -73,7 +73,7 @@ export function parseHighlightSidecar(payload: unknown): PersistedBookHighlights
   return payload.bookHighlights as PersistedBookHighlightsMap;
 }
 
-export async function ensureSidecarFolder(adapter: SidecarFileAdapter, folderPath: string): Promise<void> {
+async function ensureSidecarFolder(adapter: SidecarFileAdapter, folderPath: string): Promise<void> {
   if (typeof adapter.mkdir !== "function") return;
   let current = "";
   for (const segment of folderPath.split("/").filter(Boolean)) {

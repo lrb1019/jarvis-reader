@@ -22,9 +22,9 @@
     "src/reader-resize.ts",
     "src/reader-text-spacing.ts",
     "src/reader/ReaderSideControls.tsx",
-    "src/library/library-highlight-core.ts",
     "src/library/book-note-projection.ts",
-    "src/settings-save-queue.ts"
+    "src/settings-save-queue.ts",
+    "src/word-card-display.ts"
   ],
   "include": []
 }

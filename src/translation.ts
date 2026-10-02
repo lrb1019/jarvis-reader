@@ -13,7 +13,7 @@ import {
 import { normalizeHighlightQuote, normalizeWordDisplayText } from "./utils";
 import type { JarvisReaderSettings, TranslationProvider } from "./types";
 
-export function extractOpenAIMessageText(payload: any): string {
+function extractOpenAIMessageText(payload: any): string {
   var _a: any, _b: any, _c: any;
   const message = (_c = (_b = (_a = payload == null ? void 0 : payload.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.content;
   if (typeof message === "string") {
@@ -31,7 +31,7 @@ export function extractOpenAIMessageText(payload: any): string {
   return "";
 }
 
-export function parseTranslationResponseText(text: string): any {
+function parseTranslationResponseText(text: string): any {
   const raw = (text || "").trim();
   if (!raw)
     return null;
@@ -56,12 +56,12 @@ export function parseTranslationResponseText(text: string): any {
   return null;
 }
 
-export function looksLikeJsonObjectText(text: string): boolean {
+function looksLikeJsonObjectText(text: string): boolean {
   const raw = String(text || "").trim();
   return raw.startsWith("{") || /^```(?:json)?\s*\{/i.test(raw);
 }
 
-export function getFirstJsonObjectText(text: string): string {
+function getFirstJsonObjectText(text: string): string {
   const source = String(text || "");
   for (let firstBrace = source.indexOf("{"); firstBrace >= 0; firstBrace = source.indexOf("{", firstBrace + 1)) {
     if (source[firstBrace + 1] === "{" || source[firstBrace - 1] === "{")
@@ -122,7 +122,7 @@ export function validateTranslationPromptJsonTemplate(prompt: string): { ok: boo
   }
 }
 
-export function pickLabeledValue(text: string, labels: string[]): string {
+function pickLabeledValue(text: string, labels: string[]): string {
   const source = text || "";
   for (const label of labels) {
     const pattern = new RegExp(`^${escapeRegExp(label)}\\s*:?\\s*(.+)$`, "im");
@@ -134,7 +134,7 @@ export function pickLabeledValue(text: string, labels: string[]): string {
   return "";
 }
 
-export function pickLabeledBlock(text: string, label: string, nextLabels: string[] = []): string {
+function pickLabeledBlock(text: string, label: string, nextLabels: string[] = []): string {
   const source = text || "";
   const next = nextLabels.length ? `|${nextLabels.map((item) => escapeRegExp(item)).join("|")}` : "";
   const pattern = new RegExp(`${escapeRegExp(label)}\\s*:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:${nextLabels.map((item) => escapeRegExp(item)).join("|")})\\s*:?|$)`, "i");
@@ -142,7 +142,7 @@ export function pickLabeledBlock(text: string, label: string, nextLabels: string
   return match && match[1] ? match[1].trim() : "";
 }
 
-export function parsePlainTranslationResponse(selectedText: string, text: string, selectionType: string = ""): any {
+function parsePlainTranslationResponse(selectedText: string, text: string, selectionType: string = ""): any {
   const raw = (text || "").trim();
   if (!raw)
     return null;
@@ -176,21 +176,21 @@ export function parsePlainTranslationResponse(selectedText: string, text: string
   };
 }
 
-export function normalizeJsonString(value: any): string {
+function normalizeJsonString(value: any): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export function normalizeJsonArray(value: any): any[] {
+function normalizeJsonArray(value: any): any[] {
   return Array.isArray(value) ? value : [];
 }
 
-export function getPrimaryPosMeaning(payload: any): any {
+function getPrimaryPosMeaning(payload: any): any {
   const meanings = normalizeJsonArray(payload == null ? void 0 : payload.pos_meanings);
   const first = meanings.find((item: any) => item && (normalizeJsonString(item.pos) || normalizeJsonString(item.meaning)));
   return first || null;
 }
 
-export function normalizeJsonExample(value: any): { en: string; zh: string } {
+function normalizeJsonExample(value: any): { en: string; zh: string } {
   if (typeof value === "string") {
     return {
       en: value.trim(),
@@ -209,7 +209,7 @@ export function normalizeJsonExample(value: any): { en: string; zh: string } {
   };
 }
 
-export function buildStructuredWordDisplay(payload: any, lemma: string): string {
+function buildStructuredWordDisplay(payload: any, lemma: string): string {
   if (!payload || typeof payload !== "object")
     return "";
   const lines: string[] = [];
@@ -277,7 +277,7 @@ export function buildStructuredWordDisplay(payload: any, lemma: string): string 
   return lines.join("\n").trim();
 }
 
-export function normalizeTranslationResult(selectedText: string, payload: any, selectionType: string = ""): any {
+function normalizeTranslationResult(selectedText: string, payload: any, selectionType: string = ""): any {
   if (selectionType === "sentence") {
     const translation = payload && typeof payload.translation === "string" ? payload.translation.trim() : normalizeWordDisplayText(payload && typeof payload.display === "string" ? payload.display : "");
     return {
@@ -326,7 +326,7 @@ export function normalizeTranslationProvider(value: string, baseUrl: string = ""
   return "openai-compatible";
 }
 
-export function detectTranslationApiType(settings: any = {}): string {
+function detectTranslationApiType(settings: any = {}): string {
   const api = settings.translationApi || {};
   const lowered = String(api.baseUrl || "").toLowerCase();
   if (lowered.includes("anthropic"))
@@ -392,7 +392,7 @@ export function getTranslationProviderDefaults(provider: string): { baseUrl: str
   }
 }
 
-export function buildTranslationApiEndpoint(settings: any = {}): string {
+function buildTranslationApiEndpoint(settings: any = {}): string {
   const api = settings.translationApi || {};
   const baseUrl = String(api.baseUrl || "").trim().replace(/\/+$/g, "");
   const model = String(api.model || "").trim();
@@ -414,7 +414,7 @@ export function buildTranslationApiEndpoint(settings: any = {}): string {
   }
 }
 
-export function buildTranslationPromptText(prompt: string, selectedText: string, sentence: string = ""): string {
+function buildTranslationPromptText(prompt: string, selectedText: string, sentence: string = ""): string {
   const word = (selectedText || "").trim();
   const contextSentence = (sentence || selectedText || "").trim();
   const selectionType = getTranslationSelectionType(word);
@@ -426,7 +426,7 @@ export function buildTranslationPromptText(prompt: string, selectedText: string,
   return `${templated}\n\nSelected text: ${selectedText}\nSelection type: ${selectionType}\nContext: ${contextSentence}`;
 }
 
-export function extractAnthropicMessageText(payload: any): string {
+function extractAnthropicMessageText(payload: any): string {
   var _a: any;
   const content = (_a = payload == null ? void 0 : payload.content) != null ? _a : [];
   if (!Array.isArray(content))
@@ -434,7 +434,7 @@ export function extractAnthropicMessageText(payload: any): string {
   return content.map((part: any) => part && typeof part.text === "string" ? part.text : "").join("\n").trim();
 }
 
-export function extractGeminiMessageText(payload: any): string {
+function extractGeminiMessageText(payload: any): string {
   var _a: any, _b: any, _c: any, _d: any, _e: any;
   const parts = (_e = (_d = (_c = (_b = (_a = payload == null ? void 0 : payload.candidates) == null ? void 0 : _a[0]) == null ? void 0 : _b.content) == null ? void 0 : _c.parts) != null ? _d : []) != null ? _e : [];
   if (!Array.isArray(parts))

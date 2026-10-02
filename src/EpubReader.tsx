@@ -1,6 +1,6 @@
 import { fitReaderOverlay } from "./reader-overlay-bounds";
 import { bindReaderContainerResize } from "./reader-resize";
-import { removeEpubAnnotation } from "./epub-annotations-adapter";
+import { removeEpubAnnotation, refreshHighlightPanes } from "./epub-annotations-adapter";
 // Extracted from main.js L49177-51296 — EpubReader React component
 import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from "react";
 import { Notice, setIcon, MarkdownRenderer, Menu } from "obsidian";
@@ -20,6 +20,7 @@ import { ReaderSideControls } from "./reader/ReaderSideControls";
 import { clampSelectionMenuPosition, getSelectionTranslationOptions, type SelectionTranslationKind } from "./reader-selection";
 import { READER_ZOOM_LIMITS } from "./reader-settings";
 import { moveFloatingCardRect } from "./floating-card-core";
+import { getWordCardDisplayLineMeta, renderWordCardDisplayText } from "./word-card-display";
 
 export interface EpubReaderProps extends ReaderSettingsAccess {
   contents: ArrayBuffer;
@@ -44,10 +45,7 @@ export interface EpubReaderProps extends ReaderSettingsAccess {
   selectHighlight: (highlight: any) => void;
   registerHighlightEditor: (fn: any) => void;
   registerHighlightDeleted: (fn: any) => void;
-  setScrolled: (value: boolean) => void;
-  setSinglePage: (value: boolean) => void;
   setReaderZoom: (delta: number) => void;
-  setReaderLineHeight: (delta: number) => void;
   syncRenditionTheme: (rendition: any) => void;
   wordAssets: Record<string, any>;
   translateSelection: (text: string, sentence: string, options?: any) => Promise<any>;
@@ -74,28 +72,8 @@ const ReactReaderStyle = (ReactReaderModule as typeof ReactReaderModule & {
   ReactReaderStyle: Record<string, React.CSSProperties>;
 }).ReactReaderStyle;
 
-export function getWordLookupResultFromAsset(asset, selectedText = "") {
-  if (!asset)
-    return null;
-  return {
-    lemma: asset.lemma || "",
-    surface: selectedText || asset.title || asset.lemma || "",
-    translation: asset.translation || "",
-    phonetic: asset.phonetic || "",
-    partOfSpeech: asset.partOfSpeech || "",
-    example: asset.example || "",
-    display: asset.display || "",
-  };
-}
-export function getLightWordAsset(asset) {
-  if (!asset)
-    return asset;
-  return {
-    ...asset
-  };
-}
-export const WORD_DISPLAY_MAX_CHARS = 8e3;
-export const WORD_DISPLAY_CACHE_LIMIT = 50;
+const WORD_DISPLAY_MAX_CHARS = 8e3;
+const WORD_DISPLAY_CACHE_LIMIT = 50;
 
 export function truncateWordDisplay(value) {
   const text = normalizeWordDisplayText(value);
@@ -103,58 +81,15 @@ export function truncateWordDisplay(value) {
     return text;
   return `${text.slice(0, WORD_DISPLAY_MAX_CHARS).trimEnd()}\n\n...`;
 }
-export function renderWordCardDisplayText(text) {
-  const value = String(text || "");
-  const parts = [];
-  const pattern = /(\*\*|__)([\s\S]+?)\1/g;
-  let lastIndex = 0;
-  let match = null;
-  while ((match = pattern.exec(value))) {
-    if (match.index > lastIndex) {
-      parts.push(value.slice(lastIndex, match.index));
-    }
-    parts.push(React.createElement("strong", { key: `bold-${parts.length}` }, match[2]));
-    lastIndex = pattern.lastIndex;
-  }
-  if (lastIndex < value.length) {
-    parts.push(value.slice(lastIndex));
-  }
-  return parts.length ? parts : value;
-}
-export function getWordCardDisplayLineMeta(line) {
-  const raw = String(line || "");
-  const trimmed = raw.trim();
-  if (/^#{1,6}\s+/.test(trimmed)) {
-    return {
-      className: "jarvis-reader-word-card-display-heading",
-      text: trimmed.replace(/^#{1,6}\s+/, "")
-    };
-  }
-  if (/^>\s*/.test(trimmed)) {
-    return {
-      className: "jarvis-reader-word-card-display-quote",
-      text: trimmed.replace(/^>\s*/, "")
-    };
-  }
-  if (/^(?:[-*]|\d+[.)])\s+/.test(trimmed)) {
-    return {
-      className: "jarvis-reader-word-card-display-list",
-      text: trimmed.replace(/^(?:[-*]|\d+[.)])\s+/, "")
-    };
-  }
-  return {
-    className: "jarvis-reader-word-card-display-line",
-    text: raw
-  };
-}
-export function buildWordMatchRegex(lemma) {
+export { getWordCardDisplayLineMeta, renderWordCardDisplayText };
+function buildWordMatchRegex(lemma) {
   const normalized = normalizeWordSelection(lemma);
   if (!normalized)
     return null;
   const pattern = normalized.tokens.map((token) => escapeRegExp(token)).join("\\s+");
   return new RegExp(`(^|[^A-Za-z'-])(${pattern})(?=$|[^A-Za-z'-])`, "gi");
 }
-export function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
+function clampFloatingCardPosition(container, rect, width = 320, height = 180) {
   const containerRect = container && typeof container.getBoundingClientRect === "function" ? container.getBoundingClientRect() : null;
   const boundsWidth = Math.max(0, (containerRect == null ? void 0 : containerRect.width) || window.innerWidth || 960);
   const boundsHeight = Math.max(0, (containerRect == null ? void 0 : containerRect.height) || window.innerHeight || 720);
@@ -204,7 +139,7 @@ const ObsidianMarkdown: React.FC<{ text: string; onOpenLink?: (target: string) =
   });
 };
 
-export const EpubReader: React.FC<EpubReaderProps> = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferencesChange, contents, title, bookPath, scrolled, singlePage, readerWidth, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setScrolled, setSinglePage, setReaderZoom, setReaderLineHeight, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
+export const EpubReader: React.FC<EpubReaderProps> = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferencesChange, contents, title, bookPath, scrolled, singlePage, readerWidth, readerZoom, readerLineHeight, tocOffset, initLocation, shouldSkipInitialLocation, saveLocation, saveProgress, tocMemo, createBookNote, highlights, createHighlight, updateHighlight, deleteHighlight, selectHighlight, registerHighlightEditor, registerHighlightDeleted, setReaderZoom, syncRenditionTheme, wordAssets, translateSelection, saveWordAsset, deleteWordAsset, loadWordDisplay, addBookmark, autoWordHighlight, speechLang, highlightColors, enableWordAudio, wordAudioTemplate, wordAudioAccent, blurWordCardBody, wikiLinkCandidates, getWikiLinkCandidates, openWikiLink, promoteHighlight, onInteraction, app }) => {
   const [location, setLocation] = useState<any>(() => shouldSkipInitialLocation?.() ? null : initLocation);
   const [readerTitle, setReaderTitle] = useState<any>(title);
   const [progressLabel, setProgressLabel] = useState<any>("");
@@ -572,25 +507,6 @@ export const EpubReader: React.FC<EpubReaderProps> = ({ getPanelOpen, onPanelOpe
     };
     window.setTimeout(run, 80);
   };
-  const refreshHighlightPanes = (rendition) => {
-    window.setTimeout(() => {
-      window.requestAnimationFrame(() => {
-        var _a, _b;
-        try {
-          if (!rendition || !rendition.manager || !rendition.manager.stage)
-            return;
-          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
-          for (const view of views) {
-            if (view && view.pane && typeof view.pane.render === "function") {
-              view.pane.render();
-            }
-          }
-        } catch (error) {
-          console.warn("Jarvis Reader highlight refresh failed.", error);
-        }
-      });
-    }, 80);
-  };
   const purgeHighlightMarks = (rendition, cfiRange) => {
     if (!rendition || !cfiRange)
       return;
@@ -829,85 +745,6 @@ const showWordHoverCard = (asset, element) => {
       top: position.top
     });
     loadWordDisplayIntoHover(asset);
-  };
-  const showWordHoverCardAtRect = (asset, rect) => {
-    if (!asset || !rect)
-      return;
-    clearWordHoverHideTimer();
-    const position = clampFloatingCardPosition(containerRef.current, rect, 360, 220);
-    setActiveWordHover({
-      asset,
-      left: position.left,
-      top: position.top
-    });
-    loadWordDisplayIntoHover(asset);
-  };
-  const getWordAssetAtPoint = (contents2, event) => {
-    var _a, _b;
-    const doc = contents2 == null ? void 0 : contents2.document;
-    const win = ((_a = contents2 == null ? void 0 : contents2.window) != null ? _a : doc == null ? void 0 : doc.defaultView);
-    if (!doc || !win || !wordAssetsRef.current)
-      return null;
-    const selectionText = normalizeHighlightQuote((_b = win.getSelection == null ? void 0 : win.getSelection().toString()) != null ? _b : "");
-    if (selectionText)
-      return null;
-    let range = null;
-    try {
-      if (typeof doc.caretRangeFromPoint === "function") {
-        range = doc.caretRangeFromPoint(event.clientX, event.clientY);
-      } else if (typeof doc.caretPositionFromPoint === "function") {
-        const position = doc.caretPositionFromPoint(event.clientX, event.clientY);
-        if (position && position.offsetNode) {
-          range = doc.createRange();
-          range.setStart(position.offsetNode, position.offset);
-          range.collapse(true);
-        }
-      }
-    } catch (error) {
-      return null;
-    }
-    const node = range == null ? void 0 : range.startContainer;
-    if (!node || node.nodeType !== Node.TEXT_NODE)
-      return null;
-    const text = node.nodeValue || "";
-    let offset = Math.max(0, Math.min(text.length, range.startOffset || 0));
-    if (offset === text.length && offset > 0)
-      offset -= 1;
-    if (!/[A-Za-z'-]/.test(text.charAt(offset)) && offset > 0 && /[A-Za-z'-]/.test(text.charAt(offset - 1)))
-      offset -= 1;
-    if (!/[A-Za-z'-]/.test(text.charAt(offset)))
-      return null;
-    let start = offset;
-    let end = offset + 1;
-    while (start > 0 && /[A-Za-z'-]/.test(text.charAt(start - 1)))
-      start -= 1;
-    while (end < text.length && /[A-Za-z'-]/.test(text.charAt(end)))
-      end += 1;
-    const normalized = normalizeWordSelection(text.slice(start, end));
-    if (!normalized)
-      return null;
-    const asset = findWordAssetBySurface(wordAssetsRef.current, normalized.surface);
-    if (!asset)
-      return null;
-    const wordRange = doc.createRange();
-    wordRange.setStart(node, start);
-    wordRange.setEnd(node, end);
-    const rect = wordRange.getBoundingClientRect();
-    if (!rect || !rect.width || !rect.height)
-      return null;
-    const frameElement = win.frameElement;
-    const frameRect = frameElement && typeof frameElement.getBoundingClientRect === "function" ? frameElement.getBoundingClientRect() : { left: 0, top: 0 };
-    return {
-      asset,
-      rect: {
-        left: frameRect.left + rect.left,
-        right: frameRect.left + rect.right,
-        top: frameRect.top + rect.top,
-        bottom: frameRect.top + rect.bottom,
-        width: rect.width,
-        height: rect.height
-      }
-    };
   };
   const clearWordLookup = () => {
     pendingWordLookupRef.current += 1;
@@ -1307,6 +1144,7 @@ const showWordHoverCard = (asset, element) => {
         speechSynthesis.cancel();
       }
       clearAutoWordHighlights(renditionRef.current);
+      renditionRef.current = null;
     };
   }, []);
   useEffect(() => {
@@ -1578,19 +1416,6 @@ const showWordHoverCard = (asset, element) => {
       return null;
     return { start, end: cursor, query };
   };
-  const getWikiLinkAtCursor = (value, cursor) => {
-    const pattern = /\[\[([^\]]+)\]\]/g;
-    let match;
-    while ((match = pattern.exec(value || "")) !== null) {
-      const start = match.index;
-      const end = start + match[0].length;
-      if (cursor >= start && cursor <= end) {
-        const target = (match[1] || "").split("|")[0].trim();
-        return target || null;
-      }
-    }
-    return null;
-  };
   const getWikiLinkRangeAtCursor = (value, cursor) => {
     const pattern = /\[\[([^\]]+)\]\]/g;
     let match;
@@ -1684,19 +1509,6 @@ const showWordHoverCard = (asset, element) => {
     const innerEnd = selected ? innerStart + selected.length : innerStart;
     setWikiSuggest(null);
     setHighlightCommentWithSelection(nextValue, selected ? start + insertText.length : innerStart, selected ? start + insertText.length : innerEnd);
-  };
-  const openWikiLinkAtInputCursor = (input) => {
-    if (!input || typeof openWikiLink !== "function")
-      return;
-    const start = input.selectionStart || 0;
-    const end = input.selectionEnd || start;
-    if (start !== end)
-      return;
-    const target = getWikiLinkAtCursor(input.value || "", start);
-    if (!target)
-      return;
-    setWikiSuggest(null);
-    openWikiLink(target);
   };
   const renderWikiInputPreview = (value) => {
     const text = value || "";
@@ -1911,7 +1723,6 @@ const showWordHoverCard = (asset, element) => {
   }) : activeHighlightPopoverRect;
   const isExistingHighlightComment = !!(pendingSelection && pendingSelection.id);
   const isReadingHighlightComment = !!(isExistingHighlightComment && highlightCommentMode !== "append" && editingNoteIndex === null);
-  const isAppendingHighlightComment = !isExistingHighlightComment || highlightCommentMode === "append" || editingNoteIndex !== null;
   const highlightCommentPlaceholder = isExistingHighlightComment ? "写下新的笔记，保存后会追加到原块" : "写下你的笔记";
   const formatHighlightNoteTime = (value) => {
     const raw = String(value || "").trim();
@@ -2088,7 +1899,6 @@ const showWordHoverCard = (asset, element) => {
         }
       });
     }
-    const displayRecent = recentFiles.slice(0, 15);
 
     interface SuggestionItem {
       displayName: string;
@@ -2440,7 +2250,7 @@ const showWordHoverCard = (asset, element) => {
       syncRenditionTheme(rendition);
       applyHighlights(rendition, highlightList);
       syncAutoWordHighlights(rendition);
-      ensureReaderLocations(rendition, updateReaderTitle);
+      ensureReaderLocations(rendition, updateReaderTitle, () => renditionRef.current === rendition);
       const jarvisRendition = rendition as typeof rendition & { __awesomeReaderTitleBound?: boolean };
       if (rendition && typeof rendition.on === "function" && !jarvisRendition.__awesomeReaderTitleBound) {
         jarvisRendition.__awesomeReaderTitleBound = true;

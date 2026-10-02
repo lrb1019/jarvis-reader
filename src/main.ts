@@ -8,19 +8,17 @@ import { findBookNote, openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
 import { openFileOnceInActiveTab } from "./workspace-navigation";
 import { parseReadingSourceTarget } from "./reading-source-link";
-import { getTranslationAssetStorageKey, buildWordAssetMetadata } from "./word-assets";
-import { getLightWordAsset } from "./EpubReader";
+import { getTranslationAssetStorageKey, buildWordAssetMetadata, getLightWordAsset } from "./word-assets";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE } from "./word-assets";
-import { registerGlobalMarkdownFeatures } from "./global-markdown";
 import { WordAssetService } from "./word-asset-service";
 import { HighlightService } from "./highlight-service";
 import { BookNoteService } from "./book-note-service";
 import { createBookNoteOperations } from "./book-note-operations";
 import { KnowledgeNoteService } from "./knowledge-note-service";
 import { createKnowledgeNoteStorage } from "./knowledge-note-store";
-import { CoverCacheService } from "./cover-cache-service";
+import { CoverCacheService, saveCustomBookCover } from "./cover-cache-service";
 import type { BookCoverCache, BookCoverCacheEntry, BookHighlight } from "./types";
 import { HighlightTransactionService, writeExistingRecoveryNote } from "./highlight-transaction-service";
 import { SettingsSaveQueue } from "./settings-save-queue";
@@ -262,7 +260,6 @@ export default class JarvisReaderPlugin extends Plugin {
         }
       }, 50);
     }));
-    registerGlobalMarkdownFeatures(this);
     this.addSettingTab(new JarvisReaderSettingTab(this.app, this));
   }
   onunload() {
@@ -482,7 +479,7 @@ export default class JarvisReaderPlugin extends Plugin {
       const isLegacySentence = key.startsWith("sentence-") || legacyAsset.kind === "sentence" || legacyAsset.isWord === false;
       const assetKey = getTranslationAssetStorageKey(asset) || (isLegacySentence ? key : "");
       if (assetKey) {
-        normalized[assetKey] = getLightWordAsset(asset);
+        normalized[assetKey] = getLightWordAsset(legacyAsset);
       }
     }
     return normalized;
@@ -659,6 +656,7 @@ export default class JarvisReaderPlugin extends Plugin {
     this.settings.translationApi.apiKey = String(this.settings.translationApi.apiKey || "");
     this.settings.translationApi.model = String(this.settings.translationApi.model || "");
     delete (this.settings as any).localDictionary;
+    delete (this.settings as unknown as Record<string, unknown>).enableGlobalMarkdownTranslation;
     this.settings.translationPrompt = String(this.settings.translationPrompt || DEFAULT_TRANSLATION_PROMPT);
     this.settings.bookFolder = normalizeVaultPath(this.settings.bookFolder || "");
     this.settings.bookNoteFolder = normalizeVaultPath(this.settings.bookNoteFolder || "");
@@ -736,6 +734,30 @@ export default class JarvisReaderPlugin extends Plugin {
     }
     await this.coverCacheService.save(key, entry);
     this.settings.bookCoverCache = this.coverCacheService.snapshot();
+  }
+
+  async restoreOriginalCover(book: TFile): Promise<void> {
+    if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("书籍路径同步期间封面保存已暂停");
+    if (!this.coverCacheMigrationComplete) throw new Error("封面缓存服务不可用，已停止写入以保护旧配置。");
+    const key = `${book.path}|${book.stat?.mtime || 0}|${book.stat?.size || 0}`;
+    await this.coverCacheService.restoreOriginal(key);
+    this.settings.bookCoverCache = this.coverCacheService.snapshot();
+  }
+
+  async saveCustomCover(book: TFile, buffer: ArrayBuffer): Promise<void> {
+    await saveCustomBookCover({
+      stat: path => this.app.vault.adapter.stat(path),
+      mkdir: path => this.app.vault.createFolder(path),
+      writeBinary: async (path, data) => {
+        const file = this.app.vault.getAbstractFileByPath(path);
+        if (file instanceof TFile) {
+          await this.app.vault.modifyBinary(file, data);
+          return file.path;
+        }
+        return (await this.app.vault.createBinary(path, data)).path;
+      }
+    }, book, this.settings.customCoverFolder ?? "Cover", buffer, this.coverCacheService.snapshot(),
+    (key, entry) => this.saveBookCoverCacheEntry(key, entry));
   }
 
   async pruneBookCoverCache(validKeys: Iterable<string>): Promise<number> {

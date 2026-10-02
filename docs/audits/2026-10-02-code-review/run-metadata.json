@@ -1,0 +1,22 @@
+{
+  "baseline": "5a9be98",
+  "date": "2026-10-02",
+  "versions": {
+    "knip": "6.39.0",
+    "dependency-cruiser": "18.5.0",
+    "jscpd": "5.4.0",
+    "typescript": "5.9.3"
+  },
+  "codeModified": false,
+  "knipExitCode": 1,
+  "knipProductionExitCode": 1,
+  "dependencyCruiserExitCode": 0,
+  "jscpdExitCode": 0,
+  "noUnusedDiagnosticsExitCode": 2,
+  "notes": [
+    "Knip exit1 means findings, not a crash",
+    "noUnused flags are temporary diagnostics, not project gates",
+    "Cross-format clones use copied files renamed to .tsx only in temporary directory; manually validate matches",
+    "No fix flags, semantic AI, builds, real data or deployment used"
+  ]
+}

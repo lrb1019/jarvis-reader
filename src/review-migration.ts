@@ -1,11 +1,11 @@
 import type { WordAssetMap } from "./types.ts";
 
-export const REVIEW_ASSET_FIELDS = ["mastered", "nextReviewDate", "interval", "ease", "reviews", "reviewTimeMs"] as const;
+const REVIEW_ASSET_FIELDS = ["mastered", "nextReviewDate", "interval", "ease", "reviews", "reviewTimeMs"] as const;
 
 function isLegacySentenceAsset(key: string, asset: RecordValue): boolean {
   return key.startsWith("sentence-") || asset.kind === "sentence" || asset.isWord === false;
 }
-export const REVIEW_SETTING_FIELDS = ["autoPlayAudioOnReview", "wordReviewStats", "sm2StartingEase", "sm2EasyBonus", "sm2LapseMultiplier", "sm2MaxInterval"] as const;
+const REVIEW_SETTING_FIELDS = ["autoPlayAudioOnReview", "wordReviewStats", "sm2StartingEase", "sm2EasyBonus", "sm2LapseMultiplier", "sm2MaxInterval"] as const;
 
 type RecordValue = Record<string, unknown>;
 
@@ -13,7 +13,7 @@ function hasOwn(object: object, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(object, key);
 }
 
-export function removeReviewFields<T extends RecordValue>(value: T, fields: readonly string[]): { value: T; removed: RecordValue } {
+function removeReviewFields<T extends RecordValue>(value: T, fields: readonly string[]): { value: T; removed: RecordValue } {
   const next = { ...value };
   const removed: RecordValue = {};
   for (const field of fields) {

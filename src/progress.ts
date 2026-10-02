@@ -31,7 +31,7 @@ export function clampProgressValue(value: any): number | null {
   return Math.min(1, Math.max(0, value));
 }
 
-export function getReaderDisplayedPage(relocated: any): ReaderPagePosition | null {
+function getReaderDisplayedPage(relocated: any): ReaderPagePosition | null {
   if (!relocated || !relocated.start) {
     return null;
   }
@@ -64,7 +64,8 @@ export function getPageListProgress(relocated: any, rendition: any): any {
   };
 }
 
-export function getLocationsPercentage(relocated: any, rendition: any): number | null {
+function getLocationsPercentage(relocated: any, rendition: any): number | null {
+  if (rendition?.__jarvisReaderLocationsFailed) return null;
   const cfi = relocated && relocated.start ? relocated.start.cfi : "";
   const locations = rendition && rendition.book ? rendition.book.locations : null;
   if (!cfi || !locations || typeof locations.percentageFromCfi !== "function") {
@@ -77,7 +78,7 @@ export function getLocationsPercentage(relocated: any, rendition: any): number |
   return clampProgressValue(locations.percentageFromCfi(cfi));
 }
 
-export function getSpineFallbackPercentage(relocated: any, rendition: any, displayedPage: ReaderPagePosition | null): number | null {
+function getSpineFallbackPercentage(relocated: any, rendition: any, displayedPage: ReaderPagePosition | null): number | null {
   if (!relocated || !relocated.start || typeof relocated.start.index !== "number") {
     return null;
   }
@@ -108,29 +109,33 @@ export function formatReaderProgressLabel(progress: any): string {
 
 export function getReaderProgressLabel(relocated: any, rendition: any = null): string {
   const progress = getReaderProgress(relocated, rendition);
-  return progress ? progress.label : "";
+  if (progress) return progress.label;
+  const chapterPage = getReaderDisplayedPage(relocated);
+  return chapterPage ? `本章 ${chapterPage.page} / ${chapterPage.total}` : "";
 }
 
-export function ensureReaderLocations(rendition: any, onReady?: (current: any) => void): void {
+export function ensureReaderLocations(rendition: any, onReady?: (current: any) => void, isCurrent: () => boolean = () => true): void {
   const locations = rendition && rendition.book ? rendition.book.locations : null;
   if (!rendition || !locations || typeof locations.generate !== "function") {
     return;
   }
   const hasLocations = Array.isArray(locations._locations) && locations._locations.length > 0 || typeof locations.total === "number" && locations.total > 0;
-  if (hasLocations || rendition.__jarvisReaderLocationsLoading) {
+  if (hasLocations || rendition.__jarvisReaderLocationsLoading || rendition.__jarvisReaderLocationsSettled) {
     return;
   }
   rendition.__jarvisReaderLocationsLoading = true;
-  Promise.resolve(rendition.book.ready).then(() => locations.generate(1600)).then(() => {
-    if (typeof rendition.currentLocation === "function" && typeof onReady === "function") {
-      const current = rendition.currentLocation();
-      if (current) {
-        onReady(current);
-      }
-    }
-  }).catch(() => {
-  }).finally(() => {
+  Promise.resolve(rendition.book.ready).then(() => locations.generate(1600)).catch((error: unknown) => {
+    rendition.__jarvisReaderLocationsFailed = true;
+    if (isCurrent()) console.warn("Jarvis Reader location generation failed; using fallback progress.", error);
+  }).then(() => {
     rendition.__jarvisReaderLocationsLoading = false;
+    rendition.__jarvisReaderLocationsSettled = true;
+    if (isCurrent() && typeof rendition.currentLocation === "function" && typeof onReady === "function") {
+      const current = rendition.currentLocation();
+      if (current) onReady(current);
+    }
+  }).catch((error: unknown) => {
+    if (isCurrent()) console.warn("Jarvis Reader progress refresh failed.", error);
   });
 }
 
@@ -141,14 +146,17 @@ export function getReaderProgress(relocated: any, rendition: any): (BookProgress
   const chapterPage = getReaderDisplayedPage(relocated);
   const bookPage = getPageListProgress(relocated, rendition);
   let percentage = bookPage && bookPage.percentage != null ? bookPage.percentage : null;
+  // The engine fills locations incrementally; only a completed table is accurate.
+  if (percentage == null && rendition?.__jarvisReaderLocationsLoading) return null;
   if (percentage == null) {
     percentage = getLocationsPercentage(relocated, rendition);
   }
   if (percentage == null) {
-    percentage = clampProgressValue(relocated.start.percentage);
-  }
-  if (percentage == null || percentage <= 0) {
-    percentage = getSpineFallbackPercentage(relocated, rendition, chapterPage);
+    // Relocated percentages also come from the engine's locations table.
+    percentage = rendition?.__jarvisReaderLocationsFailed ? null : clampProgressValue(relocated.start.percentage);
+    if (percentage == null || percentage <= 0) {
+      percentage = getSpineFallbackPercentage(relocated, rendition, chapterPage);
+    }
   }
   if (percentage == null) {
     percentage = 0;

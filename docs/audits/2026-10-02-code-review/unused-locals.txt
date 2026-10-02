@@ -1,0 +1,55 @@
+src/book-note-operations.ts(2,1): error TS6133: 'BookHighlight' is declared but its value is never read.
+src/book-notes.ts(3,17): error TS6133: 'WorkspaceLeaf' is declared but its value is never read.
+src/EpubReader.tsx(5,46): error TS6133: 'useCallback' is declared but its value is never read.
+src/EpubReader.tsx(5,59): error TS6133: 'useMemo' is declared but its value is never read.
+src/EpubReader.tsx(11,10): error TS6133: 'clampReaderZoom' is declared but its value is never read.
+src/EpubReader.tsx(11,27): error TS6133: 'clampReaderLineHeight' is declared but its value is never read.
+src/EpubReader.tsx(11,72): error TS6133: 'applyObsidianThemeToRendition' is declared but its value is never read.
+src/EpubReader.tsx(12,75): error TS6133: 'getReaderProgress' is declared but its value is never read.
+src/EpubReader.tsx(207,455): error TS6133: 'setScrolled' is declared but its value is never read.
+src/EpubReader.tsx(207,468): error TS6133: 'setSinglePage' is declared but its value is never read.
+src/EpubReader.tsx(207,498): error TS6133: 'setReaderLineHeight' is declared but its value is never read.
+src/EpubReader.tsx(247,10): error TS6133: 'activeSelectionInfo' is declared but its value is never read.
+src/EpubReader.tsx(578,9): error TS6199: All variables are unused.
+src/EpubReader.tsx(803,21): error TS6133: 'upEvent' is declared but its value is never read.
+src/EpubReader.tsx(833,9): error TS6133: 'showWordHoverCardAtRect' is declared but its value is never read.
+src/EpubReader.tsx(845,9): error TS6133: 'getWordAssetAtPoint' is declared but its value is never read.
+src/EpubReader.tsx(1688,9): error TS6133: 'openWikiLinkAtInputCursor' is declared but its value is never read.
+src/EpubReader.tsx(1914,9): error TS6133: 'isAppendingHighlightComment' is declared but its value is never read.
+src/EpubReader.tsx(2091,11): error TS6133: 'displayRecent' is declared but its value is never read.
+src/EpubReader.tsx(2533,39): error TS6133: 'e' is declared but its value is never read.
+src/EpubView.ts(16,15): error TS6196: 'JarvisReaderSettings' is declared but never used.
+src/global-markdown.ts(708,38): error TS6133: 'view' is declared but its value is never read.
+src/global-markdown.ts(714,38): error TS6133: 'view' is declared but its value is never read.
+src/global-markdown.ts(723,37): error TS6133: 'view' is declared but its value is never read.
+src/global-markdown.ts(729,17): error TS6133: 'event' is declared but its value is never read.
+src/library/LibraryApp.tsx(7,10): error TS6133: 'openOrCreateNote' is declared but its value is never read.
+src/library/LibraryApp.tsx(7,49): error TS6133: 'getBookNotePath' is declared but its value is never read.
+src/library/LibraryApp.tsx(10,15): error TS6196: 'BookHighlight' is declared but never used.
+src/library/LibraryApp.tsx(27,7): error TS6133: 'createCoverThumbnail' is declared but its value is never read.
+src/library/LibraryApp.tsx(43,10): error TS6133: 'formatDate' is declared but its value is never read.
+src/library/LibraryApp.tsx(138,10): error TS6133: 'showLayoutMenu' is declared but its value is never read.
+src/library/LibraryApp.tsx(138,26): error TS6133: 'setShowLayoutMenu' is declared but its value is never read.
+src/library/LibraryApp.tsx(915,9): error TS6133: 'extractAllImages' is declared but its value is never read.
+src/library/LibraryApp.tsx(988,7): error TS6133: 'prevTotalSeconds' is declared but its value is never read.
+src/library/LibraryApp.tsx(1762,47): error TS6133: 'idx' is declared but its value is never read.
+src/main.ts(1,18): error TS6133: 'WorkspaceLeaf' is declared but its value is never read.
+src/main.ts(366,36): error TS6133: 'reveal' is declared but its value is never read.
+src/main.ts(598,13): error TS6133: 'paths' is declared but its value is never read.
+src/reader/ReaderSettingsPanel.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
+src/reader/ReaderSideControls.tsx(2,8): error TS6133: 'React' is declared but its value is never read.
+src/settings.ts(4,10): error TS6133: 'normalizeTranslationProvider' is declared but its value is never read.
+src/sidebar/BookshelfView.ts(344,27): error TS6133: 'activeEpub' is declared but its value is never read.
+src/sidebar/BookshelfView.ts(344,44): error TS6133: 'body' is declared but its value is never read.
+src/translation.ts(13,10): error TS6133: 'normalizeHighlightQuote' is declared but its value is never read.
+src/translation.ts(14,1): error TS6192: All imports in import declaration are unused.
+src/translation.ts(139,9): error TS6133: 'next' is declared but its value is never read.
+src/wiki-editor.ts(171,23): error TS6133: 'EditorView2' is declared but its value is never read.
+src/wiki-editor.ts(308,30): error TS6133: 'completion' is declared but its value is never read.
+src/word-assets.ts(6,3): error TS6133: 'joinVaultPath' is declared but its value is never read.
+src/word-assets.ts(7,3): error TS6133: 'formatLocalDate' is declared but its value is never read.
+src/word-assets.ts(8,3): error TS6133: 'sanitizeWordAssetFilename' is declared but its value is never read.
+src/word-assets.ts(9,3): error TS6133: 'ensureVaultFolder' is declared but its value is never read.
+src/word-assets.ts(10,3): error TS6133: 'escapeYamlString' is declared but its value is never read.
+src/word-assets.ts(18,3): error TS6196: 'JarvisReaderSettings' is declared but never used.
+src/word-assets.ts(378,119): error TS6133: 'settings' is declared but its value is never read.

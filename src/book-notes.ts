@@ -5,7 +5,7 @@ import { normalizeVaultPath, joinVaultPath, formatLocalDateTime } from "./utils"
 import { ensureStorageFolders } from "./storage-folders";
 import type { JarvisReaderSettings } from "./types";
 
-export function getDefaultBookNoteContent(file: TFile, toc: string): string {
+function getDefaultBookNoteContent(file: TFile, toc: string): string {
   return `---
 bookname: "[[${file.basename}.${file.extension}]]"
 status: unread
@@ -19,7 +19,7 @@ created: ${formatLocalDateTime(new Date())}
 ` + toc;
 }
 
-export function renderBookNoteTemplate(template: string, file: TFile, toc: string): string {
+function renderBookNoteTemplate(template: string, file: TFile, toc: string): string {
   if (!template || !template.trim()) {
     return getDefaultBookNoteContent(file, toc);
   }

@@ -1,3 +1,4 @@
+import { refreshHighlightPanes } from "./epub-annotations-adapter";
 // Extracted from main.js L51297-51821 — EpubView (Obsidian FileView for epub files)
 
 import React from "react";
@@ -7,12 +8,12 @@ import { FileView, WorkspaceLeaf, TFile, Notice } from "obsidian";
 import { normalizeHighlightQuote } from "./utils";
 import { openOrCreateNote, getOrCreateBookNote } from "./book-notes";
 import { getEpubTocMd, createHighlightId, getHighlightsForBook, buildHighlightNoteUpdate } from "./highlights";
-import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection } from "./word-assets";
+import { getTranslationAssetKey, getTranslationAssetStorageKey, buildWordAssetFromSelection, getLightWordAsset } from "./word-assets";
 import { translateSelectionWithApi } from "./translation";
 import { clampReaderZoom, clampReaderLineHeight, getJarvisReaderTheme, applyObsidianThemeToRendition } from "./theme";
 import { getReaderProgress } from "./progress";
 import { getMarkdownLinkCandidates } from "./wiki-editor";
-import { EpubReader, getLightWordAsset } from "./EpubReader";
+import { EpubReader } from "./EpubReader";
 import type { JarvisReaderSettings, BookHighlight } from "./types";
 import { ReadingStatsService } from "./reading-stats-service";
 import { buildKnowledgeNoteBody } from "./knowledge-note";
@@ -47,6 +48,8 @@ export class EpubView extends FileView {
   renditionFilePath = "";
   sourceJumpPending = false;
   sourceJumpSequence = 0;
+  private readerLoadSequence = 0;
+  private readerUnloaded = false;
 
   constructor(leaf: WorkspaceLeaf, settings: any, plugin: any) {
     super(leaf);
@@ -411,22 +414,7 @@ export class EpubView extends FileView {
 
   refreshCurrentHighlightPanes(): void {
     const rendition = this.currentRendition;
-    window.setTimeout(() => {
-      window.requestAnimationFrame(() => {
-        try {
-          if (!rendition || !rendition.manager || !rendition.manager.stage)
-            return;
-          const views = (typeof rendition.manager.visible === "function" ? rendition.manager.visible() : null) || [];
-          for (const view of views) {
-            if (view && view.pane && typeof view.pane.render === "function") {
-              view.pane.render();
-            }
-          }
-        } catch (error) {
-          console.warn("Jarvis Reader highlight refresh failed.", error);
-        }
-      });
-    }, 80);
+    refreshHighlightPanes(rendition);
   }
 
   async stopThemeSync(): Promise<void> {
@@ -453,8 +441,12 @@ export class EpubView extends FileView {
     if (statsFile) await this.saveReadingStats(statsFile);
   }
 
-  startThemeSync(rendition: any): void {
+  startThemeSync(rendition: any, isCurrent: () => boolean = () => true): void {
+    const sequence = this.readerLoadSequence;
+    const isActive = () => !this.readerUnloaded && sequence === this.readerLoadSequence && isCurrent();
+    if (!isActive()) return;
     void this.stopThemeSync().then(() => {
+      if (!isActive()) return;
       this.currentRendition = rendition;
       this.renditionFilePath = this.file?.path || "";
       for (const resolve of this.renditionReadyResolvers.splice(0)) resolve(rendition);
@@ -466,6 +458,7 @@ export class EpubView extends FileView {
       }, 30000);
       let lastThemeKey = "";
       const sync = () => {
+      if (!isActive()) return;
       if (Date.now() - this.lastInteractionTime < 120000) {
         const bookPath = this.statsBookFile?.path;
         if (bookPath) this.readingStatsService.add(bookPath);
@@ -567,33 +560,16 @@ export class EpubView extends FileView {
     await this.updateReaderPreferences({ readerZoom: this.getReaderPreferences().readerZoom + delta });
   }
 
-  async setReaderLineHeight(delta: number): Promise<void> {
-    await this.updateReaderPreferences({ readerLineHeight: this.getReaderPreferences().readerLineHeight + delta });
-  }
-
-  async setScrolledView(value: boolean): Promise<void> {
-    await this.updateReaderPreferences({ scrolledView: value });
-  }
-
-  async setSinglePageView(value: boolean): Promise<void> {
-    await this.updateReaderPreferences({ singlePageView: value });
-  }
-
   async setInitLocation(initLocation: string): Promise<void> {
-    this.plugin.settings.bookInitLocations[this.file!.path] = initLocation;
-    await this.plugin.saveSettings();
+    await this.plugin.bookStateService.saveLocation(this.file!.path, initLocation);
   }
 
   async setBookProgress(relocated: any, chapterTitle: string = "", rendition: any = null): Promise<void> {
     const progress = getReaderProgress(relocated, rendition);
     if (!progress)
       return;
-    (progress as any).chapterTitle = chapterTitle || "";
-    if (!this.plugin.settings.bookProgress) {
-      this.plugin.settings.bookProgress = {};
-    }
-    this.plugin.settings.bookProgress[this.file!.path] = progress;
-    await this.plugin.saveSettings();
+    progress.chapterTitle = chapterTitle || "";
+    await this.plugin.bookStateService.saveProgress(this.file!.path, progress);
   }
 
   async getInitLocation(): Promise<string | null> {
@@ -602,6 +578,9 @@ export class EpubView extends FileView {
   }
 
   async prepareBookPathChange(oldPath: string): Promise<void> {
+    ++this.readerLoadSequence;
+    this.highlightEditor = null;
+    this.highlightDeleted = null;
     this.statsBookFile = null;
     if (this.reactRoot) { this.reactRoot.unmount(); this.reactRoot = null; }
     await this.stopThemeSync();
@@ -612,9 +591,16 @@ export class EpubView extends FileView {
   }
 
   async onLoadFile(file: TFile): Promise<void> {
+    if (this.readerUnloaded) return;
+    const sequence = ++this.readerLoadSequence;
+    this.highlightEditor = null;
+    this.highlightDeleted = null;
+    const filePath = file.path;
+    const isCurrent = () => !this.readerUnloaded && sequence === this.readerLoadSequence && this.file?.path === filePath;
     this.sourceJumpPending = !!this.plugin.sourceJumpPaths?.has(file.path);
     this.setHeaderMenuVisibility(true);
     await this.stopThemeSync();
+    if (!isCurrent()) return;
     if (this.reactRoot) {
       this.reactRoot.unmount();
       this.reactRoot = null;
@@ -624,7 +610,7 @@ export class EpubView extends FileView {
     this.lastInteractionTime = Date.now();
     
     const interactionEvents = ["mousemove", "keydown", "click", "scroll"];
-    const interactionHandler = () => { this.lastInteractionTime = Date.now(); };
+    const interactionHandler = () => { if (isCurrent()) this.lastInteractionTime = Date.now(); };
     interactionEvents.forEach(evt => {
       this.contentEl.addEventListener(evt, interactionHandler, { passive: true });
     });
@@ -638,9 +624,15 @@ export class EpubView extends FileView {
     const width = parseFloat(style.width);
     const height = parseFloat(style.height);
     const tocOffset = height < width ? height : 0;
-    const contents = await this.app.vault.adapter.readBinary(file.path);
+    const contents = await this.app.vault.adapter.readBinary(filePath);
+    if (!isCurrent()) return;
+    const initLocation = await this.getInitLocation();
+    if (!isCurrent()) return;
+    const highlights = await this.getBookHighlightsForReader();
+    if (!isCurrent()) return;
     this.plugin.activeReaderView = this;
     await this.plugin.setActiveReader(this, "toc");
+    if (!isCurrent()) return;
     this.renderedReaderLayout = { readerWidth: clampReaderWidth(this.settings.readerWidth), singlePageView: this.settings.singlePageView, scrolledView: this.settings.singlePageView && this.settings.scrolledView };
     this.reactRoot = createRoot(this.contentEl);
     this.reactRoot.render(React.createElement(EpubReader, {
@@ -653,28 +645,25 @@ export class EpubView extends FileView {
       readerZoom: clampReaderZoom(this.settings.readerZoom),
       readerLineHeight: clampReaderLineHeight(this.settings.readerLineHeight),
       tocOffset,
-      initLocation: await this.getInitLocation(),
-      shouldSkipInitialLocation: () => this.sourceJumpPending,
-      saveLocation: (location: string) => { void this.setInitLocation(location).catch((error) => this.reportBackgroundSaveError("阅读位置", error)); },
-      saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { void this.setBookProgress(relocated, chapterTitle, rendition).catch((error) => this.reportBackgroundSaveError("阅读进度", error)); },
-      tocMemo: (toc: any) => { this.fileToc = toc; this.plugin.refreshReaderSidebar(this); },
+      initLocation,
+      shouldSkipInitialLocation: () => !isCurrent() || this.sourceJumpPending,
+      saveLocation: (location: string) => { if (!isCurrent()) return; void this.setInitLocation(location).catch((error) => this.reportBackgroundSaveError("阅读位置", error)); },
+      saveProgress: (relocated: any, chapterTitle: string, rendition: any) => { if (!isCurrent()) return; void this.setBookProgress(relocated, chapterTitle, rendition).catch((error) => this.reportBackgroundSaveError("阅读进度", error)); },
+      tocMemo: (toc: any) => { if (!isCurrent()) return; this.fileToc = toc; this.plugin.refreshReaderSidebar(this); },
       createBookNote: () => { this.createBookNote(); },
-      highlights: await this.getBookHighlightsForReader(),
+      highlights,
       createHighlight: (selection: any) => this.createHighlight(selection),
       updateHighlight: (highlight: any) => this.updateHighlight(highlight),
       deleteHighlight: (highlight: any) => this.deleteHighlight(highlight),
       selectHighlight: (highlight: any) => { this.selectHighlight(highlight); },
-      registerHighlightEditor: (editor: any) => { this.registerHighlightEditor(editor); },
-      registerHighlightDeleted: (callback: any) => { this.registerHighlightDeleted(callback); },
+      registerHighlightEditor: (editor: any) => { if (isCurrent()) this.registerHighlightEditor(editor); },
+      registerHighlightDeleted: (callback: any) => { if (isCurrent()) this.registerHighlightDeleted(callback); },
       getPreferences: this.getReaderPreferences,
       getPanelOpen: this.getReaderSettingsOpen,
       onPanelOpenChange: this.setReaderSettingsOpen,
       onPreferencesChange: this.updateReaderPreferences,
-      setScrolled: (value: boolean) => { void this.setScrolledView(value).catch(() => {}); },
-      setSinglePage: (value: boolean) => { void this.setSinglePageView(value).catch(() => {}); },
       setReaderZoom: (delta: number) => { void this.setReaderZoom(delta).catch(() => {}); },
-      setReaderLineHeight: (delta: number) => { void this.setReaderLineHeight(delta).catch(() => {}); },
-      syncRenditionTheme: (rendition: any) => { this.startThemeSync(rendition); },
+      syncRenditionTheme: (rendition: any) => { if (isCurrent()) this.startThemeSync(rendition, isCurrent); },
       wordAssets: this.getWordAssets(),
       translateSelection: (text: string, sentence: string = "", options: any = {}) => this.translateSelection(text, sentence, options),
       saveWordAsset: (selection: any, translation: any) => this.saveWordAsset(selection, translation),
@@ -692,12 +681,16 @@ export class EpubView extends FileView {
       getWikiLinkCandidates: () => getMarkdownLinkCandidates(this.app),
       openWikiLink: (linkText: string) => { this.openWikiLink(linkText); },
       promoteHighlight: (highlight: BookHighlight) => this.promoteHighlight(highlight),
-      onInteraction: () => { this.lastInteractionTime = Date.now(); },
+      onInteraction: () => { if (isCurrent()) this.lastInteractionTime = Date.now(); },
       app: this.app
     }));
   }
 
   onunload(): void {
+    this.readerUnloaded = true;
+    ++this.readerLoadSequence;
+    this.highlightEditor = null;
+    this.highlightDeleted = null;
     this.setHeaderMenuVisibility(false);
     void this.stopThemeSync().catch((error) => this.reportBackgroundSaveError("关闭阅读器时的统计", error));
     this.plugin.clearActiveReader(this);

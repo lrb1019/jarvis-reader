@@ -1,13 +1,13 @@
 import * as React from "react";
 import { bindDialogFocus } from "../dialog-focus";
 import { projectLibraryBookNotes } from "./book-note-projection";
-import { ensureStorageFolders, isBookInFolder } from "../storage-folders";
+import { isBookInFolder } from "../storage-folders";
 import type JarvisReaderPlugin from "../main";
 import { TFile, Notice, Menu, moment } from "obsidian";
-import { openOrCreateNote, getOrCreateBookNote, getBookNotePath, findBookNote } from "../book-notes";
+import { getOrCreateBookNote, findBookNote } from "../book-notes";
 import { getHighlightsForBook } from "../highlights";
 import { confirmDestructiveAction, formatDuration, getBookTotalSeconds } from "../utils";
-import type { BookHighlight, BookProgress } from "../types";
+import type { BookProgress } from "../types";
 import { ReadingStatsService } from "../reading-stats-service";
 import { openFileOnceInActiveTab } from "../workspace-navigation";
 
@@ -21,33 +21,6 @@ interface EpubManifestItem {
   id?: string;
   href?: string;
   type?: string;
-}
-
-// 直接读取 Blob 为 Base64，完全避免 canvas 渲染可能带来的像素损失
-const createCoverThumbnail = async (url: string): Promise<string> => {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Simple helper to format dates nicely
-function formatDate(dateStr?: string | number): string {
-  if (!dateStr) return "";
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
-  } catch (err) {
-    return String(dateStr);
-  }
 }
 
 function todayDate(): string {
@@ -135,7 +108,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
   const [viewLayout, setViewLayout] = React.useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = React.useState(false);
-  const [showLayoutMenu, setShowLayoutMenu] = React.useState(false);
 
   // Metadata States
   const [bookMetadata, setBookMetadata] = React.useState<{
@@ -171,7 +143,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [statsTab, setStatsTab] = React.useState<"week" | "month" | "year" | "all">("week");
   const [statsDate, setStatsDate] = React.useState<Date>(() => new Date());
   const [statsChartType, setStatsChartType] = React.useState<"bar" | "calendar" | "heatmap">("bar");
-  const [debugImages, setDebugImages] = React.useState<{href: string, size: number, dataUrl: string}[] | null>(null);
 
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
   // Scan books from Vault
@@ -409,7 +380,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             const pubdate = metadata.pubdate || "";
 
             const nextEntry = {
-              ...(cached || {}),
+              ...(plugin.settings.bookCoverCache[key] || {}),
               dataUrl: dataUrl || cached?.dataUrl || "",
               updated: new Date().toISOString(),
               description,
@@ -910,73 +881,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         new Notice(`删除或清理失败：${String(err)}`);
       }
     }
-  };
-
-  const extractAllImages = async (file: TFile) => {
-    try {
-      new Notice("正在提取书籍中的所有图片...");
-      const buffer = await plugin.app.vault.readBinary(file);
-      let epubFn = (window as any).JarvisReader_ePub;
-      if (!epubFn) {
-        const ep = require("epubjs");
-        epubFn = ep.default || ep;
-      }
-      const book = epubFn(buffer.slice(0));
-      await book.opened;
-
-      const manifest = book.packaging?.manifest || {};
-      const imageItems = Object.values(manifest).filter((item: any) => item.type?.startsWith("image/"));
-      
-      const imagesList = [];
-      for (const item of imageItems) {
-        try {
-          const resolvedHref = book.path ? book.path.resolve((item as any).href) : (item as any).href;
-          const blob = await book.archive.getBlob(resolvedHref);
-          if (blob) {
-            const dataUrl = await new Promise<string>((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.readAsDataURL(blob);
-            });
-            imagesList.push({ href: (item as any).href, size: blob.size, dataUrl });
-          }
-        } catch(e) {}
-      }
-      
-      imagesList.sort((a, b) => b.size - a.size);
-      setDebugImages(imagesList);
-      new Notice(`提取完成，共 ${imagesList.length} 张图片`);
-    } catch(err) {
-      new Notice("提取失败: " + err);
-    }
-  };
-
-  // Debug Modal
-  const renderDebugModal = () => {
-    if (!debugImages) return null;
-    return (
-      <div className="jarvis-library-stats-modal-overlay" onClick={() => setDebugImages(null)}>
-        <div className="jarvis-library-stats-modal" onClick={(e) => e.stopPropagation()} style={{ width: '80%', height: '80%', maxWidth: 'none', overflowY: 'auto' }}>
-          <div className="jarvis-library-stats-modal-header">
-            <h3>图片提取调试</h3>
-            <button className="jarvis-library-stats-close-btn" onClick={() => setDebugImages(null)}>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', padding: '20px' }}>
-            {debugImages.map(img => (
-              <div key={img.href} style={{ border: '1px solid var(--background-modifier-border)', padding: '12px', borderRadius: '8px', background: 'var(--background-secondary)' }}>
-                <img src={img.dataUrl} style={{ maxWidth: '240px', maxHeight: '340px', display: 'block', objectFit: 'contain' }} />
-                <div style={{ marginTop: '12px', fontSize: 'var(--font-ui-smaller)', wordBreak: 'break-all', maxWidth: '240px', color: 'var(--text-normal)' }}>
-                  <b>大小:</b> {Math.round(img.size / 1024)} KB<br/>
-                  <b>路径:</b> {img.href}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Stats View
@@ -2072,43 +1976,12 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         canvas.toBlob(async (blob) => {
           if (!blob) return;
           const buffer = await blob.arrayBuffer();
-          const targetFolder = plugin.settings.customCoverFolder ?? "Cover";
           try {
-            await ensureStorageFolders({
-              stat: path => plugin.app.vault.adapter.stat(path),
-              mkdir: path => plugin.app.vault.createFolder(path)
-            }, [targetFolder]);
-          } catch (error) {
-            new Notice("无法创建封面目录");
-            console.error("Failed to create cover folder", error);
-            return;
-          }
-          const baseName = uploadBook.basename.replace(/[\\/:*?"<>|]/g, "_");
-          const targetPath = `${targetFolder ? targetFolder + "/" : ""}cover_${baseName}.jpg`;
-          
-          let targetFile = plugin.app.vault.getAbstractFileByPath(targetPath);
-          if (targetFile instanceof TFile) {
-            await plugin.app.vault.modifyBinary(targetFile, buffer);
-          } else {
-            try {
-               targetFile = await plugin.app.vault.createBinary(targetPath, buffer);
-            } catch (e) {
-               console.error("Failed to create cover file", e);
-               return;
-            }
-          }
-          
-          if (targetFile instanceof TFile) {
-            const key = `${uploadBook.path}|${uploadBook.stat?.mtime || 0}|${uploadBook.stat?.size || 0}`;
-            const existingCache = coverCache[key] || {};
-            const nextEntry = {
-              ...existingCache,
-              vaultPath: targetFile.path,
-              isCustom: true,
-              updated: new Date().toISOString()
-            };
-            await plugin.saveBookCoverCacheEntry(key, nextEntry);
+            await plugin.saveCustomCover(uploadBook, buffer);
             setCoverCache({ ...plugin.settings.bookCoverCache });
+          } catch (error) {
+            new Notice(error instanceof Error ? error.message : "封面保存失败，请检查封面目录或缓存状态。");
+            console.error("Failed to save custom cover", error);
           }
         }, "image/jpeg", 0.85);
       };
@@ -2128,6 +2001,19 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       coverUploadBook.current = book;
       hiddenFileInput.current?.click();
     }));
+    const coverKey = `${book.path}|${book.stat?.mtime || 0}|${book.stat?.size || 0}`;
+    const currentCover = plugin.settings.bookCoverCache[coverKey];
+    if (currentCover?.isCustom || currentCover?.vaultPath) {
+      menu.addItem(item => item.setTitle("恢复原始封面").setIcon("rotate-ccw").onClick(async () => {
+        try {
+          await plugin.restoreOriginalCover(book);
+          setCoverCache({ ...plugin.settings.bookCoverCache });
+          setBooks(current => [...current]);
+        } catch (error) {
+          new Notice(error instanceof Error ? error.message : "恢复封面失败，请重试。");
+        }
+      }));
+    }
     menu.addItem(item => item.setTitle("补录阅读时长").setIcon("clock").onClick(() => {
       setTimeDate(todayDate());
       setTimeMinutes("30");
@@ -2250,7 +2136,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           <div className="jarvis-book-editor-header"><button type="button" disabled={savingTime} onClick={() => setTimeBook(null)}>取消</button><button type="submit" disabled={savingTime}>保存</button></div>
         </form>
       </div>}
-      {renderDebugModal()}
     </div>
   );
 }

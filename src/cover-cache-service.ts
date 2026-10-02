@@ -1,4 +1,40 @@
 import type { BookCoverCache, BookCoverCacheEntry } from "./types.ts";
+import { ensureStorageFolders, type FolderStorage } from "./storage-folders.ts";
+
+export interface CustomCoverBook {
+  path: string;
+  basename: string;
+  stat?: { mtime: number; size: number };
+}
+
+export interface CustomCoverStorage extends FolderStorage {
+  writeBinary(path: string, buffer: ArrayBuffer): Promise<string>;
+}
+
+export async function saveCustomBookCover(
+  storage: CustomCoverStorage,
+  book: CustomCoverBook,
+  folder: string,
+  buffer: ArrayBuffer,
+  existingCache: BookCoverCache,
+  persistEntry: (key: string, entry: BookCoverCacheEntry) => Promise<void>
+): Promise<void> {
+  await ensureStorageFolders(storage, [folder]);
+  const baseName = book.basename.replace(/[\\/:*?"<>|]/g, "_");
+  const targetPath = `${folder ? folder + "/" : ""}cover_${baseName}.jpg`;
+  const savedPath = await storage.writeBinary(targetPath, buffer);
+  const key = `${book.path}|${book.stat?.mtime || 0}|${book.stat?.size || 0}`;
+  try {
+    await persistEntry(key, {
+      ...(existingCache[key] || {}),
+      vaultPath: savedPath,
+      isCustom: true,
+      updated: new Date().toISOString()
+    });
+  } catch (error) {
+    throw new Error(`封面图片已写入 ${savedPath}，但缓存登记失败。`, { cause: error });
+  }
+}
 
 export interface CoverCacheAdapter {
   exists(path: string): Promise<boolean>;
@@ -38,7 +74,7 @@ function hashPart(value: string, seed: number): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
-export function getCoverCachePath(key: string): string {
+function getCoverCachePath(key: string): string {
   const reversed = [...key].reverse().join("");
   const hash = `${hashPart(key, 2166136261)}${hashPart(key, 3335557771)}${hashPart(reversed, 2166136261)}${hashPart(reversed, 3335557771)}`;
   return `${CACHE_FOLDER}/${hash}.json`;
@@ -88,6 +124,14 @@ export class CoverCacheService {
     const payload: PersistedCoverCacheEntry = { version: 1, key, entry };
     await this.adapter.write(path, JSON.stringify(payload));
     this.cache = { ...this.cache, [key]: entry };
+  }
+
+  async restoreOriginal(key: string): Promise<void> {
+    const current = this.cache[key];
+    if (!current || (!current.isCustom && !current.vaultPath)) return;
+    const { vaultPath: _path, isCustom: _custom, ...original } = current;
+    // dataUrl is the EPUB cover; custom images are referenced only by vaultPath.
+    await this.save(key, { ...original, updated: new Date().toISOString() });
   }
 
   async migrateLegacy(legacy: BookCoverCache): Promise<string | null> {

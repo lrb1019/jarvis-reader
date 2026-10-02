@@ -92,7 +92,7 @@ export function resolveReaderPreferences(current: ReaderPreferences, patch: Part
 }
 
 
-export const READER_QUICK_ACTIONS = [
+const READER_QUICK_ACTIONS = [
   { id: "bookmark", label: "添加书签" },
   { id: "note", label: "打开本书笔记" },
 ] as const;

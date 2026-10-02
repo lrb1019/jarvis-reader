@@ -2,7 +2,7 @@
 // Sourced from main.js runtime shapes, verified against stable DEFAULT_SETTINGS (L52776-52808)
 // --- Highlight types ---
 
-export const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "pink", "purple"] as const;
+const HIGHLIGHT_COLORS = ["yellow", "green", "blue", "pink", "purple"] as const;
 
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
 
@@ -196,7 +196,6 @@ export interface JarvisReaderSettings {
   sidebarPaneSplit: number;
   bookshelfCoverOnly: boolean;
   highlightColors: Record<string, string>;
-  enableGlobalMarkdownTranslation: boolean;
   readingStats?: ReadingStatsMap;
 }
 
