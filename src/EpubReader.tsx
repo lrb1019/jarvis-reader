@@ -2241,6 +2241,13 @@ const showWordHoverCard = (asset, element) => {
         ? bindReaderContainerResize(containerRef.current, {
           on: (event, callback) => rendition.on(event, callback),
           off: (event, callback) => rendition.off(event, callback),
+          hasActiveSelection: () => {
+            const contents = rendition.getContents();
+            return Array.isArray(contents) && contents.some((content: { window?: Window }) => {
+              const selection = content.window?.getSelection();
+              return !!selection && !selection.isCollapsed && !!selection.toString().trim();
+            });
+          },
           // Bundled epub.js accepts omitted dimensions; its declarations require them.
           resize: () => (rendition.resize as (width?: number, height?: number) => void).call(rendition),
         })

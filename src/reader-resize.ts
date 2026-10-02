@@ -2,6 +2,7 @@ export interface ResizableRendition {
   on(event: "attached", callback: () => void): void;
   off(event: "attached", callback: () => void): void;
   resize(): void;
+  hasActiveSelection?(): boolean;
 }
 
 interface ResizeHost {
@@ -37,15 +38,25 @@ export function bindReaderContainerResize(
 ): () => void {
   let attached = false;
   let disposed = false;
+  let lastWidth = -1;
+  let lastHeight = -1;
   let cancelPending: (() => void) | undefined;
   const schedule = () => {
     if (disposed || !attached) return;
     cancelPending?.();
     cancelPending = environment.delay(() => {
       cancelPending = undefined;
-      if (!disposed && host.clientWidth > 0 && host.clientHeight > 0) {
-        rendition.resize();
+      if (disposed || host.clientWidth <= 0 || host.clientHeight <= 0) return;
+      if (host.clientWidth === lastWidth && host.clientHeight === lastHeight) return;
+      // Resizing redisplays the CFI and destroys the iframe selection. Defer
+      // layout changes (including bottom composers) until selection is cleared.
+      if (rendition.hasActiveSelection?.()) {
+        schedule();
+        return;
       }
+      rendition.resize();
+      lastWidth = host.clientWidth;
+      lastHeight = host.clientHeight;
     });
   };
   const onAttached = () => {

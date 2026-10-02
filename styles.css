@@ -2123,6 +2123,13 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   display: none !important;
 }
 
+/* Unstable third-party selector: Claudian zen measures its composer and
+   reserves that height on the root. Keep it floating while an EPUB is open;
+   selection chips and expanded history must not change the reading viewport. */
+.workspace-split.mod-root.claudian-zen-host:has(.workspace-leaf-content[data-type="epub"]) {
+  padding-bottom: 0;
+}
+
 /* marks-pane appends its SVG above the EPUB iframe. Blend the whole pane
    with the page: mix-blend-mode is CSS, not an SVG presentation attribute. */
 .jarvis-reader-epub .epub-view > svg {

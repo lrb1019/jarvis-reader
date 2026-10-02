@@ -55922,15 +55922,23 @@ var browserEnvironment = {
 function bindReaderContainerResize(host, rendition, environment = browserEnvironment) {
   let attached = false;
   let disposed = false;
+  let lastWidth = -1;
+  let lastHeight = -1;
   let cancelPending;
   const schedule = () => {
     if (disposed || !attached) return;
     cancelPending?.();
     cancelPending = environment.delay(() => {
       cancelPending = void 0;
-      if (!disposed && host.clientWidth > 0 && host.clientHeight > 0) {
-        rendition.resize();
+      if (disposed || host.clientWidth <= 0 || host.clientHeight <= 0) return;
+      if (host.clientWidth === lastWidth && host.clientHeight === lastHeight) return;
+      if (rendition.hasActiveSelection?.()) {
+        schedule();
+        return;
       }
+      rendition.resize();
+      lastWidth = host.clientWidth;
+      lastHeight = host.clientHeight;
     });
   };
   const onAttached = () => {
@@ -58384,6 +58392,13 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       resizeCleanupRef.current = containerRef.current ? bindReaderContainerResize(containerRef.current, {
         on: (event, callback) => rendition.on(event, callback),
         off: (event, callback) => rendition.off(event, callback),
+        hasActiveSelection: () => {
+          const contents2 = rendition.getContents();
+          return Array.isArray(contents2) && contents2.some((content) => {
+            const selection = content.window?.getSelection();
+            return !!selection && !selection.isCollapsed && !!selection.toString().trim();
+          });
+        },
         // Bundled epub.js accepts omitted dimensions; its declarations require them.
         resize: () => rendition.resize.call(rendition)
       }) : null;

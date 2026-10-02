@@ -8,16 +8,18 @@ function fixture() {
   let observed: (() => void) | undefined;
   let pending: (() => void) | undefined;
   let disconnected = false;
+  let selected = false;
   const sizes: number[][] = [];
   const cleanup = bindReaderContainerResize(host, {
     on(_event, callback) { attached = callback; },
     off(_event, callback) { if (attached === callback) attached = undefined; },
+    hasActiveSelection() { return selected; },
     resize() { sizes.push([host.clientWidth, host.clientHeight]); },
   }, {
     observe(_host, callback) { observed = callback; return () => { disconnected = true; }; },
     delay(callback) { pending = callback; return () => { if (pending === callback) pending = undefined; }; },
   });
-  return { host, sizes, cleanup, attach: () => attached?.(), change: () => observed?.(),
+  return { host, sizes, cleanup, select: (value: boolean) => { selected = value; }, attach: () => attached?.(), change: () => observed?.(),
     flush: () => { const callback = pending; pending = undefined; callback?.(); },
     disconnected: () => disconnected, bound: () => !!attached };
 }
@@ -46,4 +48,23 @@ test("关闭或替换阅读器取消待处理重排并移除监听，旧回调�
   assert.deepEqual(f.sizes, []);
   assert.equal(f.disconnected(), true);
   assert.equal(f.bound(), false);
+});
+
+
+test("选区存在时底部输入框扩展不重排，清除后使用最终尺寸", () => {
+  const f = fixture(); f.attach(); f.flush();
+  f.select(true); f.host.clientHeight = 568; f.change(); f.flush(); f.flush();
+  assert.deepEqual(f.sizes, [[500, 600]]);
+  f.select(false); f.flush();
+  assert.deepEqual(f.sizes, [[500, 600], [500, 568]]);
+});
+
+test("选词标签消失后尺寸回到原值，不执行破坏选区的冗余重排", () => {
+  const f = fixture(); f.attach(); f.flush();
+  f.select(true); f.host.clientHeight = 568; f.change(); f.flush();
+  f.host.clientHeight = 600; f.change(); f.select(false); f.flush();
+  assert.deepEqual(f.sizes, [[500, 600]]);
+  f.select(true); f.host.clientHeight = 568; f.change(); f.flush();
+  f.cleanup(); f.select(false); f.flush();
+  assert.deepEqual(f.sizes, [[500, 600]]);
 });
