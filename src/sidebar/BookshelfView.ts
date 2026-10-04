@@ -58,6 +58,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     this.render();
   }
   async onClose() {
+    this.highlightsPanel?.closeFilters();
     window.removeEventListener("jarvis-reader-bookmarks-updated", this.bookmarkUpdateHandler);
     this.clearSidebarWidthGuard();
   }
@@ -330,6 +331,7 @@ export class JarvisReaderBookshelfView extends ItemView {
     if (!activeEpub) {
       this.activePanel = "toc";
     }
+    this.highlightsPanel?.closeFilters();
     container.empty();
     container.className = "view-content jarvis-reader-bookshelf-view jarvis-reader-sidebar-view";
     this.renderToolbar(container, activeEpub);

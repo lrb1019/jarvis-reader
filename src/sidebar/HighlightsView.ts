@@ -1,3 +1,4 @@
+import { showFilterMenu } from "../filter-settings";
 import { Menu, setIcon, type App } from "obsidian";
 import { EpubCFI } from "epubjs";
 import type JarvisReaderPlugin from "../main";
@@ -12,7 +13,7 @@ export class HighlightsPanelController {
   currentChapterOnly: boolean;
   sortMode: string;
   focusSearchOnRender: boolean;
-  filtersExpanded: boolean;
+  filterMenu: Menu | null;
   listScrollTop: number;
   pendingRevealHighlightId: string | null;
 
@@ -25,7 +26,7 @@ export class HighlightsPanelController {
     this.typeFilter = "all";
     this.currentChapterOnly = false;
     this.sortMode = "chapter";
-    this.filtersExpanded = false;
+    this.filterMenu = null;
     this.focusSearchOnRender = false;
     this.listScrollTop = 0;
     this.pendingRevealHighlightId = null;
@@ -160,18 +161,9 @@ export class HighlightsPanelController {
     }
     return result;
   }
-  renderChoiceGroup(container: HTMLElement, label: string, choices: { label: string; selected: boolean; choose: () => void }[]) {
-    const group = container.createDiv({ cls: "jarvis-reader-highlights-option-group", attr: { role: "group", "aria-label": label } });
-    group.createDiv({ cls: "jarvis-reader-highlights-option-label", text: label });
-    const buttons = group.createDiv({ cls: "jarvis-reader-highlights-filters" });
-    for (const choice of choices) {
-      const button = buttons.createEl("button", {
-        cls: `jarvis-reader-highlights-filter${choice.selected ? " is-active" : ""}`,
-        text: choice.label,
-        attr: { "aria-pressed": String(choice.selected) }
-      });
-      button.onclick = () => { choice.choose(); this.render(); };
-    }
+  closeFilters() {
+    this.filterMenu?.hide();
+    this.filterMenu = null;
   }
   renderControls(container) {
     const controls = container.createDiv({ cls: "jarvis-reader-highlights-controls" });
@@ -212,38 +204,37 @@ export class HighlightsPanelController {
     const hasFilters = this.typeFilter !== "all" || this.currentChapterOnly || this.sortMode !== "chapter";
     const toggle = searchRow.createEl("button", {
       cls: `jarvis-reader-highlights-filter-toggle clickable-icon${hasFilters ? " is-active" : ""}`,
-      attr: { "aria-label": "筛选与排序", "aria-expanded": String(this.filtersExpanded), title: "筛选与排序" }
+      attr: { "aria-label": "筛选与排序", "aria-expanded": String(Boolean(this.filterMenu)), "aria-haspopup": "menu", title: "筛选与排序" }
     });
     setIcon(toggle, "sliders-horizontal");
-    const options = controls.createDiv({ cls: "jarvis-reader-highlights-filter-options" });
-    options.hidden = !this.filtersExpanded;
     toggle.onclick = () => {
-      this.filtersExpanded = !this.filtersExpanded;
-      options.hidden = !this.filtersExpanded;
-      toggle.setAttr("aria-expanded", String(this.filtersExpanded));
+      if (this.filterMenu) { this.closeFilters(); return; }
+      toggle.setAttr("aria-expanded", "true");
+      this.filterMenu = showFilterMenu(toggle, [
+        { label: "内容", choices: [
+          { label: "全部", selected: this.typeFilter === "all", choose: () => { this.typeFilter = "all"; this.render(); } },
+          { label: "仅高亮", selected: this.typeFilter === "highlight", choose: () => { this.typeFilter = "highlight"; this.render(); } },
+          { label: "含笔记", selected: this.typeFilter === "note", choose: () => { this.typeFilter = "note"; this.render(); } }
+        ] },
+        { label: "范围", choices: [
+          { label: "全书", selected: !this.currentChapterOnly, choose: () => { this.currentChapterOnly = false; this.render(); } },
+          { label: "当前章节", selected: this.currentChapterOnly, choose: () => { this.currentChapterOnly = true; this.render(); } }
+        ] },
+        { label: "排序", choices: [
+          { label: "原文顺序", selected: this.sortMode === "chapter", choose: () => { this.sortMode = "chapter"; this.render(); } },
+          { label: "最近修改", selected: this.sortMode === "time", choose: () => { this.sortMode = "time"; this.render(); } }
+        ] },
+        ...(hasFilters ? [{ label: "操作", choices: [{ label: "重置", selected: false, choose: () => {
+          this.typeFilter = "all";
+          this.currentChapterOnly = false;
+          this.sortMode = "chapter";
+          this.render();
+        } }] }] : [])
+      ], () => {
+        this.filterMenu = null;
+        toggle.setAttr("aria-expanded", "false");
+      });
     };
-    this.renderChoiceGroup(options, "内容", [
-      { label: "全部", selected: this.typeFilter === "all", choose: () => { this.typeFilter = "all"; } },
-      { label: "仅高亮", selected: this.typeFilter === "highlight", choose: () => { this.typeFilter = "highlight"; } },
-      { label: "含笔记", selected: this.typeFilter === "note", choose: () => { this.typeFilter = "note"; } }
-    ]);
-    this.renderChoiceGroup(options, "范围", [
-      { label: "全书", selected: !this.currentChapterOnly, choose: () => { this.currentChapterOnly = false; } },
-      { label: "当前章节", selected: this.currentChapterOnly, choose: () => { this.currentChapterOnly = true; } }
-    ]);
-    this.renderChoiceGroup(options, "排序", [
-      { label: "原文顺序", selected: this.sortMode === "chapter", choose: () => { this.sortMode = "chapter"; } },
-      { label: "最近修改", selected: this.sortMode === "time", choose: () => { this.sortMode = "time"; } }
-    ]);
-    if (hasFilters) {
-      const reset = options.createEl("button", { cls: "jarvis-reader-highlights-reset", text: "重置" });
-      reset.onclick = () => {
-        this.typeFilter = "all";
-        this.currentChapterOnly = false;
-        this.sortMode = "chapter";
-        this.render();
-      };
-    }
   }
 
   renderWikiLinks(container, links) {
@@ -264,6 +255,7 @@ export class HighlightsPanelController {
     }
   }
   async render() {
+    this.closeFilters();
     const container = this.contentEl;
     if (!container)
       return;

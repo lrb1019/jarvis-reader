@@ -2,11 +2,18 @@
 
 EPUB reading and knowledge capture for Obsidian · [中文说明](./README.md)
 
-Current version: **[1.4.4](https://github.com/lrb1019/jarvis-reader/releases/tag/1.4.4)**.
+Current version: **[1.4.5](https://github.com/lrb1019/jarvis-reader/releases/tag/1.4.5)**.
 
 Read EPUBs inside Obsidian, keep quotes and reflections in Markdown, connect existing notes, and promote useful fragments into independent knowledge notes.
 
 **Read → Highlight → Reflect → Link → Create knowledge notes.** Offline lookup, AI translation, and vocabulary collection support this workflow.
+
+## Changes in 1.4.5
+
+- Consistent toolbar icons, hover and selected states across the library and reading sidebar; filters open an Obsidian themed menu on click.
+- Search matches original EPUB titles and all authors, with existing caches refreshed automatically. Display names still follow filenames. Missing or inaccurate source metadata is not guessed or corrected.
+- Reading statistics use theme fonts and controls in a centered layout up to 960px wide. Category and publisher preference analysis was removed; reading time, charts and rankings remain.
+- Existing notes are not rewritten in bulk, and reading statistics and book metadata are retained.
 
 ## Purpose
 
@@ -18,10 +25,10 @@ English support and statistics serve reading; this is not a standalone vocabular
 
 | Feature | Behavior |
 | --- | --- |
-| Library | Grid/list browsing, search, status filters and sorting; single-click selects, double-click opens and restores reading position |
+| Library | Grid/list browsing, filename and EPUB title/author search, themed menu filters and sorting; single-click selects, double-click opens and restores reading position |
 | Book management | Progress and an overflow menu below covers; metadata, custom/original covers, manual reading time, and deletion |
 | Reading layout | Font size, line height, character/word spacing, indentation, width, one/two paginated columns, and single-column scrolling; adapts to sidebar resizing |
-| Reading sidebar | Contents, bookmarks, notes/highlights, search and expandable filters |
+| Reading sidebar | Contents, bookmarks, notes/highlights, search and themed menu filters |
 | Highlights and notes | Right-click selected text; multiple reflections and links on a single quote |
 | Knowledge notes | Explicit promotion includes the quote, all reflections, and source links; repeat promotion opens the existing note |
 | English support | Bundled ECDICT lookup, explicit AI translation, manual word/phrase collection; no standalone vocabulary book or review system |

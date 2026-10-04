@@ -91,6 +91,8 @@ export interface BookProgress {
 }
 
 export interface BookCoverCacheEntry {
+  title?: string;
+  creators?: string[];
   dataUrl?: string;
   updated: string;
   description?: string;

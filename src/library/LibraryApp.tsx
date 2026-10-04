@@ -1,4 +1,7 @@
 import * as React from "react";
+import { matchesBookSearch } from "./book-search";
+import { readEpubCreators } from "./epub-metadata";
+import { showFilterMenu } from "../filter-settings";
 import { bindDialogFocus } from "../dialog-focus";
 import { projectLibraryBookNotes } from "./book-note-projection";
 import { isBookInFolder } from "../storage-folders";
@@ -108,6 +111,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
   const [sortBy, setSortBy] = React.useState<LibrarySortBy>("recent");
   const [viewLayout, setViewLayout] = React.useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = React.useState(false);
+  const filterMenu = React.useRef<Menu | null>(null);
+  React.useEffect(() => () => { filterMenu.current?.hide(); }, []);
 
   // Metadata States
   const [bookMetadata, setBookMetadata] = React.useState<{
@@ -247,7 +252,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         const key = `${file.path}|${file.stat?.mtime || 0}|${file.stat?.size || 0}`;
         const cached = plugin.settings.bookCoverCache[key];
 
-        if (!cached || !cached.dataUrl || cached.description === undefined || cached.coverVersion !== 10) {
+        if (!cached || !cached.dataUrl || cached.description === undefined || cached.title === undefined || cached.creators === undefined || cached.coverVersion !== 10) {
           try {
             const buffer = await plugin.app.vault.readBinary(file);
             let epubFn = (window as any).JarvisReader_ePub;
@@ -373,9 +378,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             }
 
             const metadata = book.packaging?.metadata || {};
+            const packageDocument = await book.load(book.path.toString());
+            const creators = readEpubCreators(packageDocument);
             const rawDesc = metadata.description || "";
             const description = stripHtml(rawDesc);
-            const creator = metadata.creator || "";
+            const creator = creators.length ? creators.join("、") : metadata.creator || "";
             const publisher = metadata.publisher || "";
             const pubdate = metadata.pubdate || "";
 
@@ -384,7 +391,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               dataUrl: dataUrl || cached?.dataUrl || "",
               updated: new Date().toISOString(),
               description,
+              title: metadata.title || "",
               creator,
+              creators,
               publisher,
               pubdate,
               coverVersion: 10,
@@ -599,76 +608,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       }
     });
 
-    const categoryCount: Record<string, number> = {};
-    const publisherCount: Record<string, number> = {};
-
-    // 偏好分析书籍集合（包含所有在读中和已读完的书籍）
-    const prefBookPaths = new Set<string>([...readBookPaths, ...finishedBookPaths]);
-
-    prefBookPaths.forEach((bookPath) => {
-      const noteFile = bookNotesMap[bookPath];
-      let fm: any = {};
-      if (noteFile) {
-        const cache = plugin.app.metadataCache.getFileCache(noteFile);
-        fm = cache?.frontmatter || {};
-      }
-
-      const secs = bookSecondsMap[bookPath] || 0;
-      const weight = secs > 0 ? secs : 1;
-
-      // 按照标签分类
-      const tagsList: string[] = [];
-      if (Array.isArray(fm.tags) && fm.tags.length > 0) {
-        fm.tags.forEach((tag: any) => {
-          if (typeof tag === "string" && tag.trim()) {
-            tagsList.push(tag.trim());
-          }
-        });
-      }
-      if (fm.category && typeof fm.category === "string" && fm.category.trim()) {
-        const cat = fm.category.trim();
-        if (!tagsList.includes(cat)) {
-          tagsList.push(cat);
-        }
-      }
-
-      if (tagsList.length > 0) {
-        tagsList.forEach((tag) => {
-          categoryCount[tag] = (categoryCount[tag] || 0) + weight;
-        });
-      } else {
-        categoryCount["未知"] = (categoryCount["未知"] || 0) + weight;
-      }
-
-      const publisher = fm.publisher || "";
-      if (publisher) {
-        publisherCount[publisher] = (publisherCount[publisher] || 0) + weight;
-      }
-    });
-
-    const topPublishers = Object.entries(publisherCount)
-      .sort((a, b) => b[1] - a[1])
-      .map(entry => entry[0])
-      .slice(0, 2);
-
-    const sortedCategories = Object.entries(categoryCount)
-      .sort((a, b) => b[1] - a[1]);
-    
-    const radarDimensions = ["影视原著", "文学", "个人成长", "社会小说", "男生小说"];
-    const topCategories = sortedCategories.slice(0, 5).map(entry => entry[0]);
-    topCategories.forEach(cat => {
-      if (!radarDimensions.includes(cat) && cat !== "未知") {
-        radarDimensions.push(cat);
-      }
-    });
-    const activeDimensions = radarDimensions.slice(0, 5);
-    const radarData = activeDimensions.map(dim => {
-      return {
-        dimension: dim,
-        value: categoryCount[dim] || 0
-      };
-    });
-
     let trendPercent = 0;
     if (prevTotalSeconds > 0) {
       trendPercent = Math.round(((totalSeconds - prevTotalSeconds) / prevTotalSeconds) * 100);
@@ -690,8 +629,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       dailySecondsMap,
       monthlySecondsMap,
       yearlySecondsMap,
-      radarData,
-      topPublishers
     };
   }, [statsTab, statsDate, books, plugin.settings.readingStats, plugin.settings.bookProgress, plugin.settings.bookHighlights, bookNotesMap, plugin.app.metadataCache, refreshTrigger]);
 
@@ -721,8 +658,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       .filter((b) => {
         // Search
         const { title, author } = parseBookInfo(b);
-        const text = `${title} ${author} ${b.basename}`.toLowerCase();
-        if (searchQuery.trim() && !text.includes(searchQuery.toLowerCase())) {
+        const metadata = getCover(b);
+        if (!matchesBookSearch(searchQuery, [b.basename, title, author, metadata?.title, metadata?.creator])) {
           return false;
         }
 
@@ -773,7 +710,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           return timeB - timeA;
         }
       });
-  }, [books, searchQuery, filterStatus, sortBy, plugin.settings.bookProgress, bookNotesMap, plugin.app.metadataCache]);
+  }, [books, searchQuery, filterStatus, sortBy, coverCache, plugin.settings.bookProgress, bookNotesMap, plugin.app.metadataCache]);
 
   // Load Metadata when detail view opens
   React.useEffect(() => {
@@ -899,8 +836,6 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
       dailySecondsMap,
       monthlySecondsMap,
       yearlySecondsMap,
-      radarData,
-      topPublishers
     } = selectedStats;
 
     const statsData = plugin.settings.readingStats || {};
@@ -1064,7 +999,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         <div className="jarvis-library-stats-view-container">
           <div className="jarvis-library-stats-view-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button className="jarvis-library-back-btn is-icon" aria-label="返回书架" title="返回书架" onClick={() => setCurrentView("home")}>
+              <button className="jarvis-library-tool-button clickable-icon" aria-label="返回书架" title="返回书架" onClick={() => setCurrentView("home")}>
                 <ObsidianIcon name="arrow-left" />
               </button>
               <h2 style={{ margin: 0, fontSize: 'var(--font-ui-medium)', fontWeight: 600 }}>阅读统计</h2>
@@ -1074,19 +1009,19 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           {/* Navigation and tab bar */}
           <div className="jarvis-stats-header-wrap">
             <div className="jarvis-stats-nav-tabs">
-              <button className={`jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`} onClick={() => setStatsTab("week")}>周</button>
-              <button className={`jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`} onClick={() => setStatsTab("month")}>月</button>
-              <button className={`jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`} onClick={() => setStatsTab("year")}>年</button>
-              <button className={`jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`} onClick={() => setStatsTab("all")}>全部</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "week" ? "is-active" : ""}`} aria-pressed={statsTab === "week"} onClick={() => setStatsTab("week")}>周</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "month" ? "is-active" : ""}`} aria-pressed={statsTab === "month"} onClick={() => setStatsTab("month")}>月</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "year" ? "is-active" : ""}`} aria-pressed={statsTab === "year"} onClick={() => setStatsTab("year")}>年</button>
+              <button className={`jarvis-stats-tab-btn ${statsTab === "all" ? "is-active" : ""}`} aria-pressed={statsTab === "all"} onClick={() => setStatsTab("all")}>全部</button>
             </div>
             {statsTab !== "all" && (
               <div className="jarvis-stats-date-picker">
-                <button className="jarvis-stats-date-btn" onClick={handlePrevDate}>
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                <button className="jarvis-library-tool-button clickable-icon" aria-label="上一周期" title="上一周期" onClick={handlePrevDate}>
+                  <ObsidianIcon name="chevron-left" />
                 </button>
                 <span className="jarvis-stats-date-text">{dateRangeStr}</span>
-                <button className="jarvis-stats-date-btn" onClick={handleNextDate}>
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                <button className="jarvis-library-tool-button clickable-icon" aria-label="下一周期" title="下一周期" onClick={handleNextDate}>
+                  <ObsidianIcon name="chevron-right" />
                 </button>
               </div>
             )}
@@ -1164,21 +1099,21 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               <div className="jarvis-stats-chart-toggles">
                 {statsTab === "month" && (
                   <>
-                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`} onClick={() => setStatsChartType("bar")}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" title="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
+                      <ObsidianIcon name="chart-no-axes-column" />
                     </button>
-                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "calendar" ? "is-active" : ""}`} onClick={() => setStatsChartType("calendar")}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "calendar" ? "is-active" : ""}`} aria-label="日历" title="日历" aria-pressed={activeChart === "calendar"} onClick={() => setStatsChartType("calendar")}>
+                      <ObsidianIcon name="calendar" />
                     </button>
                   </>
                 )}
                 {(statsTab === "year" || statsTab === "all") && (
                   <>
-                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "heatmap" ? "is-active" : ""}`} onClick={() => setStatsChartType("heatmap")}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "heatmap" ? "is-active" : ""}`} aria-label="热力图" title="热力图" aria-pressed={activeChart === "heatmap"} onClick={() => setStatsChartType("heatmap")}>
+                      <ObsidianIcon name="grid-2x2" />
                     </button>
-                    <button className={`jarvis-stats-chart-toggle-btn ${activeChart === "bar" ? "is-active" : ""}`} onClick={() => setStatsChartType("bar")}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" title="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
+                      <ObsidianIcon name="chart-no-axes-column" />
                     </button>
                   </>
                 )}
@@ -1522,160 +1457,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               )}
             </div>
 
-          {/* Preference Analysis (Shown for Year and All views) */}
-          {(statsTab === "year" || statsTab === "all") && (
-            <div>
-              <div className="jarvis-stats-top-title" style={{ marginTop: 0, marginBottom: '8px' }}>偏好分析</div>
-              <div className="jarvis-stats-pref-section">
-                {/* Category preference radar */}
-                <div className="jarvis-stats-pref-card">
-                  <span className="jarvis-stats-pref-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                    分类偏好
-                  </span>
-                  <span className="jarvis-stats-pref-sub">
-                    {radarData.length > 0 ? `偏好阅读 ${radarData[0].dimension}` : "暂无分类偏好记录"}
-                  </span>
-                  <div className="jarvis-stats-radar-container">
-                    {radarData.length > 0 ? (() => {
-                      const CX = 75;
-                      const CY = 75;
-                      const R = 45;
-                      const numPoints = 5;
-                      const maxRadarVal = Math.max(...radarData.map(d => d.value), 60);
 
-                      const angles = Array.from({ length: numPoints }).map((_, i) => -Math.PI / 2 + i * (2 * Math.PI / numPoints));
-
-                      // Draw concentric pentagons (5 layers)
-                      const pentagons = Array.from({ length: 5 }).map((_, layerIdx) => {
-                        const r = R * ((layerIdx + 1) / 5);
-                        return angles.map(angle => ({
-                          x: CX + r * Math.cos(angle),
-                          y: CY + r * Math.sin(angle)
-                        }));
-                      });
-
-                      // Axis lines from center to outer vertices
-                      const axes = angles.map(angle => ({
-                        x1: CX,
-                        y1: CY,
-                        x2: CX + R * Math.cos(angle),
-                        y2: CY + R * Math.sin(angle)
-                      }));
-
-                      // Data polygon
-                      const dataPoints = radarData.map((d, i) => {
-                        const angle = angles[i] || 0;
-                        const r = R * (d.value / maxRadarVal);
-                        return {
-                          x: CX + r * Math.cos(angle),
-                          y: CY + r * Math.sin(angle),
-                          value: d.value
-                        };
-                      });
-
-                      const polygonPointsStr = dataPoints.map(p => `${p.x},${p.y}`).join(" ");
-
-                      return (
-                        <svg width="150" height="150" viewBox="0 0 150 150">
-                          {pentagons.map((points, idx) => (
-                            <polygon
-                              key={`p-${idx}`}
-                              points={points.map(p => `${p.x},${p.y}`).join(" ")}
-                              fill="none"
-                              stroke="var(--background-modifier-border)"
-                              strokeWidth="0.8"
-                            />
-                          ))}
-                          {axes.map((axis, idx) => (
-                            <line
-                              key={`line-${idx}`}
-                              x1={axis.x1}
-                              y1={axis.y1}
-                              x2={axis.x2}
-                              y2={axis.y2}
-                              stroke="var(--background-modifier-border)"
-                              strokeWidth="0.8"
-                            />
-                          ))}
-                          {dataPoints.length > 0 && (
-                            <polygon
-                              points={polygonPointsStr}
-                              fill="color-mix(in srgb, var(--interactive-accent) 12%, transparent)"
-                              stroke="var(--interactive-accent)"
-                              strokeWidth="1.5"
-                            />
-                          )}
-                          {dataPoints.map((p, idx) => p.value > 0 && (
-                            <circle
-                              key={`circle-${idx}`}
-                              cx={p.x}
-                              cy={p.y}
-                              r="2.5"
-                              fill="var(--background-primary)"
-                              stroke="var(--interactive-accent)"
-                              strokeWidth="1.5"
-                            />
-                          ))}
-                          {radarData.map((d, i) => {
-                            const angle = angles[i] || 0;
-                            const textR = R + 10;
-                            const tx = CX + textR * Math.cos(angle);
-                            const ty = CY + textR * Math.sin(angle);
-                            let textAnchor = "middle";
-                            let dy = "3px";
-                            if (Math.abs(Math.cos(angle)) > 0.1) {
-                              textAnchor = Math.cos(angle) > 0 ? "start" : "end";
-                            }
-                            if (angle === -Math.PI / 2) {
-                              dy = "-4px";
-                            } else if (angle > 0 && angle < Math.PI) {
-                              dy = "7px";
-                            }
-                            return (
-                              <text
-                                key={`txt-${i}`}
-                                x={tx}
-                                y={ty}
-                                textAnchor={textAnchor}
-                                dy={dy}
-                                fontSize="var(--font-ui-smaller)"
-                                fill="var(--text-muted)"
-                              >
-                                {d.dimension}
-                              </text>
-                            );
-                          })}
-                        </svg>
-                      );
-                    })() : (
-                      <div style={{ fontSize: 'var(--font-ui-smaller)', color: 'var(--text-muted)' }}>暂无分析数据</div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Publisher preference list */}
-                <div className="jarvis-stats-pref-card">
-                  <span className="jarvis-stats-pref-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-muted)' }}><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="9" y1="22" x2="9" y2="16"></line><line x1="15" y1="22" x2="15" y2="16"></line><line x1="9" y1="16" x2="15" y2="16"></line><path d="M8 6h8M8 10h8M8 14h8"></path></svg>
-                    偏好出版方
-                  </span>
-                  <span className="jarvis-stats-pref-sub">偏好出版方排行</span>
-                  <div className="jarvis-stats-publishers-list">
-                    {topPublishers.length > 0 ? (
-                      topPublishers.map((pub, idx) => (
-                        <div key={pub} className="jarvis-stats-publisher-item">
-                          {pub}
-                        </div>
-                      ))
-                    ) : (
-                      <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: 'var(--font-ui-smaller)' }}>暂无出版方信息</div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -1720,27 +1502,27 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             )}
             </div>
             <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
-              <button className={`jarvis-library-filter-btn clickable-icon ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} aria-label="筛选与排序" aria-expanded={showFilters} title="筛选与排序">
+              <button className={`jarvis-library-filter-btn jarvis-library-tool-button clickable-icon ${showFilters ? 'is-active' : ''}`} onClick={event => {
+                if (filterMenu.current) { filterMenu.current.hide(); return; }
+                setShowFilters(true);
+                filterMenu.current = showFilterMenu(event.currentTarget, [
+                          { label: "状态", choices: [
+                            { label: "所有状态", selected: filterStatus === "all", choose: () => setFilterStatus("all") },
+                            { label: "未读", selected: filterStatus === "unread", choose: () => setFilterStatus("unread") },
+                            { label: "在读", selected: filterStatus === "reading", choose: () => setFilterStatus("reading") },
+                            { label: "已读完", selected: filterStatus === "finished", choose: () => setFilterStatus("finished") }
+                          ] },
+                          { label: "排序", choices: [
+                            { label: "最近阅读/修改", selected: sortBy === "recent", choose: () => setSortBy("recent") },
+                            { label: "评分最高", selected: sortBy === "rating", choose: () => setSortBy("rating") },
+                            { label: "开始时间排序", selected: sortBy === "start", choose: () => setSortBy("start") },
+                            { label: "读完时间排序", selected: sortBy === "end", choose: () => setSortBy("end") },
+                            { label: "书名排序", selected: sortBy === "name", choose: () => setSortBy("name") }
+                          ] }
+                ], () => { filterMenu.current = null; setShowFilters(false); });
+              }} aria-label="筛选与排序" aria-expanded={showFilters} aria-haspopup="menu" title="筛选与排序">
                 <ObsidianIcon name="sliders-horizontal" />
               </button>
-
-            {showFilters && (
-              <div className="jarvis-library-filter-popup">
-                <select value={filterStatus} onChange={(e: any) => setFilterStatus(e.target.value)} className="jarvis-library-select">
-                  <option value="all">所有状态</option>
-                  <option value="unread">未读</option>
-                  <option value="reading">在读</option>
-                  <option value="finished">已读完</option>
-                </select>
-                <select value={sortBy} onChange={(e: any) => setSortBy(e.target.value as LibrarySortBy)} className="jarvis-library-select">
-                  <option value="recent">最近阅读/修改</option>
-                  <option value="rating">评分最高</option>
-                  <option value="start">开始时间排序</option>
-                  <option value="end">读完时间排序</option>
-                  <option value="name">书名排序</option>
-                </select>
-              </div>
-            )}
             </div>
           </div>
 
@@ -1749,16 +1531,16 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
 
             <div className="jarvis-library-layout-toggle">
-              <button className={`jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"} title="网格布局">
+              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"} title="网格布局">
                 <ObsidianIcon name="layout-grid" />
               </button>
-              <button className={`jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} aria-label="列表布局" aria-pressed={viewLayout === "list"} title="列表布局">
+              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} aria-label="列表布局" aria-pressed={viewLayout === "list"} title="列表布局">
                 <ObsidianIcon name="list" />
               </button>
             </div>
 
             <div className="jarvis-library-header-actions">
-              <button className="jarvis-library-action-icon-btn" aria-label="插件设置" title="插件设置" onClick={() => {
+              <button className="jarvis-library-action-icon-btn jarvis-library-tool-button clickable-icon" aria-label="插件设置" title="插件设置" onClick={() => {
                 const setting = (plugin as any).app.setting;
                 setting.open();
                 setting.openTabById(plugin.manifest.id);
@@ -1768,6 +1550,8 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             </div>
           </div>
         </div>
+
+
 
         {/* Stats Quick Strip */}
         <div className="jarvis-library-stats-container">
@@ -1793,7 +1577,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
           </div>
           
           <button 
-            className="jarvis-library-back-btn" 
+            className="jarvis-library-stats-link jarvis-library-tool-button clickable-icon"
             onClick={() => setCurrentView("stats")}
           >
             <ObsidianIcon name="chart-no-axes-column" />
