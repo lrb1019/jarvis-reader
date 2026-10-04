@@ -8,6 +8,9 @@ import { findBookNote, openOrCreateNote } from "./book-notes";
 import { normalizeVaultPath } from "./utils";
 import { openFileOnceInActiveTab } from "./workspace-navigation";
 import { parseReadingSourceTarget } from "./reading-source-link";
+import { styleBookNoteTimes } from "./book-note-time-display";
+import { styleKnowledgeNoteTimes } from "./knowledge-note-time-display";
+import { knowledgeNoteTimeEditor } from "./knowledge-note-time-editor";
 import { getTranslationAssetStorageKey, buildWordAssetMetadata, getLightWordAsset } from "./word-assets";
 import { buildHighlightMetadata, getPdfTocMd } from "./highlights";
 import { normalizeTranslationProvider } from "./translation";
@@ -110,6 +113,24 @@ export default class JarvisReaderPlugin extends Plugin {
     addIcon("jarvis-logo", JARVIS_LOGO_SVG);
     addIcon("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
+    this.registerEditorExtension(knowledgeNoteTimeEditor);
+    this.registerMarkdownPostProcessor((element, context) => {
+      const sourceFile = this.app.vault.getAbstractFileByPath(context.sourcePath);
+      const metadata = sourceFile instanceof TFile ? this.app.metadataCache.getFileCache(sourceFile)?.frontmatter : undefined;
+      if (typeof metadata?.source_block === "string" && typeof metadata.source_note === "string") {
+        styleKnowledgeNoteTimes(element);
+      }
+      const isBookNote = Object.values(this.settings.bookNotePaths || {}).includes(context.sourcePath)
+        || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items)
+          && items.some((item: BookHighlight) => item.notePath === context.sourcePath));
+      if (isBookNote) styleBookNoteTimes(element, (callout) => {
+        const section = context.getSectionInfo(callout);
+        const file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+        if (!section || !(file instanceof TFile)) return undefined;
+        const headings = this.app.metadataCache.getFileCache(file)?.headings || [];
+        return headings.filter((heading) => heading.position.start.line < section.lineStart).pop()?.heading;
+      });
+    });
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
     await this.migrateReviewData();
     const highlightRecovery = await this.highlightTransactionService.recoverPending();

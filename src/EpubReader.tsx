@@ -2213,18 +2213,14 @@ const showWordHoverCard = (asset, element) => {
     }
   }, React.createElement(ReaderSideControls, {
     location: currentLocationRef.current,
-    chapterTitle: readerTitleRef.current,
+    chapterTitle: readerTitle,
     onAddBookmark: addBookmark,
     onOpenBookNote: createBookNote,
     getPanelOpen,
     onPanelOpenChange,
     getPreferences,
     onPreferencesChange,
-  }), React.createElement("div", {
-    className: "jarvis-reader-reading-title",
-    title: readerTitle,
-    style: { color: theme.muted, fontFamily: theme.fontFamily, fontSize: theme.fontSize }
-  }, readerTitle), React.createElement(ReactReader, {
+  }), React.createElement(ReactReader, {
     title: "",
     showToc: false,
     location,
@@ -2247,6 +2243,15 @@ const showWordHoverCard = (asset, element) => {
               const selection = content.window?.getSelection();
               return !!selection && !selection.isCollapsed && !!selection.toString().trim();
             });
+          },
+          // Keep the old page boundary while the percentage-sized stage grows.
+          // resize() clears the old views synchronously before displaying new ones.
+          commitViewport: () => {
+            const reader = containerRef.current as HTMLElement | null;
+            const stage = reader?.querySelector<HTMLElement>(".epub-container");
+            if (reader && stage && stage.clientWidth > 0) {
+              reader.style.setProperty("--jarvis-reader-page-width", `${stage.clientWidth}px`);
+            }
           },
           // Bundled epub.js accepts omitted dimensions; its declarations require them.
           resize: () => (rendition.resize as (width?: number, height?: number) => void).call(rendition),
@@ -2384,6 +2389,7 @@ const showWordHoverCard = (asset, element) => {
       },
       reader: {
         ...ReactReaderStyle.reader,
+        top: 16,
         backgroundColor: theme.background,
         bottom: 72,
         left: "50%",

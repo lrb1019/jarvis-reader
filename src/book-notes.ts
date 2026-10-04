@@ -2,29 +2,9 @@
 
 import { TFile, WorkspaceLeaf, Notice, App } from "obsidian";
 import { normalizeVaultPath, joinVaultPath, formatLocalDateTime } from "./utils";
+import { renderBookNoteTemplate } from "./book-note-template";
 import { ensureStorageFolders } from "./storage-folders";
 import type { JarvisReaderSettings } from "./types";
-
-function getDefaultBookNoteContent(file: TFile, toc: string): string {
-  return `---
-bookname: "[[${file.basename}.${file.extension}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: ${formatLocalDateTime(new Date())}
----
-
-` + toc;
-}
-
-function renderBookNoteTemplate(template: string, file: TFile, toc: string): string {
-  if (!template || !template.trim()) {
-    return getDefaultBookNoteContent(file, toc);
-  }
-  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, formatLocalDateTime(new Date())).replace(/\{\{toc\}\}/g, toc || "");
-}
 
 export function getBookNotePath(file: TFile, settings: Partial<JarvisReaderSettings> = {}): string {
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
@@ -79,7 +59,7 @@ export async function getOrCreateBookNote(app: App, file: TFile, toc: string, se
     }
   }
   const noteFilename = getBookNotePath(file, settings);
-  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
+  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc, formatLocalDateTime(new Date())));
   return noteFile as TFile;
 }
 

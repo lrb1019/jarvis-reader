@@ -4,6 +4,7 @@ import {
   formatBlockquote,
   formatHighlightNoteBlock,
   isHighlightNoteBlockStart,
+  HIGHLIGHT_SECTION_MARKER,
 } from "./highlight-core.ts";
 
 export interface HighlightCommentEntry {
@@ -94,10 +95,7 @@ export function appendReflectionDocument(content: string, highlight: BookHighlig
   const range = getBlockRange(lines, highlight.blockId);
   if (!range) return insertHighlightDocument(content, { ...highlight, comment: text });
 
-  let count = 0;
-  for (let i = range.startIndex; i <= range.blockIndex; i++) {
-    if (/^>\s*\*\*(?:想法|笔记)(?:\s+\d+)?\*\*/.test(lines[i] || "")) count++;
-  }
+  const count = readHighlightDetailsDocument(content, { blockId: highlight.blockId }).commentEntries.length;
   let insertIndex = range.blockIndex;
   for (let i = range.blockIndex - 1; i > range.startIndex; i--) {
     if (/^>\s*\*\*时间\*\*/.test(lines[i] || "")) {
@@ -118,7 +116,8 @@ export function appendReflectionDocument(content: string, highlight: BookHighlig
 }
 
 function normalizeBlockquoteLine(line: string): string {
-  return (line || "").replace(/^(?:>\s*)+/, "").trimEnd();
+  // Remove only the storage callout's prefix, preserving nested Markdown.
+  return (line || "").replace(/^> ?/, "");
 }
 
 function fallbackEntries(comment: string): HighlightCommentEntry[] {
@@ -143,6 +142,8 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
   let currentEntry: HighlightCommentEntry | null = null;
   let currentSection: HighlightAiSection | null = null;
   let readingQuote = true;
+  let sectionHeadingPending = false;
+  let fence: { character: string; length: number } | null = null;
 
   const flushEntry = () => {
     if (currentEntry?.text.trim()) entries.push({ ...currentEntry, text: currentEntry.text.trim() });
@@ -161,8 +162,35 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
     // that leaked onto plain lines from earlier multiline TOC titles.
     if (!/^\s*>/.test(rawLine)) continue;
     const line = normalizeBlockquoteLine(rawLine.trimStart());
+    const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    const fenceRun = fenceMatch?.[1] || "";
+    if (fence || fenceMatch) {
+      if (readingQuote) quoteLines.push(line);
+      else if (currentEntry) currentEntry.text += `${line}\n`;
+      else if (currentSection) currentSection.text += `${line}\n`;
+      if (!fence && fenceMatch) {
+        fence = { character: fenceRun.charAt(0), length: fenceRun.length };
+      } else if (fence && fenceMatch && fenceRun.charAt(0) === fence.character
+        && fenceRun.length >= fence.length && !(fenceMatch[2] || "").trim()) {
+        fence = null;
+      }
+      continue;
+    }
+    if (line === HIGHLIGHT_SECTION_MARKER) {
+      flushEntry();
+      flushSection();
+      readingQuote = false;
+      sectionHeadingPending = true;
+      continue;
+    }
     const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
-    const aiMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    const headingMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    // Older relation sections have no marker. Other headings inside notes or
+    // section content are ordinary Markdown, not generated section boundaries.
+    const aiMatch: RegExpMatchArray | null = headingMatch && (sectionHeadingPending
+      || (!currentEntry && !currentSection)
+      || (headingMatch[1] === "关联文章" && /^\[\[/.test(normalizeBlockquoteLine(lines[i + 1] || ""))))
+      ? headingMatch : null;
     if (readingQuote) {
       if (noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
       else {
@@ -172,7 +200,8 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
     }
     if (/^\*\*时间\*\*/.test(line)) {
       flushEntry();
-      continue;
+      flushSection();
+      break;
     }
     if (noteMatch) {
       flushEntry();
@@ -184,6 +213,7 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
       flushEntry();
       flushSection();
       currentSection = { title: (aiMatch[1] || "").trim(), text: "", links: [] };
+      sectionHeadingPending = false;
       continue;
     }
     if (currentEntry) {

@@ -22584,7 +22584,7 @@ var require_react_dom_development = __commonJS({
           return root2;
         }
         var ReactVersion = "18.2.0";
-        function createPortal(children, containerInfo, implementation) {
+        function createPortal2(children, containerInfo, implementation) {
           var key = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : null;
           {
             checkKeyStringCoercion(key);
@@ -23429,7 +23429,7 @@ var require_react_dom_development = __commonJS({
           if (!isValidContainer(container)) {
             throw new Error("Target container is not a DOM element.");
           }
-          return createPortal(children, container, null, key);
+          return createPortal2(children, container, null, key);
         }
         function renderSubtreeIntoContainer(parentComponent, element, containerNode, callback) {
           return unstable_renderSubtreeIntoContainer(parentComponent, element, containerNode, callback);
@@ -23665,6 +23665,26 @@ var init_utils = __esm({
   }
 });
 
+// src/book-note-template.ts
+function renderBookNoteTemplate(template, file, toc, created) {
+  const source = template.trim() ? template : DEFAULT_BOOK_NOTE_TEMPLATE;
+  return source.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, created).replace(/\{\{toc\}\}/g, toc || "");
+}
+var DEFAULT_BOOK_NOTE_TEMPLATE;
+var init_book_note_template = __esm({
+  "src/book-note-template.ts"() {
+    DEFAULT_BOOK_NOTE_TEMPLATE = `---
+bookname: "[[{{bookname}}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
+created: {{created}}
+---`;
+  }
+});
+
 // src/storage-folders.ts
 function validateFolderPath(value2) {
   const raw = value2.trim().replace(/\\/g, "/");
@@ -23739,25 +23759,6 @@ __export(book_notes_exports, {
   getOrCreateBookNote: () => getOrCreateBookNote,
   openOrCreateNote: () => openOrCreateNote
 });
-function getDefaultBookNoteContent(file, toc) {
-  return `---
-bookname: "[[${file.basename}.${file.extension}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: ${formatLocalDateTime(/* @__PURE__ */ new Date())}
----
-
-` + toc;
-}
-function renderBookNoteTemplate(template, file, toc) {
-  if (!template || !template.trim()) {
-    return getDefaultBookNoteContent(file, toc);
-  }
-  return template.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, formatLocalDateTime(/* @__PURE__ */ new Date())).replace(/\{\{toc\}\}/g, toc || "");
-}
 function getBookNotePath(file, settings = {}) {
   const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
   const noteFolder = configuredFolder || normalizeVaultPath(file.parent?.path);
@@ -23801,7 +23802,7 @@ async function getOrCreateBookNote(app, file, toc, settings = {}) {
     }
   }
   const noteFilename = getBookNotePath(file, settings);
-  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc));
+  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc, formatLocalDateTime(/* @__PURE__ */ new Date())));
   return noteFile;
 }
 async function openOrCreateNote(app, file, toc, settings = {}) {
@@ -23827,6 +23828,7 @@ var init_book_notes = __esm({
   "src/book-notes.ts"() {
     import_obsidian2 = require("obsidian");
     init_utils();
+    init_book_note_template();
     init_storage_folders();
   }
 });
@@ -53736,7 +53738,7 @@ __export(main_exports, {
   default: () => JarvisReaderPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian15 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 
 // src/epub-annotations-adapter.ts
 function removeEpubAnnotation(store, cfi, type) {
@@ -53816,7 +53818,7 @@ var READER_WIDTH_LIMITS = Object.freeze({
   min: 480,
   max: 1600,
   step: 40,
-  defaultValue: 760
+  defaultValue: 960
 });
 function clampReaderWidth(value2) {
   return clampReaderNumber(value2, READER_WIDTH_LIMITS);
@@ -53887,8 +53889,9 @@ function parseReadingSourceTarget(parameters) {
 }
 
 // src/highlight-core.ts
+var HIGHLIGHT_SECTION_MARKER = "<!-- jarvis-reader:section -->";
 function formatBlockquote(text) {
-  return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
+  return (text || "").split(/\r?\n/).map((line) => `> ${line}`).join("\n");
 }
 function formatHighlightNoteBlock(highlight) {
   const title = (highlight.chapterTitle || "").replace(/\s+/g, " ").trim() || "\u672A\u547D\u540D\u7AE0\u8282";
@@ -53937,6 +53940,7 @@ ${formatLocalDateTime(highlight.updated || highlight.created)}`);
       }
       const secContent = parts.join("\n");
       return `>
+> ${HIGHLIGHT_SECTION_MARKER}
 > ### ${sec.title || "AI \u8F93\u51FA"}
 ${formatBlockquote(secContent)}`;
     }).join("\n");
@@ -54055,10 +54059,7 @@ function appendReflectionDocument(content, highlight, reflection) {
   const lines = content.split(/\r?\n/);
   const range = getBlockRange(lines, highlight.blockId);
   if (!range) return insertHighlightDocument(content, { ...highlight, comment: text });
-  let count = 0;
-  for (let i = range.startIndex; i <= range.blockIndex; i++) {
-    if (/^>\s*\*\*(?:想法|笔记)(?:\s+\d+)?\*\*/.test(lines[i] || "")) count++;
-  }
+  const count = readHighlightDetailsDocument(content, { blockId: highlight.blockId }).commentEntries.length;
   let insertIndex = range.blockIndex;
   for (let i = range.blockIndex - 1; i > range.startIndex; i--) {
     if (/^>\s*\*\*时间\*\*/.test(lines[i] || "")) {
@@ -54080,7 +54081,7 @@ function appendReflectionDocument(content, highlight, reflection) {
   return lines.join("\n");
 }
 function normalizeBlockquoteLine(line) {
-  return (line || "").replace(/^(?:>\s*)+/, "").trimEnd();
+  return (line || "").replace(/^> ?/, "");
 }
 function fallbackEntries(comment) {
   return comment.trim().split(/\n{2,}/).map((text, index) => ({
@@ -54102,6 +54103,8 @@ function readHighlightDetailsDocument(content, highlight) {
   let currentEntry = null;
   let currentSection = null;
   let readingQuote = true;
+  let sectionHeadingPending = false;
+  let fence = null;
   const flushEntry = () => {
     if (currentEntry?.text.trim()) entries.push({ ...currentEntry, text: currentEntry.text.trim() });
     currentEntry = null;
@@ -54116,8 +54119,31 @@ function readHighlightDetailsDocument(content, highlight) {
     const rawLine = lines[i] || "";
     if (!/^\s*>/.test(rawLine)) continue;
     const line = normalizeBlockquoteLine(rawLine.trimStart());
+    const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    const fenceRun = fenceMatch?.[1] || "";
+    if (fence || fenceMatch) {
+      if (readingQuote) quoteLines.push(line);
+      else if (currentEntry) currentEntry.text += `${line}
+`;
+      else if (currentSection) currentSection.text += `${line}
+`;
+      if (!fence && fenceMatch) {
+        fence = { character: fenceRun.charAt(0), length: fenceRun.length };
+      } else if (fence && fenceMatch && fenceRun.charAt(0) === fence.character && fenceRun.length >= fence.length && !(fenceMatch[2] || "").trim()) {
+        fence = null;
+      }
+      continue;
+    }
+    if (line === HIGHLIGHT_SECTION_MARKER) {
+      flushEntry();
+      flushSection();
+      readingQuote = false;
+      sectionHeadingPending = true;
+      continue;
+    }
     const noteMatch = line.match(/^\*\*(?:想法|笔记)(?:\s+(\d+))?\*\*$/);
-    const aiMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    const headingMatch = line.match(/^#{3}\s+(.+?)\s*$/);
+    const aiMatch = headingMatch && (sectionHeadingPending || !currentEntry && !currentSection || headingMatch[1] === "\u5173\u8054\u6587\u7AE0" && /^\[\[/.test(normalizeBlockquoteLine(lines[i + 1] || ""))) ? headingMatch : null;
     if (readingQuote) {
       if (noteMatch || aiMatch || /^\*\*时间\*\*/.test(line)) readingQuote = false;
       else {
@@ -54127,7 +54153,8 @@ function readHighlightDetailsDocument(content, highlight) {
     }
     if (/^\*\*时间\*\*/.test(line)) {
       flushEntry();
-      continue;
+      flushSection();
+      break;
     }
     if (noteMatch) {
       flushEntry();
@@ -54139,6 +54166,7 @@ function readHighlightDetailsDocument(content, highlight) {
       flushEntry();
       flushSection();
       currentSection = { title: (aiMatch[1] || "").trim(), text: "", links: [] };
+      sectionHeadingPending = false;
       continue;
     }
     if (currentEntry) {
@@ -55620,7 +55648,7 @@ function getWikiLinkRangeInText(value2, cursor) {
   return null;
 }
 function createWikiLinkDecorationsExtension(cm) {
-  const { EditorView: EditorView2, ViewPlugin, Decoration } = cm.view;
+  const { EditorView: EditorView2, ViewPlugin: ViewPlugin2, Decoration: Decoration2 } = cm.view;
   const { RangeSetBuilder } = cm.state;
   const build = (view) => {
     const builder = new RangeSetBuilder();
@@ -55635,26 +55663,26 @@ function createWikiLinkDecorationsExtension(cm) {
       const innerEnd = end - 2;
       const active = head > start && head < end && (head <= innerStart || head >= innerEnd);
       if (active) {
-        builder.add(start, innerStart, Decoration.mark({ class: "jarvis-reader-cm-wikilink-bracket" }));
+        builder.add(start, innerStart, Decoration2.mark({ class: "jarvis-reader-cm-wikilink-bracket" }));
         if (innerEnd > innerStart) {
-          builder.add(innerStart, innerEnd, Decoration.mark({ class: "jarvis-reader-cm-wikilink jarvis-reader-cm-wikilink-active" }));
+          builder.add(innerStart, innerEnd, Decoration2.mark({ class: "jarvis-reader-cm-wikilink jarvis-reader-cm-wikilink-active" }));
         }
-        builder.add(innerEnd, end, Decoration.mark({ class: "jarvis-reader-cm-wikilink-bracket" }));
+        builder.add(innerEnd, end, Decoration2.mark({ class: "jarvis-reader-cm-wikilink-bracket" }));
         continue;
       }
       if (innerStart > start) {
-        builder.add(start, innerStart, Decoration.replace({}));
+        builder.add(start, innerStart, Decoration2.replace({}));
       }
       if (innerEnd > innerStart) {
-        builder.add(innerStart, innerEnd, Decoration.mark({ class: "jarvis-reader-cm-wikilink" }));
+        builder.add(innerStart, innerEnd, Decoration2.mark({ class: "jarvis-reader-cm-wikilink" }));
       }
       if (end > innerEnd) {
-        builder.add(innerEnd, end, Decoration.replace({}));
+        builder.add(innerEnd, end, Decoration2.replace({}));
       }
     }
     return builder.finish();
   };
-  return ViewPlugin.fromClass(class {
+  return ViewPlugin2.fromClass(class {
     decorations;
     constructor(view) {
       this.decorations = build(view);
@@ -55937,12 +55965,14 @@ function bindReaderContainerResize(host, rendition, environment = browserEnviron
         return;
       }
       rendition.resize();
+      rendition.commitViewport?.();
       lastWidth = host.clientWidth;
       lastHeight = host.clientHeight;
     });
   };
   const onAttached = () => {
     attached = true;
+    rendition.commitViewport?.();
     schedule();
   };
   rendition.on("attached", onAttached);
@@ -55966,6 +55996,7 @@ init_utils_core();
 // src/reader/ReaderSideControls.tsx
 var import_obsidian6 = require("obsidian");
 var import_react3 = __toESM(require_react(), 1);
+var import_react_dom = __toESM(require_react_dom(), 1);
 
 // src/reader/ReaderSettingsPanel.tsx
 var import_obsidian5 = require("obsidian");
@@ -56141,17 +56172,19 @@ function ReaderSettingsPanel({ getPreferences, onPreferencesChange, onClose, id 
 // src/reader/ReaderSideControls.tsx
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 function IconButton({ label, icon, className = "", disabled = false, onClick }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `jarvis-reader-side-button ${className}`.trim(), "aria-label": label, disabled, onClick, dangerouslySetInnerHTML: { __html: icon } });
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: `clickable-icon view-action jarvis-reader-side-button ${className}`.trim(), "aria-label": label, disabled, onClick, dangerouslySetInnerHTML: { __html: icon } });
 }
 function ReaderSideControls(props) {
   const [open, setOpen] = (0, import_react3.useState)(props.getPanelOpen);
-  const [active, setActive] = (0, import_react3.useState)(false);
+  const [headerActions, setHeaderActions] = (0, import_react3.useState)(null);
+  const [headerTitle, setHeaderTitle] = (0, import_react3.useState)(null);
   const zoneRef = (0, import_react3.useRef)(null);
-  const idleTimer = (0, import_react3.useRef)(void 0);
-  const reveal = (0, import_react3.useCallback)(() => {
-    setActive(true);
-    window.clearTimeout(idleTimer.current);
-    idleTimer.current = window.setTimeout(() => setActive(false), 2500);
+  (0, import_react3.useEffect)(() => {
+    const leaf = zoneRef.current?.closest(".workspace-leaf-content");
+    const actions = leaf?.querySelector(".view-header .view-actions");
+    if (actions) setHeaderActions(actions);
+    const title = leaf?.querySelector(".view-header .view-header-title-container");
+    if (title) setHeaderTitle(title);
   }, []);
   (0, import_react3.useEffect)(() => {
     const zone = zoneRef.current;
@@ -56168,7 +56201,6 @@ function ReaderSideControls(props) {
       else reader.style.removeProperty("--jarvis-reader-height");
     };
   }, []);
-  (0, import_react3.useEffect)(() => () => window.clearTimeout(idleTimer.current), []);
   const buttonRef = (0, import_react3.useRef)(null);
   const panelId = (0, import_react3.useId)();
   const close = (0, import_react3.useCallback)(() => {
@@ -56182,15 +56214,17 @@ function ReaderSideControls(props) {
     onAddBookmark,
     onOpenBookNote
   } = props;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { ref: zoneRef, className: `jarvis-reader-side-hover-zone${open ? " is-open" : ""}${active ? " is-active" : ""}`, onPointerEnter: reveal, onPointerMove: reveal, onPointerDown: reveal, onClick: (e) => e.stopPropagation(), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-reader-side-controls", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6DFB\u52A0\u4E66\u7B7E", disabled: !location || !chapterTitle || !onAddBookmark, icon: (0, import_obsidian6.getIcon)("bookmark")?.outerHTML || "", onClick: () => location && chapterTitle && onAddBookmark?.(location, chapterTitle) }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6253\u5F00\u672C\u4E66\u7B14\u8BB0", icon: (0, import_obsidian6.getIcon)("file-text")?.outerHTML || "", onClick: onOpenBookNote }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { ref: buttonRef, className: "jarvis-reader-side-button jarvis-reader-settings-button", "aria-label": "\u9605\u8BFB\u8BBE\u7F6E", "aria-expanded": open, "aria-controls": panelId, onClick: () => {
-        setOpen(!open);
-        props.onPanelOpenChange(!open);
-      }, dangerouslySetInnerHTML: { __html: (0, import_obsidian6.getIcon)("settings")?.outerHTML || "" } })
-    ] }),
+  const controls = /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "jarvis-reader-side-controls", role: "group", "aria-label": "\u9605\u8BFB\u5DE5\u5177", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6DFB\u52A0\u4E66\u7B7E", disabled: !location || !chapterTitle || !onAddBookmark, icon: (0, import_obsidian6.getIcon)("bookmark")?.outerHTML || "", onClick: () => location && chapterTitle && onAddBookmark?.(location, chapterTitle) }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { label: "\u6253\u5F00\u672C\u4E66\u7B14\u8BB0", icon: (0, import_obsidian6.getIcon)("file-text")?.outerHTML || "", onClick: onOpenBookNote }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { ref: buttonRef, className: "clickable-icon view-action jarvis-reader-side-button jarvis-reader-settings-button", "aria-label": "\u9605\u8BFB\u8BBE\u7F6E", "aria-expanded": open, "aria-controls": panelId, onClick: () => {
+      setOpen(!open);
+      props.onPanelOpenChange(!open);
+    }, dangerouslySetInnerHTML: { __html: (0, import_obsidian6.getIcon)("settings")?.outerHTML || "" } })
+  ] });
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { ref: zoneRef, className: `jarvis-reader-side-hover-zone${open ? " is-open" : ""}`, onClick: (e) => e.stopPropagation(), children: [
+    headerTitle && (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "jarvis-reader-reading-title", title: chapterTitle, children: chapterTitle }), headerTitle),
+    headerActions ? (0, import_react_dom.createPortal)(controls, headerActions) : controls,
     open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(ReaderSettingsPanel, { id: panelId, getPreferences: props.getPreferences, onPreferencesChange: props.onPreferencesChange, onClose: close, getPanelOpen: props.getPanelOpen, onPanelOpenChange: props.onPanelOpenChange })
   ] });
 }
@@ -58365,18 +58399,14 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
     }
   }, import_react5.default.createElement(ReaderSideControls, {
     location: currentLocationRef.current,
-    chapterTitle: readerTitleRef.current,
+    chapterTitle: readerTitle,
     onAddBookmark: addBookmark,
     onOpenBookNote: createBookNote,
     getPanelOpen,
     onPanelOpenChange,
     getPreferences,
     onPreferencesChange
-  }), import_react5.default.createElement("div", {
-    className: "jarvis-reader-reading-title",
-    title: readerTitle,
-    style: { color: theme.muted, fontFamily: theme.fontFamily, fontSize: theme.fontSize }
-  }, readerTitle), import_react5.default.createElement(import_react_reader.ReactReader, {
+  }), import_react5.default.createElement(import_react_reader.ReactReader, {
     title: "",
     showToc: false,
     location,
@@ -58398,6 +58428,15 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
             const selection = content.window?.getSelection();
             return !!selection && !selection.isCollapsed && !!selection.toString().trim();
           });
+        },
+        // Keep the old page boundary while the percentage-sized stage grows.
+        // resize() clears the old views synchronously before displaying new ones.
+        commitViewport: () => {
+          const reader = containerRef.current;
+          const stage = reader?.querySelector(".epub-container");
+          if (reader && stage && stage.clientWidth > 0) {
+            reader.style.setProperty("--jarvis-reader-page-width", `${stage.clientWidth}px`);
+          }
         },
         // Bundled epub.js accepts omitted dimensions; its declarations require them.
         resize: () => rendition.resize.call(rendition)
@@ -58525,6 +58564,7 @@ var EpubReader = ({ getPanelOpen, onPanelOpenChange, getPreferences, onPreferenc
       },
       reader: {
         ...ReactReaderStyle2.reader,
+        top: 16,
         backgroundColor: theme.background,
         bottom: 72,
         left: "50%",
@@ -59189,27 +59229,28 @@ function hasKnowledgeNoteSource(content, sourceNotePath, sourceBlockId) {
 }
 function buildKnowledgeNoteBody(quote, entries) {
   const sections = [];
+  const notes = entries.filter((entry) => entry.text.trim());
+  if (notes.length) {
+    const noteSections = notes.map((entry, index) => {
+      const label = entry.label.trim() || (index === 0 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${index + 1}`);
+      const heading = notes.length > 1 || label !== "\u7B14\u8BB0" ? `### ${label}
+
+` : "";
+      const created = entry.created?.trim() ? `
+
+*\u8BB0\u5F55\u4E8E ${entry.created.trim()}*` : "";
+      return `${heading}${entry.text.trim()}${created}`;
+    });
+    sections.push(`## \u7B14\u8BB0
+
+${noteSections.join("\n\n")}`);
+  }
   const cleanQuote = quote.trim();
   if (cleanQuote) {
     const blockquote = cleanQuote.split(/\r?\n/).map((line) => `> ${line}`).join("\n");
     sections.push(`## \u539F\u6587
 
 ${blockquote}`);
-  }
-  const notes = entries.filter((entry) => entry.text.trim());
-  if (notes.length) {
-    const noteSections = notes.map((entry, index) => {
-      const label = entry.label.trim() || (index === 0 ? "\u7B14\u8BB0" : `\u7B14\u8BB0 ${index + 1}`);
-      const created = entry.created?.trim() ? `
-
-${entry.created.trim()}` : "";
-      return `### ${label}${created}
-
-${entry.text.trim()}`;
-    });
-    sections.push(`## \u7B14\u8BB0
-
-${noteSections.join("\n\n")}`);
   }
   return sections.join("\n\n");
 }
@@ -59218,13 +59259,13 @@ function buildKnowledgeNoteContent(draft, createdAt) {
   const location = draft.sourceLocationLink ? `
 
 [\u8FD4\u56DE\u539F\u6587](${draft.sourceLocationLink})` : "";
-  const escapeYaml = (value2) => value2.replace(/"/g, '\\"');
+  const book = draft.sourceBookPath ? `[[${draft.sourceBookPath.split("/").pop()}]]` : draft.sourceBookTitle;
+  const note = `[[${draft.sourceNotePath.replace(/\.md$/i, "")}]]`;
   return `---
 created: ${createdAt}
-author: "[[Jarvis]]"
-source_book: "${escapeYaml(draft.sourceBookTitle)}"
-source_note: "${escapeYaml(draft.sourceNotePath)}"
-source_block: "${escapeYaml(draft.sourceBlockId)}"
+source_book: ${JSON.stringify(book)}
+source_note: ${JSON.stringify(note)}
+source_block: ${JSON.stringify(draft.sourceBlockId)}
 ---
 
 ${draft.body.trim()}
@@ -59238,6 +59279,30 @@ function buildKnowledgeNotePath(folder, title) {
   const cleanFolder = folder.trim().replace(/^\/+|\/+$/g, "");
   const cleanTitle = title.trim().replace(/[\\/:*?"<>|]/g, "-");
   return `${cleanFolder ? `${cleanFolder}/` : ""}${cleanTitle}.md`;
+}
+function knowledgeNoteTimeLines(text) {
+  const lines = text.split("\n");
+  if (lines[0] !== "---") return [];
+  const end = lines.indexOf("---", 1);
+  if (end < 0) return [];
+  const metadata = lines.slice(1, end).join("\n");
+  if (!/^source_block:\s*\S.+$/m.test(metadata) || !/^source_note:\s*\S.+$/m.test(metadata)) return [];
+  const result = [];
+  let inNotes = false;
+  let fence = "";
+  for (let index = end + 1; index < lines.length; index++) {
+    const line = lines[index];
+    const marker = line.match(/^\s*(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1];
+      else if (marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = "";
+      continue;
+    }
+    if (fence) continue;
+    if (/^## /.test(line)) inNotes = line === "## \u7B14\u8BB0";
+    if (inNotes && /^\*记录于 \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?\*$/.test(line)) result.push(index + 1);
+  }
+  return result;
 }
 
 // src/workspace-navigation.ts
@@ -59376,6 +59441,7 @@ var EpubView = class extends import_obsidian8.FileView {
         sourceNotePath: highlight.notePath,
         sourceBlockId: highlight.blockId || highlight.id,
         sourceBookTitle: highlight.bookTitle,
+        sourceBookPath: highlight.bookPath,
         sourceLocationLink: buildReadingSourceLink(highlight),
         createdAt: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)
       });
@@ -60578,8 +60644,6 @@ var HighlightsPanelController = class {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "\u6253\u5F00\u4E00\u672C EPUB \u540E\u663E\u793A\u7B14\u8BB0" });
       return;
     }
-    const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "\u7B14\u8BB0" });
     const list = await reader.getBookHighlightsForReader();
     if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {
@@ -60744,6 +60808,7 @@ var JarvisReaderBookshelfView = class extends import_obsidian11.ItemView {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
         "aria-label": label,
+        title: label,
         "aria-pressed": String(active)
       }
     });
@@ -60772,28 +60837,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian11.ItemView {
         this.activePanel = panel.id;
         this.render();
       });
-    }
-  }
-  renderPaneHeader(container, title, subtitle = "", action = null) {
-    const header = container.createDiv({ cls: "jarvis-reader-bookshelf-header" });
-    const titleWrap = header.createDiv({ cls: "jarvis-reader-bookshelf-header-row" });
-    titleWrap.createEl("div", { cls: "jarvis-reader-bookshelf-title", text: title });
-    if (action) {
-      const button = titleWrap.createEl("button", {
-        cls: "jarvis-reader-bookshelf-header-action",
-        attr: {
-          "aria-label": action.label,
-          title: action.label
-        }
-      });
-      button.innerHTML = action.icon;
-      button.onclick = (event) => {
-        event.preventDefault();
-        action.onClick();
-      };
-    }
-    if (subtitle) {
-      header.createEl("div", { cls: "jarvis-reader-bookshelf-count", text: subtitle });
     }
   }
   restorePanelScroll(key, listEl) {
@@ -60857,7 +60900,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian11.ItemView {
     container.className = "jarvis-reader-sidebar-pane jarvis-reader-sidebar-toc-pane";
     container.empty();
     const bookmarks = activeEpub?.file ? this.plugin.settings.bookBookmarks?.[activeEpub.file.path] || [] : [];
-    this.renderPaneHeader(container, this.activePanel === "bookmarks" ? "\u4E66\u7B7E" : "\u76EE\u5F55\u5BFC\u822A");
     if (this.activePanel === "bookmarks") {
       this.renderBookmarksList(container, activeEpub, bookmarks);
       return;
@@ -60990,7 +61032,6 @@ var JarvisReaderBookshelfView = class extends import_obsidian11.ItemView {
     const body = container.createDiv({ cls: "jarvis-reader-sidebar-body is-single" });
     if (!activeEpub) {
       const pane2 = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      this.renderPaneHeader(pane2, "\u8F85\u52A9\u8FB9\u680F", "");
       pane2.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "\u8BF7\u6253\u5F00\u4E00\u672C\u56FE\u4E66\u4EE5\u67E5\u770B\u76EE\u5F55\u548C\u7B14\u8BB0" });
       return;
     }
@@ -62918,18 +62959,8 @@ var LibraryView = class extends import_obsidian13.ItemView {
 
 // src/settings.ts
 var import_obsidian14 = require("obsidian");
+init_book_note_template();
 init_storage_folders();
-var DEFAULT_BOOK_NOTE_TEMPLATE = `---
-bookname: "[[{{bookname}}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: {{created}}
----
-
-{{toc}}`;
 var DEFAULT_SETTINGS = {
   readerLetterSpacing: 0,
   readerWordSpacing: 0,
@@ -63090,18 +63121,8 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
           button.setDisabled(false);
         }
       }));
-      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u6A21\u677F").setDesc("\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
-        text.setPlaceholder(`---
-bookname: "[[{{bookname}}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: {{created}}
----
-
-{{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value2) => {
+      new import_obsidian14.Setting(contentDiv).setName("\u8BFB\u4E66\u7B14\u8BB0\u521D\u59CB\u6A21\u677F").setDesc("\u4EC5\u7528\u4E8E\u65B0\u5EFA\u7B14\u8BB0\u3002{{toc}} \u53EF\u9884\u586B\u76EE\u5F55\uFF1B\u6458\u5F55\u683C\u5F0F\u7531\u63D2\u4EF6\u7EF4\u62A4\u3002\u652F\u6301 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}").setClass("jarvis-settings-book-note-template").addTextArea((text) => {
+        text.setPlaceholder(DEFAULT_BOOK_NOTE_TEMPLATE).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value2) => {
           this.plugin.settings.bookNoteTemplate = value2;
           await this.plugin.saveSettings();
         });
@@ -63270,6 +63291,114 @@ created: {{created}}
 // src/main.ts
 init_book_notes();
 init_utils();
+
+// src/book-note-time-display.ts
+function styleBookNoteTimes(root, chapterTitleFor) {
+  const callouts = Array.from(root.querySelectorAll(".callout-content"));
+  if (root.matches(".callout-content")) callouts.unshift(root);
+  for (const content of callouts) {
+    if (content.dataset.jarvisTimesStyled || !Array.from(content.querySelectorAll("a")).some(
+      (link) => link.getAttribute("href")?.startsWith("obsidian://jarvis-reader?")
+    )) continue;
+    content.dataset.jarvisTimesStyled = "true";
+    const callout = content.closest(".callout");
+    const title = callout?.querySelector(":scope > .callout-title .callout-title-inner");
+    const chapter = callout && chapterTitleFor?.(callout);
+    const normalize = (text) => text.replace(/\s+/g, " ").trim();
+    if (title && chapter && normalize(title.textContent || "") === normalize(chapter)) {
+      title.textContent = "\u6458\u5F55";
+    }
+    const fragmentTimes = [];
+    const noteTimes = [];
+    for (const label of Array.from(content.querySelectorAll("strong"))) {
+      if (label.textContent !== "\u65F6\u95F4") continue;
+      const br = label.nextSibling;
+      const date = br?.nextSibling;
+      if (br?.nodeName !== "BR" || date?.nodeType !== 3 || !/^\s*\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?\s*$/.test(date.textContent || "")) continue;
+      const row = content.ownerDocument.createElement("p");
+      row.className = "jarvis-book-note-time";
+      fragmentTimes.push(row);
+      let container = label;
+      while (container.parentElement && container.parentElement !== content) container = container.parentElement;
+      const startsParagraph = container.tagName === "P" && container.firstChild === label;
+      content.insertBefore(row, startsParagraph ? container : container.nextSibling);
+      const trailingBreak = date.nextSibling;
+      row.append(label, br, date);
+      if (trailingBreak?.nodeName === "BR") trailingBreak.remove();
+    }
+    const children = Array.from(content.children);
+    for (const header of children) {
+      if (header.tagName !== "P") continue;
+      const label = header.firstElementChild;
+      if (label?.tagName !== "STRONG" || !/^(?:笔记|想法)(?:\s+\d+)?$/.test(label.textContent || "")) continue;
+      const time = (header.textContent || "").match(/created:\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?)\s*$/i);
+      if (!time || (header.textContent || "").slice((label.textContent || "").length).trim() !== time[0].trim()) continue;
+      header.classList.add("jarvis-book-note-label");
+      const nextBoundary = children.slice(children.indexOf(header) + 1).find(
+        (child) => child.classList.contains("jarvis-book-note-time") || /^H[1-6]$/.test(child.tagName) || child.tagName === "P" && /^(?:笔记|想法)(?:\s+\d+)?$|^时间$/.test(child.firstElementChild?.textContent || "")
+      );
+      while (label.nextSibling) label.nextSibling.remove();
+      const footer = content.ownerDocument.createElement("p");
+      footer.className = "jarvis-book-note-time";
+      footer.textContent = `\u8BB0\u5F55\u4E8E ${time[1]}`;
+      noteTimes.push(footer);
+      content.insertBefore(footer, nextBoundary || null);
+    }
+    const noteCount = children.filter((child) => child.tagName === "P" && /^(?:笔记|想法)(?:\s+\d+)?$/.test(child.firstElementChild?.textContent || "")).length;
+    if (noteTimes.length && noteTimes.length === noteCount) {
+      for (const time of fragmentTimes) time.remove();
+    }
+    for (const link of Array.from(content.querySelectorAll("a"))) {
+      if (link.textContent !== "\u8FD4\u56DE\u539F\u6587" || !link.getAttribute("href")?.startsWith("obsidian://jarvis-reader?")) continue;
+      const oldParent = link.parentElement;
+      const row = content.ownerDocument.createElement("p");
+      row.className = "jarvis-book-note-source";
+      row.append(link);
+      content.append(row);
+      if (oldParent?.tagName === "P" && !oldParent.textContent?.trim() && Array.from(oldParent.children).every((child) => child.tagName === "BR")) oldParent.remove();
+      const lastTime = row.previousElementSibling;
+      if (lastTime?.classList.contains("jarvis-book-note-time")) {
+        const footer = content.ownerDocument.createElement("div");
+        footer.className = "jarvis-book-note-footer";
+        content.insertBefore(footer, lastTime);
+        footer.append(lastTime, row);
+      }
+    }
+  }
+}
+
+// src/knowledge-note-time-display.ts
+function styleKnowledgeNoteTimes(root) {
+  const paragraphs = Array.from(root.querySelectorAll("p"));
+  if (root.matches("p")) paragraphs.unshift(root);
+  for (const paragraph of paragraphs) {
+    const time = paragraph.firstElementChild;
+    if (time?.tagName !== "EM" || paragraph.childNodes.length !== 1) continue;
+    if (!/^记录于 \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?$/.test(time.textContent || "")) continue;
+    paragraph.classList.add("jarvis-knowledge-note-time");
+  }
+}
+
+// src/knowledge-note-time-editor.ts
+var import_view = require("@codemirror/view");
+var import_obsidian15 = require("obsidian");
+var knowledgeNoteTimeEditor = import_view.ViewPlugin.fromClass(class {
+  decorations;
+  constructor(view) {
+    this.decorations = this.build(view);
+  }
+  update(update) {
+    if (update.docChanged || update.startState.field(import_obsidian15.editorLivePreviewField, false) !== update.state.field(import_obsidian15.editorLivePreviewField, false) || update.startState.field(import_obsidian15.editorInfoField, false)?.file !== update.state.field(import_obsidian15.editorInfoField, false)?.file) {
+      this.decorations = this.build(update.view);
+    }
+  }
+  build(view) {
+    if (!view.state.field(import_obsidian15.editorLivePreviewField, false) || !view.state.field(import_obsidian15.editorInfoField, false)?.file) return import_view.Decoration.none;
+    return import_view.Decoration.set(knowledgeNoteTimeLines(view.state.doc.toString()).map(
+      (number) => import_view.Decoration.line({ class: "jarvis-knowledge-note-time-line" }).range(view.state.doc.line(number).from)
+    ));
+  }
+}, { decorations: (plugin) => plugin.decorations });
 
 // src/word-asset-service.ts
 var WordAssetService = class {
@@ -64218,7 +64347,7 @@ async function writeWordAssetSidecar(adapter, path, wordAssets, updated = (/* @_
 // src/main.ts
 var JARVIS_LOGO_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
 var LIBRARY_BIG_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library-big"><path d="M4 20V4h4l1 16H4z"/><path d="M11 20V4h3v16h-3z"/><path d="M16 4h4v16h-4l-1-16z"/></svg>`;
-var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
+var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
   bookshelfView;
   activeReaderView;
   lastIndexCounts;
@@ -64234,7 +64363,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     adapter: this.app.vault.adapter,
     readNote: async (path) => {
       const file = this.app.vault.getAbstractFileByPath(path);
-      if (!(file instanceof import_obsidian15.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
+      if (!(file instanceof import_obsidian16.TFile)) throw new Error(`\u627E\u4E0D\u5230\u4E66\u7C4D\u7B14\u8BB0\uFF1A${path}`);
       return this.app.vault.read(file);
     },
     writeNote: async (path, content) => {
@@ -64242,7 +64371,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
       await writeExistingRecoveryNote(
         path,
         content,
-        file instanceof import_obsidian15.TFile ? file : null,
+        file instanceof import_obsidian16.TFile ? file : null,
         (note, body) => this.app.vault.modify(note, body),
         this.app.vault.adapter
       );
@@ -64285,33 +64414,49 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     }
   });
   async onload() {
-    (0, import_obsidian15.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
-    (0, import_obsidian15.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
+    (0, import_obsidian16.addIcon)("jarvis-logo", JARVIS_LOGO_SVG);
+    (0, import_obsidian16.addIcon)("jarvis-library-big", LIBRARY_BIG_SVG);
     await this.loadSettings();
+    this.registerEditorExtension(knowledgeNoteTimeEditor);
+    this.registerMarkdownPostProcessor((element, context) => {
+      const sourceFile = this.app.vault.getAbstractFileByPath(context.sourcePath);
+      const metadata = sourceFile instanceof import_obsidian16.TFile ? this.app.metadataCache.getFileCache(sourceFile)?.frontmatter : void 0;
+      if (typeof metadata?.source_block === "string" && typeof metadata.source_note === "string") {
+        styleKnowledgeNoteTimes(element);
+      }
+      const isBookNote = Object.values(this.settings.bookNotePaths || {}).includes(context.sourcePath) || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items) && items.some((item) => item.notePath === context.sourcePath));
+      if (isBookNote) styleBookNoteTimes(element, (callout) => {
+        const section = context.getSectionInfo(callout);
+        const file = this.app.vault.getAbstractFileByPath(context.sourcePath);
+        if (!section || !(file instanceof import_obsidian16.TFile)) return void 0;
+        const headings = this.app.metadataCache.getFileCache(file)?.headings || [];
+        return headings.filter((heading) => heading.position.start.line < section.lineStart).pop()?.heading;
+      });
+    });
     const needsStartupIndexPersistence = await this.restoreIndexesFromSidecars();
     await this.migrateReviewData();
     const highlightRecovery = await this.highlightTransactionService.recoverPending();
     if (highlightRecovery.finalized || highlightRecovery.rolledBack) {
-      new import_obsidian15.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
+      new import_obsidian16.Notice(`\u5DF2\u6062\u590D ${highlightRecovery.finalized + highlightRecovery.rolledBack} \u4E2A\u672A\u5B8C\u6210\u7684\u9AD8\u4EAE\u64CD\u4F5C\u3002`);
     }
     if (highlightRecovery.errors.length) {
       console.error("Jarvis Reader highlight transaction recovery failed.", highlightRecovery.errors);
-      new import_obsidian15.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
+      new import_obsidian16.Notice("\u5B58\u5728\u65E0\u6CD5\u81EA\u52A8\u6062\u590D\u7684\u9AD8\u4EAE\u64CD\u4F5C\uFF0C\u6062\u590D\u8BB0\u5F55\u5DF2\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u5F00\u53D1\u8005\u5DE5\u5177\u65E5\u5FD7\u3002", 0);
     }
     await resolveSyncConflicts(this);
     if (needsStartupIndexPersistence) {
       await this.persistIndexSidecars("startup");
     }
     try {
-      if (await this.bookPathService.recover()) new import_obsidian15.Notice("\u5DF2\u6062\u590D\u672A\u5B8C\u6210\u7684\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65");
+      if (await this.bookPathService.recover()) new import_obsidian16.Notice("\u5DF2\u6062\u590D\u672A\u5B8C\u6210\u7684\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65");
     } catch (error) {
       this.bookPathUpdateBlocked = true;
       console.error("Jarvis Reader book path recovery failed", error);
-      new import_obsidian15.Notice("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u9700\u8981\u6062\u590D\uFF0C\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u6062\u590D\u8BB0\u5F55\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u65E5\u5FD7\u3002", 0);
+      new import_obsidian16.Notice("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u9700\u8981\u6062\u590D\uFF0C\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u6062\u590D\u8BB0\u5F55\u4FDD\u7559\u3002\u8BF7\u68C0\u67E5\u65E5\u5FD7\u3002", 0);
     }
     if (!this.bookPathUpdateBlocked) await this.saveSettingsData();
     this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
-      if (file instanceof import_obsidian15.TFile && file.extension.toLowerCase() === "md" && oldPath.toLowerCase().endsWith(".md")) {
+      if (file instanceof import_obsidian16.TFile && file.extension.toLowerCase() === "md" && oldPath.toLowerCase().endsWith(".md")) {
         const tracked = this.pendingNotePaths.has(oldPath) || Object.values(this.settings.bookNotePaths || {}).includes(oldPath) || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items) && items.some((item) => item.notePath === oldPath));
         if (!tracked) return;
         this.bookPathUpdateInProgress = true;
@@ -64329,11 +64474,11 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
           this.bookPathUpdateInProgress = false;
           this.bookPathUpdateBlocked = true;
           console.error("Jarvis Reader note path synchronization failed", error);
-          new import_obsidian15.Notice("\u8BFB\u4E66\u7B14\u8BB0\u5DF2\u79FB\u52A8\uFF0C\u4F46\u5173\u8054\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u539F\u8BB0\u5F55\u548C\u6062\u590D\u4FE1\u606F\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
+          new import_obsidian16.Notice("\u8BFB\u4E66\u7B14\u8BB0\u5DF2\u79FB\u52A8\uFF0C\u4F46\u5173\u8054\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u539F\u8BB0\u5F55\u548C\u6062\u590D\u4FE1\u606F\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
         });
         return;
       }
-      if (!(file instanceof import_obsidian15.TFile) || file.extension.toLowerCase() !== "epub" || !oldPath.toLowerCase().endsWith(".epub")) return;
+      if (!(file instanceof import_obsidian16.TFile) || file.extension.toLowerCase() !== "epub" || !oldPath.toLowerCase().endsWith(".epub")) return;
       this.bookPathUpdateInProgress = true;
       const newPath = file.path;
       const readers = this.app.workspace.getLeavesOfType("epub").map((leaf) => leaf.view).filter((view) => view instanceof EpubView && !!view.file);
@@ -64359,14 +64504,14 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
             if (view.file) await view.onLoadFile(view.file);
           } catch (error) {
             console.error("Jarvis Reader renamed book could not reopen", error);
-            new import_obsidian15.Notice("\u9605\u8BFB\u8BB0\u5F55\u5DF2\u540C\u6B65\uFF0C\u4F46\u4E66\u7C4D\u91CD\u65B0\u6253\u5F00\u5931\u8D25\uFF0C\u8BF7\u91CD\u65B0\u6253\u5F00\u4E66\u7C4D");
+            new import_obsidian16.Notice("\u9605\u8BFB\u8BB0\u5F55\u5DF2\u540C\u6B65\uFF0C\u4F46\u4E66\u7C4D\u91CD\u65B0\u6253\u5F00\u5931\u8D25\uFF0C\u8BF7\u91CD\u65B0\u6253\u5F00\u4E66\u7C4D");
           }
         }
       }).catch((error) => {
         this.bookPathUpdateInProgress = false;
         this.bookPathUpdateBlocked = true;
         console.error("Jarvis Reader book path synchronization failed", error);
-        new import_obsidian15.Notice("\u4E66\u7C4D\u5DF2\u6539\u540D\uFF0C\u4F46\u9605\u8BFB\u8BB0\u5F55\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u8BF7\u52FF\u7EE7\u7EED\u6539\u540D\uFF0C\u539F\u8BB0\u5F55\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u68C0\u67E5\u65E5\u5FD7\u5E76\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
+        new import_obsidian16.Notice("\u4E66\u7C4D\u5DF2\u6539\u540D\uFF0C\u4F46\u9605\u8BFB\u8BB0\u5F55\u540C\u6B65\u672A\u5B8C\u6210\uFF1B\u4FDD\u5B58\u5DF2\u6682\u505C\uFF0C\u8BF7\u52FF\u7EE7\u7EED\u6539\u540D\uFF0C\u539F\u8BB0\u5F55\u5DF2\u4FDD\u7559\uFF0C\u8BF7\u68C0\u67E5\u65E5\u5FD7\u5E76\u6062\u590D\u540E\u91CD\u8F7D\u63D2\u4EF6\u3002", 0);
       });
     }));
     this.registerView("epub", (leaf) => {
@@ -64406,7 +64551,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
       }
     });
     this.registerEvent(this.app.workspace.on("file-menu", (menu, file) => {
-      if (file instanceof import_obsidian15.TFile && file.extension.toLowerCase() === "pdf") {
+      if (file instanceof import_obsidian16.TFile && file.extension.toLowerCase() === "pdf") {
         menu.addItem((item) => {
           item.setTitle("\u521B\u5EFA\u6216\u6253\u5F00\u8BFB\u4E66\u7B14\u8BB0").setIcon("pencil").onClick(async () => {
             await openOrCreateNote(this.app, file, await getPdfTocMd(file), this.settings);
@@ -64474,21 +64619,21 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
   async openReadingSource(parameters) {
     const target = parseReadingSourceTarget(parameters);
     if (!target) {
-      new import_obsidian15.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
+      new import_obsidian16.Notice("\u539F\u6587\u94FE\u63A5\u65E0\u6548\u6216\u7248\u672C\u4E0D\u53D7\u652F\u6301\u3002");
       return;
     }
     const aliases = this.settings.bookPathAliases || {};
     const originalIndexed = (this.settings.bookHighlights?.[target.bookPath] || []).some((item) => item.id === target.highlightId || item.blockId === target.highlightId);
     if (!originalIndexed) target.bookPath = resolveBookPath(target.bookPath, aliases);
     const file = this.app.vault.getAbstractFileByPath(target.bookPath);
-    if (!(file instanceof import_obsidian15.TFile)) {
-      new import_obsidian15.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
+    if (!(file instanceof import_obsidian16.TFile)) {
+      new import_obsidian16.Notice("\u627E\u4E0D\u5230\u539F\u4E66\uFF0C\u53EF\u80FD\u5DF2\u79FB\u52A8\u6216\u5220\u9664\u3002");
       return;
     }
     const indexed2 = (this.settings.bookHighlights?.[target.bookPath] || []).find((item) => item?.id === target.highlightId || item?.blockId === target.highlightId);
     const cfiRange = indexed2?.cfiRange || target.cfiRange;
     if (!cfiRange) {
-      new import_obsidian15.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
+      new import_obsidian16.Notice("\u8FD9\u6761\u7B14\u8BB0\u6CA1\u6709\u53EF\u7528\u7684\u539F\u6587\u5B9A\u4F4D\u4FE1\u606F\u3002");
       return;
     }
     this.sourceJumpPaths.add(target.bookPath);
@@ -64498,7 +64643,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
       await leaf.view.jumpToHighlight({ id: indexed2?.id || target.highlightId, cfiRange });
     } catch (error) {
       console.error("Jarvis Reader source navigation failed.", error);
-      new import_obsidian15.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
+      new import_obsidian16.Notice(`\u65E0\u6CD5\u5B9A\u4F4D\u539F\u6587\uFF1A${error instanceof Error ? error.message : "\u672A\u77E5\u9519\u8BEF"}`);
     } finally {
       this.sourceJumpPaths.delete(target.bookPath);
     }
@@ -64679,7 +64824,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
         this.highlightSidecarUnavailable = true;
         this.settings.bookHighlights = {};
         console.error("Jarvis Reader highlight sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian15.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian16.Notice("\u9AD8\u4EAE\u4E3B\u6570\u636E highlights.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u9AD8\u4EAE\u4FDD\u5B58\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       const wordAssetSidecar = await readWordAssetSidecar(adapter, paths.wordAssets);
       if (wordAssetSidecar.status === "ready") {
@@ -64693,7 +64838,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
         this.wordAssetSidecarUnavailable = true;
         this.settings.wordAssets = {};
         console.error("Jarvis Reader word asset sidecar is invalid. The original file was left unchanged.");
-        new import_obsidian15.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
+        new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E word-assets.json \u635F\u574F\u6216\u7ED3\u6784\u975E\u6CD5\uFF0C\u539F\u6587\u4EF6\u672A\u88AB\u6539\u5199\uFF1B\u8BCD\u6761\u529F\u80FD\u5DF2\u505C\u6B62\uFF0C\u8BF7\u5148\u6062\u590D\u8BE5\u6587\u4EF6\u3002", 0);
       }
       if (restoredToMemory) {
         await this.logIndexChange("restore-from-sidecar");
@@ -64702,7 +64847,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     } catch (error) {
       this.settings.wordAssets = {};
       console.error("Jarvis Reader word asset sidecar load failed.", error);
-      new import_obsidian15.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
+      new import_obsidian16.Notice("\u8BCD\u6761\u4E3B\u6570\u636E\u8BFB\u53D6\u5931\u8D25\uFF1B\u5DF2\u505C\u6B62\u52A0\u8F7D\u8BCD\u6761\uFF0C\u8BF7\u68C0\u67E5 word-assets.json\u3002", 0);
       throw error;
     }
   }
@@ -64714,14 +64859,14 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     await writeWordAssetSidecar(adapter, paths.wordAssets, migration.wordAssets);
     this.settings = migration.settings;
     await this.saveSettingsData();
-    new import_obsidian15.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
+    new import_obsidian16.Notice("\u5DF2\u79FB\u9664\u65E7\u590D\u4E60\u548C\u957F\u53E5\u8BCD\u6761\u6570\u636E\u3002", 1e4);
   }
   async persistWordAssetSidecar(reason = "save") {
     if (this.bookPathUpdateInProgress || this.bookPathUpdateBlocked) throw new Error("\u4E66\u7C4D\u8DEF\u5F84\u540C\u6B65\u671F\u95F4\u4FDD\u5B58\u5DF2\u6682\u505C");
     if (this.wordAssetSidecarUnavailable) {
       const message = "\u8BCD\u6761\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u8BCD\u6761\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D word-assets.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian15.Notice(message, 0);
+      new import_obsidian16.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -64754,7 +64899,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     if (this.highlightSidecarUnavailable) {
       const message = "\u9AD8\u4EAE\u4E3B\u6570\u636E\u4E0D\u53EF\u7528\uFF0C\u5DF2\u505C\u6B62\u9AD8\u4EAE\u7D22\u5F15\u4FDD\u5B58\u4EE5\u4FDD\u62A4\u635F\u574F\u6587\u4EF6\u3002\u8BF7\u5148\u6062\u590D highlights.json\u3002";
       console.error(`Jarvis Reader ${message}`);
-      new import_obsidian15.Notice(message, 0);
+      new import_obsidian16.Notice(message, 0);
       throw new Error(message);
     }
     const paths = this.getIndexSidecarPaths();
@@ -64847,13 +64992,13 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
       this.coverCacheMigrationComplete = true;
       if (backupRoot) {
         await this.saveSettingsData();
-        new import_obsidian15.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
+        new import_obsidian16.Notice(`\u5C01\u9762\u7F13\u5B58\u5DF2\u8FC1\u51FA data.json\uFF0C\u539F\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${backupRoot}`, 1e4);
       }
     } catch (error) {
       this.coverCacheMigrationComplete = false;
       this.settings.bookCoverCache = legacyCoverCache;
       console.error("Jarvis Reader cover cache migration failed.", error);
-      new import_obsidian15.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
+      new import_obsidian16.Notice("\u5C01\u9762\u7F13\u5B58\u8FC1\u79FB\u5931\u8D25\uFF0C\u65E7 data.json \u6570\u636E\u5DF2\u4FDD\u7559\uFF1B\u8BF7\u68C0\u67E5\u78C1\u76D8\u7A7A\u95F4\u548C\u63D2\u4EF6\u76EE\u5F55\u6743\u9650\u3002", 0);
     }
     if (!["single", "dual"].includes(this.settings.sidebarLayoutMode)) {
       this.settings.sidebarLayoutMode = "single";
@@ -64863,7 +65008,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
     this.settings.bookshelfCoverOnly = !!this.settings.bookshelfCoverOnly;
     if (migration.migrated) {
       await this.saveSettingsData();
-      new import_obsidian15.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
+      new import_obsidian16.Notice(`\u667A\u80FD\u6307\u4EE4\u5DF2\u79FB\u9664\uFF0C\u65E7\u914D\u7F6E\u5907\u4EFD\u4F4D\u4E8E\uFF1A${smartCommandsBackupPath}`, 1e4);
     }
   }
   async configureStorageFolders(draft) {
@@ -64917,7 +65062,7 @@ var JarvisReaderPlugin = class extends import_obsidian15.Plugin {
         mkdir: (path) => this.app.vault.createFolder(path),
         writeBinary: async (path, data) => {
           const file = this.app.vault.getAbstractFileByPath(path);
-          if (file instanceof import_obsidian15.TFile) {
+          if (file instanceof import_obsidian16.TFile) {
             await this.app.vault.modifyBinary(file, data);
             return file.path;
           }

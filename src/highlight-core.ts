@@ -2,8 +2,10 @@ import { formatLocalDateTime } from "./utils-core.ts";
 import { buildReadingSourceLink } from "./reading-source-link.ts";
 import type { BookHighlight } from "./types";
 
+export const HIGHLIGHT_SECTION_MARKER = "<!-- jarvis-reader:section -->";
+
 export function formatBlockquote(text: string): string {
-  return (text || "").split(/\r?\n/).map((line) => `> ${line.trim()}`).join("\n");
+  return (text || "").split(/\r?\n/).map((line) => `> ${line}`).join("\n");
 }
 
 export function formatHighlightNoteBlock(highlight: BookHighlight): string {
@@ -43,7 +45,7 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
         parts.push(sec.text.trim());
       }
       const secContent = parts.join("\n");
-      return `>\n> ### ${sec.title || "AI \u8f93\u51fa"}\n${formatBlockquote(secContent)}`;
+      return `>\n> ${HIGHLIGHT_SECTION_MARKER}\n> ### ${sec.title || "AI \u8f93\u51fa"}\n${formatBlockquote(secContent)}`;
     }).join("\n");
   }
 

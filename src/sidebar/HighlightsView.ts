@@ -287,8 +287,6 @@ export class HighlightsPanelController {
       container.createEl("div", { cls: "jarvis-reader-highlights-empty", text: "打开一本 EPUB 后显示笔记" });
       return;
     }
-    const header = container.createDiv({ cls: "jarvis-reader-highlights-header" });
-    header.createEl("div", { cls: "jarvis-reader-highlights-title", text: "笔记" });
     const list = await reader.getBookHighlightsForReader();
     if (this.reader !== reader || this.contentEl !== container) return;
     if (!list.length) {

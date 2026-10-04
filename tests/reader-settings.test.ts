@@ -64,7 +64,7 @@ test("快捷入口兼容旧配置、空列表及未知项，并按固定顺序�
   assert.deepEqual(input, ["layout", "note"]);
 });
 
- test("栏数与阅读方式切换保留同一正文宽度，旧配置缺失宽度时用760", async () => {
+ test("栏数与阅读方式切换保留同一正文宽度，旧配置缺失宽度时用960", async () => {
   const { resolveReaderPreferences, DEFAULT_READER_PREFERENCES } = await import("../src/reader-settings.ts");
   for (const readerWidth of [480, 760, 1120, 1600]) {
     const current = { ...DEFAULT_READER_PREFERENCES, readerWidth };
@@ -76,7 +76,7 @@ test("快捷入口兼容旧配置、空列表及未知项，并按固定顺序�
     assert.equal(dual.readerWidth, readerWidth);
     assert.equal(dual.scrolledView, false);
   }
-  assert.equal(clampReaderWidth(undefined), 760);
+  assert.equal(clampReaderWidth(undefined), 960);
 });
 
 test("首行缩进旧配置与无效值默认遵循原书，切换不改变布局字段", async () => {

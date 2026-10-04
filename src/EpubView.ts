@@ -136,6 +136,7 @@ export class EpubView extends FileView {
         sourceNotePath: highlight.notePath,
         sourceBlockId: highlight.blockId || highlight.id,
         sourceBookTitle: highlight.bookTitle,
+        sourceBookPath: highlight.bookPath,
         sourceLocationLink: buildReadingSourceLink(highlight),
         createdAt: new Date().toISOString().slice(0, 10),
       });

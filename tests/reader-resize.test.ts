@@ -68,3 +68,34 @@ test("选词标签消失后尺寸回到原值，不执行破坏选区的冗余�
   f.cleanup(); f.select(false); f.flush();
   assert.deepEqual(f.sizes, [[500, 600]]);
 });
+
+
+test("分页边界在挂载时记录，选区延期期间保留，实际重排后才更新", () => {
+  const host = { clientWidth: 500, clientHeight: 600 };
+  let attached: (() => void) | undefined;
+  let observed: (() => void) | undefined;
+  let pending: (() => void) | undefined;
+  let selected = false;
+  let viewport = 0;
+  const events: string[] = [];
+  const cleanup = bindReaderContainerResize(host, {
+    on(_event, callback) { attached = callback; },
+    off() { attached = undefined; },
+    hasActiveSelection() { return selected; },
+    resize() { events.push("resize"); },
+    commitViewport() { viewport = host.clientWidth; events.push("viewport"); },
+  }, {
+    observe(_host, callback) { observed = callback; return () => {}; },
+    delay(callback) { pending = callback; return () => { pending = undefined; }; },
+  });
+  const flush = () => { const callback = pending; pending = undefined; callback?.(); };
+  attached?.(); flush();
+  assert.equal(viewport, 500);
+  selected = true; host.clientWidth = 800; observed?.(); flush();
+  assert.equal(viewport, 500);
+  selected = false; flush();
+  assert.equal(viewport, 800);
+  assert.deepEqual(events, ["viewport", "resize", "viewport", "resize", "viewport"]);
+  host.clientWidth = 1000; observed?.(); cleanup(); flush();
+  assert.equal(viewport, 800);
+});

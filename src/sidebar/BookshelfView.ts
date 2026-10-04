@@ -104,6 +104,7 @@ export class JarvisReaderBookshelfView extends ItemView {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
         "aria-label": label,
+        title: label,
         "aria-pressed": String(active)
       }
     });
@@ -135,28 +136,6 @@ export class JarvisReaderBookshelfView extends ItemView {
     }
   }
 
-  renderPaneHeader(container: HTMLElement, title: string, subtitle = "", action: any = null) {
-    const header = container.createDiv({ cls: "jarvis-reader-bookshelf-header" });
-    const titleWrap = header.createDiv({ cls: "jarvis-reader-bookshelf-header-row" });
-    titleWrap.createEl("div", { cls: "jarvis-reader-bookshelf-title", text: title });
-    if (action) {
-      const button = titleWrap.createEl("button", {
-        cls: "jarvis-reader-bookshelf-header-action",
-        attr: {
-          "aria-label": action.label,
-          title: action.label
-        }
-      });
-      button.innerHTML = action.icon;
-      button.onclick = (event) => {
-        event.preventDefault();
-        action.onClick();
-      };
-    }
-    if (subtitle) {
-      header.createEl("div", { cls: "jarvis-reader-bookshelf-count", text: subtitle });
-    }
-  }
   restorePanelScroll(key: string, listEl: HTMLElement) {
     const scrollTop = this.panelScroll[key] || 0;
     if (!listEl || !scrollTop) return;
@@ -223,7 +202,6 @@ export class JarvisReaderBookshelfView extends ItemView {
     const bookmarks = activeEpub?.file
       ? this.plugin.settings.bookBookmarks?.[activeEpub.file.path] || []
       : [];
-    this.renderPaneHeader(container, this.activePanel === "bookmarks" ? "书签" : "目录导航");
     if (this.activePanel === "bookmarks") {
       this.renderBookmarksList(container, activeEpub, bookmarks);
       return;
@@ -359,7 +337,6 @@ export class JarvisReaderBookshelfView extends ItemView {
     
     if (!activeEpub) {
       const pane = body.createDiv({ cls: "jarvis-reader-sidebar-pane" });
-      this.renderPaneHeader(pane, "辅助边栏", "");
       pane.createEl("div", { cls: "jarvis-reader-bookshelf-empty", text: "请打开一本图书以查看目录和笔记" });
       return;
     }

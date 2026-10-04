@@ -110,6 +110,29 @@ test("hydrates quote and notes from Markdown when the index contains no content 
   assert.deepEqual(details.commentEntries.map((entry) => entry.text), ["第一条笔记"]);
 });
 
+test("complex Markdown survives saving, appending and replacing without becoming AI sections", () => {
+  const text = '### 重点\n\n- 第一项\n  - 嵌套项目\n\n> 引用\n\n```md\n### 代码标题\n**笔记 9**\n**时间**\n  indented code\n```';
+  const highlight = makeHighlight({ comment: text });
+  const saved = appendReflectionDocument(insertHighlightDocument("# A\n", highlight), highlight, "第二条");
+  const details = readHighlightDetailsDocument(saved, { blockId: highlight.blockId });
+  assert.deepEqual(details.commentEntries.map(entry => entry.text), [text, "第二条"]);
+  assert.deepEqual(details.commentEntries.map(entry => entry.label), ["笔记", "笔记 2"]);
+  assert.deepEqual(details.aiSections, []);
+  const replaced = replaceHighlightDocument(saved, { ...highlight, ...details });
+  assert.deepEqual(readHighlightDetailsDocument(replaced, { blockId: highlight.blockId }), details);
+});
+
+test("explicit generated section boundaries preserve note headings and arbitrary AI headings", () => {
+  const highlight = { ...makeHighlight({ comment: "### 个人标题\n正文" }), aiSections: [
+    { title: "自定义内容", text: "### 内部标题\n\n> 引用\n  缩进", links: [] },
+    { title: "关联文章", text: "", links: ["知识/复利|2026-07-20 12:00:00"] },
+  ] };
+  const saved = insertHighlightDocument("# A\n", highlight);
+  const details = readHighlightDetailsDocument(saved, { blockId: highlight.blockId });
+  assert.equal(details.commentEntries[0]?.text, highlight.comment);
+  assert.deepEqual(details.aiSections, highlight.aiSections);
+});
+
 test("ignores multiline chapter titles leaked outside a newly written callout", () => {
   const source = `## 无处不在的系统
 

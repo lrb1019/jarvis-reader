@@ -1,21 +1,10 @@
 import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
+import { DEFAULT_BOOK_NOTE_TEMPLATE } from "./book-note-template";
 import { DEFAULT_STORAGE_FOLDERS, type StorageFolders } from "./storage-folders";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
 import { clampReaderZoom, clampReaderLineHeight, READER_ZOOM_LIMITS, READER_LINE_HEIGHT_LIMITS, READER_WIDTH_LIMITS } from "./reader-settings";
-
-const DEFAULT_BOOK_NOTE_TEMPLATE = `---
-bookname: "[[{{bookname}}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: {{created}}
----
-
-{{toc}}`;
 
 export const DEFAULT_SETTINGS = {
   readerLetterSpacing: 0,
@@ -185,19 +174,9 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         } finally { button.setDisabled(false); }
       }));
 
-      new Setting(contentDiv).setName("读书笔记模板").setDesc("支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}")
+      new Setting(contentDiv).setName("读书笔记初始模板").setDesc("仅用于新建笔记。{{toc}} 可预填目录；摘录格式由插件维护。支持 {{bookname}} {{title}} {{extension}} {{created}} {{toc}}")
         .setClass("jarvis-settings-book-note-template").addTextArea((text) => {
-        text.setPlaceholder(`---
-bookname: "[[{{bookname}}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: {{created}}
----
-
-{{toc}}`).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value) => {
+        text.setPlaceholder(DEFAULT_BOOK_NOTE_TEMPLATE).setValue(this.plugin.settings.bookNoteTemplate || "").onChange(async (value) => {
           this.plugin.settings.bookNoteTemplate = value;
           await this.plugin.saveSettings();
         });

@@ -43,7 +43,7 @@ export function clampReaderLineHeight(value: unknown): number {
 }
 
 export const READER_WIDTH_LIMITS: ReaderNumberLimits = Object.freeze({
-  min: 480, max: 1600, step: 40, defaultValue: 760,
+  min: 480, max: 1600, step: 40, defaultValue: 960,
 });
 
 export function clampReaderWidth(value: unknown): number {

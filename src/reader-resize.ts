@@ -3,6 +3,7 @@ export interface ResizableRendition {
   off(event: "attached", callback: () => void): void;
   resize(): void;
   hasActiveSelection?(): boolean;
+  commitViewport?(): void;
 }
 
 interface ResizeHost {
@@ -55,12 +56,14 @@ export function bindReaderContainerResize(
         return;
       }
       rendition.resize();
+      rendition.commitViewport?.();
       lastWidth = host.clientWidth;
       lastHeight = host.clientHeight;
     });
   };
   const onAttached = () => {
     attached = true;
+    rendition.commitViewport?.();
     schedule();
   };
   rendition.on("attached", onAttached);
