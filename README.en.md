@@ -2,6 +2,8 @@
 
 EPUB reading and knowledge capture for Obsidian · [中文说明](./README.md)
 
+Current version: **[1.4.4](https://github.com/lrb1019/jarvis-reader/releases/tag/1.4.4)**.
+
 Read EPUBs inside Obsidian, keep quotes and reflections in Markdown, connect existing notes, and promote useful fragments into independent knowledge notes.
 
 **Read → Highlight → Reflect → Link → Create knowledge notes.** Offline lookup, AI translation, and vocabulary collection support this workflow.
@@ -16,7 +18,7 @@ English support and statistics serve reading; this is not a standalone vocabular
 
 | Feature | Behavior |
 | --- | --- |
-| Library | Grid/list browsing; single-click selects, double-click opens and restores reading position |
+| Library | Grid/list browsing, search, status filters and sorting; single-click selects, double-click opens and restores reading position |
 | Book management | Progress and an overflow menu below covers; metadata, custom/original covers, manual reading time, and deletion |
 | Reading layout | Font size, line height, character/word spacing, indentation, width, one/two paginated columns, and single-column scrolling; adapts to sidebar resizing |
 | Reading sidebar | Contents, bookmarks, notes/highlights, search and expandable filters |
@@ -54,10 +56,12 @@ The three runtime files alone do not include the offline dictionary. Replace rel
 ## Reading to knowledge
 
 1. Configure a book folder and add EPUBs; an empty book-folder setting scans the vault.
-2. Single-click selects; double-click opens. Adjust layout in the reader and navigate with contents or bookmarks.
+2. Single-click selects; double-click opens. Persistent bookmark, reading-note and settings tools sit at the top right, with the chapter name on the same row. Switch contents, bookmarks and notes from the left sidebar.
 3. Select text and right-click to highlight or add a note. Each book uses one Markdown reading note rather than one file per quote.
 4. Click an annotation with notes to view its full quote and reflections. Append/edit notes and use `[[wikilinks]]`; each reflection's overflow menu provides editing and deletion.
 5. Explicitly create a knowledge note from a useful fragment. Source links return to the reading note or EPUB. Stable source identities support renames/moves; deleting files or moving them outside the vault is different.
+
+New notes use concise Markdown templates. Reading notes retain quotes, all reflections and links, with timestamps and return-to-source links aligned to the right. Knowledge notes place reflections first and retain quotes and source wikilinks that Obsidian can update on rename. Existing notes and custom initial templates are not replaced in bulk. Note cards preserve headings, lists, quotes, code and indentation.
 
 Sidebar bookmarks and fragments are deleted from their context menus. Book deletion preserves Markdown reading notes and knowledge notes by default.
 
