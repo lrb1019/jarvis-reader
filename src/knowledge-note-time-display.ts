@@ -1,11 +1,29 @@
-/** Style generated record times without changing knowledge-note Markdown. */
-export function styleKnowledgeNoteTimes(root: HTMLElement): void {
+import { knowledgeNoteTimeLines } from "./knowledge-note.ts";
+
+export interface KnowledgeNoteTimeSection {
+  text: string;
+  lineStart: number;
+  lineEnd: number;
+}
+
+/** Apply the same source-line identity used by live preview. */
+export function styleKnowledgeNoteTimes(
+  root: HTMLElement,
+  getSectionInfo: (paragraph: HTMLParagraphElement) => KnowledgeNoteTimeSection | null,
+): void {
   const paragraphs = Array.from(root.querySelectorAll<HTMLParagraphElement>("p"));
   if (root.matches("p")) paragraphs.unshift(root as HTMLParagraphElement);
+  const timeLines = new Map<string, Set<number>>();
   for (const paragraph of paragraphs) {
     const time = paragraph.firstElementChild;
     if (time?.tagName !== "EM" || paragraph.childNodes.length !== 1) continue;
-    if (!/^记录于 \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?$/.test(time.textContent || "")) continue;
-    paragraph.classList.add("jarvis-knowledge-note-time");
+    const section = getSectionInfo(paragraph);
+    if (!section || section.lineStart !== section.lineEnd) continue;
+    let lines = timeLines.get(section.text);
+    if (!lines) {
+      lines = new Set(knowledgeNoteTimeLines(section.text));
+      timeLines.set(section.text, lines);
+    }
+    paragraph.classList.toggle("jarvis-knowledge-note-time", lines.has(section.lineStart + 1));
   }
 }

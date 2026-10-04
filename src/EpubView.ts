@@ -17,7 +17,7 @@ import { EpubReader } from "./EpubReader";
 import type { JarvisReaderSettings, BookHighlight } from "./types";
 import { ReadingStatsService } from "./reading-stats-service";
 import { buildKnowledgeNoteBody } from "./knowledge-note";
-import { HighlightContentConflictError, type HighlightCommentEntry, type HighlightNoteDetails } from "./book-note-document";
+import { HighlightContentConflictError, type HighlightCommentEntry, type HighlightNoteDetails, type HighlightNoteInput } from "./book-note-document";
 import { openFileInActiveTab } from "./workspace-navigation";
 import { displayReadingSource } from "./reader-navigation";
 import { buildReadingSourceLink } from "./reading-source-link";
@@ -176,9 +176,9 @@ export class EpubView extends FileView {
     }
   }
 
-  async getBookHighlightsForReader(): Promise<BookHighlight[]> {
+  async getBookHighlightsForReader(): Promise<HighlightNoteInput[]> {
     const list = this.getBookHighlights();
-    const enriched: BookHighlight[] = [];
+    const enriched: HighlightNoteInput[] = [];
     for (const highlight of list) {
       if (!highlight || !highlight.notePath || !highlight.blockId) {
         enriched.push(highlight);
@@ -197,7 +197,7 @@ export class EpubView extends FileView {
           comment: details.comment,
           commentEntries: details.commentEntries,
           aiSections: details.aiSections,
-        } as any);
+        });
       } catch (error) {
         console.warn("Jarvis Reader read highlight comments failed.", error);
         enriched.push(highlight);
@@ -261,7 +261,7 @@ export class EpubView extends FileView {
     return highlight;
   }
 
-  async updateHighlight(highlight: any): Promise<BookHighlight | null> {
+  async updateHighlight(highlight: HighlightNoteInput & { appendComment?: boolean; expectedDetails?: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections"> }): Promise<HighlightNoteInput | null> {
     if (!highlight)
       return null;
     const list = getHighlightsForBook(this.plugin.settings, this.file!.path);
@@ -271,17 +271,17 @@ export class EpubView extends FileView {
     const updatedAt = new Date().toISOString();
     const nextComment = (highlight.comment || "").trim();
     const shouldAppendComment = !!highlight.appendComment && !!nextComment;
-    let updated = buildHighlightNoteUpdate(
+    let updated: HighlightNoteInput = buildHighlightNoteUpdate(
       list[index],
       highlight,
       shouldAppendComment ? [list[index].comment, nextComment].map((value) => (value || "").trim()).filter(Boolean).join("\n\n") : nextComment,
       updatedAt,
     );
     if (highlight.aiSections !== undefined) {
-      (updated as any).aiSections = highlight.aiSections;
+      updated.aiSections = highlight.aiSections;
     }
     if (highlight.commentEntries !== undefined) {
-      (updated as any).commentEntries = highlight.commentEntries;
+      updated.commentEntries = highlight.commentEntries;
     }
     const noteFile = this.app.vault.getAbstractFileByPath(updated.notePath!);
     if (!(noteFile instanceof TFile)) {
@@ -293,15 +293,15 @@ export class EpubView extends FileView {
       if (shouldAppendComment) {
         await this.plugin.bookNoteService.appendReflection(noteFile, updated, nextComment);
         const details = await this.plugin.bookNoteService.readHighlightDetails(noteFile, updated);
-        updated = { ...updated, comment: details.comment } as BookHighlight;
-        (updated as any).commentEntries = details.commentEntries;
-        (updated as any).aiSections = details.aiSections;
+        updated = { ...updated, comment: details.comment };
+        updated.commentEntries = details.commentEntries;
+        updated.aiSections = details.aiSections;
         nextHighlights[index] = updated;
       } else {
         await this.plugin.bookNoteService.replaceHighlight(
           noteFile,
           updated,
-          highlight.expectedDetails as Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections"> | undefined,
+          highlight.expectedDetails,
         );
       }
     })) {
@@ -493,31 +493,14 @@ export class EpubView extends FileView {
     if (!this.plugin.settings.readingStats) {
       this.plugin.settings.readingStats = {};
     }
-    await this.readingStatsService.flush(
+    await this.readingStatsService.flushAndProject(
       bookPath,
       today,
       this.plugin.settings.readingStats,
       () => this.plugin.saveSettings(),
+      (totalSeconds) => this.plugin.bookNoteService.projectReadingTime(file, totalSeconds, this.plugin.settings),
+      (error) => console.warn("Failed to sync reading time to metadata", error),
     );
-
-    // Sync reading time to frontmatter
-    let totalSecs = 0;
-    Object.values(this.plugin.settings.readingStats).forEach(daily => {
-      if (daily[bookPath]) totalSecs += daily[bookPath];
-    });
-    
-    try {
-      const { getOrCreateBookNote } = await import("./book-notes");
-      const { formatDuration } = await import("./utils");
-      const noteFile = await getOrCreateBookNote(this.plugin.app, file, "", this.plugin.settings);
-      if (noteFile) {
-        await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm: any) => {
-          fm.reading_time = formatDuration(totalSecs);
-        });
-      }
-    } catch (e) {
-      console.warn("Failed to sync reading time to metadata", e);
-    }
   }
 
   reportBackgroundSaveError(context: string, error: unknown): void {

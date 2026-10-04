@@ -1211,20 +1211,6 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   box-sizing: border-box;
 }
 
-.jarvis-reader-highlights-header {
-  border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0 8px 12px;
-}
-
-.jarvis-reader-highlights-title {
-  font-size: var(--font-ui-small);
-  font-weight: 650;
-  letter-spacing: 0;
-}
-
 .jarvis-reader-highlights-book {
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
@@ -1249,7 +1235,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   padding: 10px 0 12px;
 }
 
-.jarvis-reader-highlights-search {
+.jarvis-reader-highlights-search,
+.jarvis-library-search-input {
   background: color-mix(in srgb, var(--background-primary) 94%, transparent);
   border: 1px solid color-mix(in srgb, var(--background-modifier-border) 75%, transparent);
   border-radius: 12px;
@@ -1262,7 +1249,8 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   width: 100%;
 }
 
-.jarvis-reader-highlights-search:focus {
+.jarvis-reader-highlights-search:focus,
+.jarvis-library-search-input:focus {
   border-color: color-mix(in srgb, var(--interactive-accent) 55%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 12%, transparent);
 }
@@ -1645,57 +1633,6 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
   box-sizing: border-box;
 }
 
-.jarvis-reader-bookshelf-header {
-  border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0 8px 12px;
-}
-
-.jarvis-reader-bookshelf-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.jarvis-reader-bookshelf-title {
-  font-size: var(--font-ui-small);
-  font-weight: 650;
-}
-
-.jarvis-reader-bookshelf-header-action {
-  align-items: center;
-  appearance: none;
-  background: color-mix(in srgb, var(--background-secondary) 74%, transparent);
-  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 64%, transparent);
-  border-radius: 999px;
-  box-shadow: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: inline-flex;
-  height: 26px;
-  justify-content: center;
-  padding: 0;
-  width: 28px;
-}
-
-.jarvis-reader-bookshelf-header-action:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-}
-
-.jarvis-reader-bookshelf-header-action svg {
-  display: block;
-  fill: none;
-  height: 15px;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-  width: 15px;
-}
-
 .jarvis-reader-toc-toggle {
   appearance: none;
   background: transparent;
@@ -1715,11 +1652,6 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 .jarvis-reader-toc-toggle:hover {
   background: color-mix(in srgb, var(--background-modifier-hover) 80%, transparent);
   color: var(--text-normal);
-}
-
-.jarvis-reader-bookshelf-count {
-  color: var(--text-muted);
-  font-size: var(--font-ui-smaller);
 }
 
 .jarvis-reader-navigation-tabs {
@@ -2271,31 +2203,13 @@ g.jarvis-reader-highlight-with-comment line {
   gap: 12px;
 }
 
-.jarvis-search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-faint);
-  pointer-events: none;
-  z-index: 2;
-}
-
 .jarvis-library-search-input {
   flex: 1;
   width: 100%;
-  padding: 8px 36px 8px 36px !important;
-  background-color: var(--background-modifier-form-field) !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  border-radius: 8px !important;
+  padding: 0 30px 0 10px !important;
   color: var(--text-normal) !important;
   font-size: var(--font-ui-small);
   transition: all 0.2s ease;
-}
-
-.jarvis-library-search-input:focus {
-  border-color: var(--interactive-accent) !important;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 15%, transparent) !important;
 }
 
 .jarvis-library-search-clear {
@@ -5122,8 +5036,17 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
 .jarvis-library-app { container-type: inline-size; }
 .jarvis-library-search-wrap,
 .jarvis-library-search-input { min-width: 0; }
-.jarvis-library-search-input { height: 32px; border-radius: var(--radius-s) !important; }
-.jarvis-library-header .jarvis-library-filter-btn,
+.jarvis-library-search-input { height: 32px; }
+.jarvis-library-search-wrap { gap: 8px; }
+.jarvis-library-search-field { position: relative; flex: 1; min-width: 0; }
+.jarvis-library-header .jarvis-library-filter-btn {
+  flex: 0 0 32px; width: 32px; height: 32px; padding: 6px;
+  background: transparent; border: 0; box-shadow: none;
+}
+.jarvis-library-header .jarvis-library-filter-btn svg { width: 18px; height: 18px; }
+.jarvis-library-header .jarvis-library-filter-btn:hover { background: var(--background-modifier-hover); }
+.jarvis-library-header .jarvis-library-filter-btn.is-active { color: var(--interactive-accent); }
+
 .jarvis-library-header .jarvis-library-layout-btn,
 .jarvis-library-header .jarvis-library-action-icon-btn {
   width: 28px; height: 28px; padding: 0;

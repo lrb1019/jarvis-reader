@@ -1705,7 +1705,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
           {/* Center Search Input */}
           <div className="jarvis-library-search-wrap" style={{ flex: 1.5, display: 'flex', justifyContent: 'center' }}>
-            <ObsidianIcon name="search" className="jarvis-search-icon" />
+            <div className="jarvis-library-search-field">
             <input
               type="text"
               placeholder="搜索书名、作者..."
@@ -1718,12 +1718,9 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                 <ObsidianIcon name="x" />
               </button>
             )}
-          </div>
-
-          {/* Right side controls */}
-          <div className="jarvis-library-header-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
+            </div>
             <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
-              <button className={`jarvis-library-filter-btn ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} aria-label="筛选与排序" aria-expanded={showFilters} title="筛选与排序">
+              <button className={`jarvis-library-filter-btn clickable-icon ${showFilters ? 'is-active' : ''}`} onClick={() => setShowFilters(!showFilters)} aria-label="筛选与排序" aria-expanded={showFilters} title="筛选与排序">
                 <ObsidianIcon name="sliders-horizontal" />
               </button>
 
@@ -1745,6 +1742,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               </div>
             )}
             </div>
+          </div>
+
+          {/* Right side controls */}
+          <div className="jarvis-library-header-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
+
 
             <div className="jarvis-library-layout-toggle">
               <button className={`jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"} title="网格布局">

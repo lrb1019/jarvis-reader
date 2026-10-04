@@ -5,9 +5,6 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -23541,295 +23538,6 @@ var require_client = __commonJS({
       };
     }
     var i;
-  }
-});
-
-// src/utils-core.ts
-function normalizeVaultPath(path) {
-  return (path || "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
-}
-function joinVaultPath(folder, filename) {
-  const cleanFolder = normalizeVaultPath(folder);
-  return cleanFolder ? `${cleanFolder}/${filename}` : filename;
-}
-function formatLocalDate(value2) {
-  if (!value2)
-    return "";
-  const date = value2 instanceof Date ? value2 : new Date(value2);
-  if (Number.isNaN(date.getTime()))
-    return "";
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-function formatLocalDateTime(value2) {
-  if (!value2)
-    return "";
-  const date = value2 instanceof Date ? value2 : new Date(value2);
-  if (Number.isNaN(date.getTime()))
-    return value2;
-  const pad = (number) => String(number).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-}
-function sanitizeWordAssetFilename(value2) {
-  const cleaned = (value2 || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim();
-  return cleaned || "word";
-}
-function escapeRegExp(value2) {
-  return (value2 || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-function escapeYamlString(value2) {
-  return String(value2 || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-}
-function normalizeHighlightQuote(quote) {
-  return (quote || "").replace(/\s+/g, " ").trim();
-}
-function normalizeWordDisplayText(value2) {
-  return String(value2 || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
-}
-async function ensureVaultFolder(app, folderPath) {
-  const cleanPath = normalizeVaultPath(folderPath);
-  if (!cleanPath)
-    return;
-  const segments = cleanPath.split("/").filter(Boolean);
-  let currentPath = "";
-  for (const segment of segments) {
-    currentPath = currentPath ? `${currentPath}/${segment}` : segment;
-    const existing = app.vault.getAbstractFileByPath(currentPath);
-    if (!existing) {
-      await app.vault.createFolder(currentPath);
-    }
-  }
-}
-var init_utils_core = __esm({
-  "src/utils-core.ts"() {
-  }
-});
-
-// src/utils.ts
-var utils_exports = {};
-__export(utils_exports, {
-  confirmDestructiveAction: () => confirmDestructiveAction,
-  ensureVaultFolder: () => ensureVaultFolder,
-  escapeRegExp: () => escapeRegExp,
-  escapeYamlString: () => escapeYamlString,
-  formatDuration: () => formatDuration,
-  formatLocalDate: () => formatLocalDate,
-  formatLocalDateTime: () => formatLocalDateTime,
-  getBookTotalSeconds: () => getBookTotalSeconds,
-  joinVaultPath: () => joinVaultPath,
-  normalizeHighlightQuote: () => normalizeHighlightQuote,
-  normalizeVaultPath: () => normalizeVaultPath,
-  normalizeWordDisplayText: () => normalizeWordDisplayText,
-  sanitizeWordAssetFilename: () => sanitizeWordAssetFilename
-});
-function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8BA4\u5220\u9664") {
-  return new Promise((resolve) => {
-    let resolved = false;
-    const finish = (value2) => {
-      if (resolved)
-        return;
-      resolved = true;
-      modal.close();
-      resolve(value2);
-    };
-    const modal = new import_obsidian.Modal(app);
-    modal.shouldRestoreSelection = false;
-    modal.titleEl.setText(title);
-    modal.contentEl.createEl("p", { text: message });
-    new import_obsidian.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u53D6\u6D88").onClick(() => finish(false))).addButton((button) => button.setButtonText(confirmText).setWarning().onClick(() => finish(true)));
-    modal.onClose = () => finish(false);
-    modal.open();
-  });
-}
-function formatDuration(secs) {
-  if (secs <= 0) return "0\u5206\u949F";
-  const h = Math.floor(secs / 3600);
-  const m = Math.round(secs % 3600 / 60);
-  if (h > 0 && m > 0) return `${h}\u5C0F\u65F6${m}\u5206\u949F`;
-  else if (h > 0) return `${h}\u5C0F\u65F6`;
-  else return `${m}\u5206\u949F`;
-}
-function getBookTotalSeconds(readingStats, bookPath) {
-  if (!readingStats) return 0;
-  let sum = 0;
-  for (const dateKey in readingStats) {
-    if (readingStats[dateKey][bookPath]) sum += readingStats[dateKey][bookPath];
-  }
-  return sum;
-}
-var import_obsidian;
-var init_utils = __esm({
-  "src/utils.ts"() {
-    import_obsidian = require("obsidian");
-    init_utils_core();
-  }
-});
-
-// src/book-note-template.ts
-function renderBookNoteTemplate(template, file, toc, created) {
-  const source = template.trim() ? template : DEFAULT_BOOK_NOTE_TEMPLATE;
-  return source.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, created).replace(/\{\{toc\}\}/g, toc || "");
-}
-var DEFAULT_BOOK_NOTE_TEMPLATE;
-var init_book_note_template = __esm({
-  "src/book-note-template.ts"() {
-    DEFAULT_BOOK_NOTE_TEMPLATE = `---
-bookname: "[[{{bookname}}]]"
-status: unread
-rating: 0
-tags: []
-start_date: ""
-finish_date: ""
-created: {{created}}
----`;
-  }
-});
-
-// src/storage-folders.ts
-function validateFolderPath(value2) {
-  const raw = value2.trim().replace(/\\/g, "/");
-  if (raw.startsWith("/") || raw.split("/").some((part) => part === ".." || part === ".") || /[:\x00-\x1f]/.test(raw)) {
-    throw new Error("\u8BF7\u4F7F\u7528\u4ED3\u5E93\u5185\u7684\u6587\u4EF6\u5939\u8DEF\u5F84");
-  }
-  return normalizeVaultPath(raw);
-}
-function isBookInFolder(path, root = "") {
-  return !root || path.startsWith(root + "/");
-}
-async function ensureStorageFolders(storage, paths) {
-  const folders = /* @__PURE__ */ new Set();
-  for (const path of paths.map(validateFolderPath)) {
-    const parts = path.split("/").filter(Boolean);
-    for (let i = 1; i <= parts.length; i++) folders.add(parts.slice(0, i).join("/"));
-  }
-  for (const path of folders) {
-    const stat = await storage.stat(path);
-    if (stat && stat.type !== "folder") throw new Error(`\u8DEF\u5F84\u5DF2\u88AB\u6587\u4EF6\u5360\u7528\uFF1A${path}`);
-  }
-  for (const path of folders) {
-    if (await storage.stat(path)) continue;
-    try {
-      await storage.mkdir(path);
-    } catch (error) {
-      if ((await storage.stat(path))?.type !== "folder") throw error;
-    }
-  }
-}
-async function configureStorageFolders(storage, settings, draft, persist) {
-  const folders = {
-    bookFolder: validateFolderPath(draft.bookFolder),
-    bookNoteFolder: validateFolderPath(draft.bookNoteFolder),
-    knowledgeNoteFolder: validateFolderPath(draft.knowledgeNoteFolder),
-    customCoverFolder: validateFolderPath(draft.customCoverFolder)
-  };
-  await ensureStorageFolders(storage, Object.values(folders));
-  const hadRoot = Object.hasOwn(settings, "bookFolder");
-  const previous = {
-    bookFolder: settings.bookFolder,
-    bookNoteFolder: settings.bookNoteFolder,
-    knowledgeNoteFolder: settings.knowledgeNoteFolder,
-    customCoverFolder: settings.customCoverFolder
-  };
-  Object.assign(settings, folders);
-  try {
-    await persist();
-  } catch (error) {
-    Object.assign(settings, previous);
-    if (!hadRoot) delete settings.bookFolder;
-    throw error;
-  }
-}
-var DEFAULT_STORAGE_FOLDERS;
-var init_storage_folders = __esm({
-  "src/storage-folders.ts"() {
-    init_utils_core();
-    DEFAULT_STORAGE_FOLDERS = {
-      bookNoteFolder: "Reading Notes",
-      knowledgeNoteFolder: "Knowledge Notes",
-      customCoverFolder: "Cover"
-    };
-  }
-});
-
-// src/book-notes.ts
-var book_notes_exports = {};
-__export(book_notes_exports, {
-  findBookNote: () => findBookNote,
-  getBookNotePath: () => getBookNotePath,
-  getOrCreateBookNote: () => getOrCreateBookNote,
-  openOrCreateNote: () => openOrCreateNote
-});
-function getBookNotePath(file, settings = {}) {
-  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
-  const noteFolder = configuredFolder || normalizeVaultPath(file.parent?.path);
-  return joinVaultPath(noteFolder, `${file.basename}.md`);
-}
-function findBookNote(app, file, settings = {}) {
-  const remembered = settings.bookNotePaths?.[file.path];
-  if (remembered) {
-    const note = app.vault.getAbstractFileByPath(remembered);
-    if (note instanceof import_obsidian2.TFile) return note;
-    throw new Error("\u5173\u8054\u7684\u8BFB\u4E66\u7B14\u8BB0\u4E0D\u5B58\u5728\uFF0C\u8BF7\u6062\u590D\u6216\u4FEE\u6B63\u8DEF\u5F84\uFF0C\u672A\u65B0\u5EFA\u66FF\u4EE3\u7B14\u8BB0");
-  }
-  const exactPath = getBookNotePath(file, settings);
-  const exactFile = app.vault.getAbstractFileByPath(exactPath);
-  if (exactFile instanceof import_obsidian2.TFile) return exactFile;
-  const allMarkdownFiles = app.vault.getMarkdownFiles();
-  const targetBookname = `[[${file.basename}.${file.extension}]]`;
-  for (const mdFile of allMarkdownFiles) {
-    const cache = app.metadataCache.getFileCache(mdFile);
-    if (cache?.frontmatter?.bookname === targetBookname) {
-      return mdFile;
-    }
-  }
-  const fallbackFile = allMarkdownFiles.find((f) => f.basename === file.basename);
-  if (fallbackFile) return fallbackFile;
-  return null;
-}
-async function getOrCreateBookNote(app, file, toc, settings = {}) {
-  let noteFile = findBookNote(app, file, settings);
-  if (noteFile) return noteFile;
-  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
-  if (configuredFolder) {
-    try {
-      await ensureStorageFolders({
-        stat: (path) => app.vault.adapter.stat(path),
-        mkdir: (path) => app.vault.createFolder(path)
-      }, [configuredFolder]);
-    } catch (error) {
-      new import_obsidian2.Notice(`\u65E0\u6CD5\u521B\u5EFA\u8BFB\u4E66\u7B14\u8BB0\u76EE\u5F55\uFF1A${configuredFolder}`);
-      throw error;
-    }
-  }
-  const noteFilename = getBookNotePath(file, settings);
-  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc, formatLocalDateTime(/* @__PURE__ */ new Date())));
-  return noteFile;
-}
-async function openOrCreateNote(app, file, toc, settings = {}) {
-  const noteFile = await getOrCreateBookNote(app, file, toc, settings);
-  if (!noteFile)
-    return;
-  const epubLeaves = app.workspace.getLeavesOfType("epub");
-  const baseLeaf = epubLeaves.find((l) => {
-    var _a;
-    return ((_a = l.view) == null ? void 0 : _a.file?.path) === file.path;
-  }) || app.workspace.getMostRecentLeaf();
-  const isSidebar = baseLeaf && (baseLeaf.getRoot() === app.workspace.leftSplit || baseLeaf.getRoot() === app.workspace.rightSplit);
-  if (baseLeaf && !isSidebar) {
-    const fileLeaf = app.workspace.createLeafBySplit(baseLeaf);
-    await fileLeaf.openFile(noteFile, { active: true });
-  } else {
-    const fileLeaf = app.workspace.getLeaf(true);
-    await fileLeaf.openFile(noteFile, { active: true });
-  }
-}
-var import_obsidian2;
-var init_book_notes = __esm({
-  "src/book-notes.ts"() {
-    import_obsidian2 = require("obsidian");
-    init_utils();
-    init_book_note_template();
-    init_storage_folders();
   }
 });
 
@@ -53853,14 +53561,229 @@ function resolveReaderPreferences(current, patch) {
 // src/EpubView.ts
 var import_client = __toESM(require_client(), 1);
 var import_obsidian8 = require("obsidian");
-init_utils();
-init_book_notes();
+
+// src/utils.ts
+var import_obsidian = require("obsidian");
+
+// src/utils-core.ts
+function normalizeVaultPath(path) {
+  return (path || "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+}
+function joinVaultPath(folder, filename) {
+  const cleanFolder = normalizeVaultPath(folder);
+  return cleanFolder ? `${cleanFolder}/${filename}` : filename;
+}
+function formatLocalDate(value2) {
+  if (!value2)
+    return "";
+  const date = value2 instanceof Date ? value2 : new Date(value2);
+  if (Number.isNaN(date.getTime()))
+    return "";
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+function formatLocalDateTime(value2) {
+  if (!value2)
+    return "";
+  const date = value2 instanceof Date ? value2 : new Date(value2);
+  if (Number.isNaN(date.getTime()))
+    return value2;
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+function escapeRegExp(value2) {
+  return (value2 || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function normalizeHighlightQuote(quote) {
+  return (quote || "").replace(/\s+/g, " ").trim();
+}
+function normalizeWordDisplayText(value2) {
+  return String(value2 || "").replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n").trim();
+}
+
+// src/utils.ts
+function confirmDestructiveAction(app, title, message, confirmText = "\u786E\u8BA4\u5220\u9664") {
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (value2) => {
+      if (resolved)
+        return;
+      resolved = true;
+      modal.close();
+      resolve(value2);
+    };
+    const modal = new import_obsidian.Modal(app);
+    modal.shouldRestoreSelection = false;
+    modal.titleEl.setText(title);
+    modal.contentEl.createEl("p", { text: message });
+    new import_obsidian.Setting(modal.contentEl).addButton((button) => button.setButtonText("\u53D6\u6D88").onClick(() => finish(false))).addButton((button) => button.setButtonText(confirmText).setWarning().onClick(() => finish(true)));
+    modal.onClose = () => finish(false);
+    modal.open();
+  });
+}
+function formatDuration(secs) {
+  if (secs <= 0) return "0\u5206\u949F";
+  const h = Math.floor(secs / 3600);
+  const m = Math.round(secs % 3600 / 60);
+  if (h > 0 && m > 0) return `${h}\u5C0F\u65F6${m}\u5206\u949F`;
+  else if (h > 0) return `${h}\u5C0F\u65F6`;
+  else return `${m}\u5206\u949F`;
+}
+function getBookTotalSeconds(readingStats, bookPath) {
+  if (!readingStats) return 0;
+  let sum = 0;
+  for (const dateKey in readingStats) {
+    if (readingStats[dateKey][bookPath]) sum += readingStats[dateKey][bookPath];
+  }
+  return sum;
+}
+
+// src/book-notes.ts
+var import_obsidian2 = require("obsidian");
+
+// src/book-note-template.ts
+var DEFAULT_BOOK_NOTE_TEMPLATE = `---
+bookname: "[[{{bookname}}]]"
+status: unread
+rating: 0
+tags: []
+start_date: ""
+finish_date: ""
+created: {{created}}
+---`;
+function renderBookNoteTemplate(template, file, toc, created) {
+  const source = template.trim() ? template : DEFAULT_BOOK_NOTE_TEMPLATE;
+  return source.replace(/\{\{bookname\}\}/g, `${file.basename}.${file.extension}`).replace(/\{\{title\}\}/g, file.basename).replace(/\{\{extension\}\}/g, file.extension).replace(/\{\{created\}\}/g, created).replace(/\{\{toc\}\}/g, toc || "");
+}
+
+// src/storage-folders.ts
+var DEFAULT_STORAGE_FOLDERS = {
+  bookNoteFolder: "Reading Notes",
+  knowledgeNoteFolder: "Knowledge Notes",
+  customCoverFolder: "Cover"
+};
+function validateFolderPath(value2) {
+  const raw = value2.trim().replace(/\\/g, "/");
+  if (raw.startsWith("/") || raw.split("/").some((part) => part === ".." || part === ".") || /[:\x00-\x1f]/.test(raw)) {
+    throw new Error("\u8BF7\u4F7F\u7528\u4ED3\u5E93\u5185\u7684\u6587\u4EF6\u5939\u8DEF\u5F84");
+  }
+  return normalizeVaultPath(raw);
+}
+function isBookInFolder(path, root = "") {
+  return !root || path.startsWith(root + "/");
+}
+async function ensureStorageFolders(storage, paths) {
+  const folders = /* @__PURE__ */ new Set();
+  for (const path of paths.map(validateFolderPath)) {
+    const parts = path.split("/").filter(Boolean);
+    for (let i = 1; i <= parts.length; i++) folders.add(parts.slice(0, i).join("/"));
+  }
+  for (const path of folders) {
+    const stat = await storage.stat(path);
+    if (stat && stat.type !== "folder") throw new Error(`\u8DEF\u5F84\u5DF2\u88AB\u6587\u4EF6\u5360\u7528\uFF1A${path}`);
+  }
+  for (const path of folders) {
+    if (await storage.stat(path)) continue;
+    try {
+      await storage.mkdir(path);
+    } catch (error) {
+      if ((await storage.stat(path))?.type !== "folder") throw error;
+    }
+  }
+}
+async function configureStorageFolders(storage, settings, draft, persist) {
+  const folders = {
+    bookFolder: validateFolderPath(draft.bookFolder),
+    bookNoteFolder: validateFolderPath(draft.bookNoteFolder),
+    knowledgeNoteFolder: validateFolderPath(draft.knowledgeNoteFolder),
+    customCoverFolder: validateFolderPath(draft.customCoverFolder)
+  };
+  await ensureStorageFolders(storage, Object.values(folders));
+  const hadRoot = Object.hasOwn(settings, "bookFolder");
+  const previous = {
+    bookFolder: settings.bookFolder,
+    bookNoteFolder: settings.bookNoteFolder,
+    knowledgeNoteFolder: settings.knowledgeNoteFolder,
+    customCoverFolder: settings.customCoverFolder
+  };
+  Object.assign(settings, folders);
+  try {
+    await persist();
+  } catch (error) {
+    Object.assign(settings, previous);
+    if (!hadRoot) delete settings.bookFolder;
+    throw error;
+  }
+}
+
+// src/book-notes.ts
+function getBookNotePath(file, settings = {}) {
+  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
+  const noteFolder = configuredFolder || normalizeVaultPath(file.parent?.path);
+  return joinVaultPath(noteFolder, `${file.basename}.md`);
+}
+function findBookNote(app, file, settings = {}) {
+  const remembered = settings.bookNotePaths?.[file.path];
+  if (remembered) {
+    const note = app.vault.getAbstractFileByPath(remembered);
+    if (note instanceof import_obsidian2.TFile) return note;
+    throw new Error("\u5173\u8054\u7684\u8BFB\u4E66\u7B14\u8BB0\u4E0D\u5B58\u5728\uFF0C\u8BF7\u6062\u590D\u6216\u4FEE\u6B63\u8DEF\u5F84\uFF0C\u672A\u65B0\u5EFA\u66FF\u4EE3\u7B14\u8BB0");
+  }
+  const exactPath = getBookNotePath(file, settings);
+  const exactFile = app.vault.getAbstractFileByPath(exactPath);
+  if (exactFile instanceof import_obsidian2.TFile) return exactFile;
+  const allMarkdownFiles = app.vault.getMarkdownFiles();
+  const targetBookname = `[[${file.basename}.${file.extension}]]`;
+  for (const mdFile of allMarkdownFiles) {
+    const cache = app.metadataCache.getFileCache(mdFile);
+    if (cache?.frontmatter?.bookname === targetBookname) {
+      return mdFile;
+    }
+  }
+  const fallbackFile = allMarkdownFiles.find((f) => f.basename === file.basename);
+  if (fallbackFile) return fallbackFile;
+  return null;
+}
+async function getOrCreateBookNote(app, file, toc, settings = {}) {
+  let noteFile = findBookNote(app, file, settings);
+  if (noteFile) return noteFile;
+  const configuredFolder = normalizeVaultPath(settings.bookNoteFolder);
+  if (configuredFolder) {
+    try {
+      await ensureStorageFolders({
+        stat: (path) => app.vault.adapter.stat(path),
+        mkdir: (path) => app.vault.createFolder(path)
+      }, [configuredFolder]);
+    } catch (error) {
+      new import_obsidian2.Notice(`\u65E0\u6CD5\u521B\u5EFA\u8BFB\u4E66\u7B14\u8BB0\u76EE\u5F55\uFF1A${configuredFolder}`);
+      throw error;
+    }
+  }
+  const noteFilename = getBookNotePath(file, settings);
+  noteFile = await app.vault.create(noteFilename, renderBookNoteTemplate(settings.bookNoteTemplate || "", file, toc, formatLocalDateTime(/* @__PURE__ */ new Date())));
+  return noteFile;
+}
+async function openOrCreateNote(app, file, toc, settings = {}) {
+  const noteFile = await getOrCreateBookNote(app, file, toc, settings);
+  if (!noteFile)
+    return;
+  const epubLeaves = app.workspace.getLeavesOfType("epub");
+  const baseLeaf = epubLeaves.find((l) => {
+    var _a;
+    return ((_a = l.view) == null ? void 0 : _a.file?.path) === file.path;
+  }) || app.workspace.getMostRecentLeaf();
+  const isSidebar = baseLeaf && (baseLeaf.getRoot() === app.workspace.leftSplit || baseLeaf.getRoot() === app.workspace.rightSplit);
+  if (baseLeaf && !isSidebar) {
+    const fileLeaf = app.workspace.createLeafBySplit(baseLeaf);
+    await fileLeaf.openFile(noteFile, { active: true });
+  } else {
+    const fileLeaf = app.workspace.getLeaf(true);
+    await fileLeaf.openFile(noteFile, { active: true });
+  }
+}
 
 // src/highlights.ts
 var import_obsidian3 = require("obsidian");
-
-// src/highlight-core.ts
-init_utils_core();
 
 // src/reading-source-link.ts
 var MAX_PARAMETER_LENGTH = 8192;
@@ -53997,7 +53920,6 @@ function buildHighlightNoteUpdate(current, incoming, comment, updated) {
 }
 
 // src/book-note-document.ts
-init_utils_core();
 var HighlightContentConflictError = class extends Error {
   constructor() {
     super("\u8FD9\u6761\u5212\u7EBF\u7684\u7B14\u8BB0\u5DF2\u5728\u5176\u4ED6\u4F4D\u7F6E\u4FEE\u6539\u3002\u8BF7\u91CD\u65B0\u6253\u5F00\u540E\u518D\u7F16\u8F91\u3002");
@@ -54283,8 +54205,6 @@ async function getPdfTocMd(file) {
 }
 
 // src/word-assets.ts
-init_utils_core();
-init_utils_core();
 function getLightWordAsset(asset) {
   if (!asset) return asset;
   return { ...asset };
@@ -54621,7 +54541,6 @@ function parseWordAssetSidecar(payload) {
 
 // src/translation.ts
 var import_obsidian4 = require("obsidian");
-init_utils();
 function extractOpenAIMessageText(payload) {
   var _a, _b, _c;
   const message = (_c = (_b = (_a = payload == null ? void 0 : payload.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.content;
@@ -55990,8 +55909,6 @@ var import_react5 = __toESM(require_react(), 1);
 var import_obsidian7 = require("obsidian");
 var import_react_reader = __toESM(require_lib3(), 1);
 var ReactReaderModule = __toESM(require_lib3(), 1);
-init_utils();
-init_utils_core();
 
 // src/reader/ReaderSideControls.tsx
 var import_obsidian6 = require("obsidian");
@@ -59168,6 +59085,19 @@ var ReadingStatsService = class {
     this.inFlightByBook.set(bookPath, task);
     return task;
   }
+  async flushAndProject(bookPath, date, stats, save, project, reportProjectionError) {
+    if (this.pending(bookPath) <= 0) return;
+    await this.flush(bookPath, date, stats, save);
+    let totalSeconds = 0;
+    Object.values(stats).forEach((daily) => {
+      if (daily[bookPath]) totalSeconds += daily[bookPath];
+    });
+    try {
+      await project(totalSeconds);
+    } catch (error) {
+      reportProjectionError(error);
+    }
+  }
   recordManual(bookPath, date, minutes, stats, save) {
     const parsed = /* @__PURE__ */ new Date(`${date}T00:00:00Z`);
     if (!bookPath || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date || !Number.isInteger(minutes) || minutes <= 0 || minutes > 1440) {
@@ -59281,7 +59211,7 @@ function buildKnowledgeNotePath(folder, title) {
   return `${cleanFolder ? `${cleanFolder}/` : ""}${cleanTitle}.md`;
 }
 function knowledgeNoteTimeLines(text) {
-  const lines = text.split("\n");
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
   if (lines[0] !== "---") return [];
   const end = lines.indexOf("---", 1);
   if (end < 0) return [];
@@ -59776,28 +59706,14 @@ var EpubView = class extends import_obsidian8.FileView {
     if (!this.plugin.settings.readingStats) {
       this.plugin.settings.readingStats = {};
     }
-    await this.readingStatsService.flush(
+    await this.readingStatsService.flushAndProject(
       bookPath,
       today,
       this.plugin.settings.readingStats,
-      () => this.plugin.saveSettings()
+      () => this.plugin.saveSettings(),
+      (totalSeconds) => this.plugin.bookNoteService.projectReadingTime(file, totalSeconds, this.plugin.settings),
+      (error) => console.warn("Failed to sync reading time to metadata", error)
     );
-    let totalSecs = 0;
-    Object.values(this.plugin.settings.readingStats).forEach((daily) => {
-      if (daily[bookPath]) totalSecs += daily[bookPath];
-    });
-    try {
-      const { getOrCreateBookNote: getOrCreateBookNote2 } = await Promise.resolve().then(() => (init_book_notes(), book_notes_exports));
-      const { formatDuration: formatDuration2 } = await Promise.resolve().then(() => (init_utils(), utils_exports));
-      const noteFile = await getOrCreateBookNote2(this.plugin.app, file, "", this.plugin.settings);
-      if (noteFile) {
-        await this.plugin.app.fileManager.processFrontMatter(noteFile, (fm) => {
-          fm.reading_time = formatDuration2(totalSecs);
-        });
-      }
-    } catch (e) {
-      console.warn("Failed to sync reading time to metadata", e);
-    }
   }
   reportBackgroundSaveError(context, error) {
     console.error(`Jarvis Reader ${context}\u4FDD\u5B58\u5931\u8D25\u3002`, error);
@@ -61099,10 +61015,7 @@ function projectLibraryBookNotes(books, find) {
 }
 
 // src/library/LibraryApp.tsx
-init_storage_folders();
 var import_obsidian12 = require("obsidian");
-init_book_notes();
-init_utils();
 var import_jsx_runtime3 = __toESM(require_jsx_runtime(), 1);
 function todayDate() {
   const date = /* @__PURE__ */ new Date();
@@ -62459,22 +62372,21 @@ function LibraryApp({ plugin }) {
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-header", style: { display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "jarvis-library-header-spacer", style: { flex: 1 } }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-search-wrap", style: { flex: 1.5, display: "flex", justifyContent: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "search", className: "jarvis-search-icon" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-            "input",
-            {
-              type: "text",
-              placeholder: "\u641C\u7D22\u4E66\u540D\u3001\u4F5C\u8005...",
-              value: searchQuery,
-              onChange: (e) => setSearchQuery(e.target.value),
-              className: "jarvis-library-search-input"
-            }
-          ),
-          searchQuery && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { "aria-label": "\u6E05\u9664\u641C\u7D22", title: "\u6E05\u9664\u641C\u7D22", className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "x" }) })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-search-field", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+              "input",
+              {
+                type: "text",
+                placeholder: "\u641C\u7D22\u4E66\u540D\u3001\u4F5C\u8005...",
+                value: searchQuery,
+                onChange: (e) => setSearchQuery(e.target.value),
+                className: "jarvis-library-search-input"
+              }
+            ),
+            searchQuery && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { "aria-label": "\u6E05\u9664\u641C\u7D22", title: "\u6E05\u9664\u641C\u7D22", className: "jarvis-library-search-clear", onClick: () => setSearchQuery(""), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "x" }) })
+          ] }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { style: { position: "relative", display: "flex", gap: "8px" }, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: `jarvis-library-filter-btn ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F", "aria-expanded": showFilters, title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "sliders-horizontal" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: `jarvis-library-filter-btn clickable-icon ${showFilters ? "is-active" : ""}`, onClick: () => setShowFilters(!showFilters), "aria-label": "\u7B5B\u9009\u4E0E\u6392\u5E8F", "aria-expanded": showFilters, title: "\u7B5B\u9009\u4E0E\u6392\u5E8F", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "sliders-horizontal" }) }),
             showFilters && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-filter-popup", children: [
               /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("select", { value: filterStatus, onChange: (e) => setFilterStatus(e.target.value), className: "jarvis-library-select", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "all", children: "\u6240\u6709\u72B6\u6001" }),
@@ -62490,7 +62402,9 @@ function LibraryApp({ plugin }) {
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("option", { value: "name", children: "\u4E66\u540D\u6392\u5E8F" })
               ] })
             ] })
-          ] }),
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-header-right", style: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px" }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "jarvis-library-layout-toggle", children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "grid" ? "is-active" : ""}`, onClick: () => setViewLayout("grid"), "aria-label": "\u7F51\u683C\u5E03\u5C40", "aria-pressed": viewLayout === "grid", title: "\u7F51\u683C\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "layout-grid" }) }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: `jarvis-library-layout-btn ${viewLayout === "list" ? "is-active" : ""}`, onClick: () => setViewLayout("list"), "aria-label": "\u5217\u8868\u5E03\u5C40", "aria-pressed": viewLayout === "list", title: "\u5217\u8868\u5E03\u5C40", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(ObsidianIcon, { name: "list" }) })
@@ -62959,8 +62873,6 @@ var LibraryView = class extends import_obsidian13.ItemView {
 
 // src/settings.ts
 var import_obsidian14 = require("obsidian");
-init_book_note_template();
-init_storage_folders();
 var DEFAULT_SETTINGS = {
   readerLetterSpacing: 0,
   readerWordSpacing: 0,
@@ -63288,10 +63200,6 @@ var JarvisReaderSettingTab = class extends import_obsidian14.PluginSettingTab {
   }
 };
 
-// src/main.ts
-init_book_notes();
-init_utils();
-
 // src/book-note-time-display.ts
 function styleBookNoteTimes(root, chapterTitleFor) {
   const callouts = Array.from(root.querySelectorAll(".callout-content"));
@@ -63368,14 +63276,21 @@ function styleBookNoteTimes(root, chapterTitleFor) {
 }
 
 // src/knowledge-note-time-display.ts
-function styleKnowledgeNoteTimes(root) {
+function styleKnowledgeNoteTimes(root, getSectionInfo) {
   const paragraphs = Array.from(root.querySelectorAll("p"));
   if (root.matches("p")) paragraphs.unshift(root);
+  const timeLines = /* @__PURE__ */ new Map();
   for (const paragraph of paragraphs) {
     const time = paragraph.firstElementChild;
     if (time?.tagName !== "EM" || paragraph.childNodes.length !== 1) continue;
-    if (!/^记录于 \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2})?$/.test(time.textContent || "")) continue;
-    paragraph.classList.add("jarvis-knowledge-note-time");
+    const section = getSectionInfo(paragraph);
+    if (!section || section.lineStart !== section.lineEnd) continue;
+    let lines = timeLines.get(section.text);
+    if (!lines) {
+      lines = new Set(knowledgeNoteTimeLines(section.text));
+      timeLines.set(section.text, lines);
+    }
+    paragraph.classList.toggle("jarvis-knowledge-note-time", lines.has(section.lineStart + 1));
   }
 }
 
@@ -63510,6 +63425,9 @@ var BookNoteService = class {
   constructor(operations) {
     this.operations = operations;
   }
+  projectReadingTime(bookFile, totalSeconds, settings) {
+    return this.operations.projectReadingTime(bookFile, totalSeconds, settings);
+  }
   appendHighlight(noteFile, highlight) {
     return this.operations.appendHighlight(noteFile, highlight);
   }
@@ -63530,6 +63448,14 @@ var BookNoteService = class {
 // src/book-note-operations.ts
 function createBookNoteOperations(app) {
   return {
+    projectReadingTime: async (bookFile, totalSeconds, settings) => {
+      const noteFile = await getOrCreateBookNote(app, bookFile, "", settings);
+      if (noteFile) {
+        await app.fileManager.processFrontMatter(noteFile, (frontmatter) => {
+          frontmatter.reading_time = formatDuration(totalSeconds);
+        });
+      }
+    },
     appendHighlight: (noteFile, highlight) => appendHighlightToBookNote(app, noteFile, highlight),
     appendReflection: (noteFile, highlight, reflection) => appendReflectionToBookNote(app, noteFile, highlight, reflection),
     replaceHighlight: (noteFile, highlight, expected) => replaceHighlightInBookNote(app, noteFile, highlight, expected),
@@ -63591,7 +63517,6 @@ function createKnowledgeNoteStorage(vault) {
 }
 
 // src/cover-cache-service.ts
-init_storage_folders();
 async function saveCustomBookCover(storage, book, folder, buffer, existingCache, persistEntry) {
   await ensureStorageFolders(storage, [folder]);
   const baseName = book.basename.replace(/[\\/:*?"<>|]/g, "_");
@@ -64039,9 +63964,6 @@ var BookStateService = class {
   }
 };
 
-// src/main.ts
-init_storage_folders();
-
 // src/book-path-service.ts
 var fields = ["bookInitLocations", "bookProgress", "bookBookmarks", "bookHighlights", "readingStats", "wordAssets", "bookCoverCache", "bookPathAliases", "bookNotePaths"];
 function record(value2) {
@@ -64422,7 +64344,7 @@ var JarvisReaderPlugin = class extends import_obsidian16.Plugin {
       const sourceFile = this.app.vault.getAbstractFileByPath(context.sourcePath);
       const metadata = sourceFile instanceof import_obsidian16.TFile ? this.app.metadataCache.getFileCache(sourceFile)?.frontmatter : void 0;
       if (typeof metadata?.source_block === "string" && typeof metadata.source_note === "string") {
-        styleKnowledgeNoteTimes(element);
+        styleKnowledgeNoteTimes(element, (paragraph) => context.getSectionInfo(paragraph));
       }
       const isBookNote = Object.values(this.settings.bookNotePaths || {}).includes(context.sourcePath) || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items) && items.some((item) => item.notePath === context.sourcePath));
       if (isBookNote) styleBookNoteTimes(element, (callout) => {

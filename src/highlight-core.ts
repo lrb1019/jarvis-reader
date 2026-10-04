@@ -1,6 +1,7 @@
 import { formatLocalDateTime } from "./utils-core.ts";
 import { buildReadingSourceLink } from "./reading-source-link.ts";
 import type { BookHighlight } from "./types";
+import type { HighlightNoteInput } from "./book-note-document.ts";
 
 export const HIGHLIGHT_SECTION_MARKER = "<!-- jarvis-reader:section -->";
 
@@ -8,10 +9,10 @@ export function formatBlockquote(text: string): string {
   return (text || "").split(/\r?\n/).map((line) => `> ${line}`).join("\n");
 }
 
-export function formatHighlightNoteBlock(highlight: BookHighlight): string {
+export function formatHighlightNoteBlock(highlight: HighlightNoteInput): string {
   const title = (highlight.chapterTitle || "").replace(/\s+/g, " ").trim() || "\u672a\u547d\u540d\u7ae0\u8282";
   const quote = formatBlockquote(highlight.quote);
-  const entries = (highlight as any).commentEntries;
+  const entries = highlight.commentEntries;
   let commentBlock = "";
   if (Array.isArray(entries) && entries.length > 0) {
     commentBlock = entries.map(entry => {
@@ -26,7 +27,7 @@ export function formatHighlightNoteBlock(highlight: BookHighlight): string {
   const timestamp = formatBlockquote(`**\u65f6\u95f4**\n${formatLocalDateTime(highlight.updated || highlight.created)}`);
   
   let aiBlock = "";
-  const aiSections = (highlight as any).aiSections;
+  const aiSections = highlight.aiSections;
   if (Array.isArray(aiSections) && aiSections.length > 0) {
     aiBlock = aiSections.map(sec => {
       const parts: string[] = [];

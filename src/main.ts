@@ -118,7 +118,7 @@ export default class JarvisReaderPlugin extends Plugin {
       const sourceFile = this.app.vault.getAbstractFileByPath(context.sourcePath);
       const metadata = sourceFile instanceof TFile ? this.app.metadataCache.getFileCache(sourceFile)?.frontmatter : undefined;
       if (typeof metadata?.source_block === "string" && typeof metadata.source_note === "string") {
-        styleKnowledgeNoteTimes(element);
+        styleKnowledgeNoteTimes(element, (paragraph) => context.getSectionInfo(paragraph));
       }
       const isBookNote = Object.values(this.settings.bookNotePaths || {}).includes(context.sourcePath)
         || Object.values(this.settings.bookHighlights || {}).some((items) => Array.isArray(items)

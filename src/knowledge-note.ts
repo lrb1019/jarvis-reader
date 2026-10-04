@@ -67,7 +67,7 @@ export function buildKnowledgeNotePath(folder: string, title: string): string {
 
 /** Only generated knowledge-note record lines participate in editor styling. */
 export function knowledgeNoteTimeLines(text: string): number[] {
-  const lines = text.split("\n");
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
   if (lines[0] !== "---") return [];
   const end = lines.indexOf("---", 1);
   if (end < 0) return [];

@@ -1,0 +1,33 @@
+{
+  "baseline": "df76527",
+  "version": "1.4.3",
+  "tools": {
+    "knip": "6.39.0",
+    "dependency-cruiser": "18.5.0",
+    "typescript": "5.9.3"
+  },
+  "commands": {
+    "knip": {
+      "config": "docs/audits/2026-10-02-code-review/config-knip.json",
+      "exit": 1
+    },
+    "dependency-cruiser": {
+      "config": "docs/audits/2026-10-02-code-review/config-depcruise-runtime.json",
+      "exit": 0
+    },
+    "noUnused": {
+      "command": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+      "exit": 2
+    },
+    "focusedTests": {
+      "files": [
+        "tests/book-note-document.test.ts",
+        "tests/knowledge-note.test.ts"
+      ],
+      "exit": 0,
+      "passed": 22
+    }
+  },
+  "sourceUnchangedFromHead": true,
+  "mainJsSha256": "833f9e8cdb04fef81b5d52288c8f57f7b18cce87184ee5d07248b21681388e21"
+}

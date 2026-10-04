@@ -1,6 +1,6 @@
 // Extracted from main.js L47585-47629 — book note creation and opening
 
-import { TFile, WorkspaceLeaf, Notice, App } from "obsidian";
+import { TFile, Notice, App } from "obsidian";
 import { normalizeVaultPath, joinVaultPath, formatLocalDateTime } from "./utils";
 import { renderBookNoteTemplate } from "./book-note-template";
 import { ensureStorageFolders } from "./storage-folders";

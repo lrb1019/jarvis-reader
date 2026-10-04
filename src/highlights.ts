@@ -16,6 +16,7 @@ import {
   replaceHighlightDocument,
   replaceHighlightDocumentIfUnchanged,
   type HighlightNoteDetails,
+  type HighlightNoteInput,
 } from "./book-note-document.ts";
 
 export function createHighlightId(): string {
@@ -32,7 +33,7 @@ export {
 };
 export type { HighlightAiSection, HighlightCommentEntry, HighlightNoteDetails } from "./book-note-document.ts";
 
-export async function appendHighlightToBookNote(app: App, noteFile: TFile, highlight: BookHighlight): Promise<void> {
+export async function appendHighlightToBookNote(app: App, noteFile: TFile, highlight: HighlightNoteInput): Promise<void> {
   const content = await app.vault.read(noteFile);
   await app.vault.modify(noteFile, insertHighlightDocument(content, highlight));
 }
@@ -51,7 +52,7 @@ export async function readHighlightCommentsFromBookNote(app: App, noteFile: TFil
   return (await readHighlightNoteDetailsFromBookNote(app, noteFile, highlight)).comment;
 }
 
-export async function replaceHighlightInBookNote(app: App, noteFile: TFile, highlight: BookHighlight, expected?: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">): Promise<void> {
+export async function replaceHighlightInBookNote(app: App, noteFile: TFile, highlight: HighlightNoteInput, expected?: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">): Promise<void> {
   if (expected) {
     await app.vault.process(noteFile, (content) => replaceHighlightDocumentIfUnchanged(content, highlight, expected));
     return;

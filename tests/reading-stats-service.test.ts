@@ -87,3 +87,56 @@ test("manual reading time refuses corrupt existing totals without overwriting th
   assert.equal(stats["2026-09-30"]["a.epub"], -10);
   assert.equal(saved, false);
 });
+
+
+test("automatic save projects the all-date total only after successful persistence", async () => {
+  const service = new ReadingStatsService();
+  const stats = { "2026-10-01": { "a.epub": 60, "b.epub": 999 } };
+  const calls: string[] = [];
+  service.add("a.epub", 5);
+  await service.flushAndProject("a.epub", "2026-10-04", stats,
+    async () => { calls.push("save"); },
+    async (total) => { calls.push(`project:${total}`); },
+    () => { throw Error("unexpected projection failure"); });
+  assert.deepEqual(calls, ["save", "project:65"]);
+  assert.equal(service.pending("a.epub"), 0);
+});
+
+test("failed stats persistence retains pending seconds and skips note projection", async () => {
+  const service = new ReadingStatsService();
+  const stats = {};
+  service.add("a.epub", 5);
+  let projected = false;
+  let warned = false;
+  await assert.rejects(service.flushAndProject("a.epub", "2026-10-04", stats,
+    async () => { throw Error("stats failed"); },
+    async () => { projected = true; },
+    () => { warned = true; }), /stats failed/);
+  assert.deepEqual(stats, {});
+  assert.equal(service.pending("a.epub"), 5);
+  assert.equal(projected, false);
+  assert.equal(warned, false);
+});
+
+test("missing note or failed metadata projection does not roll back saved stats", async () => {
+  for (const reason of ["associated note missing", "metadata write failed"]) {
+    const service = new ReadingStatsService();
+    const stats: Record<string, Record<string, number>> = {};
+    service.add("a.epub", 5);
+    const failure = Error(reason);
+    let warning: unknown;
+    await service.flushAndProject("a.epub", "2026-10-04", stats,
+      async () => {}, async () => { throw failure; }, (error) => { warning = error; });
+    assert.equal(warning, failure);
+    assert.equal(stats["2026-10-04"]["a.epub"], 5);
+    assert.equal(service.pending("a.epub"), 0);
+  }
+});
+
+test("no pending time avoids saves, note creation and projection", async () => {
+  const service = new ReadingStatsService();
+  let calls = 0;
+  await service.flushAndProject("a.epub", "2026-10-04", {},
+    async () => { calls++; }, async () => { calls++; }, () => { calls++; });
+  assert.equal(calls, 0);
+});

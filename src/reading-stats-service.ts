@@ -33,6 +33,27 @@ export class ReadingStatsService {
     return task;
   }
 
+  async flushAndProject(
+    bookPath: string,
+    date: string,
+    stats: ReadingStatsState,
+    save: () => Promise<void>,
+    project: (totalSeconds: number) => Promise<void>,
+    reportProjectionError: (error: unknown) => void,
+  ): Promise<void> {
+    if (this.pending(bookPath) <= 0) return;
+    await this.flush(bookPath, date, stats, save);
+    let totalSeconds = 0;
+    Object.values(stats).forEach((daily) => {
+      if (daily[bookPath]) totalSeconds += daily[bookPath];
+    });
+    try {
+      await project(totalSeconds);
+    } catch (error) {
+      reportProjectionError(error);
+    }
+  }
+
   recordManual(bookPath: string, date: string, minutes: number, stats: ReadingStatsState, save: () => Promise<void>): Promise<void> {
     const parsed = new Date(`${date}T00:00:00Z`);
     if (!bookPath || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date || !Number.isInteger(minutes) || minutes <= 0 || minutes > 1440) {

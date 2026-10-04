@@ -26,6 +26,9 @@ export interface HighlightNoteDetails {
   aiSections: HighlightAiSection[];
 }
 
+/** Markdown-owned details for in-memory writes and reader display; never an index schema. */
+export type HighlightNoteInput = BookHighlight & Partial<Pick<HighlightNoteDetails, "commentEntries" | "aiSections">>;
+
 export class HighlightContentConflictError extends Error {
   constructor() {
     super("这条划线的笔记已在其他位置修改。请重新打开后再编辑。");
@@ -51,7 +54,7 @@ function getBlockRange(lines: string[], blockId: string): { startIndex: number; 
   return isHighlightNoteBlockStart(lines[startIndex] || "") ? { startIndex, blockIndex } : null;
 }
 
-export function insertHighlightDocument(content: string, highlight: BookHighlight): string {
+export function insertHighlightDocument(content: string, highlight: HighlightNoteInput): string {
   const lines = content.trimEnd().split(/\r?\n/);
   const targetTitle = getChapterTitle(highlight);
   const headingPattern = /^(#{1,6})\s+(.+?)\s*$/;
@@ -245,7 +248,7 @@ export function readHighlightDetailsDocument(content: string, highlight: Highlig
   };
 }
 
-export function replaceHighlightDocument(content: string, highlight: BookHighlight): string {
+export function replaceHighlightDocument(content: string, highlight: HighlightNoteInput): string {
   const lines = content.split(/\r?\n/);
   const range = getBlockRange(lines, highlight.blockId);
   if (!range) return insertHighlightDocument(content, highlight);
@@ -255,7 +258,7 @@ export function replaceHighlightDocument(content: string, highlight: BookHighlig
 
 export function replaceHighlightDocumentIfUnchanged(
   content: string,
-  highlight: BookHighlight,
+  highlight: HighlightNoteInput,
   expected: Pick<HighlightNoteDetails, "quote" | "commentEntries" | "aiSections">,
 ): string {
   if (!getBlockRange(content.split(/\r?\n/), highlight.blockId)) throw new HighlightContentConflictError();
