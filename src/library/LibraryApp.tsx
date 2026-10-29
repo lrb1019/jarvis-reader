@@ -999,7 +999,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
         <div className="jarvis-library-stats-view-container">
           <div className="jarvis-library-stats-view-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button className="jarvis-library-tool-button clickable-icon" aria-label="返回书架" title="返回书架" onClick={() => setCurrentView("home")}>
+              <button className="jarvis-library-tool-button clickable-icon" aria-label="返回书架" onClick={() => setCurrentView("home")}>
                 <ObsidianIcon name="arrow-left" />
               </button>
               <h2 style={{ margin: 0, fontSize: 'var(--font-ui-medium)', fontWeight: 600 }}>阅读统计</h2>
@@ -1016,11 +1016,11 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
             </div>
             {statsTab !== "all" && (
               <div className="jarvis-stats-date-picker">
-                <button className="jarvis-library-tool-button clickable-icon" aria-label="上一周期" title="上一周期" onClick={handlePrevDate}>
+                <button className="jarvis-library-tool-button clickable-icon" aria-label="上一周期" onClick={handlePrevDate}>
                   <ObsidianIcon name="chevron-left" />
                 </button>
                 <span className="jarvis-stats-date-text">{dateRangeStr}</span>
-                <button className="jarvis-library-tool-button clickable-icon" aria-label="下一周期" title="下一周期" onClick={handleNextDate}>
+                <button className="jarvis-library-tool-button clickable-icon" aria-label="下一周期" onClick={handleNextDate}>
                   <ObsidianIcon name="chevron-right" />
                 </button>
               </div>
@@ -1099,20 +1099,20 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               <div className="jarvis-stats-chart-toggles">
                 {statsTab === "month" && (
                   <>
-                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" title="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
                       <ObsidianIcon name="chart-no-axes-column" />
                     </button>
-                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "calendar" ? "is-active" : ""}`} aria-label="日历" title="日历" aria-pressed={activeChart === "calendar"} onClick={() => setStatsChartType("calendar")}>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "calendar" ? "is-active" : ""}`} aria-label="日历" aria-pressed={activeChart === "calendar"} onClick={() => setStatsChartType("calendar")}>
                       <ObsidianIcon name="calendar" />
                     </button>
                   </>
                 )}
                 {(statsTab === "year" || statsTab === "all") && (
                   <>
-                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "heatmap" ? "is-active" : ""}`} aria-label="热力图" title="热力图" aria-pressed={activeChart === "heatmap"} onClick={() => setStatsChartType("heatmap")}>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "heatmap" ? "is-active" : ""}`} aria-label="热力图" aria-pressed={activeChart === "heatmap"} onClick={() => setStatsChartType("heatmap")}>
                       <ObsidianIcon name="grid-2x2" />
                     </button>
-                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" title="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
+                    <button className={`jarvis-library-tool-button clickable-icon ${activeChart === "bar" ? "is-active" : ""}`} aria-label="柱形图" aria-pressed={activeChart === "bar"} onClick={() => setStatsChartType("bar")}>
                       <ObsidianIcon name="chart-no-axes-column" />
                     </button>
                   </>
@@ -1496,7 +1496,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
               className="jarvis-library-search-input"
             />
             {searchQuery && (
-              <button aria-label="清除搜索" title="清除搜索" className="jarvis-library-search-clear" onClick={() => setSearchQuery("")}>
+              <button aria-label="清除搜索" className="jarvis-library-search-clear" onClick={() => setSearchQuery("")}>
                 <ObsidianIcon name="x" />
               </button>
             )}
@@ -1520,7 +1520,7 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
                             { label: "书名排序", selected: sortBy === "name", choose: () => setSortBy("name") }
                           ] }
                 ], () => { filterMenu.current = null; setShowFilters(false); });
-              }} aria-label="筛选与排序" aria-expanded={showFilters} aria-haspopup="menu" title="筛选与排序">
+              }} aria-label="筛选与排序" aria-expanded={showFilters} aria-haspopup="menu">
                 <ObsidianIcon name="sliders-horizontal" />
               </button>
             </div>
@@ -1531,16 +1531,16 @@ export function LibraryApp({ plugin }: LibraryAppProps) {
 
 
             <div className="jarvis-library-layout-toggle">
-              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"} title="网格布局">
+              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "grid" ? "is-active" : ""}`} onClick={() => setViewLayout("grid")} aria-label="网格布局" aria-pressed={viewLayout === "grid"}>
                 <ObsidianIcon name="layout-grid" />
               </button>
-              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} aria-label="列表布局" aria-pressed={viewLayout === "list"} title="列表布局">
+              <button className={`jarvis-library-layout-btn jarvis-library-tool-button clickable-icon ${viewLayout === "list" ? "is-active" : ""}`} onClick={() => setViewLayout("list")} aria-label="列表布局" aria-pressed={viewLayout === "list"}>
                 <ObsidianIcon name="list" />
               </button>
             </div>
 
             <div className="jarvis-library-header-actions">
-              <button className="jarvis-library-action-icon-btn jarvis-library-tool-button clickable-icon" aria-label="插件设置" title="插件设置" onClick={() => {
+              <button className="jarvis-library-action-icon-btn jarvis-library-tool-button clickable-icon" aria-label="插件设置" onClick={() => {
                 const setting = (plugin as any).app.setting;
                 setting.open();
                 setting.openTabById(plugin.manifest.id);

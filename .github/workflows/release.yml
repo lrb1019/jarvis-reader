@@ -23,6 +23,7 @@ jobs:
               run: |
                   npm ci
                   npm run verify
+                  npm run submission:check
                   npm run package:release
 
             - name: Check tag version
@@ -40,4 +41,5 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --draft \
-                    main.js manifest.json styles.css "release/jarvis-reader-${tag}.zip"
+                    main.js manifest.json styles.css LICENSE THIRD_PARTY_NOTICES.md "release/jarvis-reader-${tag}.zip" \
+                    release/jarvis-reader-ecdict-*.zip release/jarvis-reader-ecdict-*.zip.sha256

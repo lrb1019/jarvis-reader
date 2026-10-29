@@ -18,7 +18,7 @@ export interface ConflictAdapter {
 }
 
 export interface ConflictResolutionHost {
-  app: { vault: { adapter: ConflictAdapter } };
+  app: { vault: { adapter: ConflictAdapter; configDir: string } };
   settings: {
     wordAssets?: WordAssetMap;
     bookHighlights?: BookHighlightsMap;
@@ -32,16 +32,15 @@ export interface ConflictResolutionHost {
   saveSettingsData(): Promise<void>;
 }
 
-const PLUGIN_ROOT = ".obsidian/plugins/jarvis-reader";
-const INDEX_FOLDER = `${PLUGIN_ROOT}/index`;
-
 export function allConflictPaths(files: ConflictFileSet): string[] {
   return [...files.wordAssets, ...files.highlights, ...files.settings];
 }
 
 export async function detectSyncConflicts(adapter: ConflictAdapter, host: ConflictResolutionHost): Promise<ConflictFileSet> {
-  const indexFiles = await adapter.exists(INDEX_FOLDER) ? (await adapter.list(INDEX_FOLDER)).files : [];
-  const rootFiles = await adapter.exists(PLUGIN_ROOT) ? (await adapter.list(PLUGIN_ROOT)).files : [];
+  const pluginRoot = `${host.app.vault.configDir}/plugins/jarvis-reader`;
+  const indexFolder = `${pluginRoot}/index`;
+  const indexFiles = await adapter.exists(indexFolder) ? (await adapter.list(indexFolder)).files : [];
+  const rootFiles = await adapter.exists(pluginRoot) ? (await adapter.list(pluginRoot)).files : [];
   const files = classifyConflictFiles(indexFiles, rootFiles);
   if (host.wordAssetSidecarUnavailable) files.wordAssets = [];
   if (host.highlightSidecarUnavailable) files.highlights = [];
@@ -56,13 +55,14 @@ async function ensureFolder(adapter: ConflictAdapter, folder: string): Promise<v
   }
 }
 
-export async function createConflictBackup(adapter: ConflictAdapter, files: ConflictFileSet): Promise<string> {
+export async function createConflictBackup(adapter: ConflictAdapter, files: ConflictFileSet, pluginRoot: string): Promise<string> {
+  const indexFolder = `${pluginRoot}/index`;
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const root = `${PLUGIN_ROOT}/backups/conflicts/${timestamp}`;
+  const root = `${pluginRoot}/backups/conflicts/${timestamp}`;
   const canonical = [
-    `${INDEX_FOLDER}/word-assets.json`,
-    `${INDEX_FOLDER}/highlights.json`,
-    `${PLUGIN_ROOT}/data.json`,
+    `${indexFolder}/word-assets.json`,
+    `${indexFolder}/highlights.json`,
+    `${pluginRoot}/data.json`,
   ];
   for (const path of [...canonical, ...allConflictPaths(files)]) {
     if (!await adapter.exists(path)) continue;
@@ -118,7 +118,7 @@ export async function mergeConfirmedConflicts(host: ConflictResolutionHost, file
     nextSettings = merged;
   }
 
-  const backupRoot = await createConflictBackup(adapter, files);
+  const backupRoot = await createConflictBackup(adapter, files, `${host.app.vault.configDir}/plugins/jarvis-reader`);
   let wordsCommitted = false;
   let highlightsCommitted = false;
   try {

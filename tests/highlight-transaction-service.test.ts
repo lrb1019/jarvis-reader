@@ -151,7 +151,7 @@ test("recovery uses Obsidian's modify method for an indexed note", async () => {
 test("highlight transaction commits Markdown and index before clearing its recovery record", async () => {
   const adapter = new MemoryTransactionAdapter();
   const state = createHost(adapter);
-  const service = new HighlightTransactionService(state.host);
+  const service = new HighlightTransactionService(state.host, ".obsidian/plugins/jarvis-reader");
 
   await service.execute({
     bookPath: previousHighlight.bookPath,
@@ -171,7 +171,7 @@ test("index failure restores the previous Markdown and removes the resolved reco
   const adapter = new MemoryTransactionAdapter();
   const state = createHost(adapter);
   state.failIndex = true;
-  const service = new HighlightTransactionService(state.host);
+  const service = new HighlightTransactionService(state.host, ".obsidian/plugins/jarvis-reader");
 
   await assert.rejects(service.execute({
     bookPath: previousHighlight.bookPath,
@@ -191,7 +191,7 @@ test("rejected stale edit leaves newer Markdown untouched and clears its recover
   const adapter = new MemoryTransactionAdapter();
   const state = createHost(adapter);
   state.note = "newer edit from another interface";
-  const service = new HighlightTransactionService(state.host);
+  const service = new HighlightTransactionService(state.host, ".obsidian/plugins/jarvis-reader");
 
   await assert.rejects(service.execute({
     bookPath: previousHighlight.bookPath,
@@ -212,7 +212,7 @@ test("startup recovery rolls back Markdown left by an interrupted transaction", 
   const state = createHost(adapter);
   state.failIndex = true;
   state.failNoteWrite = true;
-  const service = new HighlightTransactionService(state.host);
+  const service = new HighlightTransactionService(state.host, ".obsidian/plugins/jarvis-reader");
 
   await assert.rejects(service.execute({
     bookPath: previousHighlight.bookPath,
@@ -236,7 +236,7 @@ test("startup recovery finalizes a committed transaction whose marker cleanup wa
   const adapter = new MemoryTransactionAdapter();
   const state = createHost(adapter);
   adapter.failRemoveOnce = true;
-  const service = new HighlightTransactionService(state.host);
+  const service = new HighlightTransactionService(state.host, ".obsidian/plugins/jarvis-reader");
 
   await service.execute({
     bookPath: previousHighlight.bookPath,
@@ -252,4 +252,29 @@ test("startup recovery finalizes a committed transaction whose marker cleanup wa
   assert.deepEqual(recovery, { finalized: 1, rolledBack: 0, errors: [] });
   assert.equal(state.note, "after markdown");
   assert.equal(pendingFiles(adapter).length, 0);
+});
+
+
+test("custom configuration folder retains and recovers interrupted highlight transactions", async () => {
+  const adapter = new MemoryTransactionAdapter();
+  const state = createHost(adapter);
+  state.failIndex = true;
+  state.failNoteWrite = true;
+  const root = ".custom-obsidian/plugins/jarvis-reader";
+  await assert.rejects(new HighlightTransactionService(state.host, root).execute({
+    bookPath: previousHighlight.bookPath,
+    notePath: previousHighlight.notePath,
+    reason: "update-highlight",
+    previousHighlights: [previousHighlight],
+    nextHighlights: [nextHighlight],
+    applyMarkdown: async () => { state.note = "after markdown"; },
+  }), /恢复记录已保留/);
+  assert.ok(pendingFiles(adapter).every(path => path.startsWith(`${root}/pending/highlights/`)));
+  assert.equal(pendingFiles(adapter).length, 1);
+  state.failIndex = false;
+  state.failNoteWrite = false;
+  assert.deepEqual(await new HighlightTransactionService(state.host, root).recoverPending(), { finalized: 0, rolledBack: 1, errors: [] });
+  assert.equal(state.note, "before markdown");
+  assert.equal(pendingFiles(adapter).length, 0);
+  assert.ok([...adapter.folders].every(path => path.startsWith(".custom-obsidian")));
 });

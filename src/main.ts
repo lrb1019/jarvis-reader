@@ -51,7 +51,8 @@ export default class JarvisReaderPlugin extends Plugin {
   bookNoteService = new BookNoteService(createBookNoteOperations(this.app));
   bookStateService = new BookStateService(this);
   knowledgeNoteService = new KnowledgeNoteService(createKnowledgeNoteStorage(this.app.vault));
-  coverCacheService = new CoverCacheService(this.app.vault.adapter);
+  private get pluginRoot(): string { return `${this.app.vault.configDir}/plugins/${this.manifest.id}`; }
+  coverCacheService = new CoverCacheService(this.app.vault.adapter, this.pluginRoot);
   coverCacheMigrationComplete = false;
   highlightTransactionService = new HighlightTransactionService({
     adapter: this.app.vault.adapter,
@@ -73,7 +74,7 @@ export default class JarvisReaderPlugin extends Plugin {
     },
     getBookHighlights: (bookPath) => this.settings?.bookHighlights?.[bookPath] || [],
     replaceBookHighlights: (bookPath, highlights, reason) => this.highlightService.replaceBookHighlights(bookPath, highlights, reason),
-  });
+  }, this.pluginRoot);
   settingsSaveQueue = new SettingsSaveQueue(
     () => this.getSettingsDataSnapshot(),
     (settingsData) => this.saveData(settingsData),
@@ -83,12 +84,12 @@ export default class JarvisReaderPlugin extends Plugin {
   bookPathUpdateBlocked = false;
   private bookPathQueue: Promise<void> = Promise.resolve();
   private readonly pendingNotePaths = new Set<string>();
-  private readonly bookPathPending = ".obsidian/plugins/jarvis-reader/pending/book-path-rename.json";
+  private get bookPathPending(): string { return `${this.pluginRoot}/pending/book-path-rename.json`; }
   bookPathService = new BookPathService({
     state: () => this.settings,
     readPending: async () => await this.app.vault.adapter.exists(this.bookPathPending) ? this.app.vault.adapter.read(this.bookPathPending) : null,
     writePending: async content => {
-      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/pending");
+      await this.ensureAdapterFolder(`${this.pluginRoot}/pending`);
       await this.app.vault.adapter.write(this.bookPathPending, content);
     },
     clearPending: () => this.app.vault.adapter.remove(this.bookPathPending),
@@ -404,9 +405,9 @@ export default class JarvisReaderPlugin extends Plugin {
   }
   getIndexSidecarPaths() {
     return {
-      highlights: ".obsidian/plugins/jarvis-reader/index/highlights.json",
-      wordAssets: ".obsidian/plugins/jarvis-reader/index/word-assets.json",
-      log: ".obsidian/plugins/jarvis-reader/logs/index-changes.jsonl"
+      highlights: `${this.pluginRoot}/index/highlights.json`,
+      wordAssets: `${this.pluginRoot}/index/word-assets.json`,
+      log: `${this.pluginRoot}/logs/index-changes.jsonl`
     };
   }
   async ensureAdapterFolder(folderPath) {
@@ -462,7 +463,7 @@ export default class JarvisReaderPlugin extends Plugin {
       if (!changed && !String(reason || "").startsWith("restore"))
         return;
       this.lastIndexCounts = counts;
-      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
+      await this.ensureAdapterFolder(`${this.pluginRoot}/logs`);
       const line = JSON.stringify({
         time: new Date().toISOString(),
         reason,
@@ -618,7 +619,7 @@ export default class JarvisReaderPlugin extends Plugin {
       if (!adapter || typeof adapter.write !== "function") {
         throw new Error("Jarvis Reader sidecar persist failed: vault adapter not available.");
       }
-      await this.ensureAdapterFolder(".obsidian/plugins/jarvis-reader/logs");
+      await this.ensureAdapterFolder(`${this.pluginRoot}/logs`);
       const snapshot = this.getIndexSnapshot();
       if (!this.highlightSidecarUnavailable) {
         await this.persistHighlightSidecar(reason);
@@ -638,7 +639,7 @@ export default class JarvisReaderPlugin extends Plugin {
     let smartCommandsBackupPath = "";
     const migration = await removeSmartCommandsWithBackup(loadedSettings, async (content) => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      smartCommandsBackupPath = `.obsidian/plugins/jarvis-reader/backups/migrations/smart-commands-${timestamp}.json`;
+      smartCommandsBackupPath = `${this.pluginRoot}/backups/migrations/smart-commands-${timestamp}.json`;
       await this.ensureAdapterFolder(smartCommandsBackupPath.split("/").slice(0, -1).join("/"));
       await this.app.vault.adapter.write(smartCommandsBackupPath, content);
     });

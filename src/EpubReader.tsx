@@ -1790,7 +1790,6 @@ const showWordHoverCard = (asset, element) => {
       React.createElement("button", {
         className: "jarvis-reader-highlight-icon-button jarvis-reader-highlight-note-more",
         type: "button",
-        title: "笔记操作",
         "aria-label": `${entry.label || "笔记"}操作`,
         "aria-haspopup": "menu",
         onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -2124,7 +2123,7 @@ const showWordHoverCard = (asset, element) => {
             React.createElement("button", {
               className: "jarvis-reader-highlight-icon-button",
               type: "button",
-              title: "取消关联",
+              "aria-label": "取消关联",
               onClick: () => removeAssociatedLink(linkPath),
               style: { flexShrink: 0 }
             }, renderObsidianIcon("trash-2"))
@@ -2626,15 +2625,15 @@ const showWordHoverCard = (asset, element) => {
     onPointerDown: (event) => event.stopPropagation()
   }, canSwitchPendingWordToAi ?  React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
-    title: "AI \u7ffb\u8bd1",
+    "aria-label": "AI \u7ffb\u8bd1",
     onClick: translatePendingWordWithAi
   }, renderObsidianIcon("bot")) : null, canPersistPendingWord && !savedWordAsset ?  React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-save",
-    title: persistPendingLabel,
+    "aria-label": persistPendingLabel,
     onClick: persistPendingWordAsset
   }, renderObsidianIcon("bookmark-plus")) : null, React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
-    title: "\u5173\u95ed",
+    "aria-label": "\u5173\u95ed",
     onClick: clearHighlightUi
   }, renderObsidianIcon("x"))))),  React.createElement("div", {
     className: "jarvis-reader-word-panel"
@@ -2646,7 +2645,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-head"
   },  React.createElement("button", {
     className: "jarvis-reader-word-lemma jarvis-reader-word-lemma-button jarvis-reader-word-translate-lemma",
-    title: "\u70b9\u51fb\u53d1\u97f3",
+    "aria-label": `点击发音：${wordLookupState.result.surface || wordLookupState.result.lemma}`,
     onClick: () => playWordAudioText((wordLookupState.result == null ? void 0 : wordLookupState.result.surface) || (wordLookupState.result == null ? void 0 : wordLookupState.result.lemma) || pendingWordSelection.quote || ""),
     disabled: !enableWordAudio
   }, wordLookupState.result.surface || wordLookupState.result.lemma), wordLookupState.result.phonetic ?  React.createElement("div", {
@@ -2677,28 +2676,28 @@ const showWordHoverCard = (asset, element) => {
   }, isExistingHighlightComment && pendingSelection.notePath ? React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
-    title: "\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
+    "aria-label": "\u6253\u5f00\u7b14\u8bb0\u6587\u4ef6",
     onClick: openHighlightNoteBlock
   }, renderObsidianIcon("file-text")) : null, isReadingHighlightComment ? React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
-    title: "\u8ffd\u52a0\u7b14\u8bb0",
+    "aria-label": "\u8ffd\u52a0\u7b14\u8bb0",
     onClick: () => {
       setHighlightComment("");
       setHighlightCommentMode("append");
       setHighlightContentTab("notes");
     }
-  }, renderObsidianIcon("file-pen-line")) : null,
+  }, renderObsidianIcon("square-pen")) : null,
   isExistingHighlightComment && hasPromotableHighlightNote && typeof promoteHighlight === "function" ? React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
-    title: "提升为知识笔记",
+    "aria-label": "提炼为知识笔记",
     onClick: () => promoteHighlight(pendingSelection)
-  }, renderObsidianIcon("file-plus-2")) : null,
+  }, renderObsidianIcon("lightbulb")) : null,
   React.createElement("button", {
     className: "jarvis-reader-highlight-icon-button",
     type: "button",
-    title: "\u5173\u95ed",
+    "aria-label": "\u5173\u95ed",
     onClick: clearHighlightUi
   }, renderObsidianIcon("x")))),  React.createElement("div", {
     className: highlightContentTab === "ai"
@@ -2866,7 +2865,6 @@ const showWordHoverCard = (asset, element) => {
   }, isExistingHighlightComment ? "保存笔记" : "保存")), React.createElement("div", {
     className: "jarvis-reader-highlight-resize-handle",
     onPointerDown: beginHighlightPopoverResize,
-    title: "拖动右下角调整窗体大小",
     "aria-label": "拖动右下角调整窗体大小"
   }))) : null, activeWordHover ?  React.createElement("div", {
     className: "jarvis-reader-word-card" + (activeWordHover.isPinned ? " is-pinned" : ""),
@@ -2885,7 +2883,7 @@ const showWordHoverCard = (asset, element) => {
     className: "jarvis-reader-word-card-head-row"
   }, React.createElement("button", {
     className: "jarvis-reader-word-card-lemma",
-    title: "\u70b9\u51fb\u53d1\u97f3",
+    "aria-label": `点击发音：${activeWordHover.asset.title || activeWordHover.asset.lemma || ""}`,
     style: { flex: "0 0 auto", cursor: "pointer" },
     onPointerDown: (e) => e.stopPropagation(),
     onClick: () => playWordAudioText(activeWordHover.asset.title || activeWordHover.asset.lemma || "")
@@ -2896,15 +2894,15 @@ const showWordHoverCard = (asset, element) => {
     onPointerDown: (e) => e.stopPropagation()
   }, React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-ai",
-    title: "AI翻译",
+    "aria-label": "AI翻译",
     onClick: translateActiveWordWithAi
   }, renderObsidianIcon("bot")), React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-delete",
-    title: "\u5220\u9664\u8bcd\u6761",
+    "aria-label": "\u5220\u9664\u8bcd\u6761",
     onClick: deleteActiveWordAsset
   }, renderObsidianIcon("trash")),  React.createElement("button", {
     className: "jarvis-reader-word-card-action jarvis-reader-word-card-close",
-    title: "\u5173\u95ed\u5361\u7247",
+    "aria-label": "\u5173\u95ed\u5361\u7247",
     onClick: hideWordHoverCard
   }, renderObsidianIcon("x")))), activeWordHover.asset.phonetic ?  React.createElement("div", {
   className: "jarvis-reader-word-phonetic"

@@ -61,8 +61,6 @@ export interface HighlightRecoveryResult {
   errors: string[];
 }
 
-const PENDING_FOLDER = ".obsidian/plugins/jarvis-reader/pending/highlights";
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -83,9 +81,9 @@ function parsePending(payload: unknown): PendingHighlightTransaction | null {
   return payload as unknown as PendingHighlightTransaction;
 }
 
-async function ensureFolder(adapter: HighlightTransactionAdapter): Promise<void> {
+async function ensureFolder(adapter: HighlightTransactionAdapter, folder: string): Promise<void> {
   let current = "";
-  for (const part of PENDING_FOLDER.split("/").filter(Boolean)) {
+  for (const part of folder.split("/").filter(Boolean)) {
     current = current ? `${current}/${part}` : part;
     if (!await adapter.exists(current)) await adapter.mkdir(current);
   }
@@ -98,8 +96,11 @@ function createTransactionId(): string {
 export class HighlightTransactionService {
   private readonly host: HighlightTransactionHost;
 
-  constructor(host: HighlightTransactionHost) {
+  private readonly pendingFolder: string;
+
+  constructor(host: HighlightTransactionHost, pluginRoot: string) {
     this.host = host;
+    this.pendingFolder = `${pluginRoot}/pending/highlights`;
   }
 
   async execute(request: HighlightTransactionRequest): Promise<void> {
@@ -115,8 +116,8 @@ export class HighlightTransactionService {
       previousMarkdown,
       created: new Date().toISOString(),
     };
-    await ensureFolder(this.host.adapter);
-    const pendingPath = `${PENDING_FOLDER}/${pending.id}.json`;
+    await ensureFolder(this.host.adapter, this.pendingFolder);
+    const pendingPath = `${this.pendingFolder}/${pending.id}.json`;
     await this.host.adapter.write(pendingPath, JSON.stringify(pending));
 
     try {
@@ -146,8 +147,8 @@ export class HighlightTransactionService {
 
   async recoverPending(): Promise<HighlightRecoveryResult> {
     const result: HighlightRecoveryResult = { finalized: 0, rolledBack: 0, errors: [] };
-    if (!await this.host.adapter.exists(PENDING_FOLDER)) return result;
-    const listing = await this.host.adapter.list(PENDING_FOLDER);
+    if (!await this.host.adapter.exists(this.pendingFolder)) return result;
+    const listing = await this.host.adapter.list(this.pendingFolder);
     for (const path of listing.files.filter((file) => file.endsWith(".json"))) {
       try {
         const pending = parsePending(JSON.parse(await this.host.adapter.read(path)));

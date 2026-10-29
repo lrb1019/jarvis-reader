@@ -58,7 +58,7 @@ function customCoverFixture() {
 test("custom cover create and replace preserve naming, metadata and reload", async () => {
   const fixture = customCoverFixture();
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   const book = { path: "Books/A.epub", basename: "A:B", stat: { mtime: 1, size: 2 } };
   const key = "Books/A.epub|1|2";
   const cache = { [key]: { creator: "Author", dataUrl: "old", updated: "old" } };
@@ -70,7 +70,7 @@ test("custom cover create and replace preserve naming, metadata and reload", asy
   assert.equal(fixture.images.size, 1);
   assert.equal(fixture.images.get("Books/Cover/cover_A_B.jpg"), second);
   assert.deepEqual([...fixture.folders], ["Books", "Books/Cover"]);
-  const entry = (await new CoverCacheService(adapter).load())[key]!;
+  const entry = (await new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader").load())[key]!;
   assert.equal(entry.creator, "Author");
   assert.equal(entry.dataUrl, "old");
   assert.equal(entry.vaultPath, "Books/Cover/cover_A_B.jpg");
@@ -116,7 +116,7 @@ test("custom cover image write failure does not register cache", async () => {
 test("custom cover cache failure remains visible and retains image without overwriting cache", async () => {
   const fixture = customCoverFixture();
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   await service.save(firstKey, firstEntry);
   const before = service.snapshot();
   adapter.failWrites = true;
@@ -132,17 +132,17 @@ test("custom cover cache failure remains visible and retains image without overw
   });
   assert.equal(fixture.images.get(path), replacement);
   assert.deepEqual(service.snapshot(), before);
-  assert.deepEqual(await new CoverCacheService(adapter).load(), before);
+  assert.deepEqual(await new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader").load(), before);
 });
 
 test("cover cache saves and reloads each book independently", async () => {
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   await service.load();
   await service.save(firstKey, firstEntry);
   await service.save(secondKey, secondEntry);
 
-  const reloaded = new CoverCacheService(adapter);
+  const reloaded = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   assert.deepEqual(await reloaded.load(), { [firstKey]: firstEntry, [secondKey]: secondEntry });
   assert.equal([...adapter.files.keys()].filter((path) => path.includes("/cache/covers/")).length, 2);
 });
@@ -150,7 +150,7 @@ test("cover cache saves and reloads each book independently", async () => {
 test("legacy migration backs up data.json before writing independent entries", async () => {
   const adapter = new MemoryCoverCacheAdapter();
   adapter.files.set(".obsidian/plugins/jarvis-reader/data.json", JSON.stringify({ bookCoverCache: { [firstKey]: firstEntry } }));
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   await service.load();
   const backupRoot = await service.migrateLegacy({ [firstKey]: firstEntry });
 
@@ -163,7 +163,7 @@ test("failed legacy migration leaves the original data.json untouched", async ()
   const adapter = new MemoryCoverCacheAdapter();
   const original = JSON.stringify({ bookCoverCache: { [firstKey]: firstEntry } });
   adapter.files.set(".obsidian/plugins/jarvis-reader/data.json", original);
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   await service.load();
   adapter.failWrites = true;
 
@@ -173,24 +173,24 @@ test("failed legacy migration leaves the original data.json untouched", async ()
 
 test("cover cache pruning removes only entries for books no longer present", async () => {
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   await service.load();
   await service.save(firstKey, firstEntry);
   await service.save(secondKey, secondEntry);
 
   assert.equal(await service.prune([secondKey]), 1);
   assert.deepEqual(service.snapshot(), { [secondKey]: secondEntry });
-  const reloaded = new CoverCacheService(adapter);
+  const reloaded = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   assert.deepEqual(await reloaded.load(), { [secondKey]: secondEntry });
 });
 
 test("restore original cover preserves EPUB image, metadata and uploaded file across reload", async () => {
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   adapter.files.set("Cover/custom.jpg", "uploaded-image");
   await service.save(firstKey, { ...firstEntry, vaultPath: "Cover/custom.jpg", isCustom: true });
   await service.restoreOriginal(firstKey);
-  const reloaded = new CoverCacheService(adapter);
+  const reloaded = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   const restored = (await reloaded.load())[firstKey];
   assert.equal(restored.dataUrl, firstEntry.dataUrl);
   assert.equal(restored.creator, firstEntry.creator);
@@ -203,19 +203,34 @@ test("restore original cover preserves EPUB image, metadata and uploaded file ac
 
 test("failed restoration retains the custom cover in memory and on disk", async () => {
   const adapter = new MemoryCoverCacheAdapter();
-  const service = new CoverCacheService(adapter);
+  const service = new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader");
   const custom = { ...firstEntry, vaultPath: "Cover/custom.jpg", isCustom: true };
   await service.save(firstKey, custom);
   adapter.failWrites = true;
   await assert.rejects(service.restoreOriginal(firstKey), /write failure/);
   assert.deepEqual(service.snapshot()[firstKey], custom);
-  assert.deepEqual((await new CoverCacheService(adapter).load())[firstKey], custom);
+  assert.deepEqual((await new CoverCacheService(adapter, ".obsidian/plugins/jarvis-reader").load())[firstKey], custom);
 });
 
 test("restoration without an extracted EPUB image leaves it eligible for extraction", async () => {
-  const service = new CoverCacheService(new MemoryCoverCacheAdapter());
+  const service = new CoverCacheService(new MemoryCoverCacheAdapter(), ".obsidian/plugins/jarvis-reader");
   await service.save(firstKey, { vaultPath: "Cover/custom.jpg", isCustom: true, updated: "old" });
   await service.restoreOriginal(firstKey);
   assert.equal(service.snapshot()[firstKey].dataUrl, undefined);
   assert.equal(service.snapshot()[firstKey].vaultPath, undefined);
+});
+
+
+test("custom configuration folder isolates cover cache, migration backup and pruning", async () => {
+  const adapter = new MemoryCoverCacheAdapter();
+  const root = ".custom-obsidian/plugins/jarvis-reader";
+  adapter.files.set(`${root}/data.json`, "original settings");
+  const service = new CoverCacheService(adapter, root);
+  const backup = await service.migrateLegacy({ [firstKey]: firstEntry });
+  assert.equal(adapter.files.get(`${backup}/data.json`), "original settings");
+  const reloaded = new CoverCacheService(adapter, root);
+  assert.deepEqual(await reloaded.load(), { [firstKey]: firstEntry });
+  assert.equal(await reloaded.prune([]), 1);
+  assert.equal(adapter.files.get(`${root}/data.json`), "original settings");
+  assert.ok([...adapter.files.keys(), ...adapter.folders].every(path => path.startsWith(".custom-obsidian")));
 });

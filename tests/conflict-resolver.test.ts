@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   createConflictBackup,
+  detectSyncConflicts,
   mergeConfirmedConflicts,
   type ConflictAdapter,
   type ConflictResolutionHost,
@@ -62,7 +63,7 @@ function createPlugin(adapter: MemoryConflictAdapter, failSettings = false): Con
     bookProgress: {},
   };
   return {
-    app: { vault: { adapter } },
+    app: { vault: { adapter, configDir: ".obsidian" } },
     settings,
     reasons,
     wordAssetSidecarUnavailable: false,
@@ -98,7 +99,7 @@ function seedFiles(adapter: MemoryConflictAdapter): void {
 test("conflict backup copies canonical files and every detected conflict", async () => {
   const adapter = new MemoryConflictAdapter();
   seedFiles(adapter);
-  const root = await createConflictBackup(adapter, files);
+  const root = await createConflictBackup(adapter, files, ".obsidian/plugins/jarvis-reader");
   const backedUpSources = [...adapter.files.keys()].filter((path) => path.startsWith(root));
   assert.equal(backedUpSources.length, 4);
   assert.equal(adapter.trashed.length, 0);
@@ -128,4 +129,23 @@ test("failed conflict commits restore memory and keep conflict copies", async ()
   assert.equal(adapter.trashed.length, 0);
   assert.equal(adapter.files.has(files.wordAssets[0]), true);
   assert.equal(adapter.files.has(files.settings[0]), true);
+});
+
+
+test("custom configuration folder detects, backs up and merges only its own conflicts", async () => {
+  const adapter = new MemoryConflictAdapter();
+  seedFiles(adapter);
+  const root = ".custom-obsidian/plugins/jarvis-reader";
+  for (const [path, content] of [...adapter.files]) adapter.files.set(path.replace(".obsidian", ".custom-obsidian"), content);
+  adapter.folders.add(root);
+  adapter.folders.add(`${root}/index`);
+  const plugin = createPlugin(adapter);
+  plugin.app.vault.configDir = ".custom-obsidian";
+  const detected = await detectSyncConflicts(adapter, plugin);
+  assert.deepEqual(detected.wordAssets, [`${root}/index/word-assets-conflict.json`]);
+  const backup = await mergeConfirmedConflicts(plugin, detected);
+  assert.ok(backup.startsWith(`${root}/backups/conflicts/`));
+  assert.equal(adapter.files.get(`${backup}/${root}/data.json`), JSON.stringify({ readingStats: {} }));
+  assert.ok(adapter.trashed.every(path => path.startsWith(root)));
+  assert.ok(adapter.files.has(files.wordAssets[0]));
 });

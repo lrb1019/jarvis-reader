@@ -1,0 +1,53 @@
+{
+  "reviewedOn": "2026-10-29",
+  "basis": [
+    "https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#license",
+    "https://reuse.software/faq/",
+    "https://spdx.org/licenses/MIT.html",
+    "https://spdx.org/licenses/ISC.html",
+    "https://www.apache.org/licenses/LICENSE-2.0.html"
+  ],
+  "packages": {
+    "marks-pane": {
+      "version": "1.0.9",
+      "declaredLicense": "MIT",
+      "author": "Fred Chasen",
+      "attribution": "Fred Chasen; original marks project by Nick Stenning",
+      "sources": [
+        "https://github.com/fchasen/marks/blob/master/package.json",
+        "https://github.com/nickstenning/marks/blob/master/package.json"
+      ],
+      "referenceText": "licenses/SPDX-MIT.txt",
+      "review": "The distributed package declares MIT. The original marks package also declares MIT and names Nick Stenning. Preserve both author attributions and the standard MIT text. No missing copyright year is invented.",
+      "evidenceFiles": {
+        "licenses/original-marks-package.json": "3b048a653385c0d12da3460f43c348f22994b0c521a58178ae0280640c0f38a6"
+      }
+    },
+    "path-webpack": {
+      "version": "0.0.3",
+      "declaredLicense": "MIT",
+      "author": "fchasen@gmail.com",
+      "attribution": "fchasen@gmail.com; Node.js contributors and Joyent, Inc. (see retained Node.js v7 notice)",
+      "sources": [
+        "https://github.com/fchasen/path-webpack/blob/master/package.json",
+        "https://github.com/fchasen/path-webpack/blob/master/README.md",
+        "https://github.com/nodejs/node/blob/v7.0.0/LICENSE"
+      ],
+      "referenceText": "licenses/SPDX-MIT.txt",
+      "review": "The distributed package declares MIT. Include the standard MIT text, published author metadata, and the original Node.js/Joyent notice already retained separately. No missing copyright year is invented."
+    },
+    "react-reader": {
+      "version": "0.20.4",
+      "declaredLicense": "ISC",
+      "author": "Gerhard Sletten",
+      "attribution": "Gerhard Sletten",
+      "sources": [
+        "https://github.com/gerhardsletten/react-reader/blob/v0.20.4/package.json",
+        "https://github.com/gerhardsletten/react-reader/blob/v0.20.4/LICENSE"
+      ],
+      "referenceText": "licenses/SPDX-ISC.txt",
+      "suppliedLicenseSha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "review": "The exact version declares ISC in package metadata and ships Apache-2.0 LICENSE. Retain both, all supplied notices and author attribution, and satisfy the redistribution conditions of both. Do not claim an upstream OR/dual-license choice, relabel the supplied LICENSE, or invent an upstream copyright notice. Bundling does not modify this upstream package source."
+    }
+  }
+}

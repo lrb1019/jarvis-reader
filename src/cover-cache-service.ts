@@ -51,9 +51,6 @@ interface PersistedCoverCacheEntry {
   entry: BookCoverCacheEntry;
 }
 
-const CACHE_FOLDER = ".obsidian/plugins/jarvis-reader/cache/covers";
-const DATA_PATH = ".obsidian/plugins/jarvis-reader/data.json";
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
@@ -74,10 +71,10 @@ function hashPart(value: string, seed: number): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
-function getCoverCachePath(key: string): string {
+function getCoverCachePath(key: string, folder: string): string {
   const reversed = [...key].reverse().join("");
   const hash = `${hashPart(key, 2166136261)}${hashPart(key, 3335557771)}${hashPart(reversed, 2166136261)}${hashPart(reversed, 3335557771)}`;
-  return `${CACHE_FOLDER}/${hash}.json`;
+  return `${folder}/${hash}.json`;
 }
 
 async function ensureFolder(adapter: CoverCacheAdapter, folder: string): Promise<void> {
@@ -92,8 +89,15 @@ export class CoverCacheService {
   private readonly adapter: CoverCacheAdapter;
   private cache: BookCoverCache = {};
 
-  constructor(adapter: CoverCacheAdapter) {
+  private readonly pluginRoot: string;
+  private readonly cacheFolder: string;
+  private readonly dataPath: string;
+
+  constructor(adapter: CoverCacheAdapter, pluginRoot: string) {
     this.adapter = adapter;
+    this.pluginRoot = pluginRoot;
+    this.cacheFolder = `${pluginRoot}/cache/covers`;
+    this.dataPath = `${pluginRoot}/data.json`;
   }
 
   snapshot(): BookCoverCache {
@@ -102,8 +106,8 @@ export class CoverCacheService {
 
   async load(): Promise<BookCoverCache> {
     this.cache = {};
-    if (!await this.adapter.exists(CACHE_FOLDER)) return this.snapshot();
-    const listing = await this.adapter.list(CACHE_FOLDER);
+    if (!await this.adapter.exists(this.cacheFolder)) return this.snapshot();
+    const listing = await this.adapter.list(this.cacheFolder);
     for (const path of listing.files.filter((file) => file.endsWith(".json"))) {
       try {
         const parsed = parseEntry(JSON.parse(await this.adapter.read(path)));
@@ -117,8 +121,8 @@ export class CoverCacheService {
 
   async save(key: string, entry: BookCoverCacheEntry): Promise<void> {
     if (!key) throw new Error("封面缓存缺少书籍标识。");
-    await ensureFolder(this.adapter, CACHE_FOLDER);
-    const path = getCoverCachePath(key);
+    await ensureFolder(this.adapter, this.cacheFolder);
+    const path = getCoverCachePath(key, this.cacheFolder);
     const existing = await this.readPersisted(path);
     if (existing && existing.key !== key) throw new Error("封面缓存键发生哈希冲突，已停止写入。");
     const payload: PersistedCoverCacheEntry = { version: 1, key, entry };
@@ -137,10 +141,10 @@ export class CoverCacheService {
   async migrateLegacy(legacy: BookCoverCache): Promise<string | null> {
     const entries = Object.entries(legacy || {});
     if (!entries.length) return null;
-    const backupRoot = `.obsidian/plugins/jarvis-reader/backups/migrations/${new Date().toISOString().replace(/[:.]/g, "-")}`;
-    if (await this.adapter.exists(DATA_PATH)) {
+    const backupRoot = `${this.pluginRoot}/backups/migrations/${new Date().toISOString().replace(/[:.]/g, "-")}`;
+    if (await this.adapter.exists(this.dataPath)) {
       await ensureFolder(this.adapter, backupRoot);
-      await this.adapter.write(`${backupRoot}/data.json`, await this.adapter.read(DATA_PATH));
+      await this.adapter.write(`${backupRoot}/data.json`, await this.adapter.read(this.dataPath));
     }
     for (const [key, legacyEntry] of entries) {
       const current = this.cache[key];
@@ -156,7 +160,7 @@ export class CoverCacheService {
     let removed = 0;
     for (const key of Object.keys(this.cache)) {
       if (valid.has(key)) continue;
-      const path = getCoverCachePath(key);
+      const path = getCoverCachePath(key, this.cacheFolder);
       if (await this.adapter.exists(path)) await this.adapter.remove(path);
       delete this.cache[key];
       removed += 1;

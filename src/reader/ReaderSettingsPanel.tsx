@@ -10,9 +10,10 @@ export interface ReaderSettingsAccess {
 }
 
 function RangeSetting({ label, value, limits, busy, change, format, icon }: { icon: string; label: string; value: number; limits: ReaderNumberLimits; busy: boolean; change: (value: number) => void; format: (value: number) => string }) {
+  const labelId = React.useId();
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft(value), [value]);
-  return <label className="jarvis-reader-settings-range"><span className="jarvis-reader-settings-range-label">{label}</span><span className="jarvis-reader-settings-range-control"><span aria-hidden="true" className="jarvis-reader-settings-range-icon" dangerouslySetInnerHTML={{ __html: getIcon(icon)?.outerHTML || "" }} /><input aria-label={label} type="range" min={limits.min} max={limits.max} step={limits.step} value={draft} aria-busy={busy}
+  return <label className="jarvis-reader-settings-range"><span id={labelId} className="jarvis-reader-settings-range-label">{label}</span><span className="jarvis-reader-settings-range-control"><span aria-hidden="true" className="jarvis-reader-settings-range-icon" dangerouslySetInnerHTML={{ __html: getIcon(icon)?.outerHTML || "" }} /><input aria-labelledby={labelId} type="range" min={limits.min} max={limits.max} step={limits.step} value={draft} aria-busy={busy}
     onChange={e => setDraft(Number(e.currentTarget.value))}
     onPointerUp={e => change(Number(e.currentTarget.value))}
     onKeyUp={e => { if (e.key.startsWith("Arrow") || ["Home", "End", "PageUp", "PageDown"].includes(e.key)) change(Number(e.currentTarget.value)); }} /><output>{format(draft)}</output></span></label>;
@@ -22,9 +23,10 @@ function IconChoice({ label, value, options, disabled, change }: {
   label: string; value: string; options: ReadonlyArray<{ value: string; label: string; icon: string }>;
   disabled: boolean; change: (value: string) => void;
 }) {
-  return <div className="jarvis-reader-settings-choice" role="group" aria-label={label}>
-    <span>{label}</span><div className="jarvis-reader-settings-icon-options">
-      {options.map(option => <button key={option.value} type="button" aria-label={option.label} title={option.label}
+  const labelId = React.useId();
+  return <div className="jarvis-reader-settings-choice" role="group" aria-labelledby={labelId}>
+    <span id={labelId}>{label}</span><div className="jarvis-reader-settings-icon-options">
+      {options.map(option => <button key={option.value} type="button" aria-label={option.label}
         aria-pressed={value === option.value} disabled={disabled} onClick={() => change(option.value)}
         dangerouslySetInnerHTML={{ __html: getIcon(option.icon)?.outerHTML || "" }} />)}
     </div>
@@ -74,9 +76,9 @@ export function ReaderSettingsPanel({ getPreferences, onPreferencesChange, onClo
     catch { setError("阅读设置保存失败，请重试。"); }
     finally { setBusy(false); }
   };
-  return <div ref={panelRef} id={id} role="dialog" aria-label="阅读设置" aria-busy={busy} className="jarvis-reader-settings-panel"
+  return <div ref={panelRef} id={id} role="dialog" aria-labelledby={`${id}-title`} aria-busy={busy} className="jarvis-reader-settings-panel"
     onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()} onWheel={e => e.stopPropagation()}>
-    <header><strong>阅读设置</strong><button aria-label="关闭阅读设置" onClick={onClose}>×</button></header>
+    <header><strong id={`${id}-title`}>阅读设置</strong><button aria-label="关闭阅读设置" onClick={onClose}>×</button></header>
     <fieldset className="jarvis-reader-settings-group"><legend>文字排版</legend><div className="jarvis-reader-settings-group-body">
       <RangeSetting icon="type" label="字号" value={values.readerZoom} limits={READER_ZOOM_LIMITS} busy={busy} format={value => `${Math.round(value * 100)}%`} change={value => void change({ readerZoom: value })} />
       <RangeSetting icon="list" label="行距" value={values.readerLineHeight} limits={READER_LINE_HEIGHT_LIMITS} busy={busy} format={value => value.toFixed(2)} change={value => void change({ readerLineHeight: value })} />
@@ -99,7 +101,7 @@ export function ReaderSettingsPanel({ getPreferences, onPreferencesChange, onClo
         { value: "scroll", label: "滚动阅读", icon: "scroll-text" },
       ]} change={value => void change({ scrolledView: value === "scroll" })} />
     </div></fieldset>
-    <button className="jarvis-reader-settings-reset" disabled={busy} title="只恢复阅读排版与模式，保留阅读进度、书签和笔记。" onClick={() => void change({ ...DEFAULT_READER_PREFERENCES })}>恢复阅读默认值</button>
+    <button className="jarvis-reader-settings-reset" disabled={busy} aria-label="恢复阅读默认值：只恢复阅读排版与模式，保留阅读进度、书签和笔记。" onClick={() => void change({ ...DEFAULT_READER_PREFERENCES })}>恢复阅读默认值</button>
     {error && <p role="alert">{error}</p>}
   </div>;
 }

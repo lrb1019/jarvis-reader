@@ -2,6 +2,7 @@
 // Translation API functions: prompt building, response parsing, structured display, API calls
 
 import { requestUrl } from "obsidian";
+import { OfflineDictionaryError } from "./dictionary-service";
 import {
   normalizeWordSelection,
   getTranslationSelectionType,
@@ -562,7 +563,11 @@ export async function translateSelectionWithApi(settings: any = {}, selectedText
     throw new Error("翻译响应缺少 display 字段。");
   }
   if (selectionType === "word") {
-    const localMeta = await lookupLocalDictionary(settings, selectedText, app);
+    // An explicit AI request must remain usable without an installed offline dictionary.
+    const localMeta = await lookupLocalDictionary(settings, selectedText, app).catch(error => {
+      if (error instanceof OfflineDictionaryError) return null;
+      throw error;
+    });
     if (localMeta) {
       if (localMeta.tags) result.tags = localMeta.tags;
       if (localMeta.collins) result.collins = localMeta.collins;

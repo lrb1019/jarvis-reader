@@ -204,7 +204,7 @@ export class HighlightsPanelController {
     const hasFilters = this.typeFilter !== "all" || this.currentChapterOnly || this.sortMode !== "chapter";
     const toggle = searchRow.createEl("button", {
       cls: `jarvis-reader-highlights-filter-toggle clickable-icon${hasFilters ? " is-active" : ""}`,
-      attr: { "aria-label": "筛选与排序", "aria-expanded": String(Boolean(this.filterMenu)), "aria-haspopup": "menu", title: "筛选与排序" }
+      attr: { "aria-label": "筛选与排序", "aria-expanded": String(Boolean(this.filterMenu)), "aria-haspopup": "menu" }
     });
     setIcon(toggle, "sliders-horizontal");
     toggle.onclick = () => {

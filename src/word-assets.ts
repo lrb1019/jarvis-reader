@@ -1,6 +1,7 @@
 // Extracted from main.js L47630–48235 — word-asset constants and functions
 
 import type { TFile, App } from "obsidian";
+import { getOfflineDictionaryService } from "./dictionary-service.ts";
 import {
   normalizeVaultPath,
   joinVaultPath,
@@ -32,7 +33,6 @@ export function getLightWordAsset<T extends object | null | undefined>(asset: T)
 export const JARVIS_WORD_NOTE_START = "<!-- jarvis-reader-word:start -->";
 export const JARVIS_WORD_NOTE_END = "<!-- jarvis-reader-word:end -->";
 export const TRANSLATION_PROVIDER_OPTIONS = ["openai-compatible", "anthropic", "gemini", "deepseek", "zhipu", "qwen", "moonshot", "minimax", "custom"];
-const BUILTIN_DICTIONARY_FOLDER = ".obsidian/plugins/jarvis-reader/dictionaries/ecdict";
 
 export const DEFAULT_TRANSLATION_PROMPT = `你是 Obsidian 英语翻译与词卡生成器。
 
@@ -70,7 +70,6 @@ export const DEFAULT_WORD_AUDIO_TEMPLATE = "https://dict.youdao.com/dictvoice?au
 
 // --- Module-level cache ---
 
-const LOCAL_DICTIONARY_CACHE: Map<string, any> = new Map();
 
 // --- Functions ---
 
@@ -145,26 +144,6 @@ function getExperimentalTranslationSettings(settings: any = {}): {
     enabled: experimental.enabled === true,
     localDictionaryEnabled: true,
   };
-}
-
-function getBuiltinDictionaryShardPath(word: string): string {
-  const first = String(word || "").trim().charAt(0).toLowerCase();
-  const shard = /^[a-z]$/.test(first) ? first : "_";
-  return `${BUILTIN_DICTIONARY_FOLDER}/${shard}.json`;
-}
-
-async function readJsonFromVault(app: App, path: string): Promise<any> {
-  const adapter = app && app.vault ? app.vault.adapter : null;
-  if (!adapter || typeof adapter.exists !== "function" || typeof adapter.read !== "function")
-    return null;
-  const normalizedPath = normalizeVaultPath(path || "");
-  if (!normalizedPath || !await adapter.exists(normalizedPath))
-    return null;
-  if (LOCAL_DICTIONARY_CACHE.has(normalizedPath))
-    return LOCAL_DICTIONARY_CACHE.get(normalizedPath);
-  const payload = JSON.parse(await adapter.read(normalizedPath));
-  LOCAL_DICTIONARY_CACHE.set(normalizedPath, payload);
-  return payload;
 }
 
 export function getDictionaryLookupKeys(selectedText: string): string[] {
@@ -253,7 +232,7 @@ export async function lookupLocalDictionary(settings: any = {}, selectedText: st
   if (!keys.length)
     return null;
   for (const key of keys) {
-    const dictionary = await readJsonFromVault(app, getBuiltinDictionaryShardPath(key));
+    const dictionary = await getOfflineDictionaryService(app).readShard(key.charAt(0).toLowerCase());
     if (!dictionary || typeof dictionary !== "object")
       continue;
     const entry = dictionary[key] || dictionary[key.toLowerCase()] || dictionary[key.toUpperCase()];

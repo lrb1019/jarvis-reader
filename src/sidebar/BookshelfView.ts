@@ -105,7 +105,6 @@ export class JarvisReaderBookshelfView extends ItemView {
       cls: active ? "jarvis-reader-sidebar-tab is-active" : "jarvis-reader-sidebar-tab",
       attr: {
         "aria-label": label,
-        title: label,
         "aria-pressed": String(active)
       }
     });

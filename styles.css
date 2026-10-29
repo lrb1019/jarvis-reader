@@ -753,7 +753,7 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 }
 
 .jarvis-reader-word-lemma {
-  color: var(--text-accent, #c62828);
+  color: var(--text-normal);
   font: 800 1.08rem / 1.2 var(--font-interface);
 }
 
@@ -790,7 +790,7 @@ textarea.jarvis-reader-highlight-input:not(.jarvis-reader-highlight-input-shell 
 
 /* The translation panel shows one playable term; its raw selection is not repeated. */
 .jarvis-reader-word-translate-lemma {
-  color: var(--text-accent, #c62828) !important;
+  color: var(--text-normal) !important;
   font-weight: 800 !important;
 }
 
@@ -4640,7 +4640,13 @@ form.jarvis-book-editor .metadata-row { margin-bottom: 6px; }
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
+.jarvis-settings-tab-icon {
+  display: inline-flex;
+  --icon-size: var(--icon-xs);
+}
+
 .jarvis-settings-tabs-container .jarvis-settings-tab {
+  gap: var(--size-4-1);
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;

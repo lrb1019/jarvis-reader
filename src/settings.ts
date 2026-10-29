@@ -1,10 +1,12 @@
-import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App } from "obsidian";
+import { PluginSettingTab, Setting, FuzzySuggestModal, TFolder, Notice, App, setIcon } from "obsidian";
 import { DEFAULT_BOOK_NOTE_TEMPLATE } from "./book-note-template";
 import { DEFAULT_STORAGE_FOLDERS, type StorageFolders } from "./storage-folders";
 import { DEFAULT_TRANSLATION_PROMPT, DEFAULT_WORD_AUDIO_TEMPLATE, TRANSLATION_PROMPT_HELP_TEXT } from "./word-assets";
 import { normalizeTranslationProvider, getTranslationProviderDefaults, validateTranslationPromptJsonTemplate, translateSelectionWithApi } from "./translation";
 import type JarvisReaderPlugin from "./main";
 import { clampReaderZoom, clampReaderLineHeight, READER_ZOOM_LIMITS, READER_LINE_HEIGHT_LIMITS, READER_WIDTH_LIMITS } from "./reader-settings";
+import { getOfflineDictionaryService } from "./dictionary-service";
+import { DICTIONARY_PACKAGE_LIMIT } from "./dictionary-package";
 
 export const DEFAULT_SETTINGS = {
   readerLetterSpacing: 0,
@@ -73,6 +75,7 @@ class JarvisReaderFolderSuggestModal extends FuzzySuggestModal<string> {
 export class JarvisReaderSettingTab extends PluginSettingTab {
   plugin: JarvisReaderPlugin;
   activeTab: string = "storage";
+  private dictionaryImporting = false;
   
   constructor(app: App, plugin: JarvisReaderPlugin) {
     super(app, plugin);
@@ -89,34 +92,28 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     headerDiv.style.gap = "15px";
     headerDiv.style.marginBottom = "20px";
     
-    const titleEl = headerDiv.createEl("h2", { text: "Jarvis Reader 设置", cls: "jarvis-reader-settings-title" });
-    titleEl.style.fontSize = "1.25em";
-    titleEl.style.fontWeight = "600";
-    titleEl.style.margin = "0";
-    titleEl.style.color = "var(--text-normal)";
-    
     const tabsContainer = headerDiv.createDiv("jarvis-settings-tabs-container");
     
     const tabs = [
       { 
         id: "storage", 
         label: "笔记与文件",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path></svg>`
+        icon: "folder"
       },
       { 
         id: "translation", 
         label: "翻译服务",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`
+        icon: "sparkles"
       },
       { 
         id: "words", 
-        label: "词卡标记与发音",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`
+        label: "词典与词卡",
+        icon: "volume-2"
       },
       { 
         id: "appearance", 
         label: "阅读外观",
-        icon: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; flex-shrink: 0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`
+        icon: "panels-top-left"
       },
     ];
 
@@ -125,7 +122,8 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
         cls: "jarvis-settings-tab",
         attr: { type: "button", "aria-current": this.activeTab === tab.id ? "page" : "false" }
       });
-      tabEl.innerHTML = tab.icon + tab.label;
+      setIcon(tabEl.createSpan({ cls: "jarvis-settings-tab-icon", attr: { "aria-hidden": "true" } }), tab.icon);
+      tabEl.createSpan({ text: tab.label });
       tabEl.addEventListener("click", () => {
         this.activeTab = tab.id;
         this.display();
@@ -289,6 +287,7 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     }
 
     if (this.activeTab === "words") {
+      this.renderDictionarySetting(contentDiv);
       new Setting(contentDiv).setName("已保存词卡的标记").setHeading();
       new Setting(contentDiv).setName("在书中标记已保存的词卡").setDesc("开启后，阅读器会标记已保存且能在当前书中定位的单词和短语；关闭后仍保留词卡记录。").addToggle((toggle) => toggle.setValue(this.plugin.settings.enableAutoHighlight !== false).onChange(async (value) => {
         this.plugin.settings.enableAutoHighlight = value;
@@ -359,6 +358,49 @@ export class JarvisReaderSettingTab extends PluginSettingTab {
     }
     
   }
+  private renderDictionarySetting(containerEl: HTMLElement): void {
+    const service = getOfflineDictionaryService(this.app);
+    new Setting(containerEl).setName("离线词典").setHeading();
+    const row = new Setting(containerEl).setName("ECDICT").setDesc(this.dictionaryImporting ? "正在导入词典…" : "正在检查安装状态…");
+    row.descEl.setAttribute("role", "status");
+    const refresh = async () => {
+      const status = await service.status(true);
+      if (row.settingEl.isConnected && !this.dictionaryImporting) row.setDesc(status.state === "ready"
+        ? `已安装 · ${status.version}。查词无需联网，插件更新时保留。`
+        : status.message);
+    };
+    void refresh();
+    row.addButton(button => button.setButtonText("导入词典包").setDisabled(this.dictionaryImporting).onClick(() => {
+      const input = row.controlEl.createEl("input", { type: "file", attr: { accept: ".zip,application/zip", "aria-label": "选择 ECDICT 词典包" } });
+      input.hidden = true;
+      input.addEventListener("cancel", () => input.remove(), { once: true });
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        input.remove();
+        if (!file || this.dictionaryImporting) return;
+        if (file.size > DICTIONARY_PACKAGE_LIMIT) { new Notice("请选择不超过 64 MB 的词典包。"); return; }
+        this.dictionaryImporting = true;
+        button.setDisabled(true);
+        row.setDesc("正在校验并导入，原词典会保留至导入成功。");
+        try {
+          const version = await service.importPackage(await file.arrayBuffer(), done => row.setDesc(`正在校验并导入 ${done}/26…`));
+          new Notice(`离线词典已安装：${version}`);
+        } catch (error) {
+          new Notice(error instanceof Error ? error.message : "词典导入失败，原词典未替换。");
+        } finally {
+          this.dictionaryImporting = false;
+          button.setDisabled(false);
+          await refresh();
+        }
+      };
+      input.click();
+    }));
+    const help = containerEl.createEl("p", { cls: "setting-item-description" });
+    help.appendText("从 ");
+    help.createEl("a", { text: "GitHub 发布页", href: "https://github.com/lrb1019/jarvis-reader/releases", attr: { target: "_blank", rel: "noopener noreferrer" } });
+    help.appendText(" 下载 jarvis-reader-ecdict-*.zip 后导入。只在你选择文件后安装，不自动下载；已有词典可继续使用。");
+  }
+
   private createColorPicker(containerEl: HTMLElement, name: string, desc: string, key: keyof typeof DEFAULT_SETTINGS.highlightColors): void {
     new Setting(containerEl).setName(name).setDesc(desc).addColorPicker((picker) => picker
       .setValue(this.plugin.settings.highlightColors?.[key] || DEFAULT_SETTINGS.highlightColors[key])

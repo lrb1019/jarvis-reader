@@ -24,7 +24,10 @@
     "src/reader/ReaderSideControls.tsx",
     "src/library/book-note-projection.ts",
     "src/settings-save-queue.ts",
-    "src/word-card-display.ts"
+    "src/word-card-display.ts",
+    "src/dictionary-package.ts",
+    "src/dictionary-service.ts",
+    "src/jszip.d.ts"
   ],
   "include": []
 }

@@ -14,6 +14,8 @@ logs/
 backups/
 cache/
 pending/
+dictionaries/import-*/
+dictionaries/installed.json*
 .local-secrets/
 
 # 本地项目管理文件（不上传 GitHub）
