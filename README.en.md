@@ -31,7 +31,7 @@ Download the matching plugin ZIP from [Releases](https://github.com/lrb1019/jarv
 - **Published 1.4.5:** the full ZIP contains runtime files, `dictionaries/ecdict/` and third-party notices.
 - **1.4.6 and newer:** the plugin ZIP contains `main.js`, `manifest.json`, `styles.css`, `LICENSE` and `THIRD_PARTY_NOTICES.md`. The dictionary is a separate ZIP. The three runtime files alone support reading and notes; offline lookup needs dictionary data.
 
-Before upgrading, back up notes and plugin data and read the relevant release notes. Replace program files while retaining `data.json`, `index/`, `cache/`, `logs/`, `pending/`, `backups/`, the entire `dictionaries/` folder and user notes. Do not delete the whole plugin folder first. Full compatibility with custom Obsidian configuration directories remains unverified.
+Before upgrading, back up notes and plugin data and read the relevant release notes. Replace program files while retaining `data.json`, `index/`, `cache/`, `logs/`, `pending/`, `backups/`, the entire `dictionaries/` folder and user notes. Do not delete the whole plugin folder first. Reload the plugin or restart Obsidian after upgrading. Full compatibility with custom Obsidian configuration directories remains unverified.
 
 ### Separate dictionary installation (unreleased)
 

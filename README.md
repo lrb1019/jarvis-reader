@@ -31,7 +31,7 @@
 - **正式 1.4.5**：完整 ZIP 包含运行文件、`dictionaries/ecdict/` 和第三方声明。
 - **1.4.6 及更新版本**：插件 ZIP 包含 `main.js`、`manifest.json`、`styles.css`、`LICENSE`、`THIRD_PARTY_NOTICES.md`；词典改为独立 ZIP。三个运行文件也可启动阅读和笔记功能，离线查词另需词典。
 
-升级前备份笔记与插件数据，阅读对应版本的发布说明。替换程序文件时保留 `data.json`、`index/`、`cache/`、`logs/`、`pending/`、`backups/`、整个 `dictionaries/` 及用户笔记。不要先删除整个插件目录。自定义 Obsidian 配置目录的完整兼容性尚未验收。
+升级前备份笔记与插件数据，阅读对应版本的发布说明。替换程序文件时保留 `data.json`、`index/`、`cache/`、`logs/`、`pending/`、`backups/`、整个 `dictionaries/` 及用户笔记。不要先删除整个插件目录。更新后重载插件或重启 Obsidian。自定义 Obsidian 配置目录的完整兼容性尚未验收。
 
 ### 独立词典安装（未发布开发版）
 
