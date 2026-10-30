@@ -28,14 +28,14 @@ Add `lrb1019/jarvis-reader` in BRAT to install a published GitHub Release and ch
 
 Download the matching plugin ZIP from [Releases](https://github.com/lrb1019/jarvis-reader/releases). Extract it directly into your vault's `.obsidian/plugins/jarvis-reader/`, then enable it under Settings → Community plugins. Do not add an extra nested folder.
 
-- **Published 1.4.5:** the full ZIP contains runtime files, `dictionaries/ecdict/` and third-party notices.
+- **1.4.5:** the full ZIP contains runtime files, `dictionaries/ecdict/` and third-party notices.
 - **1.4.6 and newer:** the plugin ZIP contains `main.js`, `manifest.json`, `styles.css`, `LICENSE` and `THIRD_PARTY_NOTICES.md`. The dictionary is a separate ZIP. The three runtime files alone support reading and notes; offline lookup needs dictionary data.
 
 Before upgrading, back up notes and plugin data and read the relevant release notes. Replace program files while retaining `data.json`, `index/`, `cache/`, `logs/`, `pending/`, `backups/`, the entire `dictionaries/` folder and user notes. Do not delete the whole plugin folder first. Reload the plugin or restart Obsidian after upgrading. Full compatibility with custom Obsidian configuration directories remains unverified.
 
-### Separate dictionary installation (unreleased)
+### Separate dictionary installation
 
-1. Download `jarvis-reader-ecdict-*.zip` from this project's official Release without extracting it. This asset will be provided with a future release.
+1. Download `jarvis-reader-ecdict-*.zip` from this project's official Release without extracting it.
 2. In Jarvis Reader settings, choose **词典与词卡 → 导入词典包** and select the ZIP.
 3. Wait until all 26 shards have been validated and saved and the status shows **已安装**.
 
@@ -49,7 +49,7 @@ The ZIP is approximately 18 MB and the extracted data approximately 90 MB. Impor
 2. Double-click a book. Bookmark, book-note and reading-settings buttons remain at the top right.
 3. Select text and right-click to highlight, reflect or look up a word offline.
 4. Click an annotation with reflections to open its card, append thoughts or link existing content with `[[wikilinks]]`. Each reflection's menu provides editing and deletion.
-5. Promote a useful fragment to a knowledge note and use its source links to return to the reading note or EPUB. The lightbulb icon and updated tooltips are unreleased interface changes.
+5. Promote a useful fragment to a knowledge note and use its source links to return to the reading note or EPUB.
 
 New notes use Markdown templates; existing notes are not rewritten in bulk. Normal in-vault renames/moves are handled by association updates, but deleted files, moves outside the vault and historical broken links cannot be guaranteed to recover automatically. Preserve stable block IDs for source positioning.
 
@@ -89,7 +89,7 @@ Markdown is authoritative for note content; it cannot reconstruct lost EPUB CFI 
 ## Compatibility and limitations
 
 - Version 1.4.6 currently supports desktop Obsidian `1.14.5` or newer. Runtime acceptance uses macOS `1.14.5`. Mobile host testing is pending, so this version temporarily disables mobile installation; previously published releases are unchanged.
-- Complete theme coverage, clean marketplace installations, every BRAT upgrade path, real sync conflicts and forced process termination are not all verified. See [current status and risks](./项目管理/04%20接续说明.md) (Chinese).
+- Clean installation with the three runtime files and a BRAT upgrade from `1.4.5` to `1.4.6` have been verified. Complete theme coverage, marketplace installation, other BRAT upgrade paths, real sync conflicts and forced process termination have not all been tested. See [release notes](./docs/releases/1.4.6.md) (Chinese).
 - Optional Claudian Zen-mode layout adaptation depends on internal CSS and can affect other panes or cover bottom text. Claudian is not required for reading.
 - Distribution review and complete license texts are in [third-party notices](./THIRD_PARTY_NOTICES.md). The react-reader metadata/file discrepancy is disclosed, and both ISC and Apache-2.0 terms are retained; no upstream dual-license choice is asserted. This project has not been submitted to or approved for the community directory.
 
@@ -105,7 +105,7 @@ npm run package:release
 
 Before publishing, run `npm run submission:check` to verify metadata, production runtime and carried notices. Release CI runs the same gate. Passing local checks does not mean approval by Obsidian.
 
-After dependency changes, run `npm run licenses:generate` and review the diff. The license check verifies inventory consistency, not resolution of upstream permission questions. Verification covers standard/strict-core type checks, tests, a build and bundle syntax. Runtime code is generated from `src/`. Plugin and dictionary ZIPs and checksums are written to `release/`, excluding user data.
+After dependency changes, run `npm run licenses:generate` and review the diff. The license check compares dependencies, review records and bundled notices; it does not replace a review of licensing and redistribution requirements. Verification covers standard/strict-core type checks, tests, a build and bundle syntax. Runtime code is generated from `src/`. Plugin and dictionary ZIPs and checksums are written to `release/`, excluding user data.
 
 Report issues through [GitHub Issues](https://github.com/lrb1019/jarvis-reader/issues), including plugin/Obsidian versions, OS, theme, reproduction steps and redacted logs. Do not publish keys, private books or entire vaults.
 

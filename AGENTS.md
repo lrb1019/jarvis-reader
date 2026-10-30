@@ -20,7 +20,7 @@ English lookup, AI translation, vocabulary collection, review, statistics, and t
 
 ## Source Of Truth
 
-Before substantial work, read these documents in order:
+Before substantial work, read these local documents in order when they exist:
 
 1. `项目管理/00 项目总览.md`
 2. `项目管理/01 项目规则.md`
@@ -31,6 +31,8 @@ Then inspect:
 4. Current Git status and recent commits.
 5. Current source code, callers, data paths, tests, and build scripts.
 6. `项目管理/02 后续想法.md` when choosing the next task.
+
+The `项目管理/` directory and its legacy sync script are local-only and must not be staged or synchronized to GitHub. Public clones may not contain these records; in that case, use this protocol, README, public release notes, current Git state, source and tests. Do not recreate or fetch the internal records merely to satisfy this reading list.
 
 Management documents define intended boundaries. Current code and runtime evidence define actual behavior. When they conflict, diagnose the conflict instead of silently choosing one.
 
@@ -300,7 +302,7 @@ Relevant checks include:
 
 ### Step 7: Documentation
 
-After a completed change:
+After a completed change, update the following local records when available; do not include them in Git commits:
 
 - update `项目管理/03 改动日志.md`
 - update current status, risks, and next task in `项目管理/04 接续说明.md`
@@ -411,9 +413,7 @@ Place durable rules in project rules, completed facts in the changelog, and curr
 - Validate both clean-vault installation and BRAT upgrade.
 - Fix failed releases with a new patch version instead of moving a public tag.
 
-Follow:
-
-`项目管理/06 发布与同步流程.md`
+Follow the local `项目管理/06 发布与同步流程.md` when available. In public clones, use the rules above and the checked-in release workflow.
 
 ## Communication
 
